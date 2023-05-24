@@ -6,55 +6,54 @@
  */
 
 import * as web3 from '@solana/web3.js'
-import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
-import { Attribute, attributeBeet } from './Attribute'
+import * as beet from '@metaplex-foundation/beet'
 
 /**
- * Arguments used to create {@link MetadataNft}
+ * Arguments used to create {@link RoyaltyShare}
  * @category Accounts
  * @category generated
  */
-export type MetadataNftArgs = {
-  attributes: Attribute[]
-  signers: web3.PublicKey[]
+export type RoyaltyShareArgs = {
+  address: web3.PublicKey
+  share: number
 }
 
-export const metadataNftDiscriminator = [76, 147, 73, 161, 232, 241, 218, 113]
+export const royaltyShareDiscriminator = [29, 210, 207, 200, 74, 244, 84, 37]
 /**
- * Holds the data for the {@link MetadataNft} Account and provides de/serialization
+ * Holds the data for the {@link RoyaltyShare} Account and provides de/serialization
  * functionality for that data
  *
  * @category Accounts
  * @category generated
  */
-export class MetadataNft implements MetadataNftArgs {
+export class RoyaltyShare implements RoyaltyShareArgs {
   private constructor(
-    readonly attributes: Attribute[],
-    readonly signers: web3.PublicKey[]
+    readonly address: web3.PublicKey,
+    readonly share: number
   ) {}
 
   /**
-   * Creates a {@link MetadataNft} instance from the provided args.
+   * Creates a {@link RoyaltyShare} instance from the provided args.
    */
-  static fromArgs(args: MetadataNftArgs) {
-    return new MetadataNft(args.attributes, args.signers)
+  static fromArgs(args: RoyaltyShareArgs) {
+    return new RoyaltyShare(args.address, args.share)
   }
 
   /**
-   * Deserializes the {@link MetadataNft} from the data of the provided {@link web3.AccountInfo}.
+   * Deserializes the {@link RoyaltyShare} from the data of the provided {@link web3.AccountInfo}.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
     offset = 0
-  ): [MetadataNft, number] {
-    return MetadataNft.deserialize(accountInfo.data, offset)
+  ): [RoyaltyShare, number] {
+    return RoyaltyShare.deserialize(accountInfo.data, offset)
   }
 
   /**
    * Retrieves the account info from the provided address and deserializes
-   * the {@link MetadataNft} from its data.
+   * the {@link RoyaltyShare} from its data.
    *
    * @throws Error if no account info is found at the address or if deserialization fails
    */
@@ -62,15 +61,15 @@ export class MetadataNft implements MetadataNftArgs {
     connection: web3.Connection,
     address: web3.PublicKey,
     commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
-  ): Promise<MetadataNft> {
+  ): Promise<RoyaltyShare> {
     const accountInfo = await connection.getAccountInfo(
       address,
       commitmentOrConfig
     )
     if (accountInfo == null) {
-      throw new Error(`Unable to find MetadataNft account at ${address}`)
+      throw new Error(`Unable to find RoyaltyShare account at ${address}`)
     }
-    return MetadataNft.fromAccountInfo(accountInfo, 0)[0]
+    return RoyaltyShare.fromAccountInfo(accountInfo, 0)[0]
   }
 
   /**
@@ -84,70 +83,68 @@ export class MetadataNft implements MetadataNftArgs {
       'L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh'
     )
   ) {
-    return beetSolana.GpaBuilder.fromStruct(programId, metadataNftBeet)
+    return beetSolana.GpaBuilder.fromStruct(programId, royaltyShareBeet)
   }
 
   /**
-   * Deserializes the {@link MetadataNft} from the provided data Buffer.
+   * Deserializes the {@link RoyaltyShare} from the provided data Buffer.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
-  static deserialize(buf: Buffer, offset = 0): [MetadataNft, number] {
-    return metadataNftBeet.deserialize(buf, offset)
+  static deserialize(buf: Buffer, offset = 0): [RoyaltyShare, number] {
+    return royaltyShareBeet.deserialize(buf, offset)
   }
 
   /**
-   * Serializes the {@link MetadataNft} into a Buffer.
+   * Serializes the {@link RoyaltyShare} into a Buffer.
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   serialize(): [Buffer, number] {
-    return metadataNftBeet.serialize({
-      accountDiscriminator: metadataNftDiscriminator,
+    return royaltyShareBeet.serialize({
+      accountDiscriminator: royaltyShareDiscriminator,
       ...this,
     })
   }
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link MetadataNft} for the provided args.
-   *
-   * @param args need to be provided since the byte size for this account
-   * depends on them
+   * {@link RoyaltyShare}
    */
-  static byteSize(args: MetadataNftArgs) {
-    const instance = MetadataNft.fromArgs(args)
-    return metadataNftBeet.toFixedFromValue({
-      accountDiscriminator: metadataNftDiscriminator,
-      ...instance,
-    }).byteSize
+  static get byteSize() {
+    return royaltyShareBeet.byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
-   * {@link MetadataNft} data from rent
+   * {@link RoyaltyShare} data from rent
    *
-   * @param args need to be provided since the byte size for this account
-   * depends on them
    * @param connection used to retrieve the rent exemption information
    */
   static async getMinimumBalanceForRentExemption(
-    args: MetadataNftArgs,
     connection: web3.Connection,
     commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      MetadataNft.byteSize(args),
+      RoyaltyShare.byteSize,
       commitment
     )
   }
 
   /**
-   * Returns a readable version of {@link MetadataNft} properties
+   * Determines if the provided {@link Buffer} has the correct byte size to
+   * hold {@link RoyaltyShare} data.
+   */
+  static hasCorrectByteSize(buf: Buffer, offset = 0) {
+    return buf.byteLength - offset === RoyaltyShare.byteSize
+  }
+
+  /**
+   * Returns a readable version of {@link RoyaltyShare} properties
    * and can be used to convert to JSON and/or logging
    */
   pretty() {
     return {
-      attributes: this.attributes,
-      signers: this.signers,
+      address: this.address.toBase58(),
+      share: this.share,
     }
   }
 }
@@ -156,17 +153,17 @@ export class MetadataNft implements MetadataNftArgs {
  * @category Accounts
  * @category generated
  */
-export const metadataNftBeet = new beet.FixableBeetStruct<
-  MetadataNft,
-  MetadataNftArgs & {
+export const royaltyShareBeet = new beet.BeetStruct<
+  RoyaltyShare,
+  RoyaltyShareArgs & {
     accountDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['attributes', beet.array(attributeBeet)],
-    ['signers', beet.array(beetSolana.publicKey)],
+    ['address', beetSolana.publicKey],
+    ['share', beet.u8],
   ],
-  MetadataNft.fromArgs,
-  'MetadataNft'
+  RoyaltyShare.fromArgs,
+  'RoyaltyShare'
 )
