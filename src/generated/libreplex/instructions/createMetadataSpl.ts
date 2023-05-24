@@ -10,55 +10,74 @@ import * as web3 from '@solana/web3.js'
 
 /**
  * @category Instructions
- * @category DeleteMetadata
+ * @category CreateMetadataSpl
  * @category generated
  */
-export const deleteMetadataStruct = new beet.BeetArgsStruct<{
-  instructionDiscriminator: number[] /* size: 8 */
-}>(
-  [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'DeleteMetadataInstructionArgs'
+export type CreateMetadataSplInstructionArgs = {
+  name: string
+  imageUrl: string
+  isMutable: boolean
+}
+/**
+ * @category Instructions
+ * @category CreateMetadataSpl
+ * @category generated
+ */
+export const createMetadataSplStruct = new beet.FixableBeetArgsStruct<
+  CreateMetadataSplInstructionArgs & {
+    instructionDiscriminator: number[] /* size: 8 */
+  }
+>(
+  [
+    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['name', beet.utf8String],
+    ['imageUrl', beet.utf8String],
+    ['isMutable', beet.bool],
+  ],
+  'CreateMetadataSplInstructionArgs'
 )
 /**
- * Accounts required by the _deleteMetadata_ instruction
+ * Accounts required by the _createMetadataSpl_ instruction
  *
  * @property [_writable_, **signer**] authority
  * @property [_writable_] metadata
  * @property [_writable_] collection
- * @property [] metadataOverride
  * @property [_writable_] mint
  * @category Instructions
- * @category DeleteMetadata
+ * @category CreateMetadataSpl
  * @category generated
  */
-export type DeleteMetadataInstructionAccounts = {
+export type CreateMetadataSplInstructionAccounts = {
   authority: web3.PublicKey
   metadata: web3.PublicKey
   collection: web3.PublicKey
-  metadataOverride: web3.PublicKey
   mint: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const deleteMetadataInstructionDiscriminator = [
-  7, 241, 181, 162, 214, 254, 84, 251,
+export const createMetadataSplInstructionDiscriminator = [
+  68, 70, 35, 80, 149, 253, 87, 106,
 ]
 
 /**
- * Creates a _DeleteMetadata_ instruction.
+ * Creates a _CreateMetadataSpl_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
+ * @param args to provide as instruction data to the program
+ *
  * @category Instructions
- * @category DeleteMetadata
+ * @category CreateMetadataSpl
  * @category generated
  */
-export function createDeleteMetadataInstruction(
-  accounts: DeleteMetadataInstructionAccounts,
+export function createCreateMetadataSplInstruction(
+  accounts: CreateMetadataSplInstructionAccounts,
+  args: CreateMetadataSplInstructionArgs,
   programId = new web3.PublicKey('L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh')
 ) {
-  const [data] = deleteMetadataStruct.serialize({
-    instructionDiscriminator: deleteMetadataInstructionDiscriminator,
+  const [data] = createMetadataSplStruct.serialize({
+    instructionDiscriminator: createMetadataSplInstructionDiscriminator,
+    ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
@@ -74,11 +93,6 @@ export function createDeleteMetadataInstruction(
     {
       pubkey: accounts.collection,
       isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.metadataOverride,
-      isWritable: false,
       isSigner: false,
     },
     {
