@@ -1,0 +1,19 @@
+[features]
+seeds = true
+skip-lint = false
+
+[programs.localnet]
+libreplex="L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/libreflex-deployer.json"
+
+[test]
+startup_wait = 100000
+
+[test.validator]
+url = "https://api.devnet.solana.com"

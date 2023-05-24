@@ -1,0 +1,20 @@
+{
+  "name": "@libreplex/metadata",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "private": true,
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "anchor build -p libreplex",
+    "libreplex:deploy:devnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex:deploy:mainnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
