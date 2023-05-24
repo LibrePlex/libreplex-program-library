@@ -5,21 +5,17 @@ use crate::{Metadata, NFT, MetadataNft, Collection};
 
 
 #[derive(Accounts)]
-pub struct CreateMetadataNft<'info> {
+pub struct VerifyCollection<'info> {
+    
+    /// collection authority or delegate
     #[account(mut)]
-    pub authority: Signer<'info>,
+    pub collection_authority: Signer<'info>,
 
-    #[account(mut,
-        constraint = metadata.authority == authority.key(),
-        seeds =[
-            NFT.as_ref(),
-            metadata.key().as_ref(),
-        ], 
-        bump)]
+    #[account(mut)]
     pub metadata_nft: Box<Account<'info, MetadataNft>>,
 
     #[account()]
-    pub metadata: Account<'info, Metadata>,
+    pub collection: Account<'info, Collection>,
 
     #[account()]
     pub mint: Account<'info, Mint>,

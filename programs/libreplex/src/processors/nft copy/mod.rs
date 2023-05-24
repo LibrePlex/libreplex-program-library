@@ -10,6 +10,3 @@ pub use delete_metadata_nft::*;
 
 pub mod validate_verified_creators;
 pub use validate_verified_creators::*;
-
-pub mod collection_verification;
-pub use collection_verification::*;
