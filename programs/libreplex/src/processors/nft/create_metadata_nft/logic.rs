@@ -1,20 +1,38 @@
 use anchor_lang::prelude::*;
 
-use crate::{check_bump, CreateMetadataNft, NFT, Creator, Attribute};
+use crate::{validate_verified_creators, Attribute, CollectionData, CreateMetadataNft, Creator};
 
-pub fn handle_create_metadata_nft(ctx: Context<CreateMetadataNft>, 
-    creators: Vec<Creator>,
+pub fn handle_create_metadata_nft(
+    ctx: Context<CreateMetadataNft>,
+    creators: Option<Vec<Creator>>,
     attributes: Vec<Attribute>,
     collection: Option<Pubkey>,
-    bump: u8) -> Result<()> {
-
-    check_bump(&NFT.to_owned(), &ctx.bumps, bump)?;
-
+) -> Result<()> {
+    let authority = &ctx.accounts.authority;
     let metadata_nft = &mut ctx.accounts.metadata_nft;
-    
-    metadata_nft.creators = creators;
+
     metadata_nft.attributes = attributes;
-    metadata_nft.collection = collection;
+    match creators {
+        Some(x) => {
+            validate_verified_creators(&vec![], &x, &authority.key())?;
+            metadata_nft.creators = Some(x);
+        }
+        None => {
+            metadata_nft.creators = None;
+        }
+    }
+
+    match collection {
+        Some(x) => {
+            metadata_nft.collection = Some(CollectionData {
+                address: x.key(),
+                verified: false,
+            });
+        }
+        None => {
+            metadata_nft.collection = None;
+        }
+    }
 
     Ok(())
 }

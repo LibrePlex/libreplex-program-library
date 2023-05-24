@@ -11,7 +11,12 @@ pub enum MetadataError {
     #[msg("Cannot remove verified creator")]
     CannotRemoveVerifiedCreator,
 
-
     #[msg("Cannot add verified creator")]
-    CannotAddVerifiedCreator
+    CannotAddVerifiedCreator,
+
+    #[msg("Cannot verify a collection when one is not set")]
+    NoCollectionSet,
+
+    #[msg("Incorrect collection authority")]
+    IncorrectCollectionAuthority
 }

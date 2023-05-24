@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 
-use crate::{Metadata, NFT, MetadataNft, Collection};
+use crate::{Metadata, NFT, MetadataNft};
 
 
 #[derive(Accounts)]

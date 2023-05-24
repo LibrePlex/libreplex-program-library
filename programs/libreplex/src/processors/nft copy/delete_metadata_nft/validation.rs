@@ -1,16 +1,17 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::Mint;
 
-use crate::{Metadata, NFT, MetadataNft, Collection};
+use crate::{Metadata, MetadataNft, NFT};
 
 
 #[derive(Accounts)]
-pub struct CreateMetadataNft<'info> {
+pub struct DeleteMetadataNft<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
     #[account(mut,
+        close = authority,
         constraint = metadata.authority == authority.key(),
+        constraint = metadata.is_mutable,
         seeds =[
             NFT.as_ref(),
             metadata.key().as_ref(),
@@ -21,10 +22,8 @@ pub struct CreateMetadataNft<'info> {
     #[account()]
     pub metadata: Account<'info, Metadata>,
 
-    #[account()]
-    pub mint: Account<'info, Mint>,
-
     pub system_program: Program<'info, System>,
     
 }
+
 

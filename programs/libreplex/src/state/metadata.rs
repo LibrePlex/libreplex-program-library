@@ -13,6 +13,28 @@ impl Creator {
     pub const SIZE: usize = 8 + 32 + 1 + 1;
 }
 
+
+#[account]
+pub struct Verification {
+    bump: u8
+}
+
+impl Verification {
+    pub const SIZE: usize = 8 + 32 + 1 + 1;
+}
+
+
+#[account]
+#[derive(Copy)]
+pub struct CollectionData {
+    pub address: Pubkey,
+    pub verified: bool,
+}
+
+impl CollectionData {
+    pub const SIZE: usize = 8 + 32 + 1;
+}
+
 #[account]
 pub struct Attribute {
     pub trait_type: String,
@@ -25,35 +47,38 @@ pub struct Metadata {
     pub mint: Pubkey,
     pub is_mutable: bool,
     pub bump: u8,
-    // this can we made dynamic w/ realloc
-    pub image_url: String, 
-    // could we reduce the size to say max 8 characters?
+    // first of the string fields as this 
+    // could be used for search
     pub symbol: String,
-    // this can we made dynamic w/ realloc and avoid the annoying padding
+    pub offchain_url: String, 
     pub name: String,
 }
 
 impl Metadata {
-    // fixed size for now. TODO: replace with base size 
-    pub const SIZE: usize = 8 + 32 + 32 + 1 + 1 + 36 + 36 + 36;
+    // base size only, the size is set at init / reallocated at update based on
+    // the lengths of the strings
+    pub const BASE_SIZE: usize = 8 + 32 + 32 + 1 + 1;
 }
 
 /* 
     MetadataNFT address creators and attributes to the base
     Metadata struct. These are not needed for all mints (such as SPL tokens)
     and hence we are keeping under a separate PDA
- */
-
-pub const MAX_CREATOR_COUNT: usize = 5; // conform to the existing standard for now.
-
+*/
 #[account]
 pub struct MetadataNft {
+    // Set to 11111111111111111111111111111111 for no collection
+    // this saves 1 byte over using an Option and still keeps
+    // things nice and searchable
+    pub collection: Option<CollectionData>,
+
     // need to agree on best way to handle creators
     // creators should be searchable via PDA
     // so the position of each creator should be known
     // and the max size of the vector should be capped
-    pub creators: Vec<Creator>,
-    pub collection: Option<Pubkey>,
+    // dictate royalty payments
+    pub creators: Option<Vec<Creator>>, 
+    
     pub bump: u8,
 
     // there can be any number of attributes.
@@ -63,7 +88,25 @@ pub struct MetadataNft {
 
 impl MetadataNft {
     pub const BASE_SIZE: usize = 8 
-        + MAX_CREATOR_COUNT * Creator::SIZE 
         + 1 + 32
         + 1;
+}
+
+/* Rationale for collection object:
+    1) creators are typically set on a per collection basis
+    2) collection is not actually mint in that it should not be movable
+        between wallets, have mastereditions / creators / attributes etc.    
+        hence leaving name + symbol + image url here as strings only
+    3) dynamically resizes according to the length of the fields
+    4) place creators at the beginning so they can be fetched via gPA 
+        (if really needed :D otherwise use helios.xyz or alchemy etc)
+*/
+#[account]
+pub struct Collection {
+    pub authority: Pubkey,
+    pub creators: Vec<Creator>,
+    pub name: String,
+    pub symbol: String,
+    pub image_url: String,
+    pub bump: u8
 }
