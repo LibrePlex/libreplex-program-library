@@ -3,13 +3,13 @@ import { AnchorProvider, Idl, Program } from '@coral-xyz/anchor';
 import { Connection, Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { AccountUtils, isKp} from '../prog-common';
 import { Libreplex } from '../types/libreplex';
-import { findCollectionDataPDA, findMetadataPDA } from './metadata.pda';
+import { findCollectionDataPDA, /* findMetadataPDA */ } from './metadata.pda';
 
 export interface CollectionDataInput {
     name: string,
     symbol: string,
     collectionUrl: string,
-    nftCollectionData: null | NftCollectionData,
+    nftCollectionData: NftCollectionData | null,
 }
 
 export interface NftCollectionData {
@@ -27,7 +27,7 @@ export interface MetadataInput {
     name: string,
     symbol: string,
     metadataUrl: string,
-    nftMetadata: null | NftMetadata,
+    nftMetadata: NftMetadata | null,
 }
 
 export interface NftMetadata {
@@ -174,127 +174,127 @@ export class LibreplexClient extends AccountUtils {
         }
     }
 
-    async deleteCollectionData(
-        authority: PublicKey | Keypair,
-        collectionDataSeed: PublicKey,
-        receiver: PublicKey
-    ) {
-        // Derive PDAs
-        const [collectionData, collectionDataBump] = await findCollectionDataPDA(collectionDataSeed);
+    // async deleteCollectionData(
+    //     authority: PublicKey | Keypair,
+    //     collectionDataSeed: PublicKey,
+    //     receiver: PublicKey
+    // ) {
+    //     // Derive PDAs
+    //     const [collectionData, collectionDataBump] = await findCollectionDataPDA(collectionDataSeed);
 
-        // Create Signers Array
-        const signers = [];
-        if (isKp(authority)) signers.push(<Keypair>authority);
+    //     // Create Signers Array
+    //     const signers = [];
+    //     if (isKp(authority)) signers.push(<Keypair>authority);
 
-        console.log('deleting collection data with pubkey:', collectionData.toBase58());
+    //     console.log('deleting collection data with pubkey:', collectionData.toBase58());
 
-        // Transaction
-        const txSig = await this.libreplexProgram.methods
-            .deleteCollectionData(
-                collectionDataBump
-            )
-            .accounts({
-                authority: isKp(authority) ? (<Keypair>authority).publicKey : <PublicKey>authority,
-                collectionData: collectionData,
-                collectionSeed: collectionDataSeed,
-                receiver: receiver,
-                systemProgram: SystemProgram.programId
-            })
-            .signers(signers)
-            .rpc();
+    //     // Transaction
+    //     const txSig = await this.libreplexProgram.methods
+    //         .deleteCollectionData(
+    //             collectionDataBump
+    //         )
+    //         .accounts({
+    //             authority: isKp(authority) ? (<Keypair>authority).publicKey : <PublicKey>authority,
+    //             collectionData: collectionData,
+    //             collectionSeed: collectionDataSeed,
+    //             receiver: receiver,
+    //             systemProgram: SystemProgram.programId
+    //         })
+    //         .signers(signers)
+    //         .rpc();
 
-        return {
-            collectionData,
-            collectionDataBump,
-            txSig
-        }
-    }
+    //     return {
+    //         collectionData,
+    //         collectionDataBump,
+    //         txSig
+    //     }
+    // }
 
-    async createMetadata(
-        authority: PublicKey | Keypair,
-        mint: PublicKey | Keypair,
-        collectionDataSeed: PublicKey,
-        metadataInput: MetadataInput,
-    ) {
-        const mintKey: PublicKey = isKp(mint) ? (<Keypair>mint).publicKey : <PublicKey>mint;
+    // async createMetadata(
+    //     authority: PublicKey | Keypair,
+    //     mint: PublicKey | Keypair,
+    //     collectionDataSeed: PublicKey,
+    //     metadataInput: MetadataInput,
+    // ) {
+    //     const mintKey: PublicKey = isKp(mint) ? (<Keypair>mint).publicKey : <PublicKey>mint;
 
-        // Derive PDAs
-        const [collectionData, collectionDataBump] = await findCollectionDataPDA(collectionDataSeed);
-        const [metadata, metadataBump] = await findMetadataPDA(mintKey);
+    //     // Derive PDAs
+    //     const [collectionData, collectionDataBump] = await findCollectionDataPDA(collectionDataSeed);
+    //     const [metadata, metadataBump] = await findMetadataPDA(mintKey);
 
-        // Create Signers Array
-        const signers = [];
-        if (isKp(authority)) signers.push(<Keypair>authority);
-        if (isKp(mint)) signers.push(<Keypair>mint);
+    //     // Create Signers Array
+    //     const signers = [];
+    //     if (isKp(authority)) signers.push(<Keypair>authority);
+    //     if (isKp(mint)) signers.push(<Keypair>mint);
 
-        console.log('creating metadata with mint with pubkey:' , mintKey.toBase58());
+    //     console.log('creating metadata with mint with pubkey:' , mintKey.toBase58());
 
-        // Transaction
-        const txSig = await this.libreplexProgram.methods
-            .createMetadata(
-                metadataInput,
-                collectionDataBump,
-            )
-            .accounts({
-                authority: isKp(authority) ? (<Keypair>authority).publicKey : <PublicKey>authority,
-                collectionData: collectionData,
-                collectionSeed: collectionDataSeed,
-                metadata: metadata,
-                mint: isKp(mint) ? (<Keypair>mint).publicKey : <PublicKey>mint,
-                systemProgram: SystemProgram.programId
-            })
-            .signers(signers)
-            .rpc();
+    //     // Transaction
+    //     const txSig = await this.libreplexProgram.methods
+    //         .createMetadata(
+    //             metadataInput,
+    //             collectionDataBump,
+    //         )
+    //         .accounts({
+    //             authority: isKp(authority) ? (<Keypair>authority).publicKey : <PublicKey>authority,
+    //             collectionData: collectionData,
+    //             collectionSeed: collectionDataSeed,
+    //             metadata: metadata,
+    //             mint: isKp(mint) ? (<Keypair>mint).publicKey : <PublicKey>mint,
+    //             systemProgram: SystemProgram.programId
+    //         })
+    //         .signers(signers)
+    //         .rpc();
 
-        return {
-            collectionData,
-            collectionDataBump,
-            metadata,
-            metadataBump,
-            txSig
-        }
-    }
+    //     return {
+    //         collectionData,
+    //         collectionDataBump,
+    //         metadata,
+    //         metadataBump,
+    //         txSig
+    //     }
+    // }
 
-    async deleteMetadata(
-        authority: PublicKey | Keypair,
-        mint: PublicKey,
-        collectionDataSeed: PublicKey,
-        receiver: PublicKey,
-    ) {
-        // Derive PDAs
-        const [collectionData, collectionDataBump] = await findCollectionDataPDA(collectionDataSeed);
-        const [metadata, metadataBump] = await findMetadataPDA(mint);
+    // async deleteMetadata(
+    //     authority: PublicKey | Keypair,
+    //     mint: PublicKey,
+    //     collectionDataSeed: PublicKey,
+    //     receiver: PublicKey,
+    // ) {
+    //     // Derive PDAs
+    //     const [collectionData, collectionDataBump] = await findCollectionDataPDA(collectionDataSeed);
+    //     const [metadata, metadataBump] = await findMetadataPDA(mint);
 
-        // Create Signers Array
-        const signers = [];
-        if (isKp(authority)) signers.push(<Keypair>authority);
+    //     // Create Signers Array
+    //     const signers = [];
+    //     if (isKp(authority)) signers.push(<Keypair>authority);
 
-        console.log('creating metadata with mint with pubkey:' , mint.toBase58());
+    //     console.log('creating metadata with mint with pubkey:' , mint.toBase58());
 
-        // Transaction
-        const txSig = await this.libreplexProgram.methods
-            .deleteMetadata(
-                collectionDataBump,
-                metadataBump
-            )
-            .accounts({
-                authority: isKp(authority) ? (<Keypair>authority).publicKey : <PublicKey>authority,
-                collectionData: collectionData,
-                collectionSeed: collectionDataSeed,
-                metadata: metadata,
-                mint: mint,
-                receiver: receiver,
-                systemProgram: SystemProgram.programId
-            })
-            .signers(signers)
-            .rpc();
+    //     // Transaction
+    //     const txSig = await this.libreplexProgram.methods
+    //         .deleteMetadata(
+    //             collectionDataBump,
+    //             metadataBump
+    //         )
+    //         .accounts({
+    //             authority: isKp(authority) ? (<Keypair>authority).publicKey : <PublicKey>authority,
+    //             collectionData: collectionData,
+    //             collectionSeed: collectionDataSeed,
+    //             metadata: metadata,
+    //             mint: mint,
+    //             receiver: receiver,
+    //             systemProgram: SystemProgram.programId
+    //         })
+    //         .signers(signers)
+    //         .rpc();
 
-        return {
-            collectionData,
-            collectionDataBump,
-            metadata,
-            metadataBump,
-            txSig
-        }
-    }
+    //     return {
+    //         collectionData,
+    //         collectionDataBump,
+    //         metadata,
+    //         metadataBump,
+    //         txSig
+    //     }
+    // }
 }

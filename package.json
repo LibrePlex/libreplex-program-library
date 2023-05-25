@@ -1,14 +1,17 @@
 {
     "name": "@libreplex/metadata",
     "version": "0.0.0",
-    "sideEffects": false,
     "description": "metadata standard for Solana",
-    "private": true,
     "main": "dist/lib/index.js",
     "types": "dist/lib/index.d.ts",
     "files": [
-        "lib"
+        "/dist"
     ],
+    "keywords": [
+        "solana",
+        "on chain metadata"
+    ],
+    "license": "MIT",
     "scripts": {
         "build": "anchor build -p libreplex && ./scripts/cp_idl.sh",
         "libreplex:deploy:devnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
@@ -16,20 +19,22 @@
     },
     "dependencies": {
         "@coral-xyz/anchor": "0.27.0",
-        "@solana/web3.js": "^1.31.0"
+        "@solana/wallet-adapter-base": "^0.8.1",
+        "@solana/web3.js": "^1.77.1"
     },
     "devDependencies": {
     	  "@types/chai": "^4.2.22",
         "@types/chai-as-promised": "^7.1.4",
         "@types/mocha": "^9.0.0",
+        "@types/node": "^20.2.3",
         "@types/yargs": "^17.0.10",
         "chai": "^4.3.4",
         "chai-as-promised": "^7.1.1",
-        "mocha": "^9.0.3",
+        "mocha": "^10.0.0",
         "prettier": "^2.5.0",
-        "ts-mocha": "^8.0.0",
+        "ts-mocha": "^10.0.0",
         "ts-node": "^10.9.1",
-        "typescript": "4.3.5",
+        "typescript": "5.0.4",
         "yargs": "^17.4.1"
     }
 }

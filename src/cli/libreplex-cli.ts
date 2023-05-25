@@ -60,55 +60,55 @@ const parser = yargs(process.argv.slice(2)).options({
                      );
                      console.log(stringifyPKsAndBNs(createCollectionDataInstance));
                  } else {
-                     console.log('Creating collection data account for authority with pubkey', stringifyPKsAndBNs(wallet.publicKey));
+                     //console.log('Creating collection data account for authority with pubkey', stringifyPKsAndBNs(wallet.publicKey));
                  }
              })
 
 
 
 
-// Delete collection data account
-    .command('delete-collection-data', 'Delete a collection data PDA account', {
-        collectionDataPubkey: {
-            alias: 'c',
-            type: 'string',
-            demandOption: true,
-            description: 'collection data PDA account pubkey'
-        },
-        receiverPubkey: {
-            alias: 'r',
-            type: 'string',
-            demandOption: false,
-            description: 'receiver account pubkey for reclaimed rent lamports'
-        }
-    },
-             async (argv) => {
-                 const rpcConn = new Connection(networkConfig.clusterApiUrl, { confirmTransactionInitialTimeout: 91000 });
-                 const wallet: anchor.Wallet = new anchor.Wallet(await loadWallet(networkConfig.signerKeypair));
-                 const libreplexClient: LibreplexClient = new LibreplexClient(
-                     rpcConn,
-                     wallet,
-                     LibreplexIDL,
-                     METADATA_PROGRAM_ID,
-                 );
+// // Delete collection data account
+//     .command('delete-collection-data', 'Delete a collection data PDA account', {
+//         collectionDataPubkey: {
+//             alias: 'c',
+//             type: 'string',
+//             demandOption: true,
+//             description: 'collection data PDA account pubkey'
+//         },
+//         receiverPubkey: {
+//             alias: 'r',
+//             type: 'string',
+//             demandOption: false,
+//             description: 'receiver account pubkey for reclaimed rent lamports'
+//         }
+//     },
+//              async (argv) => {
+//                  const rpcConn = new Connection(networkConfig.clusterApiUrl, { confirmTransactionInitialTimeout: 91000 });
+//                  const wallet: anchor.Wallet = new anchor.Wallet(await loadWallet(networkConfig.signerKeypair));
+//                  const libreplexClient: LibreplexClient = new LibreplexClient(
+//                      rpcConn,
+//                      wallet,
+//                      LibreplexIDL,
+//                      METADATA_PROGRAM_ID,
+//                  );
 
-                 const collectionDataKey: PublicKey = new PublicKey(argv.collectionDataPubkey);
-                 const collectionDataAcct = await libreplexClient.fetchCollectionDataAccount(collectionDataKey);
-                 const collectionDataSeed = collectionDataAcct.collectionSeed;
+//                  const collectionDataKey: PublicKey = new PublicKey(argv.collectionDataPubkey);
+//                  const collectionDataAcct = await libreplexClient.fetchCollectionDataAccount(collectionDataKey);
+//                  const collectionDataSeed = collectionDataAcct.collectionSeed;
 
-                 const receiverKey: PublicKey = argv.receiverPubkey? new PublicKey(argv.receiverPubkey) : wallet.publicKey;
+//                  const receiverKey: PublicKey = argv.receiverPubkey? new PublicKey(argv.receiverPubkey) : wallet.publicKey;
 
-                 if (!argv.dryRun) {
-                     const deleteCollectionDataInstance = await libreplexClient.deleteCollectionData(
-                         wallet.payer,
-                         collectionDataSeed,
-                         receiverKey,
-                     );
-                     console.log(stringifyPKsAndBNs(deleteCollectionDataInstance));
-                 } else {
-                     console.log('Deleting collection data account for authority with pubkey', stringifyPKsAndBNs(wallet.publicKey));
-                 }
-             })
+//                  if (!argv.dryRun) {
+//                      const deleteCollectionDataInstance = await libreplexClient.deleteCollectionData(
+//                          wallet.payer,
+//                          collectionDataSeed,
+//                          receiverKey,
+//                      );
+//                      console.log(stringifyPKsAndBNs(deleteCollectionDataInstance));
+//                  } else {
+//                      //console.log('Deleting collection data account for authority with pubkey', stringifyPKsAndBNs(wallet.publicKey));
+//                  }
+//              })
 
 
 
