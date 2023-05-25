@@ -1,62 +1,58 @@
 use anchor_lang::prelude::*;
-
-pub mod processors;
-pub use processors::*;
-
-pub mod errors;
-pub use errors::MetadataError;
-
-pub mod constants;
-pub use constants::*;
-
-pub mod shared;
-pub use shared::*;
-
-pub mod state;
-pub use state::*;
+use instructions::*;
 
 declare_id!("L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh");
 
-pub mod empty_account {
-    use super::*;
-    declare_id!("11111111111111111111111111111111");
-}
+pub mod instructions;
+pub mod state;
+pub mod constants;
+
+pub use constants::*;
+pub use state::*;
 
 #[program]
 pub mod libreplex {
 
     use super::*;
 
-    /* for creating base metadata (SPL) */
-    pub fn create_metadata_spl(
-        ctx: Context<CreateMetadataSpl>,
-        name: String,
-        image_url: String,
-        is_mutable: bool,
+    pub fn create_collection_data(
+        ctx: Context<CreateCollectionData>,
+        collection_data_input: CollectionDataInput,
     ) -> Result<()> {
-        handle_create_metadata(ctx, name, image_url, is_mutable)
-    }
-
-
-    pub fn delete_metadata(ctx: Context<DeleteMetadata>) -> Result<()> {
-        handle_delete_metadata(ctx)
-    }
-
-    /* for creating auxiliary metadata with creators and attributes  */
-    pub fn create_metadata_nft(
-        ctx: Context<CreateMetadataNft>,
-        name: String,
-        offchain_url: String,
-        is_mutable: bool,
-        attributes: Vec<Attribute>,
-    ) -> Result<()> {
-        handle_create_metadata_nft(
+        msg!("creating collection data");
+        instructions::create_collection_data::handler(
             ctx,
-            name,
-            offchain_url,
-            is_mutable,
-            attributes,
+            collection_data_input
         )
+    }
+
+    pub fn delete_collection_data(
+        ctx: Context<DeleteCollectionData>,
+        _bump_collection_data: u8,
+    ) -> Result<()> {
+        msg!("deleting collection data");
+        instructions::delete_collection_data::handler(ctx)
+    }
+
+    pub fn create_metadata(
+        ctx: Context<CreateMetadata>,
+        metadata_input: MetadataInput,
+        _bump_collection_data: u8,
+    ) -> Result<()> {
+        msg!("creating metadata");
+        instructions::create_metadata::handler(
+            ctx,
+            metadata_input
+        )
+    }
+
+    pub fn delete_metadata(
+        ctx: Context<DeleteMetadata>,
+        _bump_collection_data: u8,
+        _bump_metadata: u8,
+    ) -> Result<()> {
+        msg!("deleting metadata");
+        instructions::delete_metadata::handler(ctx)
     }
 
 
