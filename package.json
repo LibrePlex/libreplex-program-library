@@ -4,7 +4,8 @@
   "sideEffects": false,
   "private": true,
   "workspaces": [
-    "app"
+    "app",
+    "sdk"
   ],
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
@@ -13,7 +14,7 @@
   ],
   "scripts": {
     "dev": "next dev",
-    "build": "anchor build -p libreplex",
+    "build": "yarn --cwd solita solita && yarn --cwd sdk tsc && yarn --cwd app build",
     "start": "next start",
     "libreplex:deploy:devnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex:deploy:mainnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",

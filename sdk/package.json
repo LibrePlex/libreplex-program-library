@@ -1,0 +1,20 @@
+{
+  "name": "@libreplex/js",
+  "version": "1.0.0",
+  "description": "Typescript Library for LibrePlex",
+  "repository": "https://github.com/LibrePlex/metadata",
+  "license": "MIT",
+  "type": "module",
+  "main": "./lib/index.js",
+  "module": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "src/*",
+    "lib/*"
+  ],
+  "private": false,
+  "dependencies": {
+    "@metaplex-foundation/beet": "^0.7.1",
+    "@metaplex-foundation/beet-solana": "^0.4.0"
+  }
+}

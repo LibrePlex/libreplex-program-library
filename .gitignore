@@ -21,3 +21,5 @@ yarn-error.log
 .amman/
 .env
 dist
+lib
+target

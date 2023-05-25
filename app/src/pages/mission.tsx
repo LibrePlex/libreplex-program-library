@@ -1,10 +1,7 @@
 "use client";
 
 import { Box, Heading, ListItem, Text, UnorderedList } from "@chakra-ui/react";
-import PageLayout from "./PageLayout";
-import { NextPage } from "next";
-import { NextPageWithLayout } from "@/components/common/NextPageWithLayout";
-export const Mission: NextPageWithLayout = () => {
+export const Mission = () => {
   return (
     <Box
       w={"100vw"}
@@ -16,7 +13,14 @@ export const Mission: NextPageWithLayout = () => {
         justifyContent: "center",
       }}
     >
-      <Box sx={{ maxWidth: "600px", display :"flex", flexDirection :"column", alignItems: 'center'}}>
+      <Box
+        sx={{
+          maxWidth: "600px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <Heading variant={"h2"} sx={{ maxWidth: "500px", pb: 3 }}>
           Mission
         </Heading>
@@ -57,7 +61,3 @@ export const Mission: NextPageWithLayout = () => {
 };
 
 export default Mission;
-
-Mission.getLayout = function getLayout(page: any) {
-  return <PageLayout>{page}</PageLayout>;
-};

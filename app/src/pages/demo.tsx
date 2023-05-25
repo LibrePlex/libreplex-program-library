@@ -1,10 +1,21 @@
 "use client";
 
 import { Box, Heading, ListItem, Text, UnorderedList } from "@chakra-ui/react";
-import PageLayout from "./PageLayout";
-import { NextPage } from "next";
-import { NextPageWithLayout } from "@/components/common/NextPageWithLayout";
-export const Mission: NextPageWithLayout = () => {
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { SendTransaction } from "components/SendTransaction";
+import { SendVersionedTransaction } from "components/SendVersionedTransaction";
+import { SignMessage } from "components/SignMessage";
+import { PROGRAM_ID as LIBREPLEX_PROGRAM_ID } from "@libreplex/js";
+const Demo = () => {
+  // Here is a wallet adapter
+  const wallet = useWallet();
+
+  // Here is an RPC connection
+  const connection = useConnection();
+
+  // The Solita client can be imported via yarn workspace
+  const id = LIBREPLEX_PROGRAM_ID;
+
   return (
     <Box
       w={"100vw"}
@@ -27,6 +38,13 @@ export const Mission: NextPageWithLayout = () => {
         <Heading variant={"h2"} sx={{ maxWidth: "500px", pb: 3 }}>
           Demo
         </Heading>
+
+        <div className="text-center">
+          <SignMessage />
+          <SendTransaction />
+          <SendVersionedTransaction />
+        </div>
+
         <Text>Functionality</Text>
 
         <UnorderedList>
@@ -40,22 +58,15 @@ export const Mission: NextPageWithLayout = () => {
           <ListItem>Delete SPL Metadata</ListItem>
           <ListItem>Verify (sign) creator</ListItem>
           <ListItem>TBD: Unverify creator</ListItem>
-          
         </UnorderedList>
-
 
         <UnorderedList>
           <ListItem>Delegation</ListItem>
           <ListItem>etc etc</ListItem>
-          
         </UnorderedList>
       </Box>
     </Box>
   );
 };
 
-export default Mission;
-
-Mission.getLayout = function getLayout(page: any) {
-  return <PageLayout>{page}</PageLayout>;
-};
+export default Demo;
