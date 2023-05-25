@@ -1,9 +1,5 @@
 use anchor_lang::prelude::*;
 
-use anchor_lang::solana_program::hash::hash;
-use anchor_lang::solana_program::program::{invoke_signed};
-use anchor_lang::solana_program::system_instruction::{create_account};
-
 use crate::state::{CollectionData, CollectionDataInput};
 use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH};
 
@@ -29,7 +25,6 @@ pub struct CreateCollectionData<'info> {
 pub fn handler(ctx: Context<CreateCollectionData>,
                collection_data_input: CollectionDataInput,
 ) -> Result<()> {
-
 
     let CollectionDataInput {name, symbol, collection_url, nft_collection_data} = collection_data_input;
 
@@ -74,34 +69,3 @@ pub fn handler(ctx: Context<CreateCollectionData>,
 
     Ok(())
 }
-
-// Auxiliary helper functions
-
-fn create_pda_with_space<'info>(
-    pda_seeds: &[&[u8]],
-    pda_info: &AccountInfo<'info>,
-    space: usize,
-    owner: &Pubkey,
-    funder_info: &AccountInfo<'info>,
-    system_program_info: &AccountInfo<'info>,
-) -> Result<()> {
-    //create a PDA and allocate space inside of it at the same time - can only be done from INSIDE the program
-    //based on https://github.com/solana-labs/solana-program-library/blob/7c8e65292a6ebc90de54468c665e30bc590c513a/feature-proposal/program/src/processor.rs#L148-L163
-    invoke_signed(
-        &create_account(
-            &funder_info.key,
-            &pda_info.key,
-            1.max(Rent::get()?.minimum_balance(space)),
-            space as u64,
-            owner,
-        ),
-        &[
-            funder_info.clone(),
-            pda_info.clone(),
-            system_program_info.clone(),
-        ],
-        &[pda_seeds], //this is the part you can't do outside the program
-    )
-        .map_err(Into::into)
-}
-
