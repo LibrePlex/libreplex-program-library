@@ -5,7 +5,8 @@
   "private": true,
   "workspaces": [
     "app",
-    "sdk"
+    "sdk",
+    "solita"
   ],
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
