@@ -6,3 +6,8 @@ pub const COLLECTION: &str = "collection";
 pub const OVERRIDE: &str = "override";
 pub const NFT: &str = "nft";
 pub const ADG: &str = "adg";
+
+
+pub const MAX_NAME_LENGTH: usize = 256;
+pub const MAX_SYMBOL_LENGTH: usize = 8;
+pub const MAX_URL_LENGTH: usize = 256;
