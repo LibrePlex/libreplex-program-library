@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "sideEffects": false,
   "private": true,
+  "workspaces": [
+    "app"
+  ],
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "files": [
