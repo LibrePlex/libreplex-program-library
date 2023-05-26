@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
-use crate::state::{CollectionData, Metadata, MetadataInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH};
+use crate::state::{Collection, Metadata, MetadataInput};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, COLLECTION, METADATA};
 
 use prog_common::{TryAdd, errors::ErrorCode};
 
@@ -12,14 +12,14 @@ pub struct CreateMetadata<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    #[account(mut, seeds = [b"collection_data".as_ref(), collection_seed.key().as_ref()],
+    #[account(mut, seeds = [COLLECTION.as_ref(), collection_seed.key().as_ref()],
               bump = bump_collection_data, has_one = authority, has_one = collection_seed)]
-    pub collection_data: Box<Account<'info, CollectionData>>,
+    pub collection_data: Box<Account<'info, Collection>>,
 
     /// CHECK: Used for seed verification of collection data PDA account
     pub collection_seed: AccountInfo<'info>,
 
-    #[account(init, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
+    #[account(init, seeds = [METADATA.as_ref(), mint.key().as_ref()],
               bump, payer = authority, space = 8 + 65 + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
 

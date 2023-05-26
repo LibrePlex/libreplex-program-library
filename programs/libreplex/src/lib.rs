@@ -15,23 +15,23 @@ pub mod libreplex {
 
     use super::*;
 
-    pub fn create_collection_data(
-        ctx: Context<CreateCollectionData>,
-        collection_data_input: CollectionDataInput,
+    pub fn create_collection(
+        ctx: Context<CreateCollection>,
+        collection_input: CollectionInput,
     ) -> Result<()> {
         msg!("creating collection data");
-        instructions::create_collection_data::handler(
+        instructions::create_collection::handler(
             ctx,
-            collection_data_input
+            collection_input
         )
     }
 
-    pub fn delete_collection_data(
-        ctx: Context<DeleteCollectionData>,
+    pub fn delete_collection(
+        ctx: Context<DeleteCollection>,
         _bump_collection_data: u8,
     ) -> Result<()> {
         msg!("deleting collection data");
-        instructions::delete_collection_data::handler(ctx)
+        instructions::delete_collection::handler(ctx)
     }
 
     pub fn create_metadata(

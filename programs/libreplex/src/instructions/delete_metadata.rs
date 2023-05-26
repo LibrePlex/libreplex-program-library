@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::state::{CollectionData, Metadata};
+use crate::{state::{Collection, Metadata}, COLLECTION, METADATA};
 use prog_common::{close_account, TrySub};
 
 #[derive(Accounts)]
@@ -9,14 +9,14 @@ pub struct DeleteMetadata<'info> {
 
     pub authority: Signer<'info>,
 
-    #[account(mut, seeds = [b"collection_data".as_ref(), collection_seed.key().as_ref()],
+    #[account(mut, seeds = [COLLECTION.as_ref(), collection_seed.key().as_ref()],
               bump = bump_collection_data, has_one = authority, has_one = collection_seed)]
-    pub collection_data: Box<Account<'info, CollectionData>>,
+    pub collection_data: Box<Account<'info, Collection>>,
 
     /// CHECK: Used for seed verification of collection data PDA account
     pub collection_seed: AccountInfo<'info>,
 
-    #[account(mut, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
+    #[account(mut, seeds = [METADATA.as_ref(), mint.key().as_ref()],
               bump = bump_metadata, has_one = collection_data, has_one = mint)]
     pub metadata: Box<Account<'info, Metadata>>,
 
