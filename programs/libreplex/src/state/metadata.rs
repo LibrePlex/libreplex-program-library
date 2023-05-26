@@ -6,7 +6,7 @@ use anchor_lang::prelude::*;
 pub struct Metadata {
 
     // the collection to which this metadata belongs
-    pub collection_data: Pubkey,
+    pub collection: Pubkey,
 
     // the mint address of the token for which the metadata refers
     pub mint: Pubkey,
