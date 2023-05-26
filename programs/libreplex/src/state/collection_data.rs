@@ -27,8 +27,7 @@ pub struct CollectionData {
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct NftCollectionData {
 
     // the royalty amount in basis points (0-10,000)
@@ -39,9 +38,9 @@ pub struct NftCollectionData {
     pub permitted_signers: Vec<Pubkey>,
 }
 
+#[proc_macros::assert_size(34)]
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct RoyaltyShare {
 
     // royalty address and their share in basis points (0-10,000)
@@ -51,8 +50,7 @@ pub struct RoyaltyShare {
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct CollectionDataInput {
 
     pub name: String,
@@ -67,7 +65,10 @@ impl NftCollectionData {
 
     pub fn get_size(&self) -> usize {
 
-        let size = 2 + 4 + 34*self.royalty_shares.len() + 4 + 32*self.permitted_signers.len();
+        let royalty_shares_length = self.royalty_shares.len();
+        let permitted_signers_length = self.permitted_signers.len();
+
+        let size = 2 + (4 + 34*royalty_shares_length) + (4 + 32*permitted_signers_length);
 
         return size;
     }
@@ -88,7 +89,7 @@ impl CollectionDataInput {
             None => 0
         };
 
-        let size = 4 + name_length + 4 + symbol_length + 4 + url_length + 1 + nft_data_length;
+        let size = (4 + name_length) + (4 + symbol_length) + (4 + url_length) + (1 + nft_data_length);
 
         return size;
     }

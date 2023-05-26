@@ -7,9 +7,14 @@
     "files": [
         "/dist"
     ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/LibrePlex/metadata"
+    },
     "keywords": [
         "solana",
-        "on chain metadata"
+        "on chain metadata",
+        "NFTs"
     ],
     "license": "MIT",
     "scripts": {

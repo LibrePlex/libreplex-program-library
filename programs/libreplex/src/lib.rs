@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use instructions::*;
 
-declare_id!("L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh");
+declare_id!("6pL4SJMD6owf32QtuLnazon7BgATpTL8x93NwzWParBR");
 
 pub mod instructions;
 pub mod state;
@@ -54,6 +54,5 @@ pub mod libreplex {
         msg!("deleting metadata");
         instructions::delete_metadata::handler(ctx)
     }
-
 
 }

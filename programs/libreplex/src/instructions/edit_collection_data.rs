@@ -60,17 +60,17 @@ pub fn handler(ctx: Context<EditCollectionData>,
         let nft_collection_data_unwrapped = nft_collection_data.as_ref().unwrap();
         let royalty_bps = nft_collection_data_unwrapped.royalty_bps;
 
-        // Ensure that basis points are between 0-10,000
+        // Ensure that the royalty basis points amount is between 0-10,000
         if royalty_bps > 10_000 {
             return Err(error!(ErrorCode::InvalidBpsInput));
         }
 
         let royalty_shares_vec: Vec<u16> = nft_collection_data_unwrapped.royalty_shares.iter().map(|x| x.royalty_share).collect();
+        let royalty_shares_sum: u16 = royalty_shares_vec.iter().sum();
 
-        for rs in royalty_shares_vec {
-            if rs > 10_000 {
-                return Err(error!(ErrorCode::InvalidBpsInput));
-            }
+        // Ensure royalty shares sum to 10,000 basis points
+        if royalty_shares_sum != 10_000 {
+            return Err(error!(ErrorCode::InvalidRoyaltySharesSum));
         }
     }
 

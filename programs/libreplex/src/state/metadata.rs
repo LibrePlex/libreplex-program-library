@@ -21,8 +21,7 @@ pub struct Metadata {
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct NftMetadata {
 
     pub attributes: Vec<Attribute>,
@@ -32,8 +31,7 @@ pub struct NftMetadata {
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct Attribute {
 
     pub trait_type: String,
@@ -43,8 +41,7 @@ pub struct Attribute {
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct MetadataInput {
 
     pub name: String,
@@ -63,7 +60,7 @@ impl Attribute {
         let trait_type_length = self.trait_type.len();
         let attribute_length = self.attribute.len();
 
-        let size = 4 + trait_type_length + 4 + attribute_length;
+        let size = (4 + trait_type_length) + (4 + attribute_length);
 
         return size;
     }
@@ -73,15 +70,10 @@ impl NftMetadata {
 
     pub fn get_size(&self) -> usize {
 
-        let mut total_attribute_size = 0;
+        let signers_length = self.signers.len();
+        let total_attribute_size: usize = self.attributes.iter().map(|x| x.get_size()).sum();
 
-        for attribute in self.attributes.iter() {
-
-            let attribute_size = attribute.get_size();
-            total_attribute_size += attribute_size;
-        }
-
-        let size = 4 + total_attribute_size + 4 + self.signers.len();
+        let size = (4 + total_attribute_size) + (4 + 32*signers_length);
 
         return size;
     }
@@ -102,7 +94,7 @@ impl MetadataInput {
             None => 0
         };
 
-        let size = 4 + name_length + 4 + symbol_length + 4 + url_length + 1 + nft_metadata_length;
+        let size = (4 + name_length) + (4 + symbol_length) + (4 + url_length) + (1 + nft_metadata_length);
 
         return size;
     }

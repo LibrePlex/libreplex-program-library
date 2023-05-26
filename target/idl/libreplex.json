@@ -13,21 +13,7 @@
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -60,21 +46,7 @@
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -110,21 +82,7 @@
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -134,21 +92,7 @@
         {
           "name": "metadata",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -185,21 +129,7 @@
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -209,21 +139,7 @@
         {
           "name": "metadata",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -295,6 +211,80 @@
       }
     },
     {
+      "name": "Metadata",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "collectionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "url",
+            "type": "string"
+          },
+          {
+            "name": "isMutable",
+            "type": "bool"
+          },
+          {
+            "name": "nftData",
+            "type": {
+              "option": {
+                "defined": "NftMetadata"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "NftMetadataUnique",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "metadata",
+            "type": "publicKey"
+          },
+          {
+            "name": "royaltyBpsOverride",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "royaltiesShareOverride",
+            "type": {
+              "option": {
+                "vec": {
+                  "defined": "RoyaltyShare"
+                }
+              }
+            }
+          },
+          {
+            "name": "permittedSignersOverride",
+            "type": {
+              "option": {
+                "vec": "publicKey"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
       "name": "NftCollectionData",
       "type": {
         "kind": "struct",
@@ -365,42 +355,6 @@
       }
     },
     {
-      "name": "Metadata",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "collectionData",
-            "type": "publicKey"
-          },
-          {
-            "name": "mint",
-            "type": "publicKey"
-          },
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "url",
-            "type": "string"
-          },
-          {
-            "name": "isMutable",
-            "type": "bool"
-          },
-          {
-            "name": "nftData",
-            "type": {
-              "option": {
-                "defined": "NftMetadata"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "NftMetadata",
       "type": {
         "kind": "struct",
@@ -460,42 +414,6 @@
             "type": {
               "option": {
                 "defined": "NftMetadata"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "NftMetadataUnique",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "metadata",
-            "type": "publicKey"
-          },
-          {
-            "name": "royaltyBpsOverride",
-            "type": {
-              "option": "u16"
-            }
-          },
-          {
-            "name": "royaltiesShareOverride",
-            "type": {
-              "option": {
-                "vec": {
-                  "defined": "RoyaltyShare"
-                }
-              }
-            }
-          },
-          {
-            "name": "permittedSignersOverride",
-            "type": {
-              "option": {
-                "vec": "publicKey"
               }
             }
           }

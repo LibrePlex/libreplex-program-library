@@ -1,9 +1,9 @@
-[features]
-seeds = true
-skip-lint = false
+# [features]
+# seeds = true
+# skip-lint = false
 
 [programs.localnet]
-libreplex="L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh"
+libreplex="6pL4SJMD6owf32QtuLnazon7BgATpTL8x93NwzWParBR"
 
 [registry]
 url = "https://api.apr.dev"

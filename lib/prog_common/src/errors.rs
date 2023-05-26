@@ -42,7 +42,9 @@ pub enum ErrorCode {
     #[msg("The value of the basis points input must not exceed 10,000")]
     InvalidBpsInput, //0x177C
 
-    Reserved13, //0x177D
+    #[msg("The sum of all royalty shares must equal 10,000 (in basis points)")]
+    InvalidRoyaltySharesSum, //0x177D
+
     Reserved14, //0x177E
     Reserved15, //0x177F
 

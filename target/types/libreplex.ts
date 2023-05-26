@@ -13,21 +13,7 @@ export type Libreplex = {
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -60,21 +46,7 @@ export type Libreplex = {
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -110,21 +82,7 @@ export type Libreplex = {
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -134,21 +92,7 @@ export type Libreplex = {
         {
           "name": "metadata",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -185,21 +129,7 @@ export type Libreplex = {
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -209,21 +139,7 @@ export type Libreplex = {
         {
           "name": "metadata",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -295,76 +211,6 @@ export type Libreplex = {
       }
     },
     {
-      "name": "nftCollectionData",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "royaltyBps",
-            "type": "u16"
-          },
-          {
-            "name": "royaltyShares",
-            "type": {
-              "vec": {
-                "defined": "RoyaltyShare"
-              }
-            }
-          },
-          {
-            "name": "permittedSigners",
-            "type": {
-              "vec": "publicKey"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "royaltyShare",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "royaltyAddress",
-            "type": "publicKey"
-          },
-          {
-            "name": "royaltyShare",
-            "type": "u16"
-          }
-        ]
-      }
-    },
-    {
-      "name": "collectionDataInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "symbol",
-            "type": "string"
-          },
-          {
-            "name": "collectionUrl",
-            "type": "string"
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "metadata",
       "type": {
         "kind": "struct",
@@ -391,72 +237,6 @@ export type Libreplex = {
           },
           {
             "name": "nftData",
-            "type": {
-              "option": {
-                "defined": "NftMetadata"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "nftMetadata",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "attributes",
-            "type": {
-              "vec": {
-                "defined": "Attribute"
-              }
-            }
-          },
-          {
-            "name": "signers",
-            "type": {
-              "vec": "publicKey"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "attribute",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "traitType",
-            "type": "string"
-          },
-          {
-            "name": "attribute",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "metadataInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "symbol",
-            "type": "string"
-          },
-          {
-            "name": "metadataUrl",
-            "type": "string"
-          },
-          {
-            "name": "nftMetadata",
             "type": {
               "option": {
                 "defined": "NftMetadata"
@@ -496,6 +276,144 @@ export type Libreplex = {
             "type": {
               "option": {
                 "vec": "publicKey"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "NftCollectionData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "royaltyBps",
+            "type": "u16"
+          },
+          {
+            "name": "royaltyShares",
+            "type": {
+              "vec": {
+                "defined": "RoyaltyShare"
+              }
+            }
+          },
+          {
+            "name": "permittedSigners",
+            "type": {
+              "vec": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoyaltyShare",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "royaltyAddress",
+            "type": "publicKey"
+          },
+          {
+            "name": "royaltyShare",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CollectionDataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "collectionUrl",
+            "type": "string"
+          },
+          {
+            "name": "nftCollectionData",
+            "type": {
+              "option": {
+                "defined": "NftCollectionData"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "NftMetadata",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attributes",
+            "type": {
+              "vec": {
+                "defined": "Attribute"
+              }
+            }
+          },
+          {
+            "name": "signers",
+            "type": {
+              "vec": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Attribute",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "traitType",
+            "type": "string"
+          },
+          {
+            "name": "attribute",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MetadataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "metadataUrl",
+            "type": "string"
+          },
+          {
+            "name": "nftMetadata",
+            "type": {
+              "option": {
+                "defined": "NftMetadata"
               }
             }
           }
@@ -520,21 +438,7 @@ export const IDL: Libreplex = {
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -567,21 +471,7 @@ export const IDL: Libreplex = {
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -617,21 +507,7 @@ export const IDL: Libreplex = {
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -641,21 +517,7 @@ export const IDL: Libreplex = {
         {
           "name": "metadata",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -692,21 +554,7 @@ export const IDL: Libreplex = {
         {
           "name": "collectionData",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "collection_data"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection_seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "collectionSeed",
@@ -716,21 +564,7 @@ export const IDL: Libreplex = {
         {
           "name": "metadata",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -802,76 +636,6 @@ export const IDL: Libreplex = {
       }
     },
     {
-      "name": "nftCollectionData",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "royaltyBps",
-            "type": "u16"
-          },
-          {
-            "name": "royaltyShares",
-            "type": {
-              "vec": {
-                "defined": "RoyaltyShare"
-              }
-            }
-          },
-          {
-            "name": "permittedSigners",
-            "type": {
-              "vec": "publicKey"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "royaltyShare",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "royaltyAddress",
-            "type": "publicKey"
-          },
-          {
-            "name": "royaltyShare",
-            "type": "u16"
-          }
-        ]
-      }
-    },
-    {
-      "name": "collectionDataInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "symbol",
-            "type": "string"
-          },
-          {
-            "name": "collectionUrl",
-            "type": "string"
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "metadata",
       "type": {
         "kind": "struct",
@@ -898,72 +662,6 @@ export const IDL: Libreplex = {
           },
           {
             "name": "nftData",
-            "type": {
-              "option": {
-                "defined": "NftMetadata"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "nftMetadata",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "attributes",
-            "type": {
-              "vec": {
-                "defined": "Attribute"
-              }
-            }
-          },
-          {
-            "name": "signers",
-            "type": {
-              "vec": "publicKey"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "attribute",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "traitType",
-            "type": "string"
-          },
-          {
-            "name": "attribute",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "metadataInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "symbol",
-            "type": "string"
-          },
-          {
-            "name": "metadataUrl",
-            "type": "string"
-          },
-          {
-            "name": "nftMetadata",
             "type": {
               "option": {
                 "defined": "NftMetadata"
@@ -1003,6 +701,144 @@ export const IDL: Libreplex = {
             "type": {
               "option": {
                 "vec": "publicKey"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "NftCollectionData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "royaltyBps",
+            "type": "u16"
+          },
+          {
+            "name": "royaltyShares",
+            "type": {
+              "vec": {
+                "defined": "RoyaltyShare"
+              }
+            }
+          },
+          {
+            "name": "permittedSigners",
+            "type": {
+              "vec": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoyaltyShare",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "royaltyAddress",
+            "type": "publicKey"
+          },
+          {
+            "name": "royaltyShare",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CollectionDataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "collectionUrl",
+            "type": "string"
+          },
+          {
+            "name": "nftCollectionData",
+            "type": {
+              "option": {
+                "defined": "NftCollectionData"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "NftMetadata",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attributes",
+            "type": {
+              "vec": {
+                "defined": "Attribute"
+              }
+            }
+          },
+          {
+            "name": "signers",
+            "type": {
+              "vec": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Attribute",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "traitType",
+            "type": "string"
+          },
+          {
+            "name": "attribute",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MetadataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "metadataUrl",
+            "type": "string"
+          },
+          {
+            "name": "nftMetadata",
+            "type": {
+              "option": {
+                "defined": "NftMetadata"
               }
             }
           }
