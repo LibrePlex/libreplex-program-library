@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
-
 use crate::state::{Collection, CollectionInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, COLLECTION};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, PERMISSIONS_SIZE, CollectionPermissions, COLLECTION};
+
 
 use prog_common::{errors::ErrorCode};
 
@@ -12,9 +12,17 @@ pub struct CreateCollection<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    #[account(init, 
+        payer = authority, 
+        space = PERMISSIONS_SIZE, 
+        seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref()], 
+        bump)]
+    pub user_permissions: Box<Account<'info, CollectionPermissions>>,
+
     #[account(init, seeds = [COLLECTION.as_ref(), seed.key().as_ref()],
       bump, payer = authority, space = 8 + 72 + collection_input.get_size())]
     pub collection: Box<Account<'info, Collection>>,
+
 
     /// CHECK: The seed address used for initialization of the collection PDA
     pub seed: AccountInfo<'info>,
@@ -33,7 +41,7 @@ pub fn handler(ctx: Context<CreateCollection>,
     let symbol_length = symbol.len();
     let url_length = collection_url.len();
 
-    if (name_length > MAX_NAME_LENGTH) || (symbol_length > MAX_SYMBOL_LENGTH) || (url_length > MAX_URL_LENGTH) {
+    if name_length > MAX_NAME_LENGTH || symbol_length > MAX_SYMBOL_LENGTH || url_length > MAX_URL_LENGTH {
         return Err(error!(ErrorCode::InvalidStringInput));
     }
 
@@ -55,8 +63,8 @@ pub fn handler(ctx: Context<CreateCollection>,
         }
     }
 
+    // Update the collection data state account
     let collection = &mut ctx.accounts.collection;
-    collection.authority = ctx.accounts.authority.key();
     collection.collection_seed = ctx.accounts.seed.key();
     collection.name = name;
     collection.symbol = symbol;
@@ -64,7 +72,17 @@ pub fn handler(ctx: Context<CreateCollection>,
     collection.collection_count = 0;
     collection.nft_collection_data = nft_collection_data;
 
+
     msg!("Collection data created with authority pubkey {}", ctx.accounts.authority.key());
 
+    let user_permissions = &mut ctx.accounts.user_permissions;
+    user_permissions.collection = collection.key();
+    user_permissions.user = ctx.accounts.authority.key();
+    user_permissions.can_add_metadatas = true;
+    user_permissions.can_edit_metadatas = true;
+    user_permissions.can_delete_metadatas =  true;
+    user_permissions.can_edit_permissions = true;
+    user_permissions.can_delete_collection = true;
+    
     Ok(())
 }

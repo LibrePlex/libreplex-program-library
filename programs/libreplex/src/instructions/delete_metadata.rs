@@ -1,23 +1,24 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::{Collection, Metadata}, COLLECTION, METADATA};
-use prog_common::{close_account, TrySub};
+use crate::{state::{Collection, Metadata}, METADATA, CollectionPermissions, assert_valid_user_permissions};
+use prog_common::{close_account, TrySub, errors::ErrorCode};
+
 
 #[derive(Accounts)]
-#[instruction(bump_collection_data: u8, bump_metadata: u8)]
 pub struct DeleteMetadata<'info> {
 
     pub authority: Signer<'info>,
 
-    #[account(mut, seeds = [COLLECTION.as_ref(), collection_seed.key().as_ref()],
-              bump = bump_collection_data, has_one = authority, has_one = collection_seed)]
-    pub collection_data: Box<Account<'info, Collection>>,
+    #[account(
+        seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref()], 
+        bump)]
+    pub user_permissions: Box<Account<'info, CollectionPermissions>>,
 
-    /// CHECK: Used for seed verification of collection data PDA account
-    pub collection_seed: AccountInfo<'info>,
+    #[account(mut)]
+    pub collection: Box<Account<'info, Collection>>,
 
     #[account(mut, seeds = [METADATA.as_ref(), mint.key().as_ref()],
-              bump = bump_metadata, has_one = collection_data, has_one = mint)]
+              bump, has_one = collection, has_one = mint)]
     pub metadata: Box<Account<'info, Metadata>>,
 
     /// CHECK: Mint address used for seed verification
@@ -34,14 +35,22 @@ pub fn handler(ctx: Context<DeleteMetadata>) -> Result<()> {
 
     // Set the receiver of the lamports to be reclaimed from the rent of the accounts to be closed
     let receiver = &mut ctx.accounts.receiver;
+    let authority = &ctx.accounts.authority;
+    let collection = &mut ctx.accounts.collection;
+    let user_permissions = &ctx.accounts.user_permissions;
+
+    assert_valid_user_permissions(user_permissions, &collection.key(), authority.key)?;
+
+    if !user_permissions.can_delete_metadatas {
+        return Err(ErrorCode::CannotDeleteMetadata.into());
+    }
 
     // Close the collection data state account
     let metadata_account_info = &mut (*ctx.accounts.metadata).to_account_info();
     close_account(metadata_account_info, receiver)?;
 
     // Decrement collection data counter
-    let collection_data = &mut ctx.accounts.collection_data;
-    collection_data.collection_count.try_sub_assign(1)?;
+    collection.collection_count.try_sub_assign(1)?;
 
     msg!("Metadata with pubkey {} now deleted", ctx.accounts.metadata.key());
     Ok(())

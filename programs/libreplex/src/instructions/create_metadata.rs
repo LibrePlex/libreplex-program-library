@@ -1,28 +1,28 @@
 use anchor_lang::prelude::*;
-
 use crate::state::{Collection, Metadata, MetadataInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, COLLECTION, METADATA};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, CollectionPermissions, assert_valid_user_permissions};
+
 
 use prog_common::{TryAdd, errors::ErrorCode};
 
 #[derive(Accounts)]
-#[instruction(metadata_input: MetadataInput, bump_collection_data: u8)]
+#[instruction(metadata_input: MetadataInput)]
 pub struct CreateMetadata<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        seeds = ["permissions".as_ref(), collection.key().as_ref(), signer.key().as_ref()], 
+        bump)]
+    pub signer_collection_permissions: Box<Account<'info, CollectionPermissions>>,
 
     #[account(mut)]
-    pub authority: Signer<'info>,
+    pub collection: Box<Account<'info, Collection>>,
 
-    #[account(mut, seeds = [COLLECTION.as_ref(), collection_seed.key().as_ref()],
-              bump = bump_collection_data, has_one = authority, has_one = collection_seed)]
-    pub collection_data: Box<Account<'info, Collection>>,
+    #[account(init, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
+              bump, payer = signer, space = 8 + 65 + metadata_input.get_size())]
 
-    /// CHECK: Used for seed verification of collection data PDA account
-    pub collection_seed: AccountInfo<'info>,
-
-    #[account(init, seeds = [METADATA.as_ref(), mint.key().as_ref()],
-              bump, payer = authority, space = 8 + 65 + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
-
     pub mint: Signer<'info>,
 
     pub system_program: Program<'info, System>,
@@ -31,6 +31,17 @@ pub struct CreateMetadata<'info> {
 pub fn handler(ctx: Context<CreateMetadata>,
                metadata_input: MetadataInput,
 ) -> Result<()> {
+    let metadata = &mut ctx.accounts.metadata;
+    let collection = &ctx.accounts.collection;
+    let user_permissions = &ctx.accounts.signer_collection_permissions;
+    let authority = &ctx.accounts.signer;
+
+    assert_valid_user_permissions(user_permissions, &collection.key(), authority.key)?;
+
+    if !user_permissions.can_add_metadatas {
+        return Err(ErrorCode::CannotAddToCollection.into());
+    }
+
 
     let MetadataInput {name, symbol, metadata_url, nft_metadata} = metadata_input;
 
@@ -44,8 +55,7 @@ pub fn handler(ctx: Context<CreateMetadata>,
     }
 
     // Update the metadata state account
-    let metadata = &mut ctx.accounts.metadata;
-    metadata.collection_data = ctx.accounts.collection_data.key();
+    metadata.collection = ctx.accounts.collection.key();
     metadata.mint = ctx.accounts.mint.key();
     metadata.name = name;
     metadata.url = metadata_url;
@@ -53,8 +63,8 @@ pub fn handler(ctx: Context<CreateMetadata>,
     metadata.nft_data = nft_metadata;
 
     // Increment collection data counter
-    let collection_data = &mut ctx.accounts.collection_data;
-    collection_data.collection_count.try_add_assign(1)?;
+    let collection = &mut ctx.accounts.collection;
+    collection.collection_count.try_add_assign(1)?;
 
     msg!("metadata created for mint with pubkey {}", ctx.accounts.mint.key());
 
