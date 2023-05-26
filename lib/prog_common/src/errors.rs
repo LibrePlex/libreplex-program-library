@@ -42,13 +42,23 @@ pub enum ErrorCode {
     #[msg("The value of the basis points input must not exceed 10,000")]
     InvalidBpsInput, //0x177C
 
-    Reserved13, //0x177D
-    Reserved14, //0x177E
-    Reserved15, //0x177F
+    #[msg("Invalid Permissions")]
+    InvalidPermissions, //0x177D
+    
+    #[msg("Cannot modify collection")]
+    CannotAddToCollection, //0x177E
 
-    Reserved16, //0x1780
-    Reserved17, //0x1781
-    Reserved18, //0x1782
+    #[msg("Cannot modify Metadata")]
+    CannotModifyMetadata, //0x177F
+
+    #[msg("Cannot delete Collection")]
+    CannotDeleteCollection, //0x1780
+
+    #[msg("Cannot delete Metadata")]
+    CannotDeleteMetadata, //0x1781
+
+    #[msg("Cannot edit permissions")]
+    CannotEditPermissions, //0x1782
     Reserved19, //0x1783
     Reserved20, //0x1784
 

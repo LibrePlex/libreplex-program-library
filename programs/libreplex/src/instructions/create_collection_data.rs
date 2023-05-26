@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::state::{CollectionData, CollectionDataInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, PERMISSIONS_SIZE, CollectionPermissions,};
 
 use prog_common::{errors::ErrorCode};
 
@@ -11,6 +11,13 @@ pub struct CreateCollectionData<'info> {
 
     #[account(mut)]
     pub authority: Signer<'info>,
+
+    #[account(init, 
+        payer = authority, 
+        space = PERMISSIONS_SIZE, 
+        seeds = ["permissions".as_ref(), collection_data.key().as_ref(), authority.key().as_ref()], 
+        bump)]
+    pub user_permissions: Box<Account<'info, CollectionPermissions>>,
 
     #[account(init, seeds = [b"collection_data".as_ref(), collection_seed.key().as_ref()],
       bump, payer = authority, space = 8 + 72 + collection_data_input.get_size())]
@@ -33,7 +40,7 @@ pub fn handler(ctx: Context<CreateCollectionData>,
     let symbol_length = symbol.len();
     let url_length = collection_url.len();
 
-    if (name_length > MAX_NAME_LENGTH) || (symbol_length > MAX_SYMBOL_LENGTH) || (url_length > MAX_URL_LENGTH) {
+    if name_length > MAX_NAME_LENGTH || symbol_length > MAX_SYMBOL_LENGTH || url_length > MAX_URL_LENGTH {
         return Err(error!(ErrorCode::InvalidStringInput));
     }
 
@@ -55,9 +62,9 @@ pub fn handler(ctx: Context<CreateCollectionData>,
         }
     }
 
+
     // Update the collection data state account
     let collection_data = &mut ctx.accounts.collection_data;
-    collection_data.authority = ctx.accounts.authority.key();
     collection_data.collection_seed = ctx.accounts.collection_seed.key();
     collection_data.name = name;
     collection_data.symbol = symbol;
@@ -67,5 +74,14 @@ pub fn handler(ctx: Context<CreateCollectionData>,
 
     msg!("Collection data created with authority pubkey {}", ctx.accounts.authority.key());
 
+    let user_permissions = &mut ctx.accounts.user_permissions;
+    user_permissions.collection = collection_data.key();
+    user_permissions.user = ctx.accounts.authority.key();
+    user_permissions.can_add_metadatas = true;
+    user_permissions.can_edit_metadatas = true;
+    user_permissions.can_delete_metadatas =  true;
+    user_permissions.can_edit_permissions = true;
+    user_permissions.can_delete_collection = true;
+    
     Ok(())
 }

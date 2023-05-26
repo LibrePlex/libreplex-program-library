@@ -4,10 +4,6 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(Debug)]
 pub struct CollectionData {
-
-    // the authority of the collection
-    pub authority: Pubkey,
-
     // Seed address used to generate unique account PDA address
     pub collection_seed: Pubkey,
 
