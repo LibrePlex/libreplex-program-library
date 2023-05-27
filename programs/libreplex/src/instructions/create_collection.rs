@@ -71,6 +71,7 @@ pub fn handler(ctx: Context<CreateCollection>,
     collection.url = collection_url;
     collection.item_count = 0;
     collection.nft_collection_data = nft_collection_data;
+    collection.creator = ctx.accounts.authority.key();
 
 
     msg!("Collection data created with authority pubkey {}", ctx.accounts.authority.key());
@@ -78,10 +79,13 @@ pub fn handler(ctx: Context<CreateCollection>,
     let user_permissions = &mut ctx.accounts.user_permissions;
     user_permissions.collection = collection.key();
     user_permissions.user = ctx.accounts.authority.key();
+
+    user_permissions.is_admin = true;
+    
     user_permissions.can_create_metadata = true;
     user_permissions.can_edit_metadata = true;
     user_permissions.can_delete_metadata =  true;
-    user_permissions.is_admin = true;
+    
     user_permissions.can_delete_collection = true;
     
     Ok(())

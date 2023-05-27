@@ -293,6 +293,10 @@
             "type": "publicKey"
           },
           {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
             "name": "name",
             "type": "string"
           },

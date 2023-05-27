@@ -293,6 +293,10 @@ export type Libreplex = {
             "type": "publicKey"
           },
           {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
             "name": "name",
             "type": "string"
           },
@@ -884,6 +888,10 @@ export const IDL: Libreplex = {
         "fields": [
           {
             "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "creator",
             "type": "publicKey"
           },
           {
