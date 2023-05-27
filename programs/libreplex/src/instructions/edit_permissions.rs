@@ -4,10 +4,10 @@ use prog_common::{errors::ErrorCode};
 
 
 pub struct EditPermissionsInput {
-    pub can_edit_permissions: bool,
-    pub can_add_metadatas: bool,
-    pub can_edit_metadatas: bool,
-    pub can_delete_metadatas: bool,
+    pub is_admin: bool,
+    pub can_create_metadata: bool,
+    pub can_edit_metadata: bool,
+    pub can_delete_metadata: bool,
     pub can_delete_collection: bool,
 }
 
@@ -47,19 +47,19 @@ pub fn handler(ctx: Context<EditPermissions>, edit_permissions_input: EditPermis
     
     assert_valid_user_permissions(auth_permissions, &collection.key(), auth.key)?;
 
-    if !auth_permissions.can_edit_permissions {
-        return Err(ErrorCode::CannotEditPermissions.into());
+    if !auth_permissions.is_admin {
+        return Err(ErrorCode::MissingPermissionAdmin.into());
     }
  
-    let EditPermissionsInput {can_add_metadatas, can_delete_collection, can_delete_metadatas, can_edit_metadatas, can_edit_permissions} = edit_permissions_input;
+    let EditPermissionsInput {can_create_metadata, can_delete_collection, can_delete_metadata, can_edit_metadata, is_admin} = edit_permissions_input;
 
     user_permissions.collection = ctx.accounts.collection.key();
     user_permissions.user = ctx.accounts.user.key();
-    user_permissions.can_add_metadatas = can_add_metadatas;
+    user_permissions.can_create_metadata = can_create_metadata;
     user_permissions.can_delete_collection = can_delete_collection;
-    user_permissions.can_delete_metadatas = can_delete_metadatas;
-    user_permissions.can_edit_metadatas = can_edit_metadatas;
-    user_permissions.can_edit_permissions = can_edit_permissions;
+    user_permissions.can_delete_metadata = can_delete_metadata;
+    user_permissions.can_edit_metadata = can_edit_metadata;
+    user_permissions.is_admin = is_admin;
 
     Ok(())                                
 }

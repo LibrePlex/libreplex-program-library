@@ -41,8 +41,8 @@ pub fn handler(ctx: Context<DeleteMetadata>) -> Result<()> {
 
     assert_valid_user_permissions(user_permissions, &collection.key(), authority.key)?;
 
-    if !user_permissions.can_delete_metadatas {
-        return Err(ErrorCode::CannotDeleteMetadata.into());
+    if !user_permissions.can_delete_metadata {
+        return Err(ErrorCode::MissingPermissionDeleteMetadata.into());
     }
 
     // Close the collection data state account
@@ -50,7 +50,7 @@ pub fn handler(ctx: Context<DeleteMetadata>) -> Result<()> {
     close_account(metadata_account_info, receiver)?;
 
     // Decrement collection data counter
-    collection.collection_count.try_sub_assign(1)?;
+    collection.item_count.try_sub_assign(1)?;
 
     msg!("Metadata with pubkey {} now deleted", ctx.accounts.metadata.key());
     Ok(())

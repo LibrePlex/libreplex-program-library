@@ -1,8 +1,10 @@
 use anchor_lang::prelude::*;
 
+
+use anchor_lang::{AnchorDeserialize, AnchorSerialize};
+
 #[repr(C)]
 #[account]
-#[derive(Debug)]
 pub struct Metadata {
 
     // the collection to which this metadata belongs
@@ -21,8 +23,7 @@ pub struct Metadata {
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct NftMetadata {
 
     pub attributes: Vec<Attribute>,
@@ -32,8 +33,7 @@ pub struct NftMetadata {
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct Attribute {
 
     pub trait_type: String,
@@ -43,8 +43,7 @@ pub struct Attribute {
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct MetadataInput {
 
     pub name: String,

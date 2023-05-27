@@ -31,7 +31,7 @@ pub fn handler(ctx: Context<DeleteCollection>) -> Result<()> {
     assert_valid_user_permissions(permissions, &ctx.accounts.collection.key(), ctx.accounts.signer.key)?;
 
     if !permissions.can_delete_collection {
-        return Err(ErrorCode::CannotDeleteCollection.into());
+        return Err(ErrorCode::MissingPermissionDeleteCollection.into());
     }
 
 

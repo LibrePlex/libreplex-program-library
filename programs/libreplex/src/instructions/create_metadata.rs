@@ -38,8 +38,8 @@ pub fn handler(ctx: Context<CreateMetadata>,
 
     assert_valid_user_permissions(user_permissions, &collection.key(), authority.key)?;
 
-    if !user_permissions.can_add_metadatas {
-        return Err(ErrorCode::CannotAddToCollection.into());
+    if !user_permissions.can_create_metadata {
+        return Err(ErrorCode::MissingPermissionCreateMetadata.into());
     }
 
 
@@ -64,7 +64,7 @@ pub fn handler(ctx: Context<CreateMetadata>,
 
     // Increment collection data counter
     let collection = &mut ctx.accounts.collection;
-    collection.collection_count.try_add_assign(1)?;
+    collection.item_count.try_add_assign(1)?;
 
     msg!("metadata created for mint with pubkey {}", ctx.accounts.mint.key());
 

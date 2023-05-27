@@ -1,11 +1,11 @@
 use anchor_lang::prelude::*;
+use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
 #[repr(C)]
 #[account]
-#[derive(Debug)]
 pub struct Collection {
     // Seed address used to generate unique account PDA address
-    pub collection_seed: Pubkey,
+    pub seed: Pubkey,
 
     // name and symbol of the collection
     pub name: String,
@@ -13,18 +13,17 @@ pub struct Collection {
     pub symbol: String,
 
     // collection url
-    pub collection_url: String,
+    pub url: String,
 
     // the number of items in collection
-    pub collection_count: u64,
+    pub item_count: u64,
 
     // for NFT collections
     pub nft_collection_data: Option<NftCollectionData>
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct NftCollectionData {
 
     // the royalty amount in basis points (0-10,000)
@@ -36,19 +35,17 @@ pub struct NftCollectionData {
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct RoyaltyShare {
 
     // royalty address and their share in basis points (0-10,000)
-    pub royalty_address: Pubkey,
+    pub recipient: Pubkey,
 
-    pub royalty_share: u16,
+    pub share: u16,
 }
 
 #[repr(C)]
-#[account]
-#[derive(Debug)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CollectionInput {
 
     pub name: String,
