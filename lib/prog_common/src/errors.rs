@@ -63,7 +63,8 @@ pub enum ErrorCode {
     #[msg("Missing delete metadata permission")]
     MissingPermissionDeleteMetadata, //0x1783
 
-    Reserved20, //0x1784
+    #[msg("Collection exists")]
+    CollectionExists, //0x1784
 
     Reserved21, //0x1785
     Reserved22, //0x1786

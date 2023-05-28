@@ -54,5 +54,12 @@ pub mod libreplex {
         instructions::delete_metadata::handler(ctx)
     }
 
+    pub fn delete_collection_permissions(
+        ctx: Context<DeleteCollectionPermissions>,
+    ) -> Result<()> {
+        msg!("deleting collection permissions");
+        instructions::delete_collection_permissions::handler(ctx)
+    }
+
 
 }
