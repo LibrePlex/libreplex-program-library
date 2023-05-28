@@ -5,6 +5,14 @@ use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, CollectionPermis
 
 use prog_common::{TryAdd, errors::ErrorCode};
 
+#[event]
+struct CreateMetadataEvent {
+    id: Pubkey,
+    collection: Pubkey,
+    mint: Pubkey,
+    name: String,
+}
+
 #[derive(Accounts)]
 #[instruction(metadata_input: MetadataInput)]
 pub struct CreateMetadata<'info> {
@@ -57,7 +65,7 @@ pub fn handler(ctx: Context<CreateMetadata>,
     // Update the metadata state account
     metadata.collection = ctx.accounts.collection.key();
     metadata.mint = ctx.accounts.mint.key();
-    metadata.name = name;
+    metadata.name = name.clone();
     metadata.url = metadata_url;
     metadata.is_mutable = true;
     metadata.nft_data = nft_metadata;
@@ -67,6 +75,13 @@ pub fn handler(ctx: Context<CreateMetadata>,
     collection.item_count.try_add_assign(1)?;
 
     msg!("metadata created for mint with pubkey {}", ctx.accounts.mint.key());
+
+    emit!(CreateMetadataEvent {
+        collection: collection.key(),
+        id: metadata.key(),
+        mint: ctx.accounts.mint.key(),
+        name: name,
+    });
 
     Ok(())
 

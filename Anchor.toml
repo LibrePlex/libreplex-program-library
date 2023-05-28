@@ -9,7 +9,7 @@ libreplex="L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "Localnet"
 wallet = "~/.config/solana/devnet-test1.json"
 
 [test]
@@ -17,3 +17,6 @@ startup_wait = 100000
 
 [test.validator]
 url = "https://api.devnet.solana.com"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 programs/**/**/tests/**/*.ts"

@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::{state::{CollectionPermissions, PERMISSIONS_SIZE, Collection}, assert_valid_user_permissions};
+use crate::{state::{CollectionPermissions, PERMISSIONS_SIZE, Collection}, assert_valid_user_permissions, PermissionEvent, PermissionEventType};
 use prog_common::{errors::ErrorCode};
 
 
@@ -60,6 +60,13 @@ pub fn handler(ctx: Context<EditPermissions>, edit_permissions_input: EditPermis
     user_permissions.can_delete_metadata = can_delete_metadata;
     user_permissions.can_edit_metadata = can_edit_metadata;
     user_permissions.is_admin = is_admin;
+
+
+    emit!(PermissionEvent {
+        collection: ctx.accounts.collection.key(),
+        user: ctx.accounts.user.key(),
+        event_type: PermissionEventType::Update,
+    });
 
     Ok(())                                
 }

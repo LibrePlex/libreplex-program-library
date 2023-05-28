@@ -4,7 +4,7 @@ use instructions::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-declare_id!("AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6");
+declare_id!("L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh");
 
 pub mod instructions;
 pub mod state;
