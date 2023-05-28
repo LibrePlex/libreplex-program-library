@@ -1,9 +1,16 @@
 use anchor_lang::prelude::*;
 use crate::state::{Collection, CollectionInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, PERMISSIONS_SIZE, CollectionPermissions, COLLECTION};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, PERMISSIONS_SIZE, CollectionPermissions, COLLECTION, PermissionEvent, PermissionEventType};
 
 
 use prog_common::{errors::ErrorCode};
+
+#[event]
+struct CreateCollectionEvent {
+    id: Pubkey,
+    creator: Pubkey,
+    name: String,
+}
 
 #[derive(Accounts)]
 #[instruction(collection_input: CollectionInput)]
@@ -66,12 +73,18 @@ pub fn handler(ctx: Context<CreateCollection>,
     // Update the collection data state account
     let collection = &mut ctx.accounts.collection;
     collection.seed = ctx.accounts.seed.key();
-    collection.name = name;
+    collection.name = name.clone();
     collection.symbol = symbol;
     collection.url = collection_url;
     collection.item_count = 0;
     collection.nft_collection_data = nft_collection_data;
     collection.creator = ctx.accounts.authority.key();
+
+    emit!(CreateCollectionEvent{
+        creator: ctx.accounts.authority.key(),
+        name,
+        id: collection.key(),
+    });
 
 
     msg!("Collection data created with authority pubkey {}", ctx.accounts.authority.key());
@@ -88,6 +101,13 @@ pub fn handler(ctx: Context<CreateCollection>,
     
     user_permissions.can_edit_collection = true;
     user_permissions.can_delete_collection = true;
+
+    
+    emit!(PermissionEvent {
+        collection: ctx.accounts.collection.key(),
+        user: ctx.accounts.authority.key(),
+        event_type: PermissionEventType::Update,
+    });
     
     Ok(())
 }
