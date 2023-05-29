@@ -27,7 +27,7 @@ pub struct CreateCollection<'info> {
     pub user_permissions: Box<Account<'info, CollectionPermissions>>,
 
     #[account(init, seeds = [COLLECTION.as_ref(), seed.key().as_ref()],
-      bump, payer = authority, space = 8 + 72 + collection_input.get_size())]
+      bump, payer = authority, space = Collection::BASE_SIZE + collection_input.get_size())]
     pub collection: Box<Account<'info, Collection>>,
 
 
