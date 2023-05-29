@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::state::{Collection, Metadata, MetadataInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, CollectionPermissions, assert_valid_user_permissions};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, CollectionPermissions, assert_valid_user_permissions, MetadataRenderMode};
 
 
 use prog_common::{TryAdd, errors::ErrorCode};
@@ -51,22 +51,37 @@ pub fn handler(ctx: Context<CreateMetadata>,
     }
 
 
-    let MetadataInput {name, symbol, metadata_url, nft_metadata} = metadata_input;
+    let MetadataInput {name, symbol, render_mode_data, nft_metadata} = metadata_input;
 
     // Ensure that the lengths of strings do not exceed the maximum allowed length
     let name_length = name.len();
     let symbol_length = symbol.len();
-    let url_length = metadata_url.len();
 
-    if (name_length > MAX_NAME_LENGTH)  || (symbol_length > MAX_SYMBOL_LENGTH) || (url_length > MAX_URL_LENGTH) {
+
+    
+
+    if (name_length > MAX_NAME_LENGTH)  || (symbol_length > MAX_SYMBOL_LENGTH) {
         return Err(error!(ErrorCode::InvalidStringInput));
     }
+
+
+    /* 
+        ensure that the initial render mode of the metadata matches the 
+        currently active render mode of the collection.
+
+        NB: It is possible to change the active render mode of the collection.
+        If that happens, it is the responsibility of the update auth holder
+        to add the appropriate render mode data to each metadata.
+
+    */ 
+    
+    render_mode_data.is_compatible_with(&collection.collection_render_mode);
 
     // Update the metadata state account
     metadata.collection = ctx.accounts.collection.key();
     metadata.mint = ctx.accounts.mint.key();
     metadata.name = name.clone();
-    metadata.url = metadata_url;
+    metadata.render_mode_data = vec![render_mode_data];
     metadata.is_mutable = true;
     metadata.nft_data = nft_metadata;
 
