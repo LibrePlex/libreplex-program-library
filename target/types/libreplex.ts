@@ -532,6 +532,10 @@ export type Libreplex = {
             "type": "publicKey"
           },
           {
+            "name": "itemCount",
+            "type": "u64"
+          },
+          {
             "name": "name",
             "type": "string"
           },
@@ -544,10 +548,6 @@ export type Libreplex = {
             "type": {
               "defined": "CollectionRenderMode"
             }
-          },
-          {
-            "name": "itemCount",
-            "type": "u64"
           },
           {
             "name": "nftCollectionData",
@@ -1661,6 +1661,10 @@ export const IDL: Libreplex = {
             "type": "publicKey"
           },
           {
+            "name": "itemCount",
+            "type": "u64"
+          },
+          {
             "name": "name",
             "type": "string"
           },
@@ -1673,10 +1677,6 @@ export const IDL: Libreplex = {
             "type": {
               "defined": "CollectionRenderMode"
             }
-          },
-          {
-            "name": "itemCount",
-            "type": "u64"
           },
           {
             "name": "nftCollectionData",

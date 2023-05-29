@@ -532,6 +532,10 @@
             "type": "publicKey"
           },
           {
+            "name": "itemCount",
+            "type": "u64"
+          },
+          {
             "name": "name",
             "type": "string"
           },
@@ -544,10 +548,6 @@
             "type": {
               "defined": "CollectionRenderMode"
             }
-          },
-          {
-            "name": "itemCount",
-            "type": "u64"
           },
           {
             "name": "nftCollectionData",
@@ -1124,5 +1124,8 @@
         }
       ]
     }
-  ]
+  ],
+  "metadata": {
+    "address": "AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6"
+  }
 }
