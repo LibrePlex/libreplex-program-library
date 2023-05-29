@@ -15,14 +15,31 @@ pub struct PermissionEvent {
     pub event_type: PermissionEventType,
 }
 
+#[event]
+pub struct MetadataPermissionEvent {
+    pub metadata: Pubkey,
+    pub user: Pubkey,
+}
+
 pub const PERMISSIONS_SIZE: usize = 32 + 32 + 1 + 1 
 // Padding
 + 30;
 
 
-pub fn assert_valid_user_permissions(permissions: &CollectionPermissions, 
+pub fn assert_valid_collection_permissions(permissions: &CollectionPermissions, 
     collection: &Pubkey, user: &Pubkey) -> Result<()> {
     let valid = &permissions.collection == collection && &permissions.user == user;
+
+    if !valid {
+        return Err(ErrorCode::InvalidPermissions.into());
+    }
+
+    Ok(())
+}
+
+pub fn assert_valid_metadata_permissions(permissions: &MetadataPermissions, 
+    metadata: &Pubkey, user: &Pubkey) -> Result<()> {
+    let valid = &permissions.metadata == metadata && &permissions.user == user;
 
     if !valid {
         return Err(ErrorCode::InvalidPermissions.into());

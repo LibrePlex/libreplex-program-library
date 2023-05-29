@@ -1,7 +1,9 @@
 use anchor_lang::prelude::*;
 
-use crate::{assert_valid_user_permissions, state::Collection, CollectionPermissions};
+
 use prog_common::{close_account, errors::ErrorCode};
+
+use crate::{CollectionPermissions, Collection, assert_valid_collection_permissions};
 
 #[derive(Accounts)]
 pub struct DeleteCollection<'info> {
@@ -28,11 +30,11 @@ pub struct DeleteCollection<'info> {
 }
 
 pub fn handler(ctx: Context<DeleteCollection>) -> Result<()> {
-    // Set the receiver of the lamports to be reclaimed from the rent of the accounts to be closed
+    //assert_valid_collection_permissionsmports to be reclaimed from the rent of the accounts to be closed
     let receiver = &mut ctx.accounts.receiver;
     let permissions = &ctx.accounts.signer_collection_permissions;
 
-    assert_valid_user_permissions(
+    assert_valid_collection_permissions(
         permissions,
         &ctx.accounts.collection.key(),
         ctx.accounts.signer.key,
