@@ -513,6 +513,44 @@
   ],
   "types": [
     {
+      "name": "AttributeType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "permittedValues",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "deleted",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BaseUrlConfiguration",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "prefix",
+            "type": "string"
+          },
+          {
+            "name": "suffix",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
       "name": "NftCollectionData",
       "type": {
         "kind": "struct",
@@ -533,6 +571,22 @@
             "name": "permittedSigners",
             "type": {
               "vec": "publicKey"
+            }
+          },
+          {
+            "name": "attributeTypes",
+            "type": {
+              "vec": {
+                "defined": "AttributeType"
+              }
+            }
+          },
+          {
+            "name": "itemBaseUrl",
+            "type": {
+              "option": {
+                "defined": "BaseUrlConfiguration"
+              }
             }
           }
         ]
@@ -589,33 +643,13 @@
         "fields": [
           {
             "name": "attributes",
-            "type": {
-              "vec": {
-                "defined": "Attribute"
-              }
-            }
+            "type": "bytes"
           },
           {
             "name": "signers",
             "type": {
               "vec": "publicKey"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Attribute",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "traitType",
-            "type": "string"
-          },
-          {
-            "name": "attribute",
-            "type": "string"
           }
         ]
       }
@@ -647,12 +681,89 @@
           }
         ]
       }
+    },
+    {
+      "name": "PermissionEventType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Update"
+          },
+          {
+            "name": "Delete"
+          }
+        ]
+      }
     }
   ],
-  "metadata": {
-    "address": "AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6",
-    "origin": "anchor",
-    "binaryVersion": "0.27.0",
-    "libVersion": "^0.27"
-  }
+  "events": [
+    {
+      "name": "CreateCollectionEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "creator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CreateMetadataEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "collection",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PermissionEvent",
+      "fields": [
+        {
+          "name": "collection",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "eventType",
+          "type": {
+            "defined": "PermissionEventType"
+          },
+          "index": false
+        }
+      ]
+    }
+  ]
 }
