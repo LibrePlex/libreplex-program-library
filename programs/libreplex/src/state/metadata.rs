@@ -6,18 +6,17 @@ use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 use prog_common::{errors::ErrorCode};
 
-use crate::{MAX_NAME_LENGTH, MAX_URL_LENGTH, Collection};
+use crate::{MAX_NAME_LENGTH, Collection};
 
 use crate::{CollectionRenderMode};
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum MetadataRenderModeData {
-    NONE {
+    Program {
+        program_id: Pubkey
     },
-    PROGRAM {
-    },
-    URL {
+    Url {
         url: String
     },
 }
@@ -25,20 +24,22 @@ pub enum MetadataRenderModeData {
 impl MetadataRenderModeData {
     pub fn get_size(&self) -> usize {
         1 + match self {
-            URL => 32,
+            MetadataRenderModeData::Url {url: _} => 32,
             _ => 0
         }
     }
     pub fn is_compatible_with(&self,collection_render_mode: &CollectionRenderMode) -> bool {
         match self {
-            MetadataRenderModeData::NONE {} => {
-                return mem::discriminant(collection_render_mode) == mem::discriminant(&CollectionRenderMode::NONE) 
+            // MetadataRenderModeData::None {} => {
+            //     return mem::discriminant(collection_render_mode) == mem::discriminant(&CollectionRenderMode::None{}) 
+            // },
+            MetadataRenderModeData::Program {
+                program_id: _
+            } => {
+                return mem::discriminant(collection_render_mode) == mem::discriminant(&CollectionRenderMode::Program{program_id: Pubkey::default()}) 
             },
-            MetadataRenderModeData::PROGRAM {} => {
-                return mem::discriminant(collection_render_mode) == mem::discriminant(&CollectionRenderMode::PROGRAM(Pubkey::default())) 
-            },
-            MetadataRenderModeData::URL {url} => {
-                return mem::discriminant(collection_render_mode) == mem::discriminant(&CollectionRenderMode::URL(String::default())) 
+            MetadataRenderModeData::Url {url} => {
+                return mem::discriminant(collection_render_mode) == mem::discriminant(&CollectionRenderMode::Url{collection_url: String::default()}) 
             }
         }
     }

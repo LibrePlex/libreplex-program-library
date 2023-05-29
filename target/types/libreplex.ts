@@ -766,17 +766,13 @@ export type Libreplex = {
           {
             "name": "continuedAtIndex",
             "type": {
-              "option": {
-                "defined": "usize"
-              }
+              "option": "u32"
             }
           },
           {
             "name": "continuedFromIndex",
             "type": {
-              "option": {
-                "defined": "usize"
-              }
+              "option": "u32"
             }
           }
         ]
@@ -934,18 +930,21 @@ export type Libreplex = {
         "kind": "enum",
         "variants": [
           {
-            "name": "NONE"
-          },
-          {
-            "name": "PROGRAM",
+            "name": "Program",
             "fields": [
-              "publicKey"
+              {
+                "name": "program_id",
+                "type": "publicKey"
+              }
             ]
           },
           {
-            "name": "URL",
+            "name": "Url",
             "fields": [
-              "string"
+              {
+                "name": "collection_url",
+                "type": "string"
+              }
             ]
           }
         ]
@@ -957,21 +956,23 @@ export type Libreplex = {
         "kind": "enum",
         "variants": [
           {
-            "name": "NONE",
-            "fields": []
-          },
-          {
-            "name": "PROGRAM",
+            "name": "Program",
             "fields": [
-              "publicKey"
+              {
+                "name": "program_id",
+                "type": "publicKey"
+              }
             ]
           },
           {
-            "name": "URL",
+            "name": "Url",
             "fields": [
               {
-                "option": {
-                  "defined": "BaseUrlConfiguration"
+                "name": "base_url_configuration",
+                "type": {
+                  "option": {
+                    "defined": "BaseUrlConfiguration"
+                  }
                 }
               }
             ]
@@ -985,15 +986,16 @@ export type Libreplex = {
         "kind": "enum",
         "variants": [
           {
-            "name": "NONE",
-            "fields": []
+            "name": "Program",
+            "fields": [
+              {
+                "name": "program_id",
+                "type": "publicKey"
+              }
+            ]
           },
           {
-            "name": "PROGRAM",
-            "fields": []
-          },
-          {
-            "name": "URL",
+            "name": "Url",
             "fields": [
               {
                 "name": "url",
@@ -1893,17 +1895,13 @@ export const IDL: Libreplex = {
           {
             "name": "continuedAtIndex",
             "type": {
-              "option": {
-                "defined": "usize"
-              }
+              "option": "u32"
             }
           },
           {
             "name": "continuedFromIndex",
             "type": {
-              "option": {
-                "defined": "usize"
-              }
+              "option": "u32"
             }
           }
         ]
@@ -2061,18 +2059,21 @@ export const IDL: Libreplex = {
         "kind": "enum",
         "variants": [
           {
-            "name": "NONE"
-          },
-          {
-            "name": "PROGRAM",
+            "name": "Program",
             "fields": [
-              "publicKey"
+              {
+                "name": "program_id",
+                "type": "publicKey"
+              }
             ]
           },
           {
-            "name": "URL",
+            "name": "Url",
             "fields": [
-              "string"
+              {
+                "name": "collection_url",
+                "type": "string"
+              }
             ]
           }
         ]
@@ -2084,21 +2085,23 @@ export const IDL: Libreplex = {
         "kind": "enum",
         "variants": [
           {
-            "name": "NONE",
-            "fields": []
-          },
-          {
-            "name": "PROGRAM",
+            "name": "Program",
             "fields": [
-              "publicKey"
+              {
+                "name": "program_id",
+                "type": "publicKey"
+              }
             ]
           },
           {
-            "name": "URL",
+            "name": "Url",
             "fields": [
               {
-                "option": {
-                  "defined": "BaseUrlConfiguration"
+                "name": "base_url_configuration",
+                "type": {
+                  "option": {
+                    "defined": "BaseUrlConfiguration"
+                  }
                 }
               }
             ]
@@ -2112,15 +2115,16 @@ export const IDL: Libreplex = {
         "kind": "enum",
         "variants": [
           {
-            "name": "NONE",
-            "fields": []
+            "name": "Program",
+            "fields": [
+              {
+                "name": "program_id",
+                "type": "publicKey"
+              }
+            ]
           },
           {
-            "name": "PROGRAM",
-            "fields": []
-          },
-          {
-            "name": "URL",
+            "name": "Url",
             "fields": [
               {
                 "name": "url",

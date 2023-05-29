@@ -1,12 +1,9 @@
 use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-
-
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum CollectionRenderMode {
-    NONE,
     /*
         Pubkey here is the address of the rendering program
         * BETA functionality (to be validated against
@@ -21,7 +18,7 @@ pub enum CollectionRenderMode {
         to obtain a rendering, it is enough
         to simulate the transaction.
 
-        input accounts:
+    input accounts:
         1) collection
 
         output:
@@ -29,15 +26,15 @@ pub enum CollectionRenderMode {
         2) image URL (including ordinal / base64)
         3) something else
     */
-    PROGRAM(Pubkey),
-    URL(String),
+    Program{program_id: Pubkey},
+    Url{collection_url: String},
 }
 
 impl CollectionRenderMode {
     pub fn get_size(&self) -> usize {
         1 + match self {
-            CollectionRenderMode::URL(item_base_url) => 4 + item_base_url.len(),
-            CollectionRenderMode::PROGRAM(program_id) => 32,
+            CollectionRenderMode::Url{collection_url} => 4 + collection_url.len(),
+            CollectionRenderMode::Program{program_id:_} => 32,
             _ => 0,
         }
     }
@@ -46,7 +43,6 @@ impl CollectionRenderMode {
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum MetadataRenderMode {
-    NONE {},
     /*
         Pubkey here is the address of the rendering program
         * BETA functionality (to be validated against
@@ -72,20 +68,28 @@ pub enum MetadataRenderMode {
         2) image URL (including ordinal / base64)
         3) something else
     */
-    PROGRAM(Pubkey),
-    URL(Option<BaseUrlConfiguration>),
+    Program {
+        program_id: Pubkey,
+    },
+    Url {
+        base_url_configuration: Option<BaseUrlConfiguration>,
+    },
 }
 
 impl MetadataRenderMode {
     pub fn get_size(&self) -> usize {
         1 + match self {
-            MetadataRenderMode::URL(item_base_url) => {
-                1 + match item_base_url {
-                    Some(baseConfig) => 4 + 4 + baseConfig.prefix.len() + baseConfig.suffix.len(),
+            MetadataRenderMode::Url {
+                base_url_configuration,
+            } => {
+                1 + match base_url_configuration {
+                    Some(base_config) => {
+                        4 + 4 + base_config.prefix.len() + base_config.suffix.len()
+                    }
                     None => 0,
                 }
             }
-            MetadataRenderMode::PROGRAM(program_id) => 32,
+            MetadataRenderMode::Program { program_id: _ } => 32,
             _ => 0,
         }
     }
@@ -177,10 +181,10 @@ pub struct AttributeType {
     pub deleted: bool,
 
     // pointer to the next attribute type in case of attribute value overflow (>255)
-    pub continued_at_index: Option<usize>,
+    pub continued_at_index: Option<u32>,
 
     // pointer to the previous attribute type in case of attribute value overflow (>255)
-    pub continued_from_index: Option<usize>,
+    pub continued_from_index: Option<u32>,
 }
 
 impl AttributeType {
