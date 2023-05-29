@@ -1,9 +1,10 @@
 use anchor_lang::prelude::*;
-use crate::{state::{CollectionPermissions, PERMISSIONS_SIZE, Collection}, assert_valid_user_permissions, PermissionEvent, PermissionEventType};
+use crate::{state::{CollectionPermissions, PERMISSIONS_SIZE, Collection}, assert_valid_collection_permissions, PermissionEvent, PermissionEventType};
 use prog_common::{errors::ErrorCode};
 
 
-pub struct EditPermissionsInput {
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct EditCollectionPermissionsInput {
     pub is_admin: bool,
     pub can_create_metadata: bool,
     pub can_edit_metadata: bool,
@@ -12,7 +13,7 @@ pub struct EditPermissionsInput {
 }
 
 #[derive(Accounts)]
-pub struct EditPermissions<'info> {
+pub struct EditCollectionPermissions<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
@@ -39,19 +40,19 @@ pub struct EditPermissions<'info> {
 
 
 
-pub fn handler(ctx: Context<EditPermissions>, edit_permissions_input: EditPermissionsInput) -> Result<()> {
+pub fn handler(ctx: Context<EditCollectionPermissions>, edit_permissions_input: EditCollectionPermissionsInput) -> Result<()> {
     let user_permissions = &mut ctx.accounts.user_permissions;
     let auth_permissions = & ctx.accounts.auth_permissions;
     let collection = &ctx.accounts.collection;
     let auth = &ctx.accounts.authority;
     
-    assert_valid_user_permissions(auth_permissions, &collection.key(), auth.key)?;
+    assert_valid_collection_permissions(auth_permissions, &collection.key(), auth.key)?;
 
     if !auth_permissions.is_admin {
         return Err(ErrorCode::MissingPermissionAdmin.into());
     }
  
-    let EditPermissionsInput {can_create_metadata, can_delete_collection, can_delete_metadata, can_edit_metadata, is_admin} = edit_permissions_input;
+    let EditCollectionPermissionsInput {can_create_metadata, can_delete_collection, can_delete_metadata, can_edit_metadata, is_admin} = edit_permissions_input;
 
     user_permissions.collection = ctx.accounts.collection.key();
     user_permissions.user = ctx.accounts.user.key();
