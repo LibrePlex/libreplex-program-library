@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::state::{Collection, Metadata, MetadataInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, CollectionPermissions, assert_valid_user_permissions};
+use crate::{CollectionPermissions, assert_valid_collection_permissions, validate_metadata_input};
 
 
 use prog_common::{TryAdd, errors::ErrorCode};
@@ -29,9 +29,9 @@ pub struct CreateMetadata<'info> {
 
     #[account(init, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
               bump, payer = signer, space = 8 + 65 + metadata_input.get_size())]
-
     pub metadata: Box<Account<'info, Metadata>>,
     pub mint: Signer<'info>,
+
 
     pub system_program: Program<'info, System>,
 }
@@ -44,23 +44,15 @@ pub fn handler(ctx: Context<CreateMetadata>,
     let user_permissions = &ctx.accounts.signer_collection_permissions;
     let authority = &ctx.accounts.signer;
 
-    assert_valid_user_permissions(user_permissions, &collection.key(), authority.key)?;
+    assert_valid_collection_permissions(user_permissions, &collection.key(), authority.key)?;
 
     if !user_permissions.can_create_metadata {
         return Err(ErrorCode::MissingPermissionCreateMetadata.into());
     }
 
+    validate_metadata_input(&metadata_input)?;
 
-    let MetadataInput {name, symbol, metadata_url, nft_metadata} = metadata_input;
-
-    // Ensure that the lengths of strings do not exceed the maximum allowed length
-    let name_length = name.len();
-    let symbol_length = symbol.len();
-    let url_length = metadata_url.len();
-
-    if (name_length > MAX_NAME_LENGTH)  || (symbol_length > MAX_SYMBOL_LENGTH) || (url_length > MAX_URL_LENGTH) {
-        return Err(error!(ErrorCode::InvalidStringInput));
-    }
+    let MetadataInput {name, metadata_url, nft_metadata} = metadata_input;
 
     // Update the metadata state account
     metadata.collection = ctx.accounts.collection.key();

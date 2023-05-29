@@ -4,7 +4,7 @@ use instructions::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-declare_id!("L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh");
+declare_id!("AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6");
 
 pub mod instructions;
 pub mod state;
@@ -34,6 +34,18 @@ pub mod libreplex {
     ) -> Result<()> {
         msg!("deleting collection data");
         instructions::delete_collection::handler(ctx)
+    }
+
+    pub fn edit_collection_permissions(ctx: Context<EditCollectionPermissions>, 
+        input: EditCollectionPermissionsInput) -> Result<()> {
+        msg!("Editing collection permissions");
+        instructions::edit_collection_permissions::handler(ctx, input)
+    }
+
+    pub fn edit_metadata_permissions(ctx: Context<EditMetadataPermissions>, 
+        input: EditMetadataPermissionsInput) -> Result<()> {
+        msg!("Editing metadata permissions");
+        instructions::edit_metadata_permissions::handler(ctx, input)
     }
 
     pub fn create_metadata(

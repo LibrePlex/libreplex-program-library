@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::{Collection, Metadata}, METADATA, CollectionPermissions, assert_valid_user_permissions};
+use crate::{state::{Collection, Metadata}, METADATA, CollectionPermissions, assert_valid_collection_permissions};
 use prog_common::{close_account, TrySub, errors::ErrorCode};
 
 
@@ -39,7 +39,7 @@ pub fn handler(ctx: Context<DeleteMetadata>) -> Result<()> {
     let collection = &mut ctx.accounts.collection;
     let user_permissions = &ctx.accounts.user_permissions;
 
-    assert_valid_user_permissions(user_permissions, &collection.key(), authority.key)?;
+    assert_valid_collection_permissions(user_permissions, &collection.key(), authority.key)?;
 
     if !user_permissions.can_delete_metadata {
         return Err(ErrorCode::MissingPermissionDeleteMetadata.into());

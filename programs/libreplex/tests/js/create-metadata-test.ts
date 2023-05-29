@@ -67,15 +67,14 @@ describe("libreplex", () => {
     })
 
 
+    console.log("Here")
     const mint = Keypair.generate()
     const metadata = PublicKey.findProgramAddressSync([Buffer.from("metadata"), mint.publicKey.toBuffer()], program.programId)[0]
     const metadataName = "COOLMETA"
 
-
     await program.methods.createMetadata({
       metadataUrl: "COOLURL.com",
       name: metadataName,
-      symbol: "COOL",
       nftMetadata: null,
     }).accounts({
       mint: mint.publicKey,
