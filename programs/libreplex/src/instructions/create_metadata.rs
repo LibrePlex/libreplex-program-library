@@ -1,9 +1,11 @@
-use anchor_lang::prelude::*;
 use crate::state::{Collection, Metadata, MetadataInput};
-use crate::{CollectionPermissions, assert_valid_collection_permissions, validate_metadata_input};
+use crate::{
+    assert_valid_collection_permissions, validate_metadata_input,
+    CollectionPermissions
+};
+use anchor_lang::prelude::*;
 
-
-use prog_common::{TryAdd, errors::ErrorCode};
+use prog_common::{errors::ErrorCode, TryAdd};
 
 #[event]
 struct CreateMetadataEvent {
@@ -32,13 +34,10 @@ pub struct CreateMetadata<'info> {
     pub metadata: Box<Account<'info, Metadata>>,
     pub mint: Signer<'info>,
 
-
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateMetadata>,
-               metadata_input: MetadataInput,
-) -> Result<()> {
+pub fn handler(ctx: Context<CreateMetadata>, metadata_input: MetadataInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let collection = &ctx.accounts.collection;
     let user_permissions = &ctx.accounts.signer_collection_permissions;
@@ -50,31 +49,31 @@ pub fn handler(ctx: Context<CreateMetadata>,
         return Err(ErrorCode::MissingPermissionCreateMetadata.into());
     }
 
-    validate_metadata_input(&metadata_input)?;
-
-    let MetadataInput {name, metadata_url, nft_metadata} = metadata_input;
+    validate_metadata_input(&metadata_input, collection)?;
 
     // Update the metadata state account
     metadata.collection = ctx.accounts.collection.key();
     metadata.mint = ctx.accounts.mint.key();
-    metadata.name = name.clone();
-    metadata.url = metadata_url;
+    metadata.name = metadata_input.name.clone();
+    metadata.render_mode_data = vec![metadata_input.render_mode_data];
     metadata.is_mutable = true;
-    metadata.nft_data = nft_metadata;
+    metadata.nft_data = metadata_input.nft_metadata;
 
     // Increment collection data counter
     let collection = &mut ctx.accounts.collection;
     collection.item_count.try_add_assign(1)?;
 
-    msg!("metadata created for mint with pubkey {}", ctx.accounts.mint.key());
+    msg!(
+        "metadata created for mint with pubkey {}",
+        ctx.accounts.mint.key()
+    );
 
     emit!(CreateMetadataEvent {
         collection: collection.key(),
         id: metadata.key(),
         mint: ctx.accounts.mint.key(),
-        name: name,
+        name: metadata_input.name,
     });
 
     Ok(())
-
 }

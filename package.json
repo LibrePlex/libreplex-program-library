@@ -12,6 +12,7 @@
     "dev": "next dev",
     "build": "anchor build -p libreplex",
     "start": "next start",
+    "libreplex:deploy:localnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster http://localhost:8899 --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex:deploy:devnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex:deploy:mainnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "lint": "next lint"

@@ -3,7 +3,7 @@ use solana_program_test::*;
 
 mod permissions {
     use anchor_lang::{InstructionData, system_program, ToAccountMetas};
-    use libreplex::{CollectionInput};
+    use libreplex::{CollectionInput, BaseUrlConfiguration};
     use solana_program::{instruction::Instruction, pubkey::Pubkey};
     use solana_sdk::{transaction::Transaction, signer::Signer, signature::Keypair};
 
@@ -28,11 +28,17 @@ mod permissions {
         }.to_account_metas(None);
 
 
+        let collection_url = "a";
+        let base_url_configuration = None;
+
         let create_collection = libreplex::instruction::CreateCollection {
             collection_input: CollectionInput {
-                    collection_url: "COOLIO.COM".to_string(),
+                    // collection_url: "COOLIO.COM".to_string(),
                     name: "COOLIO COLLECTION".to_string(),
+                    
                     symbol: "COOL".to_string(),
+                    collection_render_mode: libreplex::CollectionRenderMode::Url { collection_url: collection_url.to_string() },
+                    metadata_render_mode: libreplex::MetadataRenderMode::Url { base_url_configuration },
                     nft_collection_data: None,
             }
         };
