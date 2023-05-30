@@ -85,7 +85,7 @@ pub enum MetadataRenderMode {
 
 impl MetadataRenderMode {
     pub fn get_size(&self) -> usize {
-        1 + match self {
+        2 + match self {
             MetadataRenderMode::None => 1,
             MetadataRenderMode::Url {
                 base_url_configuration,
@@ -319,7 +319,7 @@ pub struct CollectionInput {
     pub name: String,
     pub symbol: String,
     pub collection_render_mode: CollectionRenderMode,
-    // pub metadata_render_mode: MetadataRenderMode,
+    pub metadata_render_mode: MetadataRenderMode,
     // pub nft_collection_data: Option<NftCollectionData>,
 }
 
@@ -330,8 +330,8 @@ impl CollectionInput {
         let size 
             = 4 + self.name.len()
             + 4 + self.symbol.len()
-            + self.collection_render_mode.get_size();
-            // + self.metadata_render_mode.get_size();
+            + self.collection_render_mode.get_size()
+            + self.metadata_render_mode.get_size();
             // + 1 + match self.nft_collection_data.as_ref() {
             //     Some(data) => data.get_size(),
             //     None => 0,
