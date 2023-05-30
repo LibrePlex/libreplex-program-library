@@ -854,6 +854,12 @@ export type Libreplex = {
             "type": {
               "defined": "CollectionRenderMode"
             }
+          },
+          {
+            "name": "metadataRenderMode",
+            "type": {
+              "defined": "MetadataRenderMode"
+            }
           }
         ]
       }
@@ -1966,6 +1972,12 @@ export const IDL: Libreplex = {
             "name": "collectionRenderMode",
             "type": {
               "defined": "CollectionRenderMode"
+            }
+          },
+          {
+            "name": "metadataRenderMode",
+            "type": {
+              "defined": "MetadataRenderMode"
             }
           }
         ]
