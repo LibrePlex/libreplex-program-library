@@ -533,7 +533,7 @@
           },
           {
             "name": "itemCount",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "name",
@@ -547,14 +547,6 @@
             "name": "collectionRenderMode",
             "type": {
               "defined": "CollectionRenderMode"
-            }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
             }
           },
           {
@@ -862,20 +854,6 @@
             "type": {
               "defined": "CollectionRenderMode"
             }
-          },
-          {
-            "name": "metadataRenderMode",
-            "type": {
-              "defined": "MetadataRenderMode"
-            }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
-            }
           }
         ]
       }
@@ -930,6 +908,9 @@
         "kind": "enum",
         "variants": [
           {
+            "name": "None"
+          },
+          {
             "name": "Program",
             "fields": [
               {
@@ -955,6 +936,9 @@
       "type": {
         "kind": "enum",
         "variants": [
+          {
+            "name": "None"
+          },
           {
             "name": "Program",
             "fields": [

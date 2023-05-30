@@ -533,7 +533,7 @@ export type Libreplex = {
           },
           {
             "name": "itemCount",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "name",
@@ -547,14 +547,6 @@ export type Libreplex = {
             "name": "collectionRenderMode",
             "type": {
               "defined": "CollectionRenderMode"
-            }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
             }
           },
           {
@@ -862,20 +854,6 @@ export type Libreplex = {
             "type": {
               "defined": "CollectionRenderMode"
             }
-          },
-          {
-            "name": "metadataRenderMode",
-            "type": {
-              "defined": "MetadataRenderMode"
-            }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
-            }
           }
         ]
       }
@@ -930,6 +908,9 @@ export type Libreplex = {
         "kind": "enum",
         "variants": [
           {
+            "name": "None"
+          },
+          {
             "name": "Program",
             "fields": [
               {
@@ -955,6 +936,9 @@ export type Libreplex = {
       "type": {
         "kind": "enum",
         "variants": [
+          {
+            "name": "None"
+          },
           {
             "name": "Program",
             "fields": [
@@ -1662,7 +1646,7 @@ export const IDL: Libreplex = {
           },
           {
             "name": "itemCount",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "name",
@@ -1676,14 +1660,6 @@ export const IDL: Libreplex = {
             "name": "collectionRenderMode",
             "type": {
               "defined": "CollectionRenderMode"
-            }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
             }
           },
           {
@@ -1991,20 +1967,6 @@ export const IDL: Libreplex = {
             "type": {
               "defined": "CollectionRenderMode"
             }
-          },
-          {
-            "name": "metadataRenderMode",
-            "type": {
-              "defined": "MetadataRenderMode"
-            }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
-            }
           }
         ]
       }
@@ -2059,6 +2021,9 @@ export const IDL: Libreplex = {
         "kind": "enum",
         "variants": [
           {
+            "name": "None"
+          },
+          {
             "name": "Program",
             "fields": [
               {
@@ -2084,6 +2049,9 @@ export const IDL: Libreplex = {
       "type": {
         "kind": "enum",
         "variants": [
+          {
+            "name": "None"
+          },
           {
             "name": "Program",
             "fields": [
