@@ -68,7 +68,9 @@ pub enum ErrorCode {
 
     #[msg("Incompatible metadata type")]
     IncompatibleMetadataType, //0x1785
-    Reserved22, //0x1786
+
+    #[msg("Collection has items")]
+    CollectionHasItems, //0x1786
     Reserved23, //0x1787
     Reserved24, //0x1788
     Reserved25, //0x1789

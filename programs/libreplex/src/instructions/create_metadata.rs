@@ -34,16 +34,12 @@ pub struct CreateMetadata<'info> {
               bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
 
-    pub mint_signer: Signer<'info>,
-
     /*
         Signer constraint to be relaxed later to allow for migration signatures etc. 
         Q: What to do with mints without metadata?
     */
-    #[account(mut,
-        constraint = mint_signer.key() == mint.key()
-    )]
-    pub mint: Box<Account<'info, Mint>>,
+    
+    pub mint: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 }
@@ -61,6 +57,9 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: MetadataInput) -> R
     }
 
     validate_metadata_input(&metadata_input, collection)?;
+
+    // ensure that the mint is in fact a mint
+    Account::<Mint>::try_from(&ctx.accounts.mint.to_account_info());
 
     // Update the metadata state account
     metadata.collection = collection.key();

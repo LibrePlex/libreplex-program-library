@@ -362,21 +362,15 @@ export type Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Mint",
                 "path": "mint"
               }
             ]
           }
         },
         {
-          "name": "mintSigner",
+          "name": "mint",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -1521,21 +1515,15 @@ export const IDL: Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Mint",
                 "path": "mint"
               }
             ]
           }
         },
         {
-          "name": "mintSigner",
+          "name": "mint",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "systemProgram",

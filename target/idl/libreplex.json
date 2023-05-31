@@ -362,21 +362,15 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Mint",
                 "path": "mint"
               }
             ]
           }
         },
         {
-          "name": "mintSigner",
+          "name": "mint",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -1154,8 +1148,5 @@
         }
       ]
     }
-  ],
-  "metadata": {
-    "address": "AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6"
-  }
+  ]
 }
