@@ -580,15 +580,18 @@ export type Libreplex = {
             "type": "publicKey"
           },
           {
-            "name": "name",
-            "type": "string"
-          },
-          {
             "name": "isMutable",
             "type": "bool"
           },
           {
-            "name": "nftData",
+            "name": "name",
+            "docs": [
+              "from input - variable size"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "nftMetadata",
             "type": {
               "option": {
                 "defined": "NftMetadata"
@@ -899,6 +902,18 @@ export type Libreplex = {
       }
     },
     {
+      "name": "NftMetadataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attributes",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
       "name": "MetadataInput",
       "type": {
         "kind": "struct",
@@ -917,7 +932,7 @@ export type Libreplex = {
             "name": "nftMetadata",
             "type": {
               "option": {
-                "defined": "NftMetadata"
+                "defined": "NftMetadataInput"
               }
             }
           }
@@ -991,6 +1006,9 @@ export type Libreplex = {
       "type": {
         "kind": "enum",
         "variants": [
+          {
+            "name": "None"
+          },
           {
             "name": "Program",
             "fields": [
@@ -1715,15 +1733,18 @@ export const IDL: Libreplex = {
             "type": "publicKey"
           },
           {
-            "name": "name",
-            "type": "string"
-          },
-          {
             "name": "isMutable",
             "type": "bool"
           },
           {
-            "name": "nftData",
+            "name": "name",
+            "docs": [
+              "from input - variable size"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "nftMetadata",
             "type": {
               "option": {
                 "defined": "NftMetadata"
@@ -2034,6 +2055,18 @@ export const IDL: Libreplex = {
       }
     },
     {
+      "name": "NftMetadataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attributes",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
       "name": "MetadataInput",
       "type": {
         "kind": "struct",
@@ -2052,7 +2085,7 @@ export const IDL: Libreplex = {
             "name": "nftMetadata",
             "type": {
               "option": {
-                "defined": "NftMetadata"
+                "defined": "NftMetadataInput"
               }
             }
           }
@@ -2126,6 +2159,9 @@ export const IDL: Libreplex = {
       "type": {
         "kind": "enum",
         "variants": [
+          {
+            "name": "None"
+          },
           {
             "name": "Program",
             "fields": [

@@ -1,10 +1,11 @@
 use crate::state::{Collection, Metadata, MetadataInput};
 use crate::{
-    assert_valid_collection_permissions, validate_metadata_input,
-    CollectionPermissions
+    assert_valid_collection_permissions, validate_metadata_input, CollectionPermissions,
+    NftMetadata,
 };
 use anchor_lang::prelude::*;
 
+use anchor_spl::token::Mint;
 use prog_common::{errors::ErrorCode, TryAdd};
 
 #[event]
@@ -30,8 +31,14 @@ pub struct CreateMetadata<'info> {
     pub collection: Box<Account<'info, Collection>>,
 
     #[account(init, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
-              bump, payer = signer, space = 8 + 65 + metadata_input.get_size())]
+              bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
+
+    /*
+        Signer constraint to be relaxed later to allow for migration signatures etc. 
+        Q: What to do with mints without metadata?
+    */
+    
     pub mint: Signer<'info>,
 
     pub system_program: Program<'info, System>,
@@ -39,7 +46,7 @@ pub struct CreateMetadata<'info> {
 
 pub fn handler(ctx: Context<CreateMetadata>, metadata_input: MetadataInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
-    let collection = &ctx.accounts.collection;
+    let collection = &mut ctx.accounts.collection;
     let user_permissions = &ctx.accounts.signer_collection_permissions;
     let authority = &ctx.accounts.signer;
 
@@ -51,16 +58,29 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: MetadataInput) -> R
 
     validate_metadata_input(&metadata_input, collection)?;
 
+    // ensure that the mint is in fact a mint
+    Account::<Mint>::try_from(&ctx.accounts.mint.to_account_info());
+
     // Update the metadata state account
-    metadata.collection = ctx.accounts.collection.key();
+    metadata.collection = collection.key();
     metadata.mint = ctx.accounts.mint.key();
     metadata.name = metadata_input.name.clone();
     metadata.render_mode_data = vec![metadata_input.render_mode_data];
     metadata.is_mutable = true;
-    metadata.nft_data = metadata_input.nft_metadata;
+
+    // should we do some validation here against collection type (i.e. SPL -v- NFT)?
+
+    match metadata_input.nft_metadata {
+        Some(x) => {
+            metadata.nft_metadata = Some(NftMetadata {
+                attributes: x.attributes,
+                signers: vec![],
+            });
+        }
+        None => {}
+    }
 
     // Increment collection data counter
-    let collection = &mut ctx.accounts.collection;
     collection.item_count.try_add_assign(1)?;
 
     msg!(
