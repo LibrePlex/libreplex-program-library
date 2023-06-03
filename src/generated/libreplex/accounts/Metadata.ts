@@ -6,8 +6,9 @@
  */
 
 import * as web3 from '@solana/web3.js'
-import * as beetSolana from '@metaplex-foundation/beet-solana'
 import * as beet from '@metaplex-foundation/beet'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
+import { MetadataNft, metadataNftBeet } from './MetadataNft'
 
 /**
  * Arguments used to create {@link Metadata}
@@ -15,13 +16,14 @@ import * as beet from '@metaplex-foundation/beet'
  * @category generated
  */
 export type MetadataArgs = {
-  authority: web3.PublicKey
+  collection: web3.PublicKey
   mint: web3.PublicKey
   isMutable: boolean
   bump: number
-  imageUrl: string
-  symbol: string
+  offchainUrl: string
   name: string
+  tokenType: number
+  nftData: beet.COption<MetadataNft>
 }
 
 export const metadataDiscriminator = [72, 11, 121, 26, 111, 181, 85, 93]
@@ -34,13 +36,14 @@ export const metadataDiscriminator = [72, 11, 121, 26, 111, 181, 85, 93]
  */
 export class Metadata implements MetadataArgs {
   private constructor(
-    readonly authority: web3.PublicKey,
+    readonly collection: web3.PublicKey,
     readonly mint: web3.PublicKey,
     readonly isMutable: boolean,
     readonly bump: number,
-    readonly imageUrl: string,
-    readonly symbol: string,
-    readonly name: string
+    readonly offchainUrl: string,
+    readonly name: string,
+    readonly tokenType: number,
+    readonly nftData: beet.COption<MetadataNft>
   ) {}
 
   /**
@@ -48,13 +51,14 @@ export class Metadata implements MetadataArgs {
    */
   static fromArgs(args: MetadataArgs) {
     return new Metadata(
-      args.authority,
+      args.collection,
       args.mint,
       args.isMutable,
       args.bump,
-      args.imageUrl,
-      args.symbol,
-      args.name
+      args.offchainUrl,
+      args.name,
+      args.tokenType,
+      args.nftData
     )
   }
 
@@ -163,13 +167,14 @@ export class Metadata implements MetadataArgs {
    */
   pretty() {
     return {
-      authority: this.authority.toBase58(),
+      collection: this.collection.toBase58(),
       mint: this.mint.toBase58(),
       isMutable: this.isMutable,
       bump: this.bump,
-      imageUrl: this.imageUrl,
-      symbol: this.symbol,
+      offchainUrl: this.offchainUrl,
       name: this.name,
+      tokenType: this.tokenType,
+      nftData: this.nftData,
     }
   }
 }
@@ -186,13 +191,14 @@ export const metadataBeet = new beet.FixableBeetStruct<
 >(
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['authority', beetSolana.publicKey],
+    ['collection', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
     ['isMutable', beet.bool],
     ['bump', beet.u8],
-    ['imageUrl', beet.utf8String],
-    ['symbol', beet.utf8String],
+    ['offchainUrl', beet.utf8String],
     ['name', beet.utf8String],
+    ['tokenType', beet.u8],
+    ['nftData', beet.coption(metadataNftBeet)],
   ],
   Metadata.fromArgs,
   'Metadata'

@@ -5,10 +5,8 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
-import * as beetSolana from '@metaplex-foundation/beet-solana'
-import { Creator, creatorBeet } from '../accounts/Creator'
+import * as web3 from '@solana/web3.js'
 import { Attribute, attributeBeet } from '../accounts/Attribute'
 
 /**
@@ -17,10 +15,10 @@ import { Attribute, attributeBeet } from '../accounts/Attribute'
  * @category generated
  */
 export type CreateMetadataNftInstructionArgs = {
-  creators: Creator[]
+  name: string
+  offchainUrl: string
+  isMutable: boolean
   attributes: Attribute[]
-  collection: beet.COption<web3.PublicKey>
-  bump: number
 }
 /**
  * @category Instructions
@@ -34,10 +32,10 @@ export const createMetadataNftStruct = new beet.FixableBeetArgsStruct<
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['creators', beet.array(creatorBeet)],
+    ['name', beet.utf8String],
+    ['offchainUrl', beet.utf8String],
+    ['isMutable', beet.bool],
     ['attributes', beet.array(attributeBeet)],
-    ['collection', beet.coption(beetSolana.publicKey)],
-    ['bump', beet.u8],
   ],
   'CreateMetadataNftInstructionArgs'
 )
@@ -45,17 +43,17 @@ export const createMetadataNftStruct = new beet.FixableBeetArgsStruct<
  * Accounts required by the _createMetadataNft_ instruction
  *
  * @property [_writable_, **signer**] authority
- * @property [_writable_] metadataNft
- * @property [] metadata
- * @property [] mint
+ * @property [_writable_] metadata
+ * @property [_writable_] collection
+ * @property [_writable_] mint
  * @category Instructions
  * @category CreateMetadataNft
  * @category generated
  */
 export type CreateMetadataNftInstructionAccounts = {
   authority: web3.PublicKey
-  metadataNft: web3.PublicKey
   metadata: web3.PublicKey
+  collection: web3.PublicKey
   mint: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -91,18 +89,18 @@ export function createCreateMetadataNftInstruction(
       isSigner: true,
     },
     {
-      pubkey: accounts.metadataNft,
+      pubkey: accounts.metadata,
       isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: accounts.metadata,
-      isWritable: false,
+      pubkey: accounts.collection,
+      isWritable: true,
       isSigner: false,
     },
     {
       pubkey: accounts.mint,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
