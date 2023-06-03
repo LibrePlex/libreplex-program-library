@@ -1,46 +1,10 @@
-use std::mem;
-
 use anchor_lang::prelude::*;
 
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
+use prog_common::{errors::ErrorCode};
 
-use crate::{CollectionRenderMode};
-
-#[repr(C)]
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum MetadataRenderModeData {
-    NONE {
-    },
-    PROGRAM {
-    },
-    URL {
-        url: String
-    },
-}
-
-impl MetadataRenderModeData {
-    pub fn get_size(&self) -> usize {
-        1 + match self {
-            URL => 32,
-            _ => 0
-        }
-    }
-    pub fn is_compatible_with(&self,collection_render_mode: &CollectionRenderMode) -> bool {
-        match self {
-            MetadataRenderModeData::NONE {} => {
-                return mem::discriminant(collection_render_mode) == mem::discriminant(&CollectionRenderMode::NONE) 
-            },
-            MetadataRenderModeData::PROGRAM {} => {
-                return mem::discriminant(collection_render_mode) == mem::discriminant(&CollectionRenderMode::PROGRAM(Pubkey::default())) 
-            },
-            MetadataRenderModeData::URL {url} => {
-                return mem::discriminant(collection_render_mode) == mem::discriminant(&CollectionRenderMode::URL(String::default())) 
-            }
-        }
-    }
-}
-
+use crate::{MAX_NAME_LENGTH, MAX_URL_LENGTH};
 
 #[repr(C)]
 #[account]
@@ -54,31 +18,12 @@ pub struct Metadata {
 
     pub name: String,
 
+    pub url: String,
+
     pub is_mutable: bool,
 
     pub nft_data: Option<NftMetadata>,
-
-    pub render_mode_data: Vec<MetadataRenderModeData>
-
 }
-
-
-impl Metadata {
-
-    pub fn get_size(&self) -> usize {
-
-        let size = 8 + 32 + 32 + 36 + 1 + 1 + match &self.nft_data {
-            Some(x)=>x.get_size(),
-            None=>0
-        } 
-        + 4 + self.render_mode_data.iter().map(|x|x.get_size()).sum::<usize>();
-
-        return size;
-    }
-
-}
-
-
 
 
 #[repr(C)]
@@ -108,12 +53,24 @@ impl NftMetadata {
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct MetadataInput {
-
     pub name: String,
-    pub symbol: String,
-    pub render_mode_data: MetadataRenderModeData,
+    pub metadata_url: String,
     pub nft_metadata: Option<NftMetadata>,
+}
 
+
+pub fn validate_metadata_input(metadata_input: &MetadataInput) -> Result<()> {
+    let MetadataInput {name, metadata_url, nft_metadata: _} = metadata_input;
+
+    // Ensure that the lengths of strings do not exceed the maximum allowed length
+    let name_length = name.len();
+    let url_length = metadata_url.len();
+
+    if name_length > MAX_NAME_LENGTH  || url_length > MAX_URL_LENGTH {
+        return Err(error!(ErrorCode::InvalidStringInput));
+    }
+
+    Ok(())
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,15 +82,16 @@ impl MetadataInput {
     pub fn get_size(&self) -> usize {
 
         let name_length = self.name.len();
-        let symbol_length = self.symbol.len();
-        
+
+        let url_length = self.metadata_url.len();
+
         let nft_metadata_length = match self.nft_metadata.as_ref()
         {
             Some (data) => data.get_size(),
             None => 0
         };
 
-        let size = 4 + name_length + 4 + symbol_length + 4 + self.render_mode_data.get_size() + 1 + nft_metadata_length;
+        let size = 4 + name_length + 4 + url_length + 1 + nft_metadata_length;
 
         return size;
     }
