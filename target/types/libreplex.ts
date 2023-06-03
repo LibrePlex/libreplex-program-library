@@ -74,7 +74,11 @@ export type Libreplex = {
                 "path": "collection_seed"
               }
             ]
-          }
+          },
+          "relations": [
+            "authority",
+            "collection_seed"
+          ]
         },
         {
           "name": "collectionSeed",
@@ -124,7 +128,11 @@ export type Libreplex = {
                 "path": "collection_seed"
               }
             ]
-          }
+          },
+          "relations": [
+            "authority",
+            "collection_seed"
+          ]
         },
         {
           "name": "collectionSeed",
@@ -199,7 +207,11 @@ export type Libreplex = {
                 "path": "collection_seed"
               }
             ]
-          }
+          },
+          "relations": [
+            "authority",
+            "collection_seed"
+          ]
         },
         {
           "name": "collectionSeed",
@@ -223,7 +235,11 @@ export type Libreplex = {
                 "path": "mint"
               }
             ]
-          }
+          },
+          "relations": [
+            "collection_data",
+            "mint"
+          ]
         },
         {
           "name": "mint",
@@ -581,7 +597,11 @@ export const IDL: Libreplex = {
                 "path": "collection_seed"
               }
             ]
-          }
+          },
+          "relations": [
+            "authority",
+            "collection_seed"
+          ]
         },
         {
           "name": "collectionSeed",
@@ -631,7 +651,11 @@ export const IDL: Libreplex = {
                 "path": "collection_seed"
               }
             ]
-          }
+          },
+          "relations": [
+            "authority",
+            "collection_seed"
+          ]
         },
         {
           "name": "collectionSeed",
@@ -706,7 +730,11 @@ export const IDL: Libreplex = {
                 "path": "collection_seed"
               }
             ]
-          }
+          },
+          "relations": [
+            "authority",
+            "collection_seed"
+          ]
         },
         {
           "name": "collectionSeed",
@@ -730,7 +758,11 @@ export const IDL: Libreplex = {
                 "path": "mint"
               }
             ]
-          }
+          },
+          "relations": [
+            "collection_data",
+            "mint"
+          ]
         },
         {
           "name": "mint",
