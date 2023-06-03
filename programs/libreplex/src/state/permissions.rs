@@ -2,6 +2,19 @@ use anchor_lang::prelude::*;
 use prog_common::{errors::ErrorCode};
 
 
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub enum PermissionEventType {
+    Update, Delete
+}
+
+#[event]
+pub struct PermissionEvent {
+    pub collection: Pubkey,
+    pub user: Pubkey,
+    pub event_type: PermissionEventType,
+}
+
 pub const PERMISSIONS_SIZE: usize = 32 + 32 + 1 + 1 
 // Padding
 + 30;

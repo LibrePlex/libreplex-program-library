@@ -61,5 +61,12 @@ pub fn handler(ctx: Context<EditPermissions>, edit_permissions_input: EditPermis
     user_permissions.can_edit_metadata = can_edit_metadata;
     user_permissions.is_admin = is_admin;
 
+
+    emit!(PermissionEvent {
+        collection: ctx.accounts.collection.key(),
+        user: ctx.accounts.user.key(),
+        event_type: PermissionEventType::Update,
+    });
+
     Ok(())                                
 }
