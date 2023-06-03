@@ -3,7 +3,11 @@ use anchor_lang::prelude::*;
 #[repr(C)]
 #[account]
 #[derive(Debug)]
-pub struct CollectionData {
+pub struct Collection {
+
+    // the authority of the collection
+    pub authority: Pubkey,
+
     // Seed address used to generate unique account PDA address
     pub collection_seed: Pubkey,
 
@@ -49,7 +53,7 @@ pub struct RoyaltyShare {
 #[repr(C)]
 #[account]
 #[derive(Debug)]
-pub struct CollectionDataInput {
+pub struct CollectionInput {
 
     pub name: String,
     pub symbol: String,
@@ -70,7 +74,7 @@ impl NftCollectionData {
 
 }
 
-impl CollectionDataInput {
+impl CollectionInput {
 
     pub fn get_size(&self) -> usize {
 

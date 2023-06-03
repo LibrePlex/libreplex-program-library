@@ -3,7 +3,7 @@ export type Libreplex = {
   "name": "libreplex",
   "instructions": [
     {
-      "name": "createCollectionData",
+      "name": "createCollection",
       "accounts": [
         {
           "name": "authority",
@@ -11,7 +11,7 @@ export type Libreplex = {
           "isSigner": true
         },
         {
-          "name": "collectionData",
+          "name": "collection",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -19,18 +19,18 @@ export type Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "collection_data"
+                "value": "collection"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "path": "collection_seed"
+                "path": "seed"
               }
             ]
           }
         },
         {
-          "name": "collectionSeed",
+          "name": "seed",
           "isMut": false,
           "isSigner": false
         },
@@ -42,15 +42,15 @@ export type Libreplex = {
       ],
       "args": [
         {
-          "name": "collectionDataInput",
+          "name": "collectionInput",
           "type": {
-            "defined": "CollectionDataInput"
+            "defined": "CollectionInput"
           }
         }
       ]
     },
     {
-      "name": "deleteCollectionData",
+      "name": "deleteCollection",
       "accounts": [
         {
           "name": "authority",
@@ -66,7 +66,7 @@ export type Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "collection_data"
+                "value": "collection"
               },
               {
                 "kind": "account",
@@ -120,7 +120,7 @@ export type Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "collection_data"
+                "value": "collection"
               },
               {
                 "kind": "account",
@@ -199,7 +199,7 @@ export type Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "collection_data"
+                "value": "collection"
               },
               {
                 "kind": "account",
@@ -271,7 +271,7 @@ export type Libreplex = {
   ],
   "accounts": [
     {
-      "name": "collectionData",
+      "name": "collection",
       "type": {
         "kind": "struct",
         "fields": [
@@ -353,7 +353,7 @@ export type Libreplex = {
       }
     },
     {
-      "name": "collectionDataInput",
+      "name": "collectionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -526,7 +526,7 @@ export const IDL: Libreplex = {
   "name": "libreplex",
   "instructions": [
     {
-      "name": "createCollectionData",
+      "name": "createCollection",
       "accounts": [
         {
           "name": "authority",
@@ -534,7 +534,7 @@ export const IDL: Libreplex = {
           "isSigner": true
         },
         {
-          "name": "collectionData",
+          "name": "collection",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -542,18 +542,18 @@ export const IDL: Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "collection_data"
+                "value": "collection"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "path": "collection_seed"
+                "path": "seed"
               }
             ]
           }
         },
         {
-          "name": "collectionSeed",
+          "name": "seed",
           "isMut": false,
           "isSigner": false
         },
@@ -565,15 +565,15 @@ export const IDL: Libreplex = {
       ],
       "args": [
         {
-          "name": "collectionDataInput",
+          "name": "collectionInput",
           "type": {
-            "defined": "CollectionDataInput"
+            "defined": "CollectionInput"
           }
         }
       ]
     },
     {
-      "name": "deleteCollectionData",
+      "name": "deleteCollection",
       "accounts": [
         {
           "name": "authority",
@@ -589,7 +589,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "collection_data"
+                "value": "collection"
               },
               {
                 "kind": "account",
@@ -643,7 +643,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "collection_data"
+                "value": "collection"
               },
               {
                 "kind": "account",
@@ -722,7 +722,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "collection_data"
+                "value": "collection"
               },
               {
                 "kind": "account",
@@ -794,7 +794,7 @@ export const IDL: Libreplex = {
   ],
   "accounts": [
     {
-      "name": "collectionData",
+      "name": "collection",
       "type": {
         "kind": "struct",
         "fields": [
@@ -876,7 +876,7 @@ export const IDL: Libreplex = {
       }
     },
     {
-      "name": "collectionDataInput",
+      "name": "collectionInput",
       "type": {
         "kind": "struct",
         "fields": [
