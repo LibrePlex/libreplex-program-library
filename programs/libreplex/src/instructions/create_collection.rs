@@ -34,7 +34,7 @@ pub fn handler(ctx: Context<CreateCollection>,
 ) -> Result<()> {
 
     let CollectionInput {name, symbol, 
-        // metadata_render_mode, 
+        metadata_render_mode, 
         collection_render_mode, 
         // nft_collection_data
     } = collection_input;
@@ -76,7 +76,7 @@ pub fn handler(ctx: Context<CreateCollection>,
 
     
     collection.collection_render_mode = collection_render_mode;
-    // collection.metadata_render_mode = metadata_render_mode;
+    collection.metadata_render_mode = metadata_render_mode;
     // collection.nft_collection_data = nft_collection_data;
 
     
