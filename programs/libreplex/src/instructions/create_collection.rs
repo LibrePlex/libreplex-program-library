@@ -20,7 +20,7 @@ pub struct CreateCollection<'info> {
     pub authority: Signer<'info>,
 
     #[account(init, seeds = [COLLECTION.as_ref(), seed.key().as_ref()],
-      bump, payer = authority, space = 8 + 72 + collection_input.get_size())]
+      bump, payer = authority, space = Collection::BASE_SIZE + collection_input.get_size())]
     pub collection: Box<Account<'info, Collection>>,
 
     /// CHECK: The seed address used for initialization of the collection PDA

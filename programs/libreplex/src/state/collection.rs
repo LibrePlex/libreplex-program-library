@@ -32,8 +32,10 @@ pub enum CollectionRenderMode {
 
 impl CollectionRenderMode {
     pub fn get_size(&self) -> usize {
-        1 + match self {
-            CollectionRenderMode::Url{collection_url} => 4 + collection_url.len(),
+        8 // discriminator size
+        + 32 // max variant size (from Pubkey)
+        + match self {
+            CollectionRenderMode::Url{collection_url} => std::cmp::max(4 + collection_url.len(), 32),
             CollectionRenderMode::Program{program_id:_} => 32,
             _ => 0,
         }
@@ -109,6 +111,11 @@ pub struct Collection {
     // Creator does not convey any privileges
     pub creator: Pubkey,
 
+    // the number of items in collection
+    pub item_count: u64,
+
+
+    /* variable length fields = match 1-1 with CollectionInput */
     // name and symbol of the collection
     pub name: String,
 
@@ -116,8 +123,6 @@ pub struct Collection {
 
     pub collection_render_mode: CollectionRenderMode,
 
-    // the number of items in collection
-    pub item_count: u64,
 
     // for NFT collections
     pub nft_collection_data: Option<NftCollectionData>,
@@ -125,7 +130,12 @@ pub struct Collection {
     pub metadata_render_mode: MetadataRenderMode,
 }
 
+
+
 impl Collection {
+
+    pub const BASE_SIZE: usize  = 8 + 32 + 32 + 8;
+
     pub fn get_size(&self) -> usize {
         32 + 32
             + 4
@@ -142,6 +152,43 @@ impl Collection {
             + self.metadata_render_mode.get_size()
     }
 }
+
+
+// collection input: 8 + 
+
+// pub name: String, 
+// pub symbol: String,
+// pub collection_render_mode: CollectionRenderMode,
+// pub metadata_render_mode: MetadataRenderMode,
+// pub nft_collection_data: Option<NftCollectionData>,
+
+
+
+// impl CollectionInput {
+//     pub fn get_size(&self) -> usize {
+//         let name_length = self.name.len();
+//         let symbol_length = self.symbol.len();
+
+//         let nft_data_length = match self.nft_collection_data.as_ref() {
+//             Some(data) => data.get_size(),
+//             None => 0,
+//         };
+
+//         let size = 4
+//             + name_length
+//             + 4
+//             + symbol_length
+//             + 4
+//             + self.collection_render_mode.get_size()
+//             + self.metadata_render_mode.get_size()
+//             + 1
+//             + nft_data_length;
+
+//         return size;
+//     }
+// }
+
+
 /*
 
    Attribute type is the normalisation of attributes so
@@ -196,7 +243,18 @@ impl AttributeType {
     pub fn get_size(&self) -> usize {
         let total_size: usize = self.permitted_values.iter().map(|x| 4 + x.len()).sum();
 
-        return 4 + self.permitted_values.len() + 4 + total_size + 1;
+        return 4 + 32  // name
+            +  4 + total_size 
+            + 1 // deleted
+            + 1 
+            + match self.continued_at_index { // continued_at_index
+                Some(_)=>4,
+                None => 0
+            }
+            + match self.continued_from_index { // continued_at_index
+                Some(_)=>4,
+                None => 0
+            }
     }
 }
 
@@ -271,23 +329,15 @@ pub struct CollectionInput {
 
 impl CollectionInput {
     pub fn get_size(&self) -> usize {
-        let name_length = self.name.len();
-        let symbol_length = self.symbol.len();
-
-        let nft_data_length = match self.nft_collection_data.as_ref() {
-            Some(data) => data.get_size(),
-            None => 0,
-        };
-
-        let size = 4
-            + name_length
-            + 4
-            + symbol_length
-            + 4
+        let size 
+            = 4 + self.name.len()
+            + 4 + self.symbol.len()
             + self.collection_render_mode.get_size()
             + self.metadata_render_mode.get_size()
-            + 1
-            + nft_data_length;
+            + 1 + match self.nft_collection_data.as_ref() {
+                Some(data) => data.get_size(),
+                None => 0,
+            };
 
         return size;
     }
