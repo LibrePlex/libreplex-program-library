@@ -29,6 +29,17 @@ pub mod libreplex {
         )
     }
 
+    pub fn update_collection(
+        ctx: Context<EditCollection>,
+        collection_input: CollectionInput,
+    ) -> Result<()> {
+        msg!("editing collection data");
+        instructions::edit_collection::handler(
+            ctx,
+            collection_input
+        )
+    }
+
     pub fn delete_collection(
         ctx: Context<DeleteCollection>,
         _bump_collection_data: u8,

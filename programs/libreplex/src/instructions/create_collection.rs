@@ -1,15 +1,26 @@
 use anchor_lang::prelude::*;
-
 use crate::state::{Collection, CollectionInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, COLLECTION};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, PERMISSIONS_SIZE, CollectionPermissions, COLLECTION, PermissionEvent, PermissionEventType};
+use std::error::Error;
+use std::result::Result;
+use anchor_lang::prelude::Error as AnchorError;
 
 use prog_common::{errors::ErrorCode};
 
+#[repr(C)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub enum CollectionEventType {
+    Create,
+    Edit,
+    Delete
+}
+
 #[event]
-struct CreateCollectionEvent {
-    id: Pubkey,
-    creator: Pubkey,
-    name: String,
+pub struct CollectionEvent {
+    pub id: Pubkey,
+    pub creator: Pubkey,
+    pub name: String,
+    pub event_type: CollectionEventType
 }
 
 #[derive(Accounts)]
@@ -31,13 +42,8 @@ pub struct CreateCollection<'info> {
 
 pub fn handler(ctx: Context<CreateCollection>,
                collection_input: CollectionInput,
-) -> Result<()> {
+) -> anchor_lang::Result<()> {
 
-    let CollectionInput {name, symbol, 
-        metadata_render_mode, 
-        collection_render_mode, 
-        nft_collection_data
-    } = collection_input;
 
     // Ensure that the lengths of strings do not exceed the maximum allowed length
     let name_length = name.len();
@@ -66,26 +72,23 @@ pub fn handler(ctx: Context<CreateCollection>,
     }
 
     let collection = &mut ctx.accounts.collection;
-    collection.creator = ctx.accounts.authority.key();
+    let authority = &mut ctx.accounts.authority;
+    collection.creator = authority.key();
     collection.seed = ctx.accounts.seed.key();
-    collection.name = name.clone();
-    collection.symbol = symbol;
-    
     collection.item_count = 0;
-
-
     
-    collection.collection_render_mode = collection_render_mode;
-    collection.metadata_render_mode = metadata_render_mode;
-    collection.nft_collection_data = nft_collection_data;
+
+    update_collection_from_input(collection_input, collection)?;
 
     
     
 
-    emit!(CreateCollectionEvent{
+
+    emit!(CollectionEvent{
         creator: ctx.accounts.authority.key(),
-        name,
+        name: collection.name.clone(),
         id: collection.key(),
+        event_type: CollectionEventType::Create
     });
 
 
@@ -110,6 +113,47 @@ pub fn handler(ctx: Context<CreateCollection>,
         user: ctx.accounts.authority.key(),
         event_type: PermissionEventType::Update,
     });
+    
+    Ok(())
+}
+
+pub fn update_collection_from_input<'a>(collection_input: CollectionInput, 
+    collection: &mut Box<Account<Collection>>) 
+    -> Result<(), AnchorError> {
+    let CollectionInput {name, symbol, 
+        metadata_render_mode, 
+        collection_render_mode, 
+        nft_collection_data
+    } = collection_input;
+    let name_length = name.len();
+    let symbol_length = symbol.len();
+    if name_length > MAX_NAME_LENGTH || symbol_length > MAX_SYMBOL_LENGTH {
+        return Err(error!(ErrorCode::InvalidStringInput));
+    }
+    if nft_collection_data.is_some() {
+        let nft_collection_data_unwrapped = nft_collection_data.as_ref().unwrap();
+        let royalty_bps = nft_collection_data_unwrapped.royalty_bps;
+
+        // Ensure that basis points are between 0-10,000
+        if royalty_bps > 10_000 {
+            return Err(error!(ErrorCode::InvalidBpsInput));
+        }
+
+        let royalty_shares_vec: Vec<u16> = nft_collection_data_unwrapped.royalty_shares.iter().map(|x| x.share).collect();
+
+        for rs in royalty_shares_vec {
+            if rs > 10_000 {
+                return Err(error!(ErrorCode::InvalidBpsInput));
+            }
+        }
+    }
+    
+    collection.name = name.clone();
+    collection.symbol = symbol;
+    collection.collection_render_mode = collection_render_mode;
+    collection.metadata_render_mode = metadata_render_mode;
+    collection.nft_collection_data = nft_collection_data;
+    
     
     Ok(())
 }

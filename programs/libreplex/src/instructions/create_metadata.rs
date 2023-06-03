@@ -60,6 +60,7 @@ pub fn handler(ctx: Context<CreateMetadata>,
 
     validate_metadata_input(&metadata_input, collection)?;
 
+<<<<<<< HEAD
     
 
     /* 
@@ -73,6 +74,10 @@ pub fn handler(ctx: Context<CreateMetadata>,
     */ 
     
     render_mode_data.is_compatible_with(&collection.collection_render_mode);
+=======
+    // ensure that the mint is in fact a mint
+    Account::<Mint>::try_from(&ctx.accounts.mint.to_account_info())?;
+>>>>>>> 383a976 (Add edit collection endpoint + logic, generalise CollectionEvent)
 
     // Update the metadata state account
     metadata.collection = collection.key();
