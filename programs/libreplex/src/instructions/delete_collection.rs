@@ -45,6 +45,10 @@ pub fn handler(ctx: Context<DeleteCollection>) -> Result<()> {
         return Err(ErrorCode::MissingPermissionDeleteCollection.into());
     }
 
+    if ctx.accounts.collection.item_count > 0 {
+        return Err(ErrorCode::CollectionHasItems.into())
+    }
+
     // Close the collection data state account
     let collection_data_account_info = &mut (*ctx.accounts.collection_data).to_account_info();
     close_account(collection_data_account_info, receiver)?;
