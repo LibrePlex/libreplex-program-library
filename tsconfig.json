@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "outDir": "./dist"
   },
-  "include": ["src/*", "src/cli/metadata-cli.ts"]
+  "include": ["src/*", "src/cli/libreplex-cli.ts"]
 }

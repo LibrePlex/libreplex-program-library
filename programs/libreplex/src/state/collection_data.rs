@@ -55,11 +55,13 @@ pub struct RoyaltyShare {
 #[derive(Debug)]
 pub struct CollectionDataInput {
 
-    name: String,
-    symbol: String,
-    collection_url: String,
-    nft_collection_data: Option<NftCollectionData>,
+    pub name: String,
+    pub symbol: String,
+    pub collection_url: String,
+    pub nft_collection_data: Option<NftCollectionData>,
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 impl NftCollectionData {
 
@@ -80,13 +82,13 @@ impl CollectionDataInput {
         let symbol_length = self.symbol.len();
         let url_length = self.collection_url.len();
 
-        let nft_coll_data_length = match &self.nft_collection_data
+        let nft_data_length = match self.nft_collection_data.as_ref()
         {
             Some (data) => data.get_size(),
             None => 0
         };
 
-        let size = 4 + name_length + 4 + symbol_length + 4 + url_length + 1 + nft_coll_data_length;
+        let size = 4 + name_length + 4 + symbol_length + 4 + url_length + 1 + nft_data_length;
 
         return size;
     }
