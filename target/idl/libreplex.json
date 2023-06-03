@@ -374,6 +374,14 @@
             "type": {
               "defined": "MetadataRenderMode"
             }
+          },
+          {
+            "name": "nftCollectionData",
+            "type": {
+              "option": {
+                "defined": "NftCollectionData"
+              }
+            }
           }
         ]
       }
@@ -639,6 +647,14 @@
             "name": "metadataRenderMode",
             "type": {
               "defined": "MetadataRenderMode"
+            }
+          },
+          {
+            "name": "nftCollectionData",
+            "type": {
+              "option": {
+                "defined": "NftCollectionData"
+              }
             }
           }
         ]
