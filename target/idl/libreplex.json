@@ -57,10 +57,6 @@
         {
           "name": "isMutable",
           "type": "bool"
-        },
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -127,10 +123,6 @@
           "type": {
             "option": "bool"
           }
-        },
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -243,8 +235,10 @@
         {
           "name": "creators",
           "type": {
-            "vec": {
-              "defined": "Creator"
+            "option": {
+              "vec": {
+                "defined": "Creator"
+              }
             }
           }
         },
@@ -261,10 +255,6 @@
           "type": {
             "option": "publicKey"
           }
-        },
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -327,6 +317,12 @@
               }
             }
           }
+        },
+        {
+          "name": "collection",
+          "type": {
+            "option": "publicKey"
+          }
         }
       ]
     }
@@ -348,6 +344,22 @@
           {
             "name": "share",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CollectionData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "verified",
+            "type": "bool"
           }
         ]
       }
@@ -390,11 +402,11 @@
             "type": "u8"
           },
           {
-            "name": "imageUrl",
+            "name": "symbol",
             "type": "string"
           },
           {
-            "name": "symbol",
+            "name": "offchainUrl",
             "type": "string"
           },
           {
@@ -410,17 +422,21 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "creators",
+            "name": "collection",
             "type": {
-              "vec": {
-                "defined": "Creator"
+              "option": {
+                "defined": "CollectionData"
               }
             }
           },
           {
-            "name": "collection",
+            "name": "creators",
             "type": {
-              "option": "publicKey"
+              "option": {
+                "vec": {
+                  "defined": "Creator"
+                }
+              }
             }
           },
           {
@@ -434,6 +450,42 @@
                 "defined": "Attribute"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Collection",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": "Creator"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "imageUrl",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
@@ -459,6 +511,16 @@
       "code": 6003,
       "name": "CannotAddVerifiedCreator",
       "msg": "Cannot add verified creator"
+    },
+    {
+      "code": 6004,
+      "name": "NoCollectionSet",
+      "msg": "Cannot verify a collection when one is not set"
+    },
+    {
+      "code": 6005,
+      "name": "IncorrectCollectionAuthority",
+      "msg": "Incorrect collection authority"
     }
   ]
 }

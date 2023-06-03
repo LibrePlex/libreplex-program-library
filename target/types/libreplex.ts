@@ -57,10 +57,6 @@ export type Libreplex = {
         {
           "name": "isMutable",
           "type": "bool"
-        },
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -127,10 +123,6 @@ export type Libreplex = {
           "type": {
             "option": "bool"
           }
-        },
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -243,8 +235,10 @@ export type Libreplex = {
         {
           "name": "creators",
           "type": {
-            "vec": {
-              "defined": "Creator"
+            "option": {
+              "vec": {
+                "defined": "Creator"
+              }
             }
           }
         },
@@ -261,10 +255,6 @@ export type Libreplex = {
           "type": {
             "option": "publicKey"
           }
-        },
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -327,6 +317,12 @@ export type Libreplex = {
               }
             }
           }
+        },
+        {
+          "name": "collection",
+          "type": {
+            "option": "publicKey"
+          }
         }
       ]
     }
@@ -348,6 +344,22 @@ export type Libreplex = {
           {
             "name": "share",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "collectionData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "verified",
+            "type": "bool"
           }
         ]
       }
@@ -390,11 +402,11 @@ export type Libreplex = {
             "type": "u8"
           },
           {
-            "name": "imageUrl",
+            "name": "symbol",
             "type": "string"
           },
           {
-            "name": "symbol",
+            "name": "offchainUrl",
             "type": "string"
           },
           {
@@ -410,17 +422,21 @@ export type Libreplex = {
         "kind": "struct",
         "fields": [
           {
-            "name": "creators",
+            "name": "collection",
             "type": {
-              "vec": {
-                "defined": "Creator"
+              "option": {
+                "defined": "CollectionData"
               }
             }
           },
           {
-            "name": "collection",
+            "name": "creators",
             "type": {
-              "option": "publicKey"
+              "option": {
+                "vec": {
+                  "defined": "Creator"
+                }
+              }
             }
           },
           {
@@ -434,6 +450,42 @@ export type Libreplex = {
                 "defined": "Attribute"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "collection",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": "Creator"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "imageUrl",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
@@ -459,6 +511,16 @@ export type Libreplex = {
       "code": 6003,
       "name": "CannotAddVerifiedCreator",
       "msg": "Cannot add verified creator"
+    },
+    {
+      "code": 6004,
+      "name": "NoCollectionSet",
+      "msg": "Cannot verify a collection when one is not set"
+    },
+    {
+      "code": 6005,
+      "name": "IncorrectCollectionAuthority",
+      "msg": "Incorrect collection authority"
     }
   ]
 };
@@ -522,10 +584,6 @@ export const IDL: Libreplex = {
         {
           "name": "isMutable",
           "type": "bool"
-        },
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -592,10 +650,6 @@ export const IDL: Libreplex = {
           "type": {
             "option": "bool"
           }
-        },
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -708,8 +762,10 @@ export const IDL: Libreplex = {
         {
           "name": "creators",
           "type": {
-            "vec": {
-              "defined": "Creator"
+            "option": {
+              "vec": {
+                "defined": "Creator"
+              }
             }
           }
         },
@@ -726,10 +782,6 @@ export const IDL: Libreplex = {
           "type": {
             "option": "publicKey"
           }
-        },
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -792,6 +844,12 @@ export const IDL: Libreplex = {
               }
             }
           }
+        },
+        {
+          "name": "collection",
+          "type": {
+            "option": "publicKey"
+          }
         }
       ]
     }
@@ -813,6 +871,22 @@ export const IDL: Libreplex = {
           {
             "name": "share",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "collectionData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "verified",
+            "type": "bool"
           }
         ]
       }
@@ -855,11 +929,11 @@ export const IDL: Libreplex = {
             "type": "u8"
           },
           {
-            "name": "imageUrl",
+            "name": "symbol",
             "type": "string"
           },
           {
-            "name": "symbol",
+            "name": "offchainUrl",
             "type": "string"
           },
           {
@@ -875,17 +949,21 @@ export const IDL: Libreplex = {
         "kind": "struct",
         "fields": [
           {
-            "name": "creators",
+            "name": "collection",
             "type": {
-              "vec": {
-                "defined": "Creator"
+              "option": {
+                "defined": "CollectionData"
               }
             }
           },
           {
-            "name": "collection",
+            "name": "creators",
             "type": {
-              "option": "publicKey"
+              "option": {
+                "vec": {
+                  "defined": "Creator"
+                }
+              }
             }
           },
           {
@@ -899,6 +977,42 @@ export const IDL: Libreplex = {
                 "defined": "Attribute"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "collection",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": "Creator"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "imageUrl",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
@@ -924,6 +1038,16 @@ export const IDL: Libreplex = {
       "code": 6003,
       "name": "CannotAddVerifiedCreator",
       "msg": "Cannot add verified creator"
+    },
+    {
+      "code": 6004,
+      "name": "NoCollectionSet",
+      "msg": "Cannot verify a collection when one is not set"
+    },
+    {
+      "code": 6005,
+      "name": "IncorrectCollectionAuthority",
+      "msg": "Incorrect collection authority"
     }
   ]
 };

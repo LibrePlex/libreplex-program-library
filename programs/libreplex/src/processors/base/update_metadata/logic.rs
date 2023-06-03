@@ -6,15 +6,14 @@ pub fn handle_update_metadata(
     ctx: Context<UpdateMetadata>,
     name: Option<String>,
     symbol: Option<String>,
-    uri: Option<String>,
-    is_mutable: Option<bool>,
-    bump: u8,
+    offchain_url: Option<String>,
+    is_mutable: Option<bool>
+
 ) -> Result<()> {
-    check_bump(&METADATA.to_owned(), &ctx.bumps, bump)?;
 
     let metadata = &mut ctx.accounts.metadata;
 
-    
+
     match name {
         Some(x) => {
             metadata.name = x;
@@ -29,9 +28,9 @@ pub fn handle_update_metadata(
         None => {}
     }
 
-    match uri {
+    match offchain_url {
         Some(x) => {
-            metadata.image_url = x;
+            metadata.offchain_url = x;
         },
         None => {}
     }
