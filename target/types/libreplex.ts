@@ -257,6 +257,12 @@ export type Libreplex = {
           }
         },
         {
+          "name": "collection",
+          "type": {
+            "option": "publicKey"
+          }
+        },
+        {
           "name": "bump",
           "type": "u8"
         }
@@ -389,9 +395,6 @@ export type Libreplex = {
           },
           {
             "name": "symbol",
-            "docs": [
-              "could we reduce the size to say max 8 characters?"
-            ],
             "type": "string"
           },
           {
@@ -415,16 +418,22 @@ export type Libreplex = {
             }
           },
           {
+            "name": "collection",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
             "name": "attributes",
             "type": {
               "vec": {
                 "defined": "Attribute"
               }
             }
-          },
-          {
-            "name": "bump",
-            "type": "u8"
           }
         ]
       }
@@ -713,6 +722,12 @@ export const IDL: Libreplex = {
           }
         },
         {
+          "name": "collection",
+          "type": {
+            "option": "publicKey"
+          }
+        },
+        {
           "name": "bump",
           "type": "u8"
         }
@@ -845,9 +860,6 @@ export const IDL: Libreplex = {
           },
           {
             "name": "symbol",
-            "docs": [
-              "could we reduce the size to say max 8 characters?"
-            ],
             "type": "string"
           },
           {
@@ -871,16 +883,22 @@ export const IDL: Libreplex = {
             }
           },
           {
+            "name": "collection",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
             "name": "attributes",
             "type": {
               "vec": {
                 "defined": "Attribute"
               }
             }
-          },
-          {
-            "name": "bump",
-            "type": "u8"
           }
         ]
       }

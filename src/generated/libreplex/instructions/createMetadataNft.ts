@@ -5,8 +5,9 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
+import * as beet from '@metaplex-foundation/beet'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
 import { Creator, creatorBeet } from '../accounts/Creator'
 import { Attribute, attributeBeet } from '../accounts/Attribute'
 
@@ -18,6 +19,7 @@ import { Attribute, attributeBeet } from '../accounts/Attribute'
 export type CreateMetadataNftInstructionArgs = {
   creators: Creator[]
   attributes: Attribute[]
+  collection: beet.COption<web3.PublicKey>
   bump: number
 }
 /**
@@ -34,6 +36,7 @@ export const createMetadataNftStruct = new beet.FixableBeetArgsStruct<
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['creators', beet.array(creatorBeet)],
     ['attributes', beet.array(attributeBeet)],
+    ['collection', beet.coption(beetSolana.publicKey)],
     ['bump', beet.u8],
   ],
   'CreateMetadataNftInstructionArgs'

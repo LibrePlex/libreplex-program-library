@@ -5,8 +5,8 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
+import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
 import { Creator, creatorBeet } from './Creator'
 import { Attribute, attributeBeet } from './Attribute'
@@ -18,8 +18,9 @@ import { Attribute, attributeBeet } from './Attribute'
  */
 export type MetadataNftArgs = {
   creators: Creator[]
-  attributes: Attribute[]
+  collection: beet.COption<web3.PublicKey>
   bump: number
+  attributes: Attribute[]
 }
 
 export const metadataNftDiscriminator = [76, 147, 73, 161, 232, 241, 218, 113]
@@ -33,15 +34,21 @@ export const metadataNftDiscriminator = [76, 147, 73, 161, 232, 241, 218, 113]
 export class MetadataNft implements MetadataNftArgs {
   private constructor(
     readonly creators: Creator[],
-    readonly attributes: Attribute[],
-    readonly bump: number
+    readonly collection: beet.COption<web3.PublicKey>,
+    readonly bump: number,
+    readonly attributes: Attribute[]
   ) {}
 
   /**
    * Creates a {@link MetadataNft} instance from the provided args.
    */
   static fromArgs(args: MetadataNftArgs) {
-    return new MetadataNft(args.creators, args.attributes, args.bump)
+    return new MetadataNft(
+      args.creators,
+      args.collection,
+      args.bump,
+      args.attributes
+    )
   }
 
   /**
@@ -150,8 +157,9 @@ export class MetadataNft implements MetadataNftArgs {
   pretty() {
     return {
       creators: this.creators,
-      attributes: this.attributes,
+      collection: this.collection,
       bump: this.bump,
+      attributes: this.attributes,
     }
   }
 }
@@ -169,8 +177,9 @@ export const metadataNftBeet = new beet.FixableBeetStruct<
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['creators', beet.array(creatorBeet)],
-    ['attributes', beet.array(attributeBeet)],
+    ['collection', beet.coption(beetSolana.publicKey)],
     ['bump', beet.u8],
+    ['attributes', beet.array(attributeBeet)],
   ],
   MetadataNft.fromArgs,
   'MetadataNft'

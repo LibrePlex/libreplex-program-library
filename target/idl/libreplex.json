@@ -257,6 +257,12 @@
           }
         },
         {
+          "name": "collection",
+          "type": {
+            "option": "publicKey"
+          }
+        },
+        {
           "name": "bump",
           "type": "u8"
         }
@@ -389,9 +395,6 @@
           },
           {
             "name": "symbol",
-            "docs": [
-              "could we reduce the size to say max 8 characters?"
-            ],
             "type": "string"
           },
           {
@@ -415,16 +418,22 @@
             }
           },
           {
+            "name": "collection",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
             "name": "attributes",
             "type": {
               "vec": {
                 "defined": "Attribute"
               }
             }
-          },
-          {
-            "name": "bump",
-            "type": "u8"
           }
         ]
       }
@@ -451,11 +460,5 @@
       "name": "CannotAddVerifiedCreator",
       "msg": "Cannot add verified creator"
     }
-  ],
-  "metadata": {
-    "address": "L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh",
-    "origin": "anchor",
-    "binaryVersion": "0.27.0",
-    "libVersion": "^0.27"
-  }
+  ]
 }
