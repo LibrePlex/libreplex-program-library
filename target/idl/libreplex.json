@@ -75,6 +75,78 @@
       ]
     },
     {
+      "name": "updateCollection",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Collection",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collection",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "seed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "collectionInput",
+          "type": {
+            "defined": "CollectionInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "deleteCollection",
       "accounts": [
         {
@@ -940,6 +1012,23 @@
       }
     },
     {
+      "name": "CollectionEventType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Create"
+          },
+          {
+            "name": "Edit"
+          },
+          {
+            "name": "Delete"
+          }
+        ]
+      }
+    },
+    {
       "name": "CollectionRenderMode",
       "type": {
         "kind": "enum",
@@ -1047,7 +1136,7 @@
   ],
   "events": [
     {
-      "name": "CreateCollectionEvent",
+      "name": "CollectionEvent",
       "fields": [
         {
           "name": "id",
@@ -1062,6 +1151,13 @@
         {
           "name": "name",
           "type": "string",
+          "index": false
+        },
+        {
+          "name": "eventType",
+          "type": {
+            "defined": "CollectionEventType"
+          },
           "index": false
         }
       ]
@@ -1081,6 +1177,26 @@
         },
         {
           "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "EditCollectionEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "creator",
           "type": "publicKey",
           "index": false
         },

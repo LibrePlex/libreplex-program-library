@@ -59,7 +59,7 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: MetadataInput) -> R
     validate_metadata_input(&metadata_input, collection)?;
 
     // ensure that the mint is in fact a mint
-    Account::<Mint>::try_from(&ctx.accounts.mint.to_account_info());
+    Account::<Mint>::try_from(&ctx.accounts.mint.to_account_info())?;
 
     // Update the metadata state account
     metadata.collection = collection.key();
