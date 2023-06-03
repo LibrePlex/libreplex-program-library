@@ -634,6 +634,12 @@
             "type": {
               "defined": "CollectionRenderMode"
             }
+          },
+          {
+            "name": "metadataRenderMode",
+            "type": {
+              "defined": "MetadataRenderMode"
+            }
           }
         ]
       }
