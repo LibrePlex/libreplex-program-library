@@ -6,7 +6,7 @@ The mission of Libreplex is to provide a community-driven, open license protocol
 
 To ensure that no single entity can unilaterally make changes that impact or jeopardise the integrity of the applications that depend on the protocol.
 
-2) Open license held by a Trust
+2) Open license held by a Trust / Foundation
 
 The licensing must ensure that any applications utilising the protocol can do so knowing that the nature of the protocol remains constant, to minimise uncertainty and maximise transparency.
 
