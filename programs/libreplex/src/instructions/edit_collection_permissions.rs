@@ -21,19 +21,19 @@ pub struct EditCollectionPermissions<'info> {
     pub user: AccountInfo<'info>,
 
     #[account(
-        seeds = ["permissions".as_ref(), collection_data.key().as_ref(), authority.key().as_ref()], 
+        seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref()], 
         bump)]
     pub auth_permissions: Box<Account<'info, CollectionPermissions>>,
 
     #[account(init_if_needed, 
         payer = authority, 
         space = PERMISSIONS_SIZE, 
-        seeds = ["permissions".as_ref(), collection_data.key().as_ref(), user.key().as_ref()], 
+        seeds = ["permissions".as_ref(), collection.key().as_ref(), user.key().as_ref()], 
         bump)]
     pub user_permissions: Box<Account<'info, CollectionPermissions>>,
 
     #[account(mut)]
-    pub collection_data: Box<Account<'info, CollectionData>>,
+    pub collection: Box<Account<'info, Collection>>,
 
     pub system_program: Program<'info, System>,
 }
@@ -43,7 +43,7 @@ pub struct EditCollectionPermissions<'info> {
 pub fn handler(ctx: Context<EditCollectionPermissions>, edit_permissions_input: EditCollectionPermissionsInput) -> Result<()> {
     let user_permissions = &mut ctx.accounts.user_permissions;
     let auth_permissions = & ctx.accounts.auth_permissions;
-    let collection = &ctx.accounts.collection_data;
+    let collection = &ctx.accounts.collection;
     let auth = &ctx.accounts.authority;
     
     assert_valid_collection_permissions(auth_permissions, &collection.key(), auth.key)?;
@@ -54,7 +54,7 @@ pub fn handler(ctx: Context<EditCollectionPermissions>, edit_permissions_input: 
  
     let EditCollectionPermissionsInput {can_create_metadata, can_delete_collection, can_delete_metadata, can_edit_metadata, is_admin} = edit_permissions_input;
 
-    user_permissions.collection = ctx.accounts.collection_data.key();
+    user_permissions.collection = ctx.accounts.collection.key();
     user_permissions.user = ctx.accounts.user.key();
     user_permissions.can_create_metadata = can_create_metadata;
     user_permissions.can_delete_collection = can_delete_collection;

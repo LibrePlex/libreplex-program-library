@@ -6,8 +6,7 @@ use prog_common::{close_account, errors::ErrorCode};
 use crate::{CollectionPermissions, Collection, assert_valid_collection_permissions, instructions::{CollectionEvent, CollectionEventType}};
 
 #[derive(Accounts)]
-#[instruction(bump_collection_data: u8)]
-pub struct DeleteCollectionData<'info> {
+pub struct DeleteCollection<'info> {
     pub signer: Signer<'info>,
 
     #[account(mut,
@@ -50,7 +49,7 @@ pub fn handler(ctx: Context<DeleteCollection>) -> Result<()> {
     }
 
     // Close the collection data state account
-    let collection_data_account_info = &mut (*ctx.accounts.collection_data).to_account_info();
+    let collection_data_account_info = &mut (*ctx.accounts.collection).to_account_info();
     close_account(collection_data_account_info, receiver)?;
 
     msg!(

@@ -203,6 +203,186 @@ export type Libreplex = {
       "args": []
     },
     {
+      "name": "editCollectionPermissions",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Collection",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Collection",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collection",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "EditCollectionPermissionsInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "editMetadataPermissions",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Collection",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Collection",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "collection"
+          ]
+        },
+        {
+          "name": "collection",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "EditMetadataPermissionsInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "createMetadata",
       "accounts": [
         {
@@ -600,6 +780,46 @@ export type Libreplex = {
   ],
   "types": [
     {
+      "name": "EditCollectionPermissionsInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isAdmin",
+            "type": "bool"
+          },
+          {
+            "name": "canCreateMetadata",
+            "type": "bool"
+          },
+          {
+            "name": "canEditMetadata",
+            "type": "bool"
+          },
+          {
+            "name": "canDeleteMetadata",
+            "type": "bool"
+          },
+          {
+            "name": "canDeleteCollection",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EditMetadataPermissionsInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "canModify",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
       "name": "AttributeType",
       "type": {
         "kind": "struct",
@@ -772,10 +992,6 @@ export type Libreplex = {
         "fields": [
           {
             "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "symbol",
             "type": "string"
           },
           {
@@ -1029,6 +1245,21 @@ export type Libreplex = {
           "type": {
             "defined": "PermissionEventType"
           },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MetadataPermissionEvent",
+      "fields": [
+        {
+          "name": "metadata",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
           "index": false
         }
       ]
@@ -1241,6 +1472,186 @@ export const IDL: Libreplex = {
       "args": []
     },
     {
+      "name": "editCollectionPermissions",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Collection",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Collection",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collection",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "EditCollectionPermissionsInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "editMetadataPermissions",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Collection",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Collection",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "collection"
+          ]
+        },
+        {
+          "name": "collection",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "EditMetadataPermissionsInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "createMetadata",
       "accounts": [
         {
@@ -1638,6 +2049,46 @@ export const IDL: Libreplex = {
   ],
   "types": [
     {
+      "name": "EditCollectionPermissionsInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isAdmin",
+            "type": "bool"
+          },
+          {
+            "name": "canCreateMetadata",
+            "type": "bool"
+          },
+          {
+            "name": "canEditMetadata",
+            "type": "bool"
+          },
+          {
+            "name": "canDeleteMetadata",
+            "type": "bool"
+          },
+          {
+            "name": "canDeleteCollection",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EditMetadataPermissionsInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "canModify",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
       "name": "AttributeType",
       "type": {
         "kind": "struct",
@@ -1810,10 +2261,6 @@ export const IDL: Libreplex = {
         "fields": [
           {
             "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "symbol",
             "type": "string"
           },
           {
@@ -2010,7 +2457,6 @@ export const IDL: Libreplex = {
       ]
     },
     {
-
       "name": "EditCollectionEvent",
       "fields": [
         {
@@ -2068,6 +2514,21 @@ export const IDL: Libreplex = {
           "type": {
             "defined": "PermissionEventType"
           },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MetadataPermissionEvent",
+      "fields": [
+        {
+          "name": "metadata",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
           "index": false
         }
       ]

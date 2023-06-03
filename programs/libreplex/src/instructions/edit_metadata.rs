@@ -48,7 +48,7 @@ pub fn handler(ctx: Context<EditMetadata>,
     let collection = &ctx.accounts.collection;
     let metadata = &mut ctx.accounts.metadata;
 
-    validate_metadata_input(&metadata_input)?;
+    validate_metadata_input(&metadata_input, collection)?;
 
     let has_metadata_permission = match editor_metadata_permissions {
         Some(metadata_permissions) => {
@@ -71,15 +71,6 @@ pub fn handler(ctx: Context<EditMetadata>,
           return Err(error!(ErrorCode::MissingPermissionEditMetadata));
     }
 
-<<<<<<< HEAD
-    let MetadataInput {name, metadata_url, nft_metadata} = metadata_input;
-
-    // Update the metadata state account
-    metadata.name = name.clone();
-    metadata.url = metadata_url;
-    metadata.nft_data = nft_metadata;
-
-=======
     let MetadataInput {name, render_mode_data, nft_metadata:_} = metadata_input;
 
     // Update the metadata state account
@@ -88,7 +79,6 @@ pub fn handler(ctx: Context<EditMetadata>,
    
     update_nft_metadata(metadata, metadata_input.nft_metadata)?;
     
->>>>>>> ab3118e (Fix metadata creation, account sizes and attributes)
     emit!(EditMetadataEvent{
         collection: collection.key(),
         id: metadata.key(),

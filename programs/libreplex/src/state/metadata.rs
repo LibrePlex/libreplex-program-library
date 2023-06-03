@@ -5,11 +5,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 use prog_common::errors::ErrorCode;
 
-<<<<<<< HEAD
-use crate::{MAX_NAME_LENGTH, MAX_URL_LENGTH};
-=======
 use crate::{Collection, MAX_NAME_LENGTH};
->>>>>>> ab3118e (Fix metadata creation, account sizes and attributes)
 
 use crate::CollectionRenderMode;
 
@@ -56,7 +52,7 @@ impl MetadataRenderModeData {
 #[account]
 pub struct Metadata {
     // the collection to which this metadata belongs
-    pub collection_data: Pubkey,
+    pub collection: Pubkey,
 
     // the mint address of the token for which the metadata refers
     pub mint: Pubkey,
@@ -135,7 +131,6 @@ impl NftMetadataInput {
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct MetadataInput {
     pub name: String,
-    pub symbol: String,
     pub render_mode_data: MetadataRenderModeData,
     pub nft_metadata: Option<NftMetadataInput>,
 }
@@ -150,9 +145,6 @@ pub fn validate_metadata_input(
         nft_metadata:_,
     } = metadata_input;
 
-<<<<<<< HEAD
-pub fn validate_metadata_input(metadata_input: &MetadataInput) -> Result<()> {
-=======
     /*
         ensure that the initial render mode of the metadata matches the
         currently active render mode of the collection.
@@ -163,18 +155,13 @@ pub fn validate_metadata_input(metadata_input: &MetadataInput) -> Result<()> {
 
     */
 
->>>>>>> ab3118e (Fix metadata creation, account sizes and attributes)
     
+    render_mode_data.is_compatible_with(&collection.collection_render_mode);
+
     // Ensure that the lengths of strings do not exceed the maximum allowed length
-<<<<<<< HEAD
-    let name_length = metadata_input.name.len();
-    
-    if name_length > MAX_NAME_LENGTH  {
-=======
     let name_length = name.len();
 
     if name_length > MAX_NAME_LENGTH {
->>>>>>> ab3118e (Fix metadata creation, account sizes and attributes)
         return Err(error!(ErrorCode::InvalidStringInput));
     }
 
@@ -187,19 +174,6 @@ impl MetadataInput {
 
    
     pub fn get_size(&self) -> usize {
-<<<<<<< HEAD
-
-        let name_length = self.name.len();
-        let symbol_length = self.symbol.len();
-        
-        let nft_metadata_length = match self.nft_metadata.as_ref()
-        {
-            Some (data) => data.get_size(),
-            None => 0
-        };
-
-        let size = 4 + name_length + 4 + symbol_length + 4 + self.render_mode_data.get_size() + 1 + nft_metadata_length;
-=======
         let size = 4
             + self.name.len()
             + self.render_mode_data.get_size()
@@ -208,7 +182,6 @@ impl MetadataInput {
                 Some(data) => data.get_size(),
                 None => 0,
             };
->>>>>>> ab3118e (Fix metadata creation, account sizes and attributes)
 
         return size;
     }

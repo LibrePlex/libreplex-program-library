@@ -76,4 +76,3 @@ pub struct CollectionPermissions {
     pub can_edit_collection: bool,
     pub can_delete_collection: bool,
 }
-

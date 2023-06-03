@@ -42,7 +42,6 @@ pub mod libreplex {
 
     pub fn delete_collection(
         ctx: Context<DeleteCollection>,
-        _bump_collection_data: u8,
     ) -> Result<()> {
         msg!("deleting collection data");
         instructions::delete_collection::handler(ctx)
@@ -63,7 +62,6 @@ pub mod libreplex {
     pub fn create_metadata(
         ctx: Context<CreateMetadata>,
         metadata_input: MetadataInput,
-        _bump_collection_data: u8,
     ) -> Result<()> {
         msg!("creating metadata");
         instructions::create_metadata::handler(
@@ -74,8 +72,6 @@ pub mod libreplex {
 
     pub fn delete_metadata(
         ctx: Context<DeleteMetadata>,
-        _bump_collection_data: u8,
-        _bump_metadata: u8,
     ) -> Result<()> {
         msg!("deleting metadata");
         instructions::delete_metadata::handler(ctx)

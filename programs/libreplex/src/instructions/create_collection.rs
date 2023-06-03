@@ -30,9 +30,17 @@ pub struct CreateCollection<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    #[account(init, 
+        payer = authority, 
+        space = PERMISSIONS_SIZE, 
+        seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref()], 
+        bump)]
+    pub user_permissions: Box<Account<'info, CollectionPermissions>>,
+
     #[account(init, seeds = [COLLECTION.as_ref(), seed.key().as_ref()],
       bump, payer = authority, space = Collection::BASE_SIZE + collection_input.get_size())]
     pub collection: Box<Account<'info, Collection>>,
+
 
     /// CHECK: The seed address used for initialization of the collection PDA
     pub seed: AccountInfo<'info>,
@@ -44,32 +52,6 @@ pub fn handler(ctx: Context<CreateCollection>,
                collection_input: CollectionInput,
 ) -> anchor_lang::Result<()> {
 
-
-    // Ensure that the lengths of strings do not exceed the maximum allowed length
-    let name_length = name.len();
-    let symbol_length = symbol.len();
-    
-    if name_length > MAX_NAME_LENGTH || symbol_length > MAX_SYMBOL_LENGTH {
-        return Err(error!(ErrorCode::InvalidStringInput));
-    }
-
-    if nft_collection_data.is_some() {
-        let nft_collection_data_unwrapped = nft_collection_data.as_ref().unwrap();
-        let royalty_bps = nft_collection_data_unwrapped.royalty_bps;
-
-        // Ensure that basis points are between 0-10,000
-        if royalty_bps > 10_000 {
-            return Err(error!(ErrorCode::InvalidBpsInput));
-        }
-
-        let royalty_shares_vec: Vec<u16> = nft_collection_data_unwrapped.royalty_shares.iter().map(|x| x.share).collect();
-
-        for rs in royalty_shares_vec {
-            if rs > 10_000 {
-                return Err(error!(ErrorCode::InvalidBpsInput));
-            }
-        }
-    }
 
     let collection = &mut ctx.accounts.collection;
     let authority = &mut ctx.accounts.authority;
@@ -95,7 +77,7 @@ pub fn handler(ctx: Context<CreateCollection>,
     msg!("Collection data created with authority pubkey {}", ctx.accounts.authority.key());
 
     let user_permissions = &mut ctx.accounts.user_permissions;
-    user_permissions.collection = collection_data.key();
+    user_permissions.collection = collection.key();
     user_permissions.user = ctx.accounts.authority.key();
 
     user_permissions.is_admin = true;

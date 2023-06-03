@@ -104,12 +104,7 @@ impl MetadataRenderMode {
 
 #[repr(C)]
 #[account]
-<<<<<<< HEAD
-#[derive(Debug)]
-pub struct CollectionData {
-=======
 pub struct Collection {
->>>>>>> 551ed7b (Rename permissions to include is_admin and a light organise of field prefixes)
     // Seed address used to generate unique account PDA address
     pub seed: Pubkey,
 
