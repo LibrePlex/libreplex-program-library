@@ -26,25 +26,30 @@ pub enum CollectionRenderMode {
         2) image URL (including ordinal / base64)
         3) something else
     */
+    None,
     Program{program_id: Pubkey},
     Url{collection_url: String},
 }
 
 impl CollectionRenderMode {
     pub fn get_size(&self) -> usize {
-        8 // discriminator size
-        + 32 // max variant size (from Pubkey)
+        let _size = 2 // discriminator size
+        // + 32 // max variant size (from Pubkey)
         + match self {
-            CollectionRenderMode::Url{collection_url} => std::cmp::max(4 + collection_url.len(), 32),
-            CollectionRenderMode::Program{program_id:_} => 32,
-            _ => 0,
-        }
+            CollectionRenderMode::None => 0,
+            CollectionRenderMode::Url{collection_url} => 4 + collection_url.len(),
+            CollectionRenderMode::Program{program_id:_} => 32
+        };
+
+        msg!("Collection render mode size {}", _size);
+        return _size;
     }
 }
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum MetadataRenderMode {
+    None,
     /*
         Pubkey here is the address of the rendering program
         * BETA functionality (to be validated against
@@ -81,6 +86,7 @@ pub enum MetadataRenderMode {
 impl MetadataRenderMode {
     pub fn get_size(&self) -> usize {
         1 + match self {
+            MetadataRenderMode::None => 1,
             MetadataRenderMode::Url {
                 base_url_configuration,
             } => {
@@ -92,7 +98,6 @@ impl MetadataRenderMode {
                 }
             }
             MetadataRenderMode::Program { program_id: _ } => 32,
-            _ => 0,
         }
     }
 }
@@ -112,7 +117,7 @@ pub struct Collection {
     pub creator: Pubkey,
 
     // the number of items in collection
-    pub item_count: u64,
+    pub item_count: u32,
 
 
     /* variable length fields = match 1-1 with CollectionInput */
@@ -123,33 +128,31 @@ pub struct Collection {
 
     pub collection_render_mode: CollectionRenderMode,
 
+    pub metadata_render_mode: MetadataRenderMode,
 
     // for NFT collections
-    pub nft_collection_data: Option<NftCollectionData>,
+    
+    // pub nft_collection_data: Option<NftCollectionData>,
 
-    pub metadata_render_mode: MetadataRenderMode,
+    
 }
 
 
 
 impl Collection {
 
-    pub const BASE_SIZE: usize  = 8 + 32 + 32 + 8;
+    pub const BASE_SIZE: usize  = 8 + 32 + 32 + 4; // anchor + seed + creator + item count
 
     pub fn get_size(&self) -> usize {
-        32 + 32
-            + 4
-            + self.name.len()
-            + 4
-            + self.symbol.len()
-            + self.collection_render_mode.get_size()
-            + 8
-            + 1
-            + match &self.nft_collection_data {
-                Some(x) => x.get_size(),
-                None => 0,
-            }
-            + self.metadata_render_mode.get_size()
+        Collection::BASE_SIZE
+        + 4 + self.name.len() // name
+        + 4 + self.symbol.len() // symbol
+        + self.collection_render_mode.get_size()
+        // + match &self.nft_collection_data {
+        //     Some(x) => x.get_size(),
+        //     None => 0,
+        // }
+        // + self.metadata_render_mode.get_size()
     }
 }
 
@@ -321,8 +324,8 @@ pub struct CollectionInput {
     pub name: String,
     pub symbol: String,
     pub collection_render_mode: CollectionRenderMode,
-    pub metadata_render_mode: MetadataRenderMode,
-    pub nft_collection_data: Option<NftCollectionData>,
+    // pub metadata_render_mode: MetadataRenderMode,
+    // pub nft_collection_data: Option<NftCollectionData>,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -332,12 +335,12 @@ impl CollectionInput {
         let size 
             = 4 + self.name.len()
             + 4 + self.symbol.len()
-            + self.collection_render_mode.get_size()
-            + self.metadata_render_mode.get_size()
-            + 1 + match self.nft_collection_data.as_ref() {
-                Some(data) => data.get_size(),
-                None => 0,
-            };
+            + self.collection_render_mode.get_size();
+            // + self.metadata_render_mode.get_size();
+            // + 1 + match self.nft_collection_data.as_ref() {
+            //     Some(data) => data.get_size(),
+            //     None => 0,
+            // };
 
         return size;
     }
