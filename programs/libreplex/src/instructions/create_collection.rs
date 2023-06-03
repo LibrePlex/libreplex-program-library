@@ -33,14 +33,13 @@ pub fn handler(ctx: Context<CreateCollection>,
                collection_input: CollectionInput,
 ) -> Result<()> {
 
-    let CollectionInput {name, symbol, collection_url, nft_collection_data} = collection_input;
+    let CollectionInput {name, symbol, metadata_render_mode, collection_render_mode, nft_collection_data} = collection_input;
 
     // Ensure that the lengths of strings do not exceed the maximum allowed length
     let name_length = name.len();
     let symbol_length = symbol.len();
-    let url_length = collection_url.len();
-
-    if name_length > MAX_NAME_LENGTH || symbol_length > MAX_SYMBOL_LENGTH || url_length > MAX_URL_LENGTH {
+    
+    if name_length > MAX_NAME_LENGTH || symbol_length > MAX_SYMBOL_LENGTH {
         return Err(error!(ErrorCode::InvalidStringInput));
     }
 
@@ -66,7 +65,8 @@ pub fn handler(ctx: Context<CreateCollection>,
     collection.seed = ctx.accounts.seed.key();
     collection.name = name.clone();
     collection.symbol = symbol;
-    collection.url = collection_url;
+    collection.collection_render_mode = collection_render_mode;
+    collection.metadata_render_mode = metadata_render_mode;
     collection.item_count = 0;
     collection.nft_collection_data = nft_collection_data;
     collection.creator = ctx.accounts.authority.key();

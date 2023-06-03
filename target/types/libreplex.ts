@@ -360,8 +360,10 @@ export type Libreplex = {
             "type": "string"
           },
           {
-            "name": "url",
-            "type": "string"
+            "name": "collectionRenderMode",
+            "type": {
+              "defined": "CollectionRenderMode"
+            }
           },
           {
             "name": "itemCount",
@@ -373,6 +375,12 @@ export type Libreplex = {
               "option": {
                 "defined": "NftCollectionData"
               }
+            }
+          },
+          {
+            "name": "metadataRenderMode",
+            "type": {
+              "defined": "MetadataRenderMode"
             }
           }
         ]
@@ -396,10 +404,6 @@ export type Libreplex = {
             "type": "string"
           },
           {
-            "name": "url",
-            "type": "string"
-          },
-          {
             "name": "isMutable",
             "type": "bool"
           },
@@ -408,6 +412,14 @@ export type Libreplex = {
             "type": {
               "option": {
                 "defined": "NftMetadata"
+              }
+            }
+          },
+          {
+            "name": "renderModeData",
+            "type": {
+              "vec": {
+                "defined": "MetadataRenderModeData"
               }
             }
           }
@@ -530,6 +542,22 @@ export type Libreplex = {
           {
             "name": "deleted",
             "type": "bool"
+          },
+          {
+            "name": "continuedAtIndex",
+            "type": {
+              "option": {
+                "defined": "usize"
+              }
+            }
+          },
+          {
+            "name": "continuedFromIndex",
+            "type": {
+              "option": {
+                "defined": "usize"
+              }
+            }
           }
         ]
       }
@@ -580,14 +608,6 @@ export type Libreplex = {
                 "defined": "AttributeType"
               }
             }
-          },
-          {
-            "name": "itemBaseUrl",
-            "type": {
-              "option": {
-                "defined": "BaseUrlConfiguration"
-              }
-            }
           }
         ]
       }
@@ -622,8 +642,16 @@ export type Libreplex = {
             "type": "string"
           },
           {
-            "name": "collectionUrl",
-            "type": "string"
+            "name": "collectionRenderMode",
+            "type": {
+              "defined": "CollectionRenderMode"
+            }
+          },
+          {
+            "name": "metadataRenderMode",
+            "type": {
+              "defined": "MetadataRenderMode"
+            }
           },
           {
             "name": "nftCollectionData",
@@ -668,8 +696,10 @@ export type Libreplex = {
             "type": "string"
           },
           {
-            "name": "metadataUrl",
-            "type": "string"
+            "name": "renderModeData",
+            "type": {
+              "defined": "MetadataRenderModeData"
+            }
           },
           {
             "name": "nftMetadata",
@@ -678,6 +708,82 @@ export type Libreplex = {
                 "defined": "NftMetadata"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CollectionRenderMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NONE"
+          },
+          {
+            "name": "PROGRAM",
+            "fields": [
+              "publicKey"
+            ]
+          },
+          {
+            "name": "URL",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "MetadataRenderMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NONE",
+            "fields": []
+          },
+          {
+            "name": "PROGRAM",
+            "fields": [
+              "publicKey"
+            ]
+          },
+          {
+            "name": "URL",
+            "fields": [
+              {
+                "option": {
+                  "defined": "BaseUrlConfiguration"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "MetadataRenderModeData",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NONE",
+            "fields": []
+          },
+          {
+            "name": "PROGRAM",
+            "fields": []
+          },
+          {
+            "name": "URL",
+            "fields": [
+              {
+                "name": "url",
+                "type": "string"
+              }
+            ]
           }
         ]
       }
@@ -1130,8 +1236,10 @@ export const IDL: Libreplex = {
             "type": "string"
           },
           {
-            "name": "url",
-            "type": "string"
+            "name": "collectionRenderMode",
+            "type": {
+              "defined": "CollectionRenderMode"
+            }
           },
           {
             "name": "itemCount",
@@ -1143,6 +1251,12 @@ export const IDL: Libreplex = {
               "option": {
                 "defined": "NftCollectionData"
               }
+            }
+          },
+          {
+            "name": "metadataRenderMode",
+            "type": {
+              "defined": "MetadataRenderMode"
             }
           }
         ]
@@ -1166,10 +1280,6 @@ export const IDL: Libreplex = {
             "type": "string"
           },
           {
-            "name": "url",
-            "type": "string"
-          },
-          {
             "name": "isMutable",
             "type": "bool"
           },
@@ -1178,6 +1288,14 @@ export const IDL: Libreplex = {
             "type": {
               "option": {
                 "defined": "NftMetadata"
+              }
+            }
+          },
+          {
+            "name": "renderModeData",
+            "type": {
+              "vec": {
+                "defined": "MetadataRenderModeData"
               }
             }
           }
@@ -1300,6 +1418,22 @@ export const IDL: Libreplex = {
           {
             "name": "deleted",
             "type": "bool"
+          },
+          {
+            "name": "continuedAtIndex",
+            "type": {
+              "option": {
+                "defined": "usize"
+              }
+            }
+          },
+          {
+            "name": "continuedFromIndex",
+            "type": {
+              "option": {
+                "defined": "usize"
+              }
+            }
           }
         ]
       }
@@ -1350,14 +1484,6 @@ export const IDL: Libreplex = {
                 "defined": "AttributeType"
               }
             }
-          },
-          {
-            "name": "itemBaseUrl",
-            "type": {
-              "option": {
-                "defined": "BaseUrlConfiguration"
-              }
-            }
           }
         ]
       }
@@ -1392,8 +1518,16 @@ export const IDL: Libreplex = {
             "type": "string"
           },
           {
-            "name": "collectionUrl",
-            "type": "string"
+            "name": "collectionRenderMode",
+            "type": {
+              "defined": "CollectionRenderMode"
+            }
+          },
+          {
+            "name": "metadataRenderMode",
+            "type": {
+              "defined": "MetadataRenderMode"
+            }
           },
           {
             "name": "nftCollectionData",
@@ -1438,8 +1572,10 @@ export const IDL: Libreplex = {
             "type": "string"
           },
           {
-            "name": "metadataUrl",
-            "type": "string"
+            "name": "renderModeData",
+            "type": {
+              "defined": "MetadataRenderModeData"
+            }
           },
           {
             "name": "nftMetadata",
@@ -1448,6 +1584,82 @@ export const IDL: Libreplex = {
                 "defined": "NftMetadata"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CollectionRenderMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NONE"
+          },
+          {
+            "name": "PROGRAM",
+            "fields": [
+              "publicKey"
+            ]
+          },
+          {
+            "name": "URL",
+            "fields": [
+              "string"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "MetadataRenderMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NONE",
+            "fields": []
+          },
+          {
+            "name": "PROGRAM",
+            "fields": [
+              "publicKey"
+            ]
+          },
+          {
+            "name": "URL",
+            "fields": [
+              {
+                "option": {
+                  "defined": "BaseUrlConfiguration"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "MetadataRenderModeData",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NONE",
+            "fields": []
+          },
+          {
+            "name": "PROGRAM",
+            "fields": []
+          },
+          {
+            "name": "URL",
+            "fields": [
+              {
+                "name": "url",
+                "type": "string"
+              }
+            ]
           }
         ]
       }
