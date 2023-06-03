@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::state::{Collection};
-use crate::{CollectionPermissions, MetadataInput, Metadata, MetadataPermissions, assert_valid_collection_permissions, assert_valid_metadata_permissions, validate_metadata_input};
+use crate::{CollectionPermissions, MetadataInput, Metadata, MetadataPermissions, assert_valid_collection_permissions, assert_valid_metadata_permissions, validate_metadata_input, NftMetadata, NftMetadataInput};
 
 
 use prog_common::{errors::ErrorCode};
@@ -71,6 +71,7 @@ pub fn handler(ctx: Context<EditMetadata>,
           return Err(error!(ErrorCode::MissingPermissionEditMetadata));
     }
 
+<<<<<<< HEAD
     let MetadataInput {name, metadata_url, nft_metadata} = metadata_input;
 
     // Update the metadata state account
@@ -78,13 +79,50 @@ pub fn handler(ctx: Context<EditMetadata>,
     metadata.url = metadata_url;
     metadata.nft_data = nft_metadata;
 
+=======
+    let MetadataInput {name, render_mode_data, nft_metadata:_} = metadata_input;
+
+    // Update the metadata state account
+    metadata.name = name.clone();
+    metadata.render_mode_data = vec![render_mode_data];
+   
+    update_nft_metadata(metadata, metadata_input.nft_metadata)?;
+    
+>>>>>>> ab3118e (Fix metadata creation, account sizes and attributes)
     emit!(EditMetadataEvent{
         collection: collection.key(),
         id: metadata.key(),
         name
     });
 
-    
+    Ok(())
+}
 
+pub fn update_nft_metadata(metadata: &mut Account<Metadata>, input: Option<NftMetadataInput>) -> std::result::Result<(), Error> {
+    match &metadata.nft_metadata {
+        Some(metadata_old) => {
+            match input {
+                Some(metadata_new) => {
+                    metadata.nft_metadata = Some(NftMetadata {
+                        attributes: metadata_new.attributes,
+                        signers: metadata_old.signers.clone()
+                    });
+                },
+                None => {
+                    // return Err(ErrorCode::IncompatibleMetadataType.into());
+                }
+            }
+        }, None => {
+            match input {
+                Some(_) => {
+                    // return Err(ErrorCode::IncompatibleMetadataType.into());
+                },
+                None => {
+                    // do nothing - this is an SPL, there is no need to edit NFT metadata
+                }
+            }
+        
+        }
+    }
     Ok(())
 }

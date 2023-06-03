@@ -1,11 +1,11 @@
-use anchor_lang::prelude::*;
 use crate::state::{Collection, Metadata, MetadataInput};
-use crate::{CollectionPermissions, assert_valid_collection_permissions, validate_metadata_input};
+use crate::{
+    assert_valid_collection_permissions, validate_metadata_input, CollectionPermissions,
+    NftMetadata,
+};
 
-use crate::state::{Collection, Metadata, MetadataInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, MAX_URL_LENGTH, COLLECTION, METADATA};
-
-use prog_common::{TryAdd, errors::ErrorCode};
+use anchor_spl::token::Mint;
+use prog_common::{errors::ErrorCode, TryAdd};
 
 #[event]
 struct CreateMetadataEvent {
@@ -30,9 +30,19 @@ pub struct CreateMetadata<'info> {
     pub collection_data: Box<Account<'info, CollectionData>>,
 
     #[account(init, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
-              bump, payer = signer, space = 8 + 65 + metadata_input.get_size())]
+              bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
-    pub mint: Signer<'info>,
+
+    pub mint_signer: Signer<'info>,
+
+    /*
+        Signer constraint to be relaxed later to allow for migration signatures etc. 
+        Q: What to do with mints without metadata?
+    */
+    #[account(mut,
+        constraint = mint_signer.key() == mint.key()
+    )]
+    pub mint: Box<Account<'info, Mint>>,
 
 
     pub system_program: Program<'info, System>,
@@ -42,7 +52,7 @@ pub fn handler(ctx: Context<CreateMetadata>,
                metadata_input: MetadataInput,
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
-    let collection_data = &ctx.accounts.collection_data;
+    let collection = &mut ctx.accounts.collection;
     let user_permissions = &ctx.accounts.signer_collection_permissions;
     let authority = &ctx.accounts.signer;
 
@@ -52,20 +62,42 @@ pub fn handler(ctx: Context<CreateMetadata>,
         return Err(ErrorCode::MissingPermissionCreateMetadata.into());
     }
 
-    validate_metadata_input(&metadata_input)?;
+    validate_metadata_input(&metadata_input, collection)?;
 
-    let MetadataInput {name, metadata_url, nft_metadata} = metadata_input;
+    
+
+    /* 
+        ensure that the initial render mode of the metadata matches the 
+        currently active render mode of the collection.
+
+        NB: It is possible to change the active render mode of the collection.
+        If that happens, it is the responsibility of the update auth holder
+        to add the appropriate render mode data to each metadata.
+
+    */ 
+    
+    render_mode_data.is_compatible_with(&collection.collection_render_mode);
 
     // Update the metadata state account
-    metadata.collection_data = ctx.accounts.collection_data.key();
+    metadata.collection = collection.key();
     metadata.mint = ctx.accounts.mint.key();
     metadata.name = name.clone();
-    metadata.url = metadata_url;
+    metadata.render_mode_data = vec![render_mode_data];
     metadata.is_mutable = true;
-    metadata.nft_data = nft_metadata;
+
+    // should we do some validation here against collection type (i.e. SPL -v- NFT)?
+
+    match metadata_input.nft_metadata {
+        Some(x) => {
+            metadata.nft_metadata = Some(NftMetadata {
+                attributes: x.attributes,
+                signers: vec![],
+            });
+        }
+        None => {}
+    }
 
     // Increment collection data counter
-    let collection = &mut ctx.accounts.collection;
     collection.item_count.try_add_assign(1)?;
 
     msg!("metadata created for mint with pubkey {}", ctx.accounts.mint.key());

@@ -182,15 +182,21 @@
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "Mint",
                 "path": "mint"
               }
             ]
           }
         },
         {
-          "name": "mint",
+          "name": "mintSigner",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -400,15 +406,18 @@
             "type": "publicKey"
           },
           {
-            "name": "name",
-            "type": "string"
-          },
-          {
             "name": "isMutable",
             "type": "bool"
           },
           {
-            "name": "nftData",
+            "name": "name",
+            "docs": [
+              "from input - variable size"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "nftMetadata",
             "type": {
               "option": {
                 "defined": "NftMetadata"
@@ -679,6 +688,18 @@
       }
     },
     {
+      "name": "NftMetadataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attributes",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
       "name": "MetadataInput",
       "type": {
         "kind": "struct",
@@ -701,7 +722,7 @@
             "name": "nftMetadata",
             "type": {
               "option": {
-                "defined": "NftMetadata"
+                "defined": "NftMetadataInput"
               }
             }
           }
@@ -775,6 +796,9 @@
       "type": {
         "kind": "enum",
         "variants": [
+          {
+            "name": "None"
+          },
           {
             "name": "Program",
             "fields": [
