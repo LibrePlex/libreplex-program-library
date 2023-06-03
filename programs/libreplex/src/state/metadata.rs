@@ -22,25 +22,30 @@ pub struct Metadata {
     pub nft_data: Option<NftMetadata>,
 }
 
+
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct NftMetadata {
 
-    pub attributes: Vec<Attribute>,
+    pub attributes: Vec<u8>,
 
     pub signers: Vec<Pubkey>,
 
 }
 
-#[repr(C)]
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct Attribute {
 
-    pub trait_type: String,
 
-    pub attribute: String,
+impl NftMetadata {
+
+    pub fn get_size(&self) -> usize {
+
+        let size = 4 + self.attributes.len() + 4 + self.signers.len();
+
+        return size;
+    }
 
 }
+
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -55,37 +60,7 @@ pub struct MetadataInput {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-impl Attribute {
 
-    pub fn get_size(&self) -> usize {
-
-        let trait_type_length = self.trait_type.len();
-        let attribute_length = self.attribute.len();
-
-        let size = 4 + trait_type_length + 4 + attribute_length;
-
-        return size;
-    }
-}
-
-impl NftMetadata {
-
-    pub fn get_size(&self) -> usize {
-
-        let mut total_attribute_size = 0;
-
-        for attribute in self.attributes.iter() {
-
-            let attribute_size = attribute.get_size();
-            total_attribute_size += attribute_size;
-        }
-
-        let size = 4 + total_attribute_size + 4 + self.signers.len();
-
-        return size;
-    }
-
-}
 
 impl MetadataInput {
 

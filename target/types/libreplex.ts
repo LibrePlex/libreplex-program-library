@@ -513,6 +513,44 @@ export type Libreplex = {
   ],
   "types": [
     {
+      "name": "AttributeType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "permittedValues",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "deleted",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BaseUrlConfiguration",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "prefix",
+            "type": "string"
+          },
+          {
+            "name": "suffix",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
       "name": "NftCollectionData",
       "type": {
         "kind": "struct",
@@ -533,6 +571,22 @@ export type Libreplex = {
             "name": "permittedSigners",
             "type": {
               "vec": "publicKey"
+            }
+          },
+          {
+            "name": "attributeTypes",
+            "type": {
+              "vec": {
+                "defined": "AttributeType"
+              }
+            }
+          },
+          {
+            "name": "itemBaseUrl",
+            "type": {
+              "option": {
+                "defined": "BaseUrlConfiguration"
+              }
             }
           }
         ]
@@ -589,33 +643,13 @@ export type Libreplex = {
         "fields": [
           {
             "name": "attributes",
-            "type": {
-              "vec": {
-                "defined": "Attribute"
-              }
-            }
+            "type": "bytes"
           },
           {
             "name": "signers",
             "type": {
               "vec": "publicKey"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Attribute",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "traitType",
-            "type": "string"
-          },
-          {
-            "name": "attribute",
-            "type": "string"
           }
         ]
       }
@@ -647,6 +681,89 @@ export type Libreplex = {
           }
         ]
       }
+    },
+    {
+      "name": "PermissionEventType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Update"
+          },
+          {
+            "name": "Delete"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "CreateCollectionEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "creator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CreateMetadataEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "collection",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PermissionEvent",
+      "fields": [
+        {
+          "name": "collection",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "eventType",
+          "type": {
+            "defined": "PermissionEventType"
+          },
+          "index": false
+        }
+      ]
     }
   ]
 };
@@ -1166,6 +1283,44 @@ export const IDL: Libreplex = {
   ],
   "types": [
     {
+      "name": "AttributeType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "permittedValues",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "deleted",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BaseUrlConfiguration",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "prefix",
+            "type": "string"
+          },
+          {
+            "name": "suffix",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
       "name": "NftCollectionData",
       "type": {
         "kind": "struct",
@@ -1186,6 +1341,22 @@ export const IDL: Libreplex = {
             "name": "permittedSigners",
             "type": {
               "vec": "publicKey"
+            }
+          },
+          {
+            "name": "attributeTypes",
+            "type": {
+              "vec": {
+                "defined": "AttributeType"
+              }
+            }
+          },
+          {
+            "name": "itemBaseUrl",
+            "type": {
+              "option": {
+                "defined": "BaseUrlConfiguration"
+              }
             }
           }
         ]
@@ -1242,33 +1413,13 @@ export const IDL: Libreplex = {
         "fields": [
           {
             "name": "attributes",
-            "type": {
-              "vec": {
-                "defined": "Attribute"
-              }
-            }
+            "type": "bytes"
           },
           {
             "name": "signers",
             "type": {
               "vec": "publicKey"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Attribute",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "traitType",
-            "type": "string"
-          },
-          {
-            "name": "attribute",
-            "type": "string"
           }
         ]
       }
@@ -1300,6 +1451,89 @@ export const IDL: Libreplex = {
           }
         ]
       }
+    },
+    {
+      "name": "PermissionEventType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Update"
+          },
+          {
+            "name": "Delete"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "CreateCollectionEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "creator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CreateMetadataEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "collection",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PermissionEvent",
+      "fields": [
+        {
+          "name": "collection",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "eventType",
+          "type": {
+            "defined": "PermissionEventType"
+          },
+          "index": false
+        }
+      ]
     }
   ]
 };
