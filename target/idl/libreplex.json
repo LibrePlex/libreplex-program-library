@@ -546,17 +546,13 @@
           {
             "name": "continuedAtIndex",
             "type": {
-              "option": {
-                "defined": "usize"
-              }
+              "option": "u32"
             }
           },
           {
             "name": "continuedFromIndex",
             "type": {
-              "option": {
-                "defined": "usize"
-              }
+              "option": "u32"
             }
           }
         ]
@@ -718,18 +714,21 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "NONE"
-          },
-          {
-            "name": "PROGRAM",
+            "name": "Program",
             "fields": [
-              "publicKey"
+              {
+                "name": "program_id",
+                "type": "publicKey"
+              }
             ]
           },
           {
-            "name": "URL",
+            "name": "Url",
             "fields": [
-              "string"
+              {
+                "name": "collection_url",
+                "type": "string"
+              }
             ]
           }
         ]
@@ -741,21 +740,23 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "NONE",
-            "fields": []
-          },
-          {
-            "name": "PROGRAM",
+            "name": "Program",
             "fields": [
-              "publicKey"
+              {
+                "name": "program_id",
+                "type": "publicKey"
+              }
             ]
           },
           {
-            "name": "URL",
+            "name": "Url",
             "fields": [
               {
-                "option": {
-                  "defined": "BaseUrlConfiguration"
+                "name": "base_url_configuration",
+                "type": {
+                  "option": {
+                    "defined": "BaseUrlConfiguration"
+                  }
                 }
               }
             ]
@@ -769,15 +770,16 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "NONE",
-            "fields": []
+            "name": "Program",
+            "fields": [
+              {
+                "name": "program_id",
+                "type": "publicKey"
+              }
+            ]
           },
           {
-            "name": "PROGRAM",
-            "fields": []
-          },
-          {
-            "name": "URL",
+            "name": "Url",
             "fields": [
               {
                 "name": "url",
