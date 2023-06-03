@@ -84,7 +84,7 @@ export type Libreplex = {
         },
         {
           "name": "signerCollectionPermissions",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -106,6 +106,11 @@ export type Libreplex = {
               }
             ]
           }
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "collection",
@@ -266,6 +271,56 @@ export type Libreplex = {
         {
           "name": "mint",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deleteCollectionPermissions",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "signerCollectionPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collection",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -682,7 +737,7 @@ export const IDL: Libreplex = {
         },
         {
           "name": "signerCollectionPermissions",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -704,6 +759,11 @@ export const IDL: Libreplex = {
               }
             ]
           }
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "collection",
@@ -864,6 +924,56 @@ export const IDL: Libreplex = {
         {
           "name": "mint",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "receiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deleteCollectionPermissions",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "signerCollectionPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "collection"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collection",
+          "isMut": true,
           "isSigner": false
         },
         {

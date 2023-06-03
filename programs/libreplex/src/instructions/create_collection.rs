@@ -76,6 +76,7 @@ pub fn handler(ctx: Context<CreateCollection>,
     user_permissions.can_edit_metadata = true;
     user_permissions.can_delete_metadata =  true;
     
+    user_permissions.can_edit_collection = true;
     user_permissions.can_delete_collection = true;
     
     Ok(())
