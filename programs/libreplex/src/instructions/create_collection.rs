@@ -34,9 +34,9 @@ pub fn handler(ctx: Context<CreateCollection>,
 ) -> Result<()> {
 
     let CollectionInput {name, symbol, 
-        metadata_render_mode, 
+        // metadata_render_mode, 
         collection_render_mode, 
-        nft_collection_data
+        // nft_collection_data
     } = collection_input;
 
     // Ensure that the lengths of strings do not exceed the maximum allowed length
@@ -47,23 +47,23 @@ pub fn handler(ctx: Context<CreateCollection>,
         return Err(error!(ErrorCode::InvalidStringInput));
     }
 
-    if nft_collection_data.is_some() {
-        let nft_collection_data_unwrapped = nft_collection_data.as_ref().unwrap();
-        let royalty_bps = nft_collection_data_unwrapped.royalty_bps;
+    // if nft_collection_data.is_some() {
+    //     let nft_collection_data_unwrapped = nft_collection_data.as_ref().unwrap();
+    //     let royalty_bps = nft_collection_data_unwrapped.royalty_bps;
 
-        // Ensure that basis points are between 0-10,000
-        if royalty_bps > 10_000 {
-            return Err(error!(ErrorCode::InvalidBpsInput));
-        }
+    //     // Ensure that basis points are between 0-10,000
+    //     if royalty_bps > 10_000 {
+    //         return Err(error!(ErrorCode::InvalidBpsInput));
+    //     }
 
-        let royalty_shares_vec: Vec<u16> = nft_collection_data_unwrapped.royalty_shares.iter().map(|x| x.share).collect();
+    //     let royalty_shares_vec: Vec<u16> = nft_collection_data_unwrapped.royalty_shares.iter().map(|x| x.share).collect();
 
-        for rs in royalty_shares_vec {
-            if rs > 10_000 {
-                return Err(error!(ErrorCode::InvalidBpsInput));
-            }
-        }
-    }
+    //     for rs in royalty_shares_vec {
+    //         if rs > 10_000 {
+    //             return Err(error!(ErrorCode::InvalidBpsInput));
+    //         }
+    //     }
+    // }
 
     let collection = &mut ctx.accounts.collection;
     collection.creator = ctx.accounts.authority.key();
@@ -76,8 +76,8 @@ pub fn handler(ctx: Context<CreateCollection>,
 
     
     collection.collection_render_mode = collection_render_mode;
-    collection.metadata_render_mode = metadata_render_mode;
-    collection.nft_collection_data = nft_collection_data;
+    // collection.metadata_render_mode = metadata_render_mode;
+    // collection.nft_collection_data = nft_collection_data;
 
     
     

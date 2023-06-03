@@ -374,14 +374,6 @@ export type Libreplex = {
             "type": {
               "defined": "MetadataRenderMode"
             }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
-            }
           }
         ]
       }
@@ -641,20 +633,6 @@ export type Libreplex = {
             "name": "collectionRenderMode",
             "type": {
               "defined": "CollectionRenderMode"
-            }
-          },
-          {
-            "name": "metadataRenderMode",
-            "type": {
-              "defined": "MetadataRenderMode"
-            }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
             }
           }
         ]
@@ -1258,14 +1236,6 @@ export const IDL: Libreplex = {
             "type": {
               "defined": "MetadataRenderMode"
             }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
-            }
           }
         ]
       }
@@ -1525,20 +1495,6 @@ export const IDL: Libreplex = {
             "name": "collectionRenderMode",
             "type": {
               "defined": "CollectionRenderMode"
-            }
-          },
-          {
-            "name": "metadataRenderMode",
-            "type": {
-              "defined": "MetadataRenderMode"
-            }
-          },
-          {
-            "name": "nftCollectionData",
-            "type": {
-              "option": {
-                "defined": "NftCollectionData"
-              }
             }
           }
         ]
