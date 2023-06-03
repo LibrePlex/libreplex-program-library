@@ -12,6 +12,9 @@ pub struct Collection {
     // Seed address used to generate unique account PDA address
     pub seed: Pubkey,
 
+    // Creator does not convey any privileges
+    pub creator: Pubkey,
+
     // name and symbol of the collection
     pub name: String,
 
