@@ -35,10 +35,15 @@ pub struct CollectionPermissions {
     pub collection: Pubkey,
     pub user: Pubkey,
 
-    pub can_edit_permissions: bool,
-    pub can_add_metadatas: bool,
-    pub can_edit_metadatas: bool,
-    pub can_delete_metadatas: bool,
+    // admin permission includes
+    // the ability to change permissions
+    pub is_admin: bool,
+    
+    pub can_create_metadata: bool,
+    pub can_edit_metadata: bool,
+    pub can_delete_metadata: bool,
+    
+    pub can_edit_collection: bool,
     pub can_delete_collection: bool,
 }
 

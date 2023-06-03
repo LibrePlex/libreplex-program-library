@@ -1,20 +1,20 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::{Collection}, COLLECTION};
-use prog_common::{close_account};
+use crate::{state::{CollectionData}, CollectionPermissions, assert_valid_user_permissions};
+use prog_common::{close_account, errors::ErrorCode};
 
 #[derive(Accounts)]
 #[instruction(bump_collection_data: u8)]
-pub struct DeleteCollection<'info> {
+pub struct DeleteCollectionData<'info> {
+    pub signer: Signer<'info>,
 
-    pub authority: Signer<'info>,
+    #[account(
+        seeds = ["permissions".as_ref(), collection_data.key().as_ref(), signer.key().as_ref()], 
+        bump)]
+    pub signer_collection_permissions: Box<Account<'info, CollectionPermissions>>,
 
-    #[account(mut, seeds = [COLLECTION.as_ref(), collection_seed.key().as_ref()],
-              bump = bump_collection_data, has_one = authority, has_one = collection_seed)]
-    pub collection_data: Box<Account<'info, Collection>>,
-
-    /// CHECK: Used for seed verification of collection data PDA account
-    pub collection_seed: AccountInfo<'info>,
+    #[account(mut)]
+    pub collection_data: Box<Account<'info, CollectionData>>,
 
     /// CHECK: Receiver address for the rent-exempt lamports
     #[account(mut)]
@@ -27,6 +27,14 @@ pub fn handler(ctx: Context<DeleteCollection>) -> Result<()> {
 
     // Set the receiver of the lamports to be reclaimed from the rent of the accounts to be closed
     let receiver = &mut ctx.accounts.receiver;
+    let permissions = &ctx.accounts.signer_collection_permissions;
+  
+    assert_valid_user_permissions(permissions, &ctx.accounts.collection_data.key(), ctx.accounts.signer.key)?;
+
+    if !permissions.can_delete_collection {
+        return Err(ErrorCode::MissingPermissionDeleteCollection.into());
+    }
+
 
     // Close the collection data state account
     let collection_data_account_info = &mut (*ctx.accounts.collection_data).to_account_info();

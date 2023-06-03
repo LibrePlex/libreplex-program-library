@@ -6,7 +6,7 @@ use crate::state::{RoyaltyShare};
 
 #[repr(C)]
 #[account]
-#[derive(Debug)]
+#[derive()]
 pub struct NftMetadataUnique {
 
     // The metadata account for which the additional unique data exists

@@ -45,21 +45,24 @@ pub enum ErrorCode {
     #[msg("Invalid Permissions")]
     InvalidPermissions, //0x177D
     
-    #[msg("Cannot modify collection")]
-    CannotAddToCollection, //0x177E
+    #[msg("Missing admin permission")]
+    MissingPermissionAdmin, //0x177E
 
-    #[msg("Cannot modify Metadata")]
-    CannotModifyMetadata, //0x177F
+    #[msg("Missing edit collection permission")]
+    MissingPermissionEditCollection, //0x177F
 
-    #[msg("Cannot delete Collection")]
-    CannotDeleteCollection, //0x1780
+    #[msg("Missing delete collection permission")]
+    MissingPermissionDeleteCollection, //0x1780
 
-    #[msg("Cannot delete Metadata")]
-    CannotDeleteMetadata, //0x1781
+    #[msg("Missing create metadata permission")]
+    MissingPermissionCreateMetadata, //0x1781
 
-    #[msg("Cannot edit permissions")]
-    CannotEditPermissions, //0x1782
-    Reserved19, //0x1783
+    #[msg("Missing edit metadata permission")]
+    MissingPermissionEditMetadata, //0x1782
+
+    #[msg("Missing delete metadata permission")]
+    MissingPermissionDeleteMetadata, //0x1783
+
     Reserved20, //0x1784
 
     Reserved21, //0x1785

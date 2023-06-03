@@ -1,7 +1,10 @@
 use anchor_lang::prelude::*;
 use instructions::*;
 
-declare_id!("L1BRc7ZYjj7t9k7E5xbdnKy3KhaY6sTcJx4gAsqxUbh");
+
+use anchor_lang::{AnchorDeserialize, AnchorSerialize};
+
+declare_id!("AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6");
 
 pub mod instructions;
 pub mod state;
