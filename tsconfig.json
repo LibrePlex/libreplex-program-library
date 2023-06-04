@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
-              "types": ["mocha", "chai"],
-              "typeRoots": ["./node_modules/@types"],
-              "lib": ["es2015"],
-              "module": "commonjs",
-              "target": "es6",
-              "esModuleInterop": true
-            },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["es2015"],
+    "module": "commonjs",
+    "outDir": "dist",
+    "target": "es6",
+    "esModuleInterop": true,
+    "baseUrl": "./target",
+    
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "programs"]
 }

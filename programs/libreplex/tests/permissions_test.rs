@@ -37,7 +37,7 @@ mod permissions {
                     name: "COOLIO COLLECTION".to_string(),
                     
                     symbol: "COOL".to_string(),
-                    collection_render_mode: libreplex::CollectionRenderMode::Url { collection_url: collection_url.to_string() },
+                    collection_render_mode: libreplex::CollectionRenderMode::Url { url: collection_url.to_string() },
                     metadata_render_mode: libreplex::MetadataRenderMode::Url { base_url_configuration },
                     nft_collection_data: None,
             }

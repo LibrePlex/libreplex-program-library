@@ -41,7 +41,7 @@ impl MetadataRenderModeData {
             MetadataRenderModeData::Url { url:_ } => {
                 return mem::discriminant(collection_render_mode)
                     == mem::discriminant(&CollectionRenderMode::Url {
-                        collection_url: String::default(),
+                        url: String::default(),
                     })
             }
         }

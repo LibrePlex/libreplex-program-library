@@ -105,7 +105,8 @@ pub fn update_collection_from_input<'a>(collection_input: CollectionInput,
     let CollectionInput {name, symbol, 
         metadata_render_mode, 
         collection_render_mode, 
-        nft_collection_data
+        nft_collection_data,
+        description,
     } = collection_input;
     let name_length = name.len();
     let symbol_length = symbol.len();
@@ -132,6 +133,7 @@ pub fn update_collection_from_input<'a>(collection_input: CollectionInput,
     
     collection.name = name.clone();
     collection.symbol = symbol;
+    collection.description = description;
     collection.collection_render_mode = collection_render_mode;
     collection.metadata_render_mode = metadata_render_mode;
     collection.nft_collection_data = nft_collection_data;

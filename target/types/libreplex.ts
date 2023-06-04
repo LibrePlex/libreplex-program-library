@@ -616,6 +616,10 @@ export type Libreplex = {
             "type": "string"
           },
           {
+            "name": "description",
+            "type": "string"
+          },
+          {
             "name": "collectionRenderMode",
             "type": {
               "defined": "CollectionRenderMode"
@@ -831,7 +835,9 @@ export type Libreplex = {
           {
             "name": "permittedValues",
             "type": {
-              "vec": "string"
+              "vec": {
+                "defined": "AttributeValue"
+              }
             }
           },
           {
@@ -930,6 +936,10 @@ export type Libreplex = {
           },
           {
             "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "description",
             "type": "string"
           },
           {
@@ -1049,7 +1059,7 @@ export type Libreplex = {
             "name": "Url",
             "fields": [
               {
-                "name": "collection_url",
+                "name": "url",
                 "type": "string"
               }
             ]
@@ -1084,6 +1094,98 @@ export type Libreplex = {
                     "defined": "BaseUrlConfiguration"
                   }
                 }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "AttributeValue",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "String",
+            "fields": [
+              {
+                "name": "value",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "U8",
+            "fields": [
+              {
+                "name": "value",
+                "type": "u8"
+              }
+            ]
+          },
+          {
+            "name": "U16",
+            "fields": [
+              {
+                "name": "value",
+                "type": "u16"
+              }
+            ]
+          },
+          {
+            "name": "U32",
+            "fields": [
+              {
+                "name": "value",
+                "type": "u32"
+              }
+            ]
+          },
+          {
+            "name": "U64",
+            "fields": [
+              {
+                "name": "value",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "I8",
+            "fields": [
+              {
+                "name": "value",
+                "type": "i8"
+              }
+            ]
+          },
+          {
+            "name": "I16",
+            "fields": [
+              {
+                "name": "value",
+                "type": "i16"
+              }
+            ]
+          },
+          {
+            "name": "I32",
+            "fields": [
+              {
+                "name": "value",
+                "type": "i32"
+              }
+            ]
+          },
+          {
+            "name": "I64",
+            "fields": [
+              {
+                "name": "value",
+                "type": "i64"
               }
             ]
           }
@@ -1885,6 +1987,10 @@ export const IDL: Libreplex = {
             "type": "string"
           },
           {
+            "name": "description",
+            "type": "string"
+          },
+          {
             "name": "collectionRenderMode",
             "type": {
               "defined": "CollectionRenderMode"
@@ -2100,7 +2206,9 @@ export const IDL: Libreplex = {
           {
             "name": "permittedValues",
             "type": {
-              "vec": "string"
+              "vec": {
+                "defined": "AttributeValue"
+              }
             }
           },
           {
@@ -2199,6 +2307,10 @@ export const IDL: Libreplex = {
           },
           {
             "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "description",
             "type": "string"
           },
           {
@@ -2318,7 +2430,7 @@ export const IDL: Libreplex = {
             "name": "Url",
             "fields": [
               {
-                "name": "collection_url",
+                "name": "url",
                 "type": "string"
               }
             ]
@@ -2353,6 +2465,98 @@ export const IDL: Libreplex = {
                     "defined": "BaseUrlConfiguration"
                   }
                 }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "AttributeValue",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "String",
+            "fields": [
+              {
+                "name": "value",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "U8",
+            "fields": [
+              {
+                "name": "value",
+                "type": "u8"
+              }
+            ]
+          },
+          {
+            "name": "U16",
+            "fields": [
+              {
+                "name": "value",
+                "type": "u16"
+              }
+            ]
+          },
+          {
+            "name": "U32",
+            "fields": [
+              {
+                "name": "value",
+                "type": "u32"
+              }
+            ]
+          },
+          {
+            "name": "U64",
+            "fields": [
+              {
+                "name": "value",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "I8",
+            "fields": [
+              {
+                "name": "value",
+                "type": "i8"
+              }
+            ]
+          },
+          {
+            "name": "I16",
+            "fields": [
+              {
+                "name": "value",
+                "type": "i16"
+              }
+            ]
+          },
+          {
+            "name": "I32",
+            "fields": [
+              {
+                "name": "value",
+                "type": "i32"
+              }
+            ]
+          },
+          {
+            "name": "I64",
+            "fields": [
+              {
+                "name": "value",
+                "type": "i64"
               }
             ]
           }

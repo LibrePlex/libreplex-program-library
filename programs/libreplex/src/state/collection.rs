@@ -28,7 +28,7 @@ pub enum CollectionRenderMode {
     */
     None,
     Program{program_id: Pubkey},
-    Url{collection_url: String},
+    Url{url: String},
 }
 
 impl CollectionRenderMode {
@@ -37,7 +37,7 @@ impl CollectionRenderMode {
         // + 32 // max variant size (from Pubkey)
         + match self {
             CollectionRenderMode::None => 0,
-            CollectionRenderMode::Url{collection_url} => 4 + collection_url.len(),
+            CollectionRenderMode::Url{url} => 4 + url.len(),
             CollectionRenderMode::Program{program_id:_} => 32
         };
 
@@ -121,6 +121,8 @@ pub struct Collection {
 
     pub symbol: String,
 
+    pub description: String,
+
     pub collection_render_mode: CollectionRenderMode,
 
     pub metadata_render_mode: MetadataRenderMode,
@@ -142,6 +144,7 @@ impl Collection {
         Collection::BASE_SIZE
         + 4 + self.name.len() // name
         + 4 + self.symbol.len() // symbol
+        + 4 + self.description.len() // symbol
         + self.collection_render_mode.get_size()
         + self.metadata_render_mode.get_size()
         + match &self.nft_collection_data {
@@ -213,6 +216,40 @@ impl Collection {
 
 */
 
+#[repr(C)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub enum AttributeValue {
+    None,
+    String {value: String},
+    U8 {value: u8},
+    U16 {value: u16},
+    U32 {value: u32},
+    U64 {value: u64},
+    I8 {value: i8},
+    I16 {value: i16},
+    I32 {value: i32},
+    I64 {value: i64},
+    
+    //HedgeHog{ value: HedgeHog} new custom types can be added as needed
+}
+
+impl AttributeValue {
+    pub fn get_size(&self) -> usize {
+        2 + match &self {
+            AttributeValue::None => 0,
+            AttributeValue::U8 {value: _}=> 1,
+            AttributeValue::I8 {value: _}=> 1,
+            AttributeValue::U16{value: _} => 2,
+            AttributeValue::I16 {value: _}=> 2,
+            AttributeValue::U32{value: _} => 4,
+            AttributeValue::I32 {value: _}=> 4,
+            AttributeValue::U64{value: _} => 8,
+            AttributeValue::I64 {value: _}=> 8,
+            AttributeValue::String{value} => 4 + value.len()
+        }
+    }
+}
+
 /*
     #0 BACKGROUND - "blue", "red", ...., "green"
     #1 FACE - "angry", "sad",
@@ -226,7 +263,7 @@ pub struct AttributeType {
     // royalty address and their share in basis points (0-10,000)
     pub name: String,
 
-    pub permitted_values: Vec<String>,
+    pub permitted_values: Vec<AttributeValue>,
 
     pub deleted: bool,
 
@@ -239,7 +276,7 @@ pub struct AttributeType {
 
 impl AttributeType {
     pub fn get_size(&self) -> usize {
-        let total_size: usize = self.permitted_values.iter().map(|x| 4 + x.len()).sum();
+        let total_size: usize = self.permitted_values.iter().map(|x| 4 + x.get_size()).sum();
 
         return 4 + 32  // name
             +  4 + total_size 
@@ -318,6 +355,7 @@ pub struct RoyaltyShare {
 pub struct CollectionInput {
     pub name: String,
     pub symbol: String,
+    pub description: String,
     pub collection_render_mode: CollectionRenderMode,
     pub metadata_render_mode: MetadataRenderMode,
     pub nft_collection_data: Option<NftCollectionData>,
@@ -330,6 +368,7 @@ impl CollectionInput {
         let size 
             = 4 + self.name.len()
             + 4 + self.symbol.len()
+            + 4 + self.description.len()
             + self.collection_render_mode.get_size()
             + self.metadata_render_mode.get_size()
             + 1 + match self.nft_collection_data.as_ref() {
