@@ -511,6 +511,7 @@
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "Mint",
                 "path": "mint"
               }
             ]

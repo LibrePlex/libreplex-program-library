@@ -511,6 +511,7 @@ export type Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "Mint",
                 "path": "mint"
               }
             ]
@@ -1882,6 +1883,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "Mint",
                 "path": "mint"
               }
             ]

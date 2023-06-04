@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_spl::token::Mint;
 
 use crate::{state::{Collection, Metadata}, METADATA, CollectionPermissions, assert_valid_collection_permissions};
 use prog_common::{close_account, TrySub, errors::ErrorCode};
@@ -21,7 +22,7 @@ pub struct DeleteMetadata<'info> {
               bump, has_one = collection, has_one = mint)]
     pub metadata: Box<Account<'info, Metadata>>,
 
-    pub mint: AccountInfo<'info>,
+    pub mint: Account<'info, Mint>,
 
     /// CHECK: Receiver address for the rent-exempt lamports
     #[account(mut)]

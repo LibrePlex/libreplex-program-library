@@ -62,9 +62,6 @@ pub fn handler(ctx: Context<CreateCollection>,
 
     update_collection_from_input(collection_input, collection)?;
 
-    
-    
-
 
     emit!(CollectionEvent{
         creator: ctx.accounts.authority.key(),
