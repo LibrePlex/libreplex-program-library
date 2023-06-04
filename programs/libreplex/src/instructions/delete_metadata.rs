@@ -21,7 +21,6 @@ pub struct DeleteMetadata<'info> {
               bump, has_one = collection, has_one = mint)]
     pub metadata: Box<Account<'info, Metadata>>,
 
-    /// CHECK: Mint address used for seed verification
     pub mint: AccountInfo<'info>,
 
     /// CHECK: Receiver address for the rent-exempt lamports
