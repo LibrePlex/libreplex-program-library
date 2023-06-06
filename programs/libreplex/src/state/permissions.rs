@@ -82,5 +82,16 @@ pub enum PermissionCounts {
 #[account]
 pub struct Permissions {
     pub bump: u8,
+    pub user: Pubkey,
+    pub reference: Pubkey,
     pub permissions: Vec<PermissionType>,
+}
+
+impl Permissions {
+
+    pub const BASE_SIZE: usize = 8 + 1 + 32 + 32 + 4;
+
+    pub fn get_size(&self) -> usize {
+        return Permissions::BASE_SIZE + self.permissions.len();
+    }
 }

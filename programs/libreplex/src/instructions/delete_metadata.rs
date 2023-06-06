@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 
 use crate::{state::{Collection, Metadata}, METADATA, Permissions, assert_valid_permissions, PermissionType};
-use prog_common::{close_account, TrySub, errors::ErrorCode};
+use prog_common::{close_account, TrySub};
 
 
 #[derive(Accounts)]

@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::instructions::has_permission;
 
-use crate::{UpdateMetadataExtendedInput, Metadata, Permissions, PermissionType, MetadataInput};
+use crate::{UpdateMetadataExtendedInput, Metadata, Permissions, PermissionType, CreateMetadataInput, UpdateMetadataInput};
 
 
 use prog_common::{errors::ErrorCode};
@@ -30,7 +30,7 @@ pub struct EditMetadata<'info> {
 }
 
 pub fn handler(ctx: Context<EditMetadata>,
-    metadata_input: MetadataInput,
+    update_metadata_input: UpdateMetadataInput,
 ) -> Result<()> {
     let editor = &ctx.accounts.editor;
     let collection = &ctx.accounts.collection;
@@ -38,12 +38,12 @@ pub fn handler(ctx: Context<EditMetadata>,
     let permissions = &ctx.accounts.permissions;
     
 
-    let MetadataInput {name, 
+    let UpdateMetadataInput {name, 
             symbol,
             url,
             description,
             invoked_permission
-        } = metadata_input;
+        } = update_metadata_input;
 
     if invoked_permission != PermissionType::Admin && invoked_permission != PermissionType::Edit {
         return Err(ErrorCode::InvalidPermissions.into())
@@ -51,6 +51,8 @@ pub fn handler(ctx: Context<EditMetadata>,
     
     let metadata_key = metadata.key();
     let editor_key = editor.key();
+
+
 
     let metadata_permissions_path = &[b"permissions", metadata_key.as_ref(), editor_key.as_ref()];
     let (metadata_permissions_key, metadata_bump) = Pubkey::find_program_address(metadata_permissions_path, &crate::id());
@@ -67,7 +69,6 @@ pub fn handler(ctx: Context<EditMetadata>,
         
     }
     
-    let collection = &ctx.accounts.collection;
     let metadata = &mut ctx.accounts.metadata;
 
     
@@ -76,6 +77,7 @@ pub fn handler(ctx: Context<EditMetadata>,
     metadata.name = name.clone();
     metadata.url = url.clone();
     metadata.description = description;
+    metadata.symbol= symbol;
     
     emit!(EditMetadataEvent{
         id: metadata.key(),

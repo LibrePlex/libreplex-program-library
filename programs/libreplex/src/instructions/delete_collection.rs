@@ -13,7 +13,9 @@ pub struct DeleteCollection<'info> {
         close = creator,
         seeds = ["permissions".as_ref(), collection.key().as_ref(), signer.key().as_ref()], 
         bump)]
-    pub signer_collection_permissions: Box<Account<'info, Permissions>>,
+    pub permissions: Box<Account<'info, Permissions>>,
+
+
 
     /// CHECK: checked in macro. This is the collection creator
     pub creator: UncheckedAccount<'info>,
@@ -29,16 +31,21 @@ pub struct DeleteCollection<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<DeleteCollection>) -> Result<()> {
+pub fn handler(ctx: Context<DeleteCollection>, permission_invoked: PermissionType) -> Result<()> {
     //assert_valid_collection_permissionsmports to be reclaimed from the rent of the accounts to be closed
     let receiver = &mut ctx.accounts.receiver;
-    let permissions = &ctx.accounts.signer_collection_permissions;
+    let permissions = &ctx.accounts.permissions;
     let collection = &ctx.accounts.collection;
+
+    if permission_invoked != PermissionType::Admin && permission_invoked != PermissionType::Delete {
+        return Err(ErrorCode::InvalidPermissions.into());
+    }
+
     assert_valid_permissions(
         permissions,
         ctx.accounts.collection.key(),
         ctx.accounts.signer.key(),
-        PermissionType::Admin
+        permission_invoked
     )?;
 
     if ctx.accounts.collection.item_count > 0 {

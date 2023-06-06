@@ -42,9 +42,10 @@ pub mod libreplex {
 
     pub fn delete_collection(
         ctx: Context<DeleteCollection>,
+        permission_type: PermissionType
     ) -> Result<()> {
         msg!("deleting collection data");
-        instructions::delete_collection::handler(ctx)
+        instructions::delete_collection::handler(ctx, permission_type)
     }
 
     pub fn edit_collection_permissions(ctx: Context<EditCollectionPermissions>, 
@@ -55,7 +56,7 @@ pub mod libreplex {
 
     pub fn create_metadata(
         ctx: Context<CreateMetadata>,
-        metadata_input: MetadataInput,
+        metadata_input: CreateMetadataInput,
     ) -> Result<()> {
         msg!("creating metadata");
         instructions::create_metadata::handler(

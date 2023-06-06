@@ -25,7 +25,7 @@ pub struct ExpandMetadata<'info> {
     #[account(
         seeds = ["permissions".as_ref(), collection.key().as_ref(), signer.key().as_ref()], 
         bump)]
-    pub signer_collection_permissions: Box<Account<'info, CollectionPermissions>>,
+    pub signer_permissions: Box<Account<'info, Permissions>>,
 
     #[account(mut)]
     pub collection: Box<Account<'info, Collection>>,
@@ -50,7 +50,7 @@ pub struct ExpandMetadata<'info> {
 pub fn handler(ctx: Context<CreateMetadata>, metadata_input: MetadataInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let collection = &mut ctx.accounts.collection;
-    let user_permissions = &ctx.accounts.signer_collection_permissions;
+    let permissions = &ctx.accounts.permissions;
     let authority = &ctx.accounts.signer;
 
     assert_valid_collection_permissions(user_permissions, &collection.key(), authority.key)?;

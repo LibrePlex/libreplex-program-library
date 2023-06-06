@@ -52,10 +52,15 @@ pub fn handler(ctx: Context<CreateCollection>,
 
 
     let collection = &mut ctx.accounts.collection;
+    let permissions = &mut ctx.accounts.permissions;
     let authority = &mut ctx.accounts.authority;
     collection.creator = authority.key();
     collection.seed = ctx.accounts.seed.key();
     collection.item_count = 0;
+
+
+    permissions.permissions = vec![PermissionType::Admin];
+    
     
 
     update_collection_from_input(collection_input, collection)?;

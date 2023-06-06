@@ -5,7 +5,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 use prog_common::errors::ErrorCode;
 
-use crate::{Collection, MAX_NAME_LENGTH, PermissionType};
+use crate::{Collection, MAX_NAME_LENGTH, PermissionType, PermissionCounts};
 
 use crate::CollectionRenderMode;
 
@@ -158,15 +158,14 @@ impl AttributesInput {
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct MetadataInput {
+pub struct CreateMetadataInput {
     pub name: String,
     pub symbol: String,
     pub url: String,
     pub description: Option<String>,
-    pub invoked_permission: PermissionType
 }
 
-impl MetadataInput {
+impl CreateMetadataInput {
     pub fn get_size(&self) -> usize {
         let size = 4 + self.name.len()
         + 4 + self.symbol.len()
@@ -176,6 +175,31 @@ impl MetadataInput {
             None => 0
         }
         ;
+
+        return size;
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct UpdateMetadataInput {
+    pub name: String,
+    pub symbol: String,
+    pub url: String,
+    pub description: Option<String>,
+    pub invoked_permission: PermissionType,
+}
+
+impl UpdateMetadataInput {
+    pub fn get_size(&self) -> usize {
+        let size = 4 + self.name.len()
+        + 4 + self.symbol.len()
+        + 4 + self.url.len()
+        + 1 + match &self.description {
+            Some(x) => x.len(),
+            None => 0
+        }
+        + 1;
 
         return size;
     }
