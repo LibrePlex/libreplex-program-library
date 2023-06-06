@@ -5,7 +5,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 use prog_common::errors::ErrorCode;
 
-use crate::{Collection, MAX_NAME_LENGTH};
+use crate::{Collection, MAX_NAME_LENGTH, PermissionType};
 
 use crate::CollectionRenderMode;
 
@@ -51,23 +51,52 @@ impl MetadataRenderModeData {
 #[repr(C)]
 #[account]
 pub struct Metadata {
-    // the collection to which this metadata belongs
-    pub collection: Pubkey,
-
+    
     // the mint address of the token for which the metadata refers
     pub mint: Pubkey,
+
+    pub creator: Pubkey,
 
     pub is_mutable: bool,
 
     /// from input - variable size
     pub name: String,
 
+    /// from input - variable size
+    pub symbol: String,
+
+    /// from input - variable size
+    pub url: String,
+
+    pub description: Option<String>
+}
+
+impl Metadata {
+    
+    pub const BASE_SIZE: usize = 8 + 32 + 32 + 1;
+    
+
+    pub fn get_size(&self) -> usize {
+        let size = Metadata::BASE_SIZE
+            + 4 + self.name.len()
+            + 4 + self.symbol.len()
+            + 4 + self.url.len();
+
+        return size;
+    }
+}
+
+
+#[repr(C)]
+#[account]
+pub struct MetadataExtended {
+    
     pub nft_metadata: Option<NftMetadata>,
 
     pub render_mode_data: Vec<MetadataRenderModeData>,
 }
 
-impl Metadata {
+impl MetadataExtended {
     
     pub const BASE_SIZE: usize = 8 + 32 + 32 + 1 
     + 4  // because MetadataRanderModeData is wrapped in a vector
@@ -75,7 +104,6 @@ impl Metadata {
 
     pub fn get_size(&self) -> usize {
         let size = Metadata::BASE_SIZE
-            + 4 + self.name.len()
             + 1 + match &self.nft_metadata {
                 Some(x) => x.get_size(),
                 None => 0,
@@ -89,6 +117,7 @@ impl Metadata {
         return size;
     }
 }
+
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -107,7 +136,7 @@ impl NftMetadata {
 }
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct NftMetadataInput {
+pub struct AttributesInput {
     pub attributes: Vec<u8>,
 
     /*
@@ -119,7 +148,7 @@ pub struct NftMetadataInput {
 
 }
 
-impl NftMetadataInput {
+impl AttributesInput {
     pub fn get_size(&self) -> usize {
         let size = 4 + self.attributes.len();
 
@@ -131,16 +160,43 @@ impl NftMetadataInput {
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct MetadataInput {
     pub name: String,
-    pub render_mode_data: MetadataRenderModeData,
-    pub nft_metadata: Option<NftMetadataInput>,
+    pub symbol: String,
+    pub url: String,
+    pub description: Option<String>,
+    pub invoked_permission: PermissionType
 }
 
+impl MetadataInput {
+    pub fn get_size(&self) -> usize {
+        let size = 4 + self.name.len()
+        + 4 + self.symbol.len()
+        + 4 + self.url.len()
+        + 1 + match &self.description {
+            Some(x) => x.len(),
+            None => 0
+        }
+        ;
+
+        return size;
+    }
+}
+
+
+#[repr(C)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct UpdateMetadataExtendedInput {
+    pub render_mode_data: MetadataRenderModeData,
+    pub nft_metadata: Option<AttributesInput>,
+    pub invoked_permission: PermissionType,
+}
+
+
 pub fn validate_metadata_input(
-    metadata_input: &MetadataInput,
+    metadata_input: &UpdateMetadataExtendedInput,
     collection: &Collection,
 ) -> Result<()> {
-    let MetadataInput {
-        name,
+    let UpdateMetadataExtendedInput {
+        invoked_permission,
         render_mode_data,
         nft_metadata:_,
     } = metadata_input;
@@ -159,23 +215,19 @@ pub fn validate_metadata_input(
     render_mode_data.is_compatible_with(&collection.collection_render_mode);
 
     // Ensure that the lengths of strings do not exceed the maximum allowed length
-    let name_length = name.len();
-
-    if name_length > MAX_NAME_LENGTH {
-        return Err(error!(ErrorCode::InvalidStringInput));
-    }
-
+    
     Ok(())
 }
 
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-impl MetadataInput {
+impl UpdateMetadataExtendedInput {
 
    
     pub fn get_size(&self) -> usize {
         let size = 4
-            + self.name.len()
             + self.render_mode_data.get_size()
             + 1
             + match self.nft_metadata.as_ref() {

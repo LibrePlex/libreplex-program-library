@@ -26,53 +26,61 @@ pub const PERMISSIONS_SIZE: usize = 32 + 32 + 1 + 1
 + 30;
 
 
-pub fn assert_valid_collection_permissions(permissions: &CollectionPermissions, 
-    collection: &Pubkey, user: &Pubkey) -> Result<()> {
-    let valid = &permissions.collection == collection && &permissions.user == user;
+pub fn assert_valid_permissions(permissions: &Account<Permissions>, 
+    reference: Pubkey, user: Pubkey, permission_type: PermissionType) -> Result<()> {
 
-    if !valid {
+    // check derivation
+
+    let path = &[b"permissions", reference.as_ref(), user.as_ref()];
+
+    let (key, bump) = Pubkey::find_program_address(path, &crate::id());
+
+    if permissions.key() != key {
+        return Err(ErrorCode::UnexpectedPermissionsKey.into());
+    }
+
+   
+    if permissions.bump != bump {
+        return Err(ErrorCode::InvalidBump.into());
+    } 
+
+
+    if permissions.permissions.clone().into_iter().find(|x|(x.eq(&permission_type))).is_none() {
         return Err(ErrorCode::InvalidPermissions.into());
     }
 
     Ok(())
 }
 
-pub fn assert_valid_metadata_permissions(permissions: &MetadataPermissions, 
-    metadata: &Pubkey, user: &Pubkey) -> Result<()> {
-    let valid = &permissions.metadata == metadata && &permissions.user == user;
 
-    if !valid {
-        return Err(ErrorCode::InvalidPermissions.into());
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, PartialEq)]
+pub enum PermissionType {
+    Admin,
+    Create,
+    Edit,
+    Delete,
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+pub enum PermissionCounts {
+    Admin{
+        count: u32,
+    },
+    Create{ 
+        count: u32
+    },
+    Edit{ 
+        count: u32
+    },
+    Delete{ 
+        count: u32
     }
-
-    Ok(())
-}
-
-#[account]
-#[derive(Debug)]
-pub struct MetadataPermissions {
-    pub metadata: Pubkey,
-    pub user: Pubkey,
-    pub can_modify: bool,
-
-    // Maybe we will add more
 }
 
 
+#[repr(C)]
 #[account]
-#[derive(Debug)]
-pub struct CollectionPermissions {
-    pub collection: Pubkey,
-    pub user: Pubkey,
-
-    // admin permission includes
-    // the ability to change permissions
-    pub is_admin: bool,
-    
-    pub can_create_metadata: bool,
-    pub can_edit_metadata: bool,
-    pub can_delete_metadata: bool,
-    
-    pub can_edit_collection: bool,
-    pub can_delete_collection: bool,
+pub struct Permissions {
+    pub bump: u8,
+    pub permissions: Vec<PermissionType>,
 }

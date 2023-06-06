@@ -220,7 +220,7 @@ impl Collection {
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum AttributeValue {
     None,
-    String {value: String},
+    Word {value: String},
     U8 {value: u8},
     U16 {value: u16},
     U32 {value: u32},
@@ -245,7 +245,7 @@ impl AttributeValue {
             AttributeValue::I32 {value: _}=> 4,
             AttributeValue::U64{value: _} => 8,
             AttributeValue::I64 {value: _}=> 8,
-            AttributeValue::String{value} => 4 + value.len()
+            AttributeValue::Word{value} => 4 + value.len()
         }
     }
 }
@@ -355,7 +355,12 @@ pub struct RoyaltyShare {
 pub struct CollectionInput {
     pub name: String,
     pub symbol: String,
-    pub description: String,
+    /*
+        commenting this out because it seems
+        we're hitting the limit of serializable
+        input size.
+     */
+    // pub description: String,
     pub collection_render_mode: CollectionRenderMode,
     pub metadata_render_mode: MetadataRenderMode,
     pub nft_collection_data: Option<NftCollectionData>,
@@ -368,7 +373,7 @@ impl CollectionInput {
         let size 
             = 4 + self.name.len()
             + 4 + self.symbol.len()
-            + 4 + self.description.len()
+            + 4 //+ self.description.len()
             + self.collection_render_mode.get_size()
             + self.metadata_render_mode.get_size()
             + 1 + match self.nft_collection_data.as_ref() {

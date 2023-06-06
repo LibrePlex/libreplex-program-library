@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
-use crate::state::{Collection};
-use crate::{CollectionPermissions, MetadataInput, Metadata, MetadataPermissions, assert_valid_collection_permissions, assert_valid_metadata_permissions, validate_metadata_input, NftMetadata, NftMetadataInput};
+use crate::instructions::has_permission;
+
+use crate::{UpdateMetadataExtendedInput, Metadata, Permissions, PermissionType, MetadataInput};
 
 
 use prog_common::{errors::ErrorCode};
@@ -8,32 +9,21 @@ use prog_common::{errors::ErrorCode};
 #[event]
 struct EditMetadataEvent {
     id: Pubkey,
-    collection: Pubkey,
     name: String,
 }
 
 #[derive(Accounts)]
-#[instruction(metadata_input: MetadataInput)]
+#[instruction(metadata_input: UpdateMetadataExtendedInput)]
 pub struct EditMetadata<'info> {
     #[account(mut)]
     pub editor: Signer<'info>,
 
-    #[account(
-        seeds = ["permissions".as_ref(), collection.key().as_ref(), editor.key().as_ref()], 
-        bump)]
-    pub editor_collection_permissions: Option<Box<Account<'info, CollectionPermissions>>>,
+    #[account()]
+    pub permissions: Box<Account<'info, Permissions>>,
 
-    #[account(
-        seeds = ["permissions".as_ref(), 
-        collection.key().as_ref(), 
-        editor.key().as_ref(), 
-        metadata.key().as_ref()], 
-        bump)]
-    pub editor_metadata_permissions: Option<Box<Account<'info, MetadataPermissions>>>,
+    /// CHECK: may be empty
+    pub collection: UncheckedAccount<'info>,
 
-    pub collection: Box<Account<'info, Collection>>,
-
-    #[account(mut, has_one = collection)]
     pub metadata: Box<Account<'info, Metadata>>,
 
     pub system_program: Program<'info, System>,
@@ -43,76 +33,54 @@ pub fn handler(ctx: Context<EditMetadata>,
     metadata_input: MetadataInput,
 ) -> Result<()> {
     let editor = &ctx.accounts.editor;
-    let editor_collection_permissions = &ctx.accounts.editor_collection_permissions;
-    let editor_metadata_permissions = &ctx.accounts.editor_metadata_permissions;
+    let collection = &ctx.accounts.collection;
+    let metadata = &ctx.accounts.metadata;
+    let permissions = &ctx.accounts.permissions;
+    
+
+    let MetadataInput {name, 
+            symbol,
+            url,
+            description,
+            invoked_permission
+        } = metadata_input;
+
+    if invoked_permission != PermissionType::Admin && invoked_permission != PermissionType::Edit {
+        return Err(ErrorCode::InvalidPermissions.into())
+    }
+    
+    let metadata_key = metadata.key();
+    let editor_key = editor.key();
+
+    let metadata_permissions_path = &[b"permissions", metadata_key.as_ref(), editor_key.as_ref()];
+    let (metadata_permissions_key, metadata_bump) = Pubkey::find_program_address(metadata_permissions_path, &crate::id());
+
+    if metadata_permissions_key == permissions.key() {
+        if permissions.bump != metadata_bump  {
+            return Err(ErrorCode::InvalidBump.into())
+        }
+
+        if has_permission(&permissions.permissions, invoked_permission).is_none() {
+            // TODO: Add support for edit as well as admin
+            return Err(ErrorCode::InvalidPermissions.into())
+        }
+        
+    }
+    
     let collection = &ctx.accounts.collection;
     let metadata = &mut ctx.accounts.metadata;
 
-    validate_metadata_input(&metadata_input, collection)?;
-
-    let has_metadata_permission = match editor_metadata_permissions {
-        Some(metadata_permissions) => {
-            assert_valid_metadata_permissions(&metadata_permissions, &metadata.key(), editor.key)
-                .map(|_| metadata_permissions.can_modify)
-        },
-        None => Ok(false),
-    }?;
-
-
-    let has_collection_permission = match editor_collection_permissions {
-        Some(collection_permissions) => {
-            assert_valid_collection_permissions(&collection_permissions, &collection.key(), editor.key)
-                .map(|_| collection_permissions.can_edit_metadata)
-        },
-        None => Ok(false),
-    }?;
-
-    if !has_metadata_permission && !has_collection_permission {
-          return Err(error!(ErrorCode::MissingPermissionEditMetadata));
-    }
-
-    let MetadataInput {name, render_mode_data, nft_metadata:_} = metadata_input;
+    
 
     // Update the metadata state account
     metadata.name = name.clone();
-    metadata.render_mode_data = vec![render_mode_data];
-   
-    update_nft_metadata(metadata, metadata_input.nft_metadata)?;
+    metadata.url = url.clone();
+    metadata.description = description;
     
     emit!(EditMetadataEvent{
-        collection: collection.key(),
         id: metadata.key(),
         name
     });
 
-    Ok(())
-}
-
-pub fn update_nft_metadata(metadata: &mut Account<Metadata>, input: Option<NftMetadataInput>) -> std::result::Result<(), Error> {
-    match &metadata.nft_metadata {
-        Some(metadata_old) => {
-            match input {
-                Some(metadata_new) => {
-                    metadata.nft_metadata = Some(NftMetadata {
-                        attributes: metadata_new.attributes,
-                        signers: metadata_old.signers.clone()
-                    });
-                },
-                None => {
-                    // return Err(ErrorCode::IncompatibleMetadataType.into());
-                }
-            }
-        }, None => {
-            match input {
-                Some(_) => {
-                    // return Err(ErrorCode::IncompatibleMetadataType.into());
-                },
-                None => {
-                    // do nothing - this is an SPL, there is no need to edit NFT metadata
-                }
-            }
-        
-        }
-    }
     Ok(())
 }

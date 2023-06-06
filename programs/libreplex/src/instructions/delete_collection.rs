@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 
 use prog_common::{close_account, errors::ErrorCode};
 
-use crate::{CollectionPermissions, Collection, assert_valid_collection_permissions, instructions::{CollectionEvent, CollectionEventType}};
+use crate::{Collection, instructions::{CollectionEvent, CollectionEventType}, Permissions, assert_valid_permissions, PermissionType};
 
 #[derive(Accounts)]
 pub struct DeleteCollection<'info> {
@@ -13,7 +13,7 @@ pub struct DeleteCollection<'info> {
         close = creator,
         seeds = ["permissions".as_ref(), collection.key().as_ref(), signer.key().as_ref()], 
         bump)]
-    pub signer_collection_permissions: Box<Account<'info, CollectionPermissions>>,
+    pub signer_collection_permissions: Box<Account<'info, Permissions>>,
 
     /// CHECK: checked in macro. This is the collection creator
     pub creator: UncheckedAccount<'info>,
@@ -34,15 +34,12 @@ pub fn handler(ctx: Context<DeleteCollection>) -> Result<()> {
     let receiver = &mut ctx.accounts.receiver;
     let permissions = &ctx.accounts.signer_collection_permissions;
     let collection = &ctx.accounts.collection;
-    assert_valid_collection_permissions(
+    assert_valid_permissions(
         permissions,
-        &ctx.accounts.collection.key(),
-        ctx.accounts.signer.key,
+        ctx.accounts.collection.key(),
+        ctx.accounts.signer.key(),
+        PermissionType::Admin
     )?;
-
-    if !permissions.can_delete_collection {
-        return Err(ErrorCode::MissingPermissionDeleteCollection.into());
-    }
 
     if ctx.accounts.collection.item_count > 0 {
         return Err(ErrorCode::CollectionHasItems.into())

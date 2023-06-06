@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::state::{Collection, CollectionInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, PERMISSIONS_SIZE, CollectionPermissions, COLLECTION, PermissionEvent, PermissionEventType};
-use std::error::Error;
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, PERMISSIONS_SIZE, COLLECTION, PermissionEvent, PermissionEventType, Permissions, PermissionType};
 use std::result::Result;
 use anchor_lang::prelude::Error as AnchorError;
 
@@ -33,14 +32,13 @@ pub struct CreateCollection<'info> {
     #[account(init, 
         payer = authority, 
         space = PERMISSIONS_SIZE, 
-        seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref()], 
+        seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref(), &(PermissionType::Admin as u8).to_le_bytes()], 
         bump)]
-    pub user_permissions: Box<Account<'info, CollectionPermissions>>,
+    pub permissions: Box<Account<'info, Permissions>>,
 
     #[account(init, seeds = [COLLECTION.as_ref(), seed.key().as_ref()],
-      bump, payer = authority, space = Collection::BASE_SIZE + collection_input.get_size())]
+        bump, payer = authority, space = Collection::BASE_SIZE + collection_input.get_size())]
     pub collection: Box<Account<'info, Collection>>,
-
 
     /// CHECK: The seed address used for initialization of the collection PDA
     pub seed: AccountInfo<'info>,
@@ -73,20 +71,6 @@ pub fn handler(ctx: Context<CreateCollection>,
 
     msg!("Collection data created with authority pubkey {}", ctx.accounts.authority.key());
 
-    let user_permissions = &mut ctx.accounts.user_permissions;
-    user_permissions.collection = collection.key();
-    user_permissions.user = ctx.accounts.authority.key();
-
-    user_permissions.is_admin = true;
-    
-    user_permissions.can_create_metadata = true;
-    user_permissions.can_edit_metadata = true;
-    user_permissions.can_delete_metadata =  true;
-    
-    user_permissions.can_edit_collection = true;
-    user_permissions.can_delete_collection = true;
-
-    
     emit!(PermissionEvent {
         collection: ctx.accounts.collection.key(),
         user: ctx.accounts.authority.key(),
@@ -103,7 +87,7 @@ pub fn update_collection_from_input<'a>(collection_input: CollectionInput,
         metadata_render_mode, 
         collection_render_mode, 
         nft_collection_data,
-        description,
+        // description,
     } = collection_input;
     let name_length = name.len();
     let symbol_length = symbol.len();
@@ -130,11 +114,20 @@ pub fn update_collection_from_input<'a>(collection_input: CollectionInput,
     
     collection.name = name.clone();
     collection.symbol = symbol;
-    collection.description = description;
+    // commenting out until we 
+    // figure out a way to expand the 
+    // instruction input size limit
+    // collection.description = "".to_owned(); //description;
     collection.collection_render_mode = collection_render_mode;
     collection.metadata_render_mode = metadata_render_mode;
     collection.nft_collection_data = nft_collection_data;
     
+    match &collection.nft_collection_data {
+        Some(x) => {
+            msg!("Create collection with royalties: {} ", x.royalty_bps);
+        }, None => {}
+    }
     
+
     Ok(())
 }

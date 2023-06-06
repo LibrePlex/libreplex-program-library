@@ -24,7 +24,7 @@ mod permissions {
             seed: collection_seed_kp.pubkey(),
             collection,
             system_program: system_program::ID,
-            user_permissions: collection_authority_permissions
+            permissions: collection_authority_permissions
         }.to_account_metas(None);
 
 

@@ -1,7 +1,7 @@
-use crate::state::{Collection, Metadata, UpdateMetadataExtendedInput};
+use crate::state::{Collection, Metadata, MetadataInput};
 use crate::{
-    assert_valid_permissions, validate_metadata_input, MetadataExtended, MetadataInput,
-    NftMetadata, PermissionType, Permissions,
+    assert_valid_collection_permissions, validate_metadata_input, CollectionPermissions,
+    NftMetadata,
 };
 use anchor_lang::prelude::*;
 
@@ -17,27 +17,26 @@ struct CreateMetadataEvent {
 }
 
 #[derive(Accounts)]
-#[instruction(metadata_input: MetadataInput)]
-pub struct CreateMetadata<'info> {
+#[instruction(metadata_input: MetadataExtendedInput)]
+pub struct ExpandMetadata<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
     #[account(
         seeds = ["permissions".as_ref(), collection.key().as_ref(), signer.key().as_ref()], 
         bump)]
-    pub signer_collection_permissions: Box<Account<'info, Permissions>>,
+    pub signer_collection_permissions: Box<Account<'info, CollectionPermissions>>,
 
     #[account(mut)]
     pub collection: Box<Account<'info, Collection>>,
 
-    #[account(init, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
-              bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
+    #[account(seeds = [b"metadata".as_ref(), mint.key().as_ref()],
+              bump)]
     pub metadata: Box<Account<'info, Metadata>>,
 
-    #[account(
-        seeds = ["permissions".as_ref(), collection.key().as_ref(), signer.key().as_ref(), &(PermissionType::Admin as u8).to_le_bytes()], 
-        bump)]
-    pub permissions: Box<Account<'info, Permissions>>,
+    #[account(init, seeds = [b"metadata_extended".as_ref(), metadata.key().as_ref()],
+              bump, payer = signer, space = MetadataExtended::BASE_SIZE + metadata_input.get_size())]
+    pub metadata: Box<Account<'info, MetadataExtended>>,
 
     /*
         Signer constraint to be relaxed later to allow for migration signatures etc.
@@ -54,16 +53,35 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: MetadataInput) -> R
     let user_permissions = &ctx.accounts.signer_collection_permissions;
     let authority = &ctx.accounts.signer;
 
+    assert_valid_collection_permissions(user_permissions, &collection.key(), authority.key)?;
+
+    if !user_permissions.can_create_metadata {
+        return Err(ErrorCode::MissingPermissionCreateMetadata.into());
+    }
+
+    validate_metadata_input(&metadata_input, collection)?;
+
     // ensure that the mint is in fact a mint
     Account::<Mint>::try_from(&ctx.accounts.mint.to_account_info())?;
 
     // Update the metadata state account
+    metadata.collection = collection.key();
     metadata.mint = ctx.accounts.mint.key();
     metadata.name = metadata_input.name.clone();
+    metadata.render_mode_data = vec![metadata_input.render_mode_data];
     metadata.is_mutable = true;
-    metadata.creator = authority.key();
 
     // should we do some validation here against collection type (i.e. SPL -v- NFT)?
+
+    match metadata_input.nft_metadata {
+        Some(x) => {
+            metadata.nft_metadata = Some(NftMetadata {
+                attributes: x.attributes,
+                signers: vec![],
+            });
+        }
+        None => {}
+    }
 
     // Increment collection data counter
     collection.item_count.try_add_assign(1)?;
