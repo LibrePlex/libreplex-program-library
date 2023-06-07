@@ -3,7 +3,7 @@ export type Libreplex = {
   "name": "libreplex",
   "instructions": [
     {
-      "name": "createCollection",
+      "name": "createGroup",
       "accounts": [
         {
           "name": "authority",
@@ -24,7 +24,7 @@ export type Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -69,7 +69,7 @@ export type Libreplex = {
         {
           "name": "collectionInput",
           "type": {
-            "defined": "CollectionInput"
+            "defined": "GroupInput"
           }
         }
       ]
@@ -83,7 +83,7 @@ export type Libreplex = {
           "isSigner": true
         },
         {
-          "name": "userPermissions",
+          "name": "permissions",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -96,7 +96,7 @@ export type Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -141,7 +141,7 @@ export type Libreplex = {
         {
           "name": "collectionInput",
           "type": {
-            "defined": "CollectionInput"
+            "defined": "GroupInput"
           }
         }
       ]
@@ -168,7 +168,7 @@ export type Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -308,7 +308,7 @@ export type Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -385,7 +385,7 @@ export type Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -495,7 +495,7 @@ export type Libreplex = {
   ],
   "accounts": [
     {
-      "name": "collection",
+      "name": "group",
       "type": {
         "kind": "struct",
         "fields": [
@@ -776,7 +776,7 @@ export type Libreplex = {
       }
     },
     {
-      "name": "CollectionInput",
+      "name": "GroupInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -868,7 +868,7 @@ export type Libreplex = {
       }
     },
     {
-      "name": "CollectionEventType",
+      "name": "GroupEventType",
       "type": {
         "kind": "enum",
         "variants": [
@@ -1047,7 +1047,7 @@ export type Libreplex = {
   ],
   "events": [
     {
-      "name": "CollectionEvent",
+      "name": "GroupEvent",
       "fields": [
         {
           "name": "id",
@@ -1067,7 +1067,7 @@ export type Libreplex = {
         {
           "name": "eventType",
           "type": {
-            "defined": "CollectionEventType"
+            "defined": "GroupEventType"
           },
           "index": false
         }
@@ -1183,7 +1183,7 @@ export const IDL: Libreplex = {
   "name": "libreplex",
   "instructions": [
     {
-      "name": "createCollection",
+      "name": "createGroup",
       "accounts": [
         {
           "name": "authority",
@@ -1204,7 +1204,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -1249,7 +1249,7 @@ export const IDL: Libreplex = {
         {
           "name": "collectionInput",
           "type": {
-            "defined": "CollectionInput"
+            "defined": "GroupInput"
           }
         }
       ]
@@ -1263,7 +1263,7 @@ export const IDL: Libreplex = {
           "isSigner": true
         },
         {
-          "name": "userPermissions",
+          "name": "permissions",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -1276,7 +1276,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -1321,7 +1321,7 @@ export const IDL: Libreplex = {
         {
           "name": "collectionInput",
           "type": {
-            "defined": "CollectionInput"
+            "defined": "GroupInput"
           }
         }
       ]
@@ -1348,7 +1348,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -1488,7 +1488,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -1565,7 +1565,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -1675,7 +1675,7 @@ export const IDL: Libreplex = {
   ],
   "accounts": [
     {
-      "name": "collection",
+      "name": "group",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1956,7 +1956,7 @@ export const IDL: Libreplex = {
       }
     },
     {
-      "name": "CollectionInput",
+      "name": "GroupInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2048,7 +2048,7 @@ export const IDL: Libreplex = {
       }
     },
     {
-      "name": "CollectionEventType",
+      "name": "GroupEventType",
       "type": {
         "kind": "enum",
         "variants": [
@@ -2227,7 +2227,7 @@ export const IDL: Libreplex = {
   ],
   "events": [
     {
-      "name": "CollectionEvent",
+      "name": "GroupEvent",
       "fields": [
         {
           "name": "id",
@@ -2247,7 +2247,7 @@ export const IDL: Libreplex = {
         {
           "name": "eventType",
           "type": {
-            "defined": "CollectionEventType"
+            "defined": "GroupEventType"
           },
           "index": false
         }

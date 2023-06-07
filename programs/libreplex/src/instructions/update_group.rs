@@ -1,5 +1,5 @@
-use crate::instructions::{update_collection_from_input, CollectionEvent, CollectionEventType};
-use crate::state::{Collection, CollectionInput};
+use crate::instructions::{update_collection_from_input, GroupEvent, GroupEventType};
+use crate::state::{Group, GroupInput};
 use crate::{
     COLLECTION, Permissions, PermissionType, assert_valid_permissions
 };
@@ -15,23 +15,23 @@ struct EditCollectionEvent {
 }
 
 #[derive(Accounts)]
-#[instruction(collection_input: CollectionInput)]
-pub struct EditCollection<'info> {
+#[instruction(collection_input: GroupInput)]
+pub struct UpdateGroup<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
     #[account(
         seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref()], 
         bump)]
-    pub user_permissions: Box<Account<'info, Permissions>>,
+    pub permissions: Box<Account<'info, Permissions>>,
 
     #[account(mut, 
-        realloc =  Collection::BASE_SIZE + collection_input.get_size(),
+        realloc =  Group::BASE_SIZE + collection_input.get_size(),
         realloc::payer = authority,
         realloc::zero = false,
         seeds = [COLLECTION.as_ref(), seed.key().as_ref()],
       bump)]
-    pub collection: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, Group>>,
 
     /// CHECK: The seed address used for initialization of the collection PDA
     pub seed: AccountInfo<'info>,
@@ -39,12 +39,12 @@ pub struct EditCollection<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<EditCollection>, collection_input: CollectionInput) -> Result<()> {
+pub fn handler(ctx: Context<UpdateGroup>, collection_input: GroupInput) -> Result<()> {
 
 
     let collection = &mut ctx.accounts.collection;
     let authority = &mut ctx.accounts.authority;
-    let user_permissions = &ctx.accounts.user_permissions;
+    let user_permissions = &ctx.accounts.permissions;
 
     assert_valid_permissions(&user_permissions, collection.key(),  authority.key(), &PermissionType::Admin)?;
 
@@ -52,11 +52,11 @@ pub fn handler(ctx: Context<EditCollection>, collection_input: CollectionInput) 
     update_collection_from_input(collection_input, collection)?;
 
 
-    emit!(CollectionEvent{
+    emit!(GroupEvent{
         creator: ctx.accounts.authority.key(),
         name: collection.name.clone(),
         id: collection.key(),
-        event_type: CollectionEventType::Edit
+        event_type: GroupEventType::Edit
     });
 
 

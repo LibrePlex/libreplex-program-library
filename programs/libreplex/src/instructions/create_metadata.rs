@@ -1,4 +1,4 @@
-use crate::state::{Collection, Metadata, MetadataInput};
+use crate::state::{Group, Metadata, MetadataInput};
 use crate::{
     validate_metadata_input,
     NftMetadata, Permissions, assert_valid_permissions,
@@ -28,7 +28,7 @@ pub struct CreateMetadata<'info> {
     pub permissions: Box<Account<'info, Permissions>>,
 
     #[account(mut)]
-    pub collection: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, Group>>,
 
     #[account(init, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
               bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]

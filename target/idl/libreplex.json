@@ -3,7 +3,7 @@
   "name": "libreplex",
   "instructions": [
     {
-      "name": "createCollection",
+      "name": "createGroup",
       "accounts": [
         {
           "name": "authority",
@@ -24,7 +24,7 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -69,7 +69,7 @@
         {
           "name": "collectionInput",
           "type": {
-            "defined": "CollectionInput"
+            "defined": "GroupInput"
           }
         }
       ]
@@ -83,7 +83,7 @@
           "isSigner": true
         },
         {
-          "name": "userPermissions",
+          "name": "permissions",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -96,7 +96,7 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -141,7 +141,7 @@
         {
           "name": "collectionInput",
           "type": {
-            "defined": "CollectionInput"
+            "defined": "GroupInput"
           }
         }
       ]
@@ -168,7 +168,7 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -308,7 +308,7 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -385,7 +385,7 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Collection",
+                "account": "Group",
                 "path": "collection"
               },
               {
@@ -495,7 +495,7 @@
   ],
   "accounts": [
     {
-      "name": "Collection",
+      "name": "Group",
       "type": {
         "kind": "struct",
         "fields": [
@@ -776,7 +776,7 @@
       }
     },
     {
-      "name": "CollectionInput",
+      "name": "GroupInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -868,7 +868,7 @@
       }
     },
     {
-      "name": "CollectionEventType",
+      "name": "GroupEventType",
       "type": {
         "kind": "enum",
         "variants": [
@@ -1047,7 +1047,7 @@
   ],
   "events": [
     {
-      "name": "CollectionEvent",
+      "name": "GroupEvent",
       "fields": [
         {
           "name": "id",
@@ -1067,7 +1067,7 @@
         {
           "name": "eventType",
           "type": {
-            "defined": "CollectionEventType"
+            "defined": "GroupEventType"
           },
           "index": false
         }

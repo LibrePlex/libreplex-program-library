@@ -4,12 +4,12 @@ use prog_common::{close_account, errors::ErrorCode};
 
 use crate::{
     assert_valid_permissions,
-    instructions::{CollectionEvent, CollectionEventType},
-    Collection, PermissionType, Permissions,
+    instructions::{GroupEvent, GroupEventType},
+    Group, PermissionType, Permissions,
 };
 
 #[derive(Accounts)]
-pub struct DeleteCollection<'info> {
+pub struct DeleteGroup<'info> {
     pub signer: Signer<'info>,
 
     #[account(mut,
@@ -23,7 +23,7 @@ pub struct DeleteCollection<'info> {
 
     #[account(mut,
         constraint = collection.creator == creator.key())]
-    pub collection: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, Group>>,
 
     /// CHECK: Receiver address for the rent-exempt lamports
     #[account(mut)]
@@ -32,7 +32,7 @@ pub struct DeleteCollection<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<DeleteCollection>) -> Result<()> {
+pub fn handler(ctx: Context<DeleteGroup>) -> Result<()> {
     //assert_valid_collection_permissionsmports to be reclaimed from the rent of the accounts to be closed
     let receiver = &mut ctx.accounts.receiver;
     let permissions = &ctx.accounts.signer_collection_permissions;
@@ -57,11 +57,11 @@ pub fn handler(ctx: Context<DeleteCollection>) -> Result<()> {
         ctx.accounts.collection.key()
     );
 
-    emit!(CollectionEvent {
+    emit!(GroupEvent {
         creator: ctx.accounts.signer.key(),
         name: collection.name.clone(),
         id: collection.key(),
-        event_type: CollectionEventType::Delete
+        event_type: GroupEventType::Delete
     });
     Ok(())
 }
