@@ -996,15 +996,6 @@ export type Libreplex = {
         "variants": [
           {
             "name": "Admin"
-          },
-          {
-            "name": "Create"
-          },
-          {
-            "name": "Edit"
-          },
-          {
-            "name": "Delete"
           }
         ]
       }
@@ -2185,15 +2176,6 @@ export const IDL: Libreplex = {
         "variants": [
           {
             "name": "Admin"
-          },
-          {
-            "name": "Create"
-          },
-          {
-            "name": "Edit"
-          },
-          {
-            "name": "Delete"
           }
         ]
       }

@@ -56,9 +56,6 @@ pub fn assert_valid_permissions(permissions: &Account<Permissions>,
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, PartialEq)]
 pub enum PermissionType {
     Admin,
-    Create,
-    Edit,
-    Delete,
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]

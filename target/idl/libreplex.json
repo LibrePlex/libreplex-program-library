@@ -996,15 +996,6 @@
         "variants": [
           {
             "name": "Admin"
-          },
-          {
-            "name": "Create"
-          },
-          {
-            "name": "Edit"
-          },
-          {
-            "name": "Delete"
           }
         ]
       }
