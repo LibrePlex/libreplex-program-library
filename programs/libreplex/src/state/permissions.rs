@@ -10,7 +10,7 @@ pub enum PermissionEventType {
 
 #[event]
 pub struct PermissionEvent {
-    pub collection: Pubkey,
+    pub group: Pubkey,
     pub user: Pubkey,
     pub event_type: PermissionEventType,
 }
@@ -27,7 +27,7 @@ pub const PERMISSIONS_SIZE: usize = 32 + 32 + 1 + 1
 
 
 pub fn assert_valid_permissions(permissions: &Account<Permissions>, 
-    reference: Pubkey, user: Pubkey, permission_type: PermissionType) -> Result<()> {
+    reference: Pubkey, user: Pubkey, permission_type: &PermissionType) -> Result<()> {
 
     // check derivation
 
@@ -45,7 +45,7 @@ pub fn assert_valid_permissions(permissions: &Account<Permissions>,
     } 
 
 
-    if permissions.permissions.clone().into_iter().find(|x|(x.eq(&permission_type))).is_none() {
+    if permissions.permissions.clone().into_iter().find(|x|(x.eq(permission_type))).is_none() {
         return Err(ErrorCode::InvalidPermissions.into());
     }
 

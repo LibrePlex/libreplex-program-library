@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::{state::{PERMISSIONS_SIZE, Collection}, PermissionEvent, PermissionEventType, Permissions, assert_valid_permissions, PermissionType};
+use crate::{state::{PERMISSIONS_SIZE, MetadataGroup}, PermissionEvent, PermissionEventType, Permissions, assert_valid_permissions, PermissionType};
 use prog_common::{errors::ErrorCode};
 
 
@@ -31,7 +31,7 @@ pub struct EditCollectionPermissions<'info> {
     pub user_permissions: Box<Account<'info, Permissions>>,
 
     #[account(mut)]
-    pub collection: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, MetadataGroup>>,
 
     pub system_program: Program<'info, System>,
 }
@@ -48,7 +48,7 @@ pub fn handler(ctx: Context<EditCollectionPermissions>, edit_permissions_input: 
     let collection = &ctx.accounts.collection;
     let auth = &ctx.accounts.authority;
     
-    assert_valid_permissions(auth_permissions, collection.key(), auth.key(), crate::PermissionType::Admin)?;
+    assert_valid_permissions(auth_permissions, collection.key(), auth.key(), &crate::PermissionType::Admin)?;
 
     let EditCollectionPermissionsInput {
          add_permissions,
@@ -90,7 +90,7 @@ pub fn handler(ctx: Context<EditCollectionPermissions>, edit_permissions_input: 
     // user_permissions.is_admin = is_admin;
 
     emit!(PermissionEvent {
-        collection: ctx.accounts.collection.key(),
+        group: ctx.accounts.collection.key(),
         user: ctx.accounts.user.key(),
         event_type: PermissionEventType::Update,
     });

@@ -1,50 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-#[repr(C)]
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum CollectionRenderMode {
-    /*
-        Pubkey here is the address of the rendering program
-        * BETA functionality (to be validated against
-            validator resourcing limitations) *
+use crate::instructions::Royalties;
 
-        the id of the external COLLECTION rendering program
-        that implements the LibrePlex rendering
-        interface standard
-        the interface will have the following
-        signature (roughly, still in discussions):
-
-        to obtain a rendering, it is enough
-        to simulate the transaction.
-
-    input accounts:
-        1) collection
-
-        output:
-        1) JSON
-        2) image URL (including ordinal / base64)
-        3) something else
-    */
-    None,
-    Program{program_id: Pubkey},
-    Url{url: String},
-}
-
-impl CollectionRenderMode {
-    pub fn get_size(&self) -> usize {
-        let _size = 2 // discriminator size
-        // + 32 // max variant size (from Pubkey)
-        + match self {
-            CollectionRenderMode::None => 0,
-            CollectionRenderMode::Url{url} => 4 + url.len(),
-            CollectionRenderMode::Program{program_id:_} => 32
-        };
-
-        msg!("Collection render mode size {}", _size);
-        return _size;
-    }
-}
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -65,7 +23,7 @@ pub enum MetadataRenderMode {
         to simulate the transaction.
 
         input accounts:
-        1) collection
+        1) group
         2) metadata
         3) mint
         4) (optional) token account
@@ -104,7 +62,7 @@ impl MetadataRenderMode {
 
 #[repr(C)]
 #[account]
-pub struct Collection {
+pub struct MetadataGroup {
     // Seed address used to generate unique account PDA address
     pub seed: Pubkey,
 
@@ -121,74 +79,42 @@ pub struct Collection {
 
     pub symbol: String,
 
-    pub description: String,
+    pub url: String,
 
-    pub collection_render_mode: CollectionRenderMode,
+    // pub description: String,
 
     pub metadata_render_mode: MetadataRenderMode,
 
-    // for NFT collections
+    pub royalties: Option<Royalties>,
     
-    pub nft_collection_data: Option<NftCollectionData>,
+    pub permitted_signers: Vec<Pubkey>,
 
+    pub attribute_types: Vec<AttributeType>,
     
 }
 
 
 
-impl Collection {
+impl MetadataGroup {
 
     pub const BASE_SIZE: usize  = 8 + 32 + 32 + 4; // anchor + seed + creator + item count
 
     pub fn get_size(&self) -> usize {
-        Collection::BASE_SIZE
+        MetadataGroup::BASE_SIZE
         + 4 + self.name.len() // name
         + 4 + self.symbol.len() // symbol
-        + 4 + self.description.len() // symbol
-        + self.collection_render_mode.get_size()
+        + 4 + self.url.len() // symbol
+        // + 4 + self.description.len() // symbol
+        // + self.collection_render_mode.get_size()
         + self.metadata_render_mode.get_size()
-        + match &self.nft_collection_data {
-            Some(x) => x.get_size(),
-            None => 0,
+        + 1 + match &self.royalties {
+            Some(x)=>x.get_size(),
+            None=>0
         }
+        + 4 + self.permitted_signers.len() * 32 
+        + 4 + self.attribute_types.iter().map(|x|x.get_size()).sum::<usize>()
     }
 }
-
-
-// collection input: 8 + 
-
-// pub name: String, 
-// pub symbol: String,
-// pub collection_render_mode: CollectionRenderMode,
-// pub metadata_render_mode: MetadataRenderMode,
-// pub nft_collection_data: Option<NftCollectionData>,
-
-
-
-// impl CollectionInput {
-//     pub fn get_size(&self) -> usize {
-//         let name_length = self.name.len();
-//         let symbol_length = self.symbol.len();
-
-//         let nft_data_length = match self.nft_collection_data.as_ref() {
-//             Some(data) => data.get_size(),
-//             None => 0,
-//         };
-
-//         let size = 4
-//             + name_length
-//             + 4
-//             + symbol_length
-//             + 4
-//             + self.collection_render_mode.get_size()
-//             + self.metadata_render_mode.get_size()
-//             + 1
-//             + nft_data_length;
-
-//         return size;
-//     }
-// }
-
 
 /*
 
@@ -308,38 +234,38 @@ impl BaseUrlConfiguration {
     }
 }
 
-#[repr(C)]
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct NftCollectionData {
-    // the royalty amount in basis points (0-10,000)
-    pub royalty_bps: u16,
+// #[repr(C)]
+// #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+// pub struct NftCollectionData {
+//     // the royalty amount in basis points (0-10,000)
+//     pub royalty_bps: u16,
 
-    pub royalty_shares: Vec<RoyaltyShare>,
+//     pub royalty_shares: Vec<RoyaltyShare>,
 
-    pub permitted_signers: Vec<Pubkey>,
+//     pub permitted_signers: Vec<Pubkey>,
 
-    pub attribute_types: Vec<AttributeType>,
-}
+//     pub attribute_types: Vec<AttributeType>,
+// }
 
-impl NftCollectionData {
-    pub fn get_size(&self) -> usize {
-        let total_size_attribute_configurations: usize = 4 + self
-            .attribute_types
-            .iter()
-            .map(|x| 4 + x.get_size())
-            .sum::<usize>();
+// impl NftCollectionData {
+//     pub fn get_size(&self) -> usize {
+//         let total_size_attribute_configurations: usize = 4 + self
+//             .attribute_types
+//             .iter()
+//             .map(|x| 4 + x.get_size())
+//             .sum::<usize>();
 
-        let size = 2
-            + 4
-            + 34 * self.royalty_shares.len()
-            + 4
-            + 32 * self.permitted_signers.len()
-            + total_size_attribute_configurations
-            + 1 as usize;
+//         let size = 2
+//             + 4
+//             + 34 * self.royalty_shares.len()
+//             + 4
+//             + 32 * self.permitted_signers.len()
+//             + total_size_attribute_configurations
+//             + 1 as usize;
 
-        return size;
-    }
-}
+//         return size;
+//     }
+// }
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -350,36 +276,50 @@ pub struct RoyaltyShare {
     pub share: u16,
 }
 
+impl RoyaltyShare {
+    pub const SIZE: usize = 32 + 2;
+}
+
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CollectionInput {
+pub struct GroupInput {
     pub name: String,
     pub symbol: String,
+    pub url: String,
     /*
         commenting this out because it seems
         we're hitting the limit of serializable
         input size.
      */
     // pub description: String,
-    pub collection_render_mode: CollectionRenderMode,
+    // pub collection_render_mode: CollectionRenderMode,
     pub metadata_render_mode: MetadataRenderMode,
-    pub nft_collection_data: Option<NftCollectionData>,
+    pub royalties: Option<Royalties>,
+    pub attribute_types: Vec<AttributeType>,
+    pub permitted_signers: Vec<Pubkey>
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-impl CollectionInput {
+impl GroupInput {
     pub fn get_size(&self) -> usize {
         let size 
             = 4 + self.name.len()
             + 4 + self.symbol.len()
-            + 4 //+ self.description.len()
-            + self.collection_render_mode.get_size()
+            + 4 + self.url.len()
+            // + 1 + match &self.description {
+            //     Some(x)=>self.description.len(),
+            //     None=>0
+            // }
+            // + self.collection_render_mode.get_size()
             + self.metadata_render_mode.get_size()
-            + 1 + match self.nft_collection_data.as_ref() {
+            + 1 + match self.royalties.as_ref() {
                 Some(data) => data.get_size(),
                 None => 0,
-            };
+            }
+            + 4 + self.attribute_types.iter().map(|x|x.get_size()).sum::<usize>()
+            + 4 + self.permitted_signers.len() * 32;
 
         return size;
     }

@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
-use crate::state::{Collection, CollectionInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, PERMISSIONS_SIZE, COLLECTION, PermissionEvent, PermissionEventType, Permissions, PermissionType};
+use crate::state::{MetadataGroup, GroupInput};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, PERMISSIONS_SIZE, GROUP, PermissionEvent, PermissionEventType, Permissions, PermissionType, PERMISSIONS};
 use std::result::Result;
 use anchor_lang::prelude::Error as AnchorError;
 
@@ -23,8 +23,8 @@ pub struct CollectionEvent {
 }
 
 #[derive(Accounts)]
-#[instruction(collection_input: CollectionInput)]
-pub struct CreateCollection<'info> {
+#[instruction(group_input: GroupInput)]
+pub struct CreateGroup<'info> {
 
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -32,13 +32,14 @@ pub struct CreateCollection<'info> {
     #[account(init, 
         payer = authority, 
         space = PERMISSIONS_SIZE, 
-        seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref(), &(PermissionType::Admin as u8).to_le_bytes()], 
-        bump)]
+        seeds = [PERMISSIONS.as_ref(), group.key().as_ref(), authority.key().as_ref()], 
+        bump
+    )]
     pub permissions: Box<Account<'info, Permissions>>,
 
-    #[account(init, seeds = [COLLECTION.as_ref(), seed.key().as_ref()],
-        bump, payer = authority, space = Collection::BASE_SIZE + collection_input.get_size())]
-    pub collection: Box<Account<'info, Collection>>,
+    #[account(init, seeds = [GROUP.as_ref(), seed.key().as_ref()],
+        bump, payer = authority, space = MetadataGroup::BASE_SIZE + group_input.get_size())]
+    pub group: Box<Account<'info, MetadataGroup>>,
 
     /// CHECK: The seed address used for initialization of the collection PDA
     pub seed: AccountInfo<'info>,
@@ -46,30 +47,34 @@ pub struct CreateCollection<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateCollection>,
-               collection_input: CollectionInput,
+pub fn handler(ctx: Context<CreateGroup>,
+               group_input: GroupInput,
 ) -> anchor_lang::Result<()> {
 
 
-    let collection = &mut ctx.accounts.collection;
+    let group = &mut ctx.accounts.group;
     let permissions = &mut ctx.accounts.permissions;
     let authority = &mut ctx.accounts.authority;
-    collection.creator = authority.key();
-    collection.seed = ctx.accounts.seed.key();
-    collection.item_count = 0;
+    group.creator = authority.key();
+    group.seed = ctx.accounts.seed.key();
+    group.item_count = 0;
+    
 
 
     permissions.permissions = vec![PermissionType::Admin];
-    
+    permissions.user = authority.key();
+    permissions.reference = group.key();
+    permissions.bump = *ctx.bumps.get("permissions").unwrap();
+
     
 
-    update_collection_from_input(collection_input, collection)?;
+    update_collection_from_input(group_input, group)?;
 
 
     emit!(CollectionEvent{
         creator: ctx.accounts.authority.key(),
-        name: collection.name.clone(),
-        id: collection.key(),
+        name: group.name.clone(),
+        id: group.key(),
         event_type: CollectionEventType::Create
     });
 
@@ -77,7 +82,7 @@ pub fn handler(ctx: Context<CreateCollection>,
     msg!("Collection data created with authority pubkey {}", ctx.accounts.authority.key());
 
     emit!(PermissionEvent {
-        collection: ctx.accounts.collection.key(),
+        group: ctx.accounts.group.key(),
         user: ctx.accounts.authority.key(),
         event_type: PermissionEventType::Update,
     });
@@ -85,54 +90,54 @@ pub fn handler(ctx: Context<CreateCollection>,
     Ok(())
 }
 
-pub fn update_collection_from_input<'a>(collection_input: CollectionInput, 
-    collection: &mut Box<Account<Collection>>) 
+pub fn update_collection_from_input<'a>(group_input: GroupInput, 
+    group: &mut Box<Account<MetadataGroup>>) 
     -> Result<(), AnchorError> {
-    let CollectionInput {name, symbol, 
+    let GroupInput {name, symbol, 
         metadata_render_mode, 
-        collection_render_mode, 
-        nft_collection_data,
+        // collection_render_mode, 
+        royalties,
+        permitted_signers,
+        attribute_types,
+        url,
         // description,
-    } = collection_input;
+    } = group_input;
     let name_length = name.len();
     let symbol_length = symbol.len();
     if name_length > MAX_NAME_LENGTH || symbol_length > MAX_SYMBOL_LENGTH {
         return Err(error!(ErrorCode::InvalidStringInput));
     }
-    if nft_collection_data.is_some() {
-        let nft_collection_data_unwrapped = nft_collection_data.as_ref().unwrap();
-        let royalty_bps = nft_collection_data_unwrapped.royalty_bps;
+    if royalties.is_some() {
+        let royalties_data = royalties.as_ref().unwrap();
+        let royalty_bps = royalties_data.bps;
 
         // Ensure that basis points are between 0-10,000
         if royalty_bps > 10_000 {
             return Err(error!(ErrorCode::InvalidBpsInput));
         }
 
-        let royalty_shares_vec: Vec<u16> = nft_collection_data_unwrapped.royalty_shares.iter().map(|x| x.share).collect();
+        let royalty_shares_vec: Vec<u16> = royalties_data.shares.iter().map(|x| x.share).collect();
 
         for rs in royalty_shares_vec {
-            if rs > 10_000 {
+            if rs != 10_000 {
                 return Err(error!(ErrorCode::InvalidBpsInput));
             }
         }
     }
     
-    collection.name = name.clone();
-    collection.symbol = symbol;
+    group.name = name.clone();
+    group.symbol = symbol;
     // commenting out until we 
     // figure out a way to expand the 
     // instruction input size limit
     // collection.description = "".to_owned(); //description;
-    collection.collection_render_mode = collection_render_mode;
-    collection.metadata_render_mode = metadata_render_mode;
-    collection.nft_collection_data = nft_collection_data;
+    // collection.collection_render_mode = collection_render_mode;
+    group.metadata_render_mode = metadata_render_mode;
+    group.royalties = royalties;
+    group.attribute_types = attribute_types;
+    group.permitted_signers = permitted_signers;
+    group.url = url;
     
-    match &collection.nft_collection_data {
-        Some(x) => {
-            msg!("Create collection with royalties: {} ", x.royalty_bps);
-        }, None => {}
-    }
     
-
     Ok(())
 }

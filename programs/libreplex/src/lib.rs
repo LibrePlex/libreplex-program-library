@@ -18,12 +18,12 @@ pub mod libreplex {
 
     use super::*;
 
-    pub fn create_collection(
-        ctx: Context<CreateCollection>,
-        collection_input: CollectionInput,
+    pub fn create_group(
+        ctx: Context<CreateGroup>,
+        collection_input: GroupInput,
     ) -> Result<()> {
         msg!("creating collection data");
-        instructions::create_collection::handler(
+        instructions::create_group::handler(
             ctx,
             collection_input
         )
@@ -31,7 +31,7 @@ pub mod libreplex {
 
     pub fn update_collection(
         ctx: Context<EditCollection>,
-        collection_input: CollectionInput,
+        collection_input: GroupInput,
     ) -> Result<()> {
         msg!("editing collection data");
         instructions::edit_collection::handler(
@@ -40,12 +40,12 @@ pub mod libreplex {
         )
     }
 
-    pub fn delete_collection(
+    pub fn delete_group(
         ctx: Context<DeleteCollection>,
         permission_type: PermissionType
     ) -> Result<()> {
         msg!("deleting collection data");
-        instructions::delete_collection::handler(ctx, permission_type)
+        instructions::delete_group::handler(ctx, &permission_type)
     }
 
     pub fn edit_collection_permissions(ctx: Context<EditCollectionPermissions>, 
@@ -60,6 +60,17 @@ pub mod libreplex {
     ) -> Result<()> {
         msg!("creating metadata");
         instructions::create_metadata::handler(
+            ctx,
+            metadata_input
+        )
+    }
+
+    pub fn extend_metadata(
+        ctx: Context<ExtendMetadata>,
+        metadata_input: ExtendMetadataInput,
+    ) -> Result<()> {
+        msg!("extending metadata");
+        instructions::extend_metadata::handler(
             ctx,
             metadata_input
         )

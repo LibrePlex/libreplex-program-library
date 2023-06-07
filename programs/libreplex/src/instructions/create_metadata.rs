@@ -1,5 +1,5 @@
 use crate::state::{Metadata};
-use crate::{ CreateMetadataInput, Permissions};
+use crate::{ CreateMetadataInput, Permissions, PermissionType};
 use anchor_lang::prelude::*;
 
 #[event]
@@ -15,11 +15,11 @@ pub struct CreateMetadata<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(init, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
+    #[account(init, seeds = [b"metadata", mint.key().as_ref()],
               bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
 
-    #[account(init, seeds = [b"permissions".as_ref(), metadata.key().as_ref(), signer.key().as_ref()],
+    #[account(init, seeds = [b"permissions", metadata.key().as_ref(), signer.key().as_ref()],
             // all permissions start out with one permission, hence the +1
               bump, payer = signer, space = Permissions::BASE_SIZE + 1)] 
     pub permissions: Box<Account<'info, Permissions>>,
@@ -48,10 +48,12 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     metadata.name = metadata_input.name.clone();
     metadata.creator = authority.key();
     metadata.description = metadata_input.description;
+    metadata.url = metadata_input.url;
 
     permissions.bump = *ctx.bumps.get("permissions").unwrap();
     permissions.user = authority.key();
     permissions.reference = metadata.key();
+    permissions.permissions = vec![PermissionType::Admin];
 
     msg!(
         "metadata created for mint with pubkey {}",

@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 
 use prog_common::{close_account, errors::ErrorCode};
 
-use crate::{Collection, instructions::{CollectionEvent, CollectionEventType}, Permissions, assert_valid_permissions, PermissionType};
+use crate::{MetadataGroup, instructions::{CollectionEvent, CollectionEventType}, Permissions, assert_valid_permissions, PermissionType};
 
 #[derive(Accounts)]
 pub struct DeleteCollection<'info> {
@@ -22,7 +22,7 @@ pub struct DeleteCollection<'info> {
 
     #[account(mut,
         constraint = collection.creator == creator.key())]
-    pub collection: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, MetadataGroup>>,
 
     /// CHECK: Receiver address for the rent-exempt lamports
     #[account(mut)]
@@ -31,13 +31,13 @@ pub struct DeleteCollection<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<DeleteCollection>, permission_invoked: PermissionType) -> Result<()> {
+pub fn handler(ctx: Context<DeleteCollection>, permission_invoked: &PermissionType) -> Result<()> {
     //assert_valid_collection_permissionsmports to be reclaimed from the rent of the accounts to be closed
     let receiver = &mut ctx.accounts.receiver;
     let permissions = &ctx.accounts.permissions;
     let collection = &ctx.accounts.collection;
 
-    if permission_invoked != PermissionType::Admin && permission_invoked != PermissionType::Delete {
+    if !permission_invoked.eq(&PermissionType::Admin) && permission_invoked.eq(&PermissionType::Delete) {
         return Err(ErrorCode::InvalidPermissions.into());
     }
 

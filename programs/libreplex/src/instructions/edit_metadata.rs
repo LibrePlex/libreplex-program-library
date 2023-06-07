@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::instructions::has_permission;
 
-use crate::{UpdateMetadataExtendedInput, Metadata, Permissions, PermissionType, CreateMetadataInput, UpdateMetadataInput};
+use crate::{ExtendMetadataInput, Metadata, Permissions, PermissionType, CreateMetadataInput, UpdateMetadataInput};
 
 
 use prog_common::{errors::ErrorCode};
@@ -13,7 +13,7 @@ struct EditMetadataEvent {
 }
 
 #[derive(Accounts)]
-#[instruction(metadata_input: UpdateMetadataExtendedInput)]
+#[instruction(metadata_input: ExtendMetadataInput)]
 pub struct EditMetadata<'info> {
     #[account(mut)]
     pub editor: Signer<'info>,

@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 
-use crate::{state::{Collection, Metadata}, METADATA, Permissions, assert_valid_permissions, PermissionType};
+use crate::{state::{MetadataGroup, Metadata}, METADATA, Permissions, assert_valid_permissions, PermissionType};
 use prog_common::{close_account, TrySub};
 
 
@@ -13,7 +13,7 @@ pub struct DeleteMetadata<'info> {
     pub permissions: Box<Account<'info, Permissions>>,
 
     #[account(mut)]
-    pub collection: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, MetadataGroup>>,
 
     #[account(mut, seeds = [METADATA.as_ref(), mint.key().as_ref()],
               bump, has_one = mint)]
@@ -38,7 +38,7 @@ pub fn handler(ctx: Context<DeleteMetadata>) -> Result<()> {
 
     // only collection admin can delete metadata. TODO: Extend logic to allow deletions when the authority has Delete
     // permissions on collection / metadata
-    assert_valid_permissions(permissions, collection.key(), authority.key(), PermissionType::Admin)?;
+    assert_valid_permissions(permissions, collection.key(), authority.key(), &PermissionType::Admin)?;
 
     // Close the collection data state account
     let metadata_account_info = &mut (*ctx.accounts.metadata).to_account_info();
