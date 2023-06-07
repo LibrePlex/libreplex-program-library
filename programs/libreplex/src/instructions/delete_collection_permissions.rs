@@ -1,14 +1,15 @@
 use anchor_lang::prelude::*;
 
-use crate::{CollectionPermissions};
 use prog_common::{errors::ErrorCode};
+
+use crate::Permissions;
 
 /* 
     Intended for cleaning up one's own permissions Ø
     after the collection has been deleted.
  */
 #[derive(Accounts)]
-pub struct DeleteCollectionPermissions<'info> {
+pub struct DeletePermissions<'info> {
     pub signer: Signer<'info>,
 
     #[account(mut,
@@ -18,7 +19,7 @@ pub struct DeleteCollectionPermissions<'info> {
             collection.key().as_ref(), 
             signer.key().as_ref()], 
         bump)]
-    pub signer_collection_permissions: Box<Account<'info, CollectionPermissions>>,
+    pub permissions: Box<Account<'info, Permissions>>,
 
     /*  
         this account must be empty before permissions can be deleted 
@@ -38,8 +39,8 @@ pub struct DeleteCollectionPermissions<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<DeleteCollectionPermissions>) -> Result<()> {
-    let permissions = &ctx.accounts.signer_collection_permissions;
+pub fn handler(ctx: Context<DeletePermissions>) -> Result<()> {
+    let permissions = &ctx.accounts.permissions;
     let collection = &ctx.accounts.collection;
 
     if !collection.data_is_empty() {

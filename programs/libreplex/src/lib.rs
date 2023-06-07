@@ -47,18 +47,12 @@ pub mod libreplex {
         instructions::delete_collection::handler(ctx)
     }
 
-    pub fn edit_collection_permissions(ctx: Context<EditCollectionPermissions>, 
-        input: EditCollectionPermissionsInput) -> Result<()> {
-        msg!("Editing collection permissions");
-        instructions::edit_collection_permissions::handler(ctx, input)
+    pub fn edit_permissions(ctx: Context<EditPermissions>, 
+        input: EditPermissionsInput) -> Result<()> {
+        instructions::edit_permissions::handler(ctx, input)
     }
 
-    pub fn edit_metadata_permissions(ctx: Context<EditMetadataPermissions>, 
-        input: EditMetadataPermissionsInput) -> Result<()> {
-        msg!("Editing metadata permissions");
-        instructions::edit_metadata_permissions::handler(ctx, input)
-    }
-
+    
     pub fn create_metadata(
         ctx: Context<CreateMetadata>,
         metadata_input: MetadataInput,
@@ -77,8 +71,8 @@ pub mod libreplex {
         instructions::delete_metadata::handler(ctx)
     }
 
-    pub fn delete_collection_permissions(
-        ctx: Context<DeleteCollectionPermissions>,
+    pub fn delete_permissions(
+        ctx: Context<DeletePermissions>,
     ) -> Result<()> {
         msg!("deleting collection permissions");
         instructions::delete_collection_permissions::handler(ctx)

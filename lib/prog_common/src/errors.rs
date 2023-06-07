@@ -71,10 +71,20 @@ pub enum ErrorCode {
 
     #[msg("Collection has items")]
     CollectionHasItems, //0x1786
-    Reserved23, //0x1787
-    Reserved24, //0x1788
-    Reserved25, //0x1789
-    Reserved26, //0x178A
+    #[msg("Permission account is empty")]
+    PermissionAccountEmpty, //0x1787
+    
+    
+
+    #[msg("Invalid bump")]
+    InvalidBump, //0x1788
+
+    #[msg("Royalties must add up to 10000")]
+    RoyaltiesBadSum, //0x1789
+
+    #[msg("Unexpected permission is empty")]
+    UnexpectedPermissionsKey, //0x178A
+    
     Reserved27, //0x178B
     Reserved28, //0x178C
     Reserved29, //0x178D

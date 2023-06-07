@@ -1,7 +1,7 @@
 use crate::state::{Collection, Metadata, MetadataInput};
 use crate::{
-    assert_valid_collection_permissions, validate_metadata_input, CollectionPermissions,
-    NftMetadata,
+    validate_metadata_input,
+    NftMetadata, Permissions, assert_valid_permissions,
 };
 use anchor_lang::prelude::*;
 
@@ -25,7 +25,7 @@ pub struct CreateMetadata<'info> {
     #[account(
         seeds = ["permissions".as_ref(), collection.key().as_ref(), signer.key().as_ref()], 
         bump)]
-    pub signer_collection_permissions: Box<Account<'info, CollectionPermissions>>,
+    pub permissions: Box<Account<'info, Permissions>>,
 
     #[account(mut)]
     pub collection: Box<Account<'info, Collection>>,
@@ -47,14 +47,10 @@ pub struct CreateMetadata<'info> {
 pub fn handler(ctx: Context<CreateMetadata>, metadata_input: MetadataInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let collection = &mut ctx.accounts.collection;
-    let user_permissions = &ctx.accounts.signer_collection_permissions;
+    let permissions = &ctx.accounts.permissions;
     let authority = &ctx.accounts.signer;
 
-    assert_valid_collection_permissions(user_permissions, &collection.key(), authority.key)?;
-
-    if !user_permissions.can_create_metadata {
-        return Err(ErrorCode::MissingPermissionCreateMetadata.into());
-    }
+    assert_valid_permissions(permissions, collection.key(), authority.key(), &crate::PermissionType::Admin)?;
 
     validate_metadata_input(&metadata_input, collection)?;
 

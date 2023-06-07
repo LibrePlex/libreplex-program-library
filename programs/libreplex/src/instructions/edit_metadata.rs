@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::state::{Collection};
-use crate::{CollectionPermissions, MetadataInput, Metadata, MetadataPermissions, assert_valid_collection_permissions, assert_valid_metadata_permissions, validate_metadata_input, NftMetadata, NftMetadataInput};
+use crate::{MetadataInput, Metadata, validate_metadata_input, NftMetadata, NftMetadataInput, Permissions, PermissionType, assert_valid_permissions};
 
 
 use prog_common::{errors::ErrorCode};
@@ -21,7 +21,7 @@ pub struct EditMetadata<'info> {
     #[account(
         seeds = ["permissions".as_ref(), collection.key().as_ref(), editor.key().as_ref()], 
         bump)]
-    pub editor_collection_permissions: Option<Box<Account<'info, CollectionPermissions>>>,
+    pub editor_collection_permissions: Option<Box<Account<'info, Permissions>>>,
 
     #[account(
         seeds = ["permissions".as_ref(), 
@@ -29,7 +29,7 @@ pub struct EditMetadata<'info> {
         editor.key().as_ref(), 
         metadata.key().as_ref()], 
         bump)]
-    pub editor_metadata_permissions: Option<Box<Account<'info, MetadataPermissions>>>,
+    pub editor_metadata_permissions: Option<Box<Account<'info, Permissions>>>,
 
     pub collection: Box<Account<'info, Collection>>,
 
@@ -50,24 +50,27 @@ pub fn handler(ctx: Context<EditMetadata>,
 
     validate_metadata_input(&metadata_input, collection)?;
 
-    let has_metadata_permission = match editor_metadata_permissions {
+    let mut permissions_found = false;
+    match editor_metadata_permissions {
         Some(metadata_permissions) => {
-            assert_valid_metadata_permissions(&metadata_permissions, &metadata.key(), editor.key)
-                .map(|_| metadata_permissions.can_modify)
+            assert_valid_permissions(&metadata_permissions, metadata.key(), editor.key(), &PermissionType::Admin)?;
+            permissions_found = true;
+                
         },
-        None => Ok(false),
-    }?;
-
-
-    let has_collection_permission = match editor_collection_permissions {
+        None => {},
+    };
+    
+    match editor_collection_permissions {
         Some(collection_permissions) => {
-            assert_valid_collection_permissions(&collection_permissions, &collection.key(), editor.key)
-                .map(|_| collection_permissions.can_edit_metadata)
+            assert_valid_permissions(&collection_permissions, collection.key(), editor.key(), &PermissionType::Admin)?;
+            permissions_found = true;
+                
         },
-        None => Ok(false),
-    }?;
+        None => {},
+    };
 
-    if !has_metadata_permission && !has_collection_permission {
+
+    if !permissions_found {
           return Err(error!(ErrorCode::MissingPermissionEditMetadata));
     }
 
