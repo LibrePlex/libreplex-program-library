@@ -18,38 +18,38 @@ pub mod libreplex {
 
     use super::*;
 
-    pub fn create_collection(
-        ctx: Context<CreateCollection>,
-        collection_input: CollectionInput,
+    pub fn create_group(
+        ctx: Context<CreateGroup>,
+        collection_input: GroupInput,
     ) -> Result<()> {
         msg!("creating collection data");
-        instructions::create_collection::handler(
+        instructions::create_group::handler(
             ctx,
             collection_input
         )
     }
 
-    pub fn update_collection(
-        ctx: Context<EditCollection>,
-        collection_input: CollectionInput,
+    pub fn update_group(
+        ctx: Context<UpdateGroup>,
+        collection_input: GroupInput,
     ) -> Result<()> {
-        msg!("editing collection data");
-        instructions::edit_collection::handler(
+        msg!("Update group");
+        instructions::update_group::handler(
             ctx,
             collection_input
         )
     }
 
-    pub fn delete_collection(
-        ctx: Context<DeleteCollection>,
+    pub fn delete_group(
+        ctx: Context<DeleteGroup>,
     ) -> Result<()> {
-        msg!("deleting collection data");
-        instructions::delete_collection::handler(ctx)
+        msg!("delete group data");
+        instructions::delete_group::handler(ctx)
     }
 
-    pub fn edit_permissions(ctx: Context<EditPermissions>, 
+    pub fn edit_permissions(ctx: Context<UpdatePermissions>, 
         input: EditPermissionsInput) -> Result<()> {
-        instructions::edit_permissions::handler(ctx, input)
+        instructions::update_permissions::handler(ctx, input)
     }
 
     
@@ -75,7 +75,7 @@ pub mod libreplex {
         ctx: Context<DeletePermissions>,
     ) -> Result<()> {
         msg!("deleting collection permissions");
-        instructions::delete_collection_permissions::handler(ctx)
+        instructions::delete_permissions::handler(ctx)
     }
 
 

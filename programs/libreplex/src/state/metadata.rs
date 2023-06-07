@@ -5,7 +5,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 use prog_common::errors::ErrorCode;
 
-use crate::{Collection, MAX_NAME_LENGTH};
+use crate::{Group, MAX_NAME_LENGTH};
 
 use crate::CollectionRenderMode;
 
@@ -137,7 +137,7 @@ pub struct MetadataInput {
 
 pub fn validate_metadata_input(
     metadata_input: &MetadataInput,
-    collection: &Collection,
+    collection: &Group,
 ) -> Result<()> {
     let MetadataInput {
         name,

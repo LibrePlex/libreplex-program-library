@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::{Collection, Metadata}, METADATA, Permissions, PermissionType, assert_valid_permissions};
+use crate::{state::{Group, Metadata}, METADATA, Permissions, PermissionType, assert_valid_permissions};
 use prog_common::{close_account, TrySub, errors::ErrorCode};
 
 
@@ -15,7 +15,7 @@ pub struct DeleteMetadata<'info> {
     pub permissions: Box<Account<'info, Permissions>>,
 
     #[account(mut)]
-    pub collection: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, Group>>,
 
     #[account(mut, seeds = [METADATA.as_ref(), mint.key().as_ref()],
               bump, has_one = collection, has_one = mint)]

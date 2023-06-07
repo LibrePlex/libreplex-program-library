@@ -9,7 +9,7 @@ pub struct EditPermissionsInput {
 }
 
 #[derive(Accounts)]
-pub struct EditPermissions<'info> {
+pub struct UpdatePermissions<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
@@ -42,7 +42,7 @@ pub fn has_permission(permissions: &Vec<PermissionType>, permission_type: Permis
 }
 
 
-pub fn handler(ctx: Context<EditPermissions>, edit_permissions_input: EditPermissionsInput) -> Result<()> {
+pub fn handler(ctx: Context<UpdatePermissions>, edit_permissions_input: EditPermissionsInput) -> Result<()> {
     let user_permissions = &mut ctx.accounts.user_permissions;
     let auth_permissions = & ctx.accounts.auth_permissions;
     let reference = &ctx.accounts.reference;

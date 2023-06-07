@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::state::{Collection, CollectionInput};
+use crate::state::{Group, GroupInput};
 use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, PERMISSIONS_SIZE, COLLECTION, PermissionEvent, PermissionEventType, Permissions, PermissionType, PERMISSIONS};
 use std::result::Result;
 use anchor_lang::prelude::Error as AnchorError;
@@ -8,23 +8,23 @@ use prog_common::{errors::ErrorCode};
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum CollectionEventType {
+pub enum GroupEventType {
     Create,
     Edit,
     Delete
 }
 
 #[event]
-pub struct CollectionEvent {
+pub struct GroupEvent {
     pub id: Pubkey,
     pub creator: Pubkey,
     pub name: String,
-    pub event_type: CollectionEventType
+    pub event_type: GroupEventType
 }
 
 #[derive(Accounts)]
-#[instruction(collection_input: CollectionInput)]
-pub struct CreateCollection<'info> {
+#[instruction(collection_input: GroupInput)]
+pub struct CreateGroup<'info> {
 
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -37,8 +37,8 @@ pub struct CreateCollection<'info> {
     pub permissions: Box<Account<'info, Permissions>>,
 
     #[account(init, seeds = [COLLECTION.as_ref(), seed.key().as_ref()],
-      bump, payer = authority, space = Collection::BASE_SIZE + collection_input.get_size())]
-    pub collection: Box<Account<'info, Collection>>,
+      bump, payer = authority, space = Group::BASE_SIZE + collection_input.get_size())]
+    pub collection: Box<Account<'info, Group>>,
 
 
     /// CHECK: The seed address used for initialization of the collection PDA
@@ -47,8 +47,8 @@ pub struct CreateCollection<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateCollection>,
-               collection_input: CollectionInput,
+pub fn handler(ctx: Context<CreateGroup>,
+               collection_input: GroupInput,
 ) -> anchor_lang::Result<()> {
 
 
@@ -65,11 +65,11 @@ pub fn handler(ctx: Context<CreateCollection>,
     
 
 
-    emit!(CollectionEvent{
+    emit!(GroupEvent{
         creator: ctx.accounts.authority.key(),
         name: collection.name.clone(),
         id: collection.key(),
-        event_type: CollectionEventType::Create
+        event_type: GroupEventType::Create
     });
 
 
@@ -88,10 +88,10 @@ pub fn handler(ctx: Context<CreateCollection>,
     Ok(())
 }
 
-pub fn update_collection_from_input<'a>(collection_input: CollectionInput, 
-    collection: &mut Box<Account<Collection>>) 
+pub fn update_collection_from_input<'a>(collection_input: GroupInput, 
+    collection: &mut Box<Account<Group>>) 
     -> Result<(), AnchorError> {
-    let CollectionInput {name, symbol, 
+    let GroupInput {name, symbol, 
         metadata_render_mode, 
         collection_render_mode, 
         nft_collection_data

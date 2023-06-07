@@ -3,7 +3,7 @@ use solana_program_test::*;
 
 mod permissions {
     use anchor_lang::{InstructionData, system_program, ToAccountMetas};
-    use libreplex::{CollectionInput, BaseUrlConfiguration};
+    use libreplex::{GroupInput, BaseUrlConfiguration};
     use solana_program::{instruction::Instruction, pubkey::Pubkey};
     use solana_sdk::{transaction::Transaction, signer::Signer, signature::Keypair};
 
@@ -19,7 +19,7 @@ mod permissions {
         let collection_authority_permissions = Pubkey::find_program_address(&[b"permissions", collection.as_ref(), collection_authority.as_ref()], &libreplex::ID).0;
 
   
-        let create_collection_accounts = libreplex::accounts::CreateCollection {
+        let create_collection_accounts = libreplex::accounts::CreateGroup {
             authority: collection_authority,
             seed: collection_seed_kp.pubkey(),
             collection,
@@ -31,8 +31,8 @@ mod permissions {
         let collection_url = "a";
         let base_url_configuration = None;
 
-        let create_collection = libreplex::instruction::CreateCollection {
-            collection_input: CollectionInput {
+        let create_collection = libreplex::instruction::CreateGroup {
+            collection_input: GroupInput {
                     // collection_url: "COOLIO.COM".to_string(),
                     name: "COOLIO COLLECTION".to_string(),
                     

@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::state::{Collection};
+use crate::state::{Group};
 use crate::{MetadataInput, Metadata, validate_metadata_input, NftMetadata, NftMetadataInput, Permissions, PermissionType, assert_valid_permissions};
 
 
@@ -14,7 +14,7 @@ struct EditMetadataEvent {
 
 #[derive(Accounts)]
 #[instruction(metadata_input: MetadataInput)]
-pub struct EditMetadata<'info> {
+pub struct UpdateMetadata<'info> {
     #[account(mut)]
     pub editor: Signer<'info>,
 
@@ -31,7 +31,7 @@ pub struct EditMetadata<'info> {
         bump)]
     pub editor_metadata_permissions: Option<Box<Account<'info, Permissions>>>,
 
-    pub collection: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, Group>>,
 
     #[account(mut, has_one = collection)]
     pub metadata: Box<Account<'info, Metadata>>,
@@ -39,7 +39,7 @@ pub struct EditMetadata<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<EditMetadata>,
+pub fn handler(ctx: Context<UpdateMetadata>,
     metadata_input: MetadataInput,
 ) -> Result<()> {
     let editor = &ctx.accounts.editor;

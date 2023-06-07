@@ -104,7 +104,7 @@ impl MetadataRenderMode {
 
 #[repr(C)]
 #[account]
-pub struct Collection {
+pub struct Group {
     // Seed address used to generate unique account PDA address
     pub seed: Pubkey,
 
@@ -134,12 +134,12 @@ pub struct Collection {
 
 
 
-impl Collection {
+impl Group {
 
     pub const BASE_SIZE: usize  = 8 + 32 + 32 + 4; // anchor + seed + creator + item count
 
     pub fn get_size(&self) -> usize {
-        Collection::BASE_SIZE
+        Group::BASE_SIZE
         + 4 + self.name.len() // name
         + 4 + self.symbol.len() // symbol
         + self.collection_render_mode.get_size()
@@ -315,7 +315,7 @@ pub struct RoyaltyShare {
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CollectionInput {
+pub struct GroupInput {
     pub name: String,
     pub symbol: String,
     pub collection_render_mode: CollectionRenderMode,
@@ -325,7 +325,7 @@ pub struct CollectionInput {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-impl CollectionInput {
+impl GroupInput {
     pub fn get_size(&self) -> usize {
         let size 
             = 4 + self.name.len()
