@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::{Collection, Metadata}, METADATA, CollectionPermissions, assert_valid_collection_permissions};
+use crate::{state::{Collection, Metadata}, METADATA, Permissions, PermissionType, assert_valid_permissions};
 use prog_common::{close_account, TrySub, errors::ErrorCode};
 
 
@@ -12,7 +12,7 @@ pub struct DeleteMetadata<'info> {
     #[account(
         seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref()], 
         bump)]
-    pub user_permissions: Box<Account<'info, CollectionPermissions>>,
+    pub permissions: Box<Account<'info, Permissions>>,
 
     #[account(mut)]
     pub collection: Box<Account<'info, Collection>>,
@@ -37,14 +37,10 @@ pub fn handler(ctx: Context<DeleteMetadata>) -> Result<()> {
     let receiver = &mut ctx.accounts.receiver;
     let authority = &ctx.accounts.authority;
     let collection = &mut ctx.accounts.collection;
-    let user_permissions = &ctx.accounts.user_permissions;
+    let user_permissions = &ctx.accounts.permissions;
 
-    assert_valid_collection_permissions(user_permissions, &collection.key(), authority.key)?;
-
-    if !user_permissions.can_delete_metadata {
-        return Err(ErrorCode::MissingPermissionDeleteMetadata.into());
-    }
-
+    assert_valid_permissions(user_permissions, collection.key(), authority.key(), &PermissionType::Admin)?;
+    
     // Close the collection data state account
     let metadata_account_info = &mut (*ctx.accounts.metadata).to_account_info();
     close_account(metadata_account_info, receiver)?;
