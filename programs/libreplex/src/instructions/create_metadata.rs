@@ -1,94 +1,63 @@
-use crate::state::{Group, Metadata, MetadataInput};
-use crate::{
-    validate_metadata_input,
-    NftMetadata, Permissions, assert_valid_permissions,
-};
+use crate::state::{Metadata};
+use crate::{ CreateMetadataInput, Permissions, PermissionType, MetadataEvent, MetadataEventType};
 use anchor_lang::prelude::*;
 
-use anchor_spl::token::Mint;
-use prog_common::{errors::ErrorCode, TryAdd};
-
-#[event]
-struct CreateMetadataEvent {
-    id: Pubkey,
-    collection: Pubkey,
-    mint: Pubkey,
-    name: String,
-}
 
 #[derive(Accounts)]
-#[instruction(metadata_input: MetadataInput)]
+#[instruction(metadata_input: CreateMetadataInput)]
 pub struct CreateMetadata<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(
-        seeds = ["permissions".as_ref(), collection.key().as_ref(), signer.key().as_ref()], 
-        bump)]
-    pub permissions: Box<Account<'info, Permissions>>,
-
-    #[account(mut)]
-    pub collection: Box<Account<'info, Group>>,
-
-    #[account(init, seeds = [b"metadata".as_ref(), mint.key().as_ref()],
+    #[account(init, seeds = [b"metadata", mint.key().as_ref()],
               bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
 
+    #[account(init, seeds = [b"permissions", metadata.key().as_ref(), signer.key().as_ref()],
+            // all permissions start out with one permission, hence the +1
+              bump, payer = signer, space = Permissions::BASE_SIZE + 1)] 
+    pub permissions: Box<Account<'info, Permissions>>,
+
     /*
-        Signer constraint to be relaxed later to allow for migration signatures etc. 
-        Q: What to do with mints without metadata?
+        Signer constraint to be relaxed later
+        to allow for migration signatures etc.
+
+        Currently this signer does not need to be a mint,
+        but you can tag metadata onto anything.
     */
-    
     pub mint: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateMetadata>, metadata_input: MetadataInput) -> Result<()> {
+pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
-    let collection = &mut ctx.accounts.collection;
-    let permissions = &ctx.accounts.permissions;
     let authority = &ctx.accounts.signer;
-
-    assert_valid_permissions(permissions, collection.key(), authority.key(), &crate::PermissionType::Admin)?;
-
-    validate_metadata_input(&metadata_input, collection)?;
-
-    // ensure that the mint is in fact a mint
-    Account::<Mint>::try_from(&ctx.accounts.mint.to_account_info())?;
+    let permissions = &mut ctx.accounts.permissions;
 
     // Update the metadata state account
-    metadata.collection = collection.key();
     metadata.mint = ctx.accounts.mint.key();
-    metadata.name = metadata_input.name.clone();
-    metadata.render_mode_data = vec![metadata_input.render_mode_data];
     metadata.is_mutable = true;
+    metadata.symbol = metadata_input.symbol.clone();
+    metadata.name = metadata_input.name.clone();
+    metadata.creator = authority.key();
+    metadata.description = metadata_input.description;
+    metadata.asset = metadata_input.asset;
 
-    // should we do some validation here against collection type (i.e. SPL -v- NFT)?
-
-    match metadata_input.nft_metadata {
-        Some(x) => {
-            metadata.nft_metadata = Some(NftMetadata {
-                attributes: x.attributes,
-                signers: vec![],
-            });
-        }
-        None => {}
-    }
-
-    // Increment collection data counter
-    collection.item_count.try_add_assign(1)?;
+    permissions.bump = *ctx.bumps.get("permissions").unwrap();
+    permissions.user = authority.key();
+    permissions.reference = metadata.key();
+    permissions.permissions = vec![PermissionType::Admin];
 
     msg!(
         "metadata created for mint with pubkey {}",
         ctx.accounts.mint.key()
     );
 
-    emit!(CreateMetadataEvent {
-        collection: collection.key(),
+    emit!(MetadataEvent {
         id: metadata.key(),
         mint: ctx.accounts.mint.key(),
-        name: metadata_input.name,
+        event_type: MetadataEventType::Create
     });
 
     Ok(())

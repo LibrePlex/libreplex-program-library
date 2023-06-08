@@ -1,11 +1,9 @@
-use crate::instructions::{update_collection_from_input, GroupEvent, GroupEventType};
+use crate::instructions::{update_collection_from_input};
 use crate::state::{Group, GroupInput};
 use crate::{
-    COLLECTION, Permissions, PermissionType, assert_valid_permissions
+    GROUP, Permissions, PermissionType, assert_valid_permissions, GroupEvent, GroupEventType
 };
 use anchor_lang::prelude::*;
-
-use prog_common::errors::ErrorCode;
 
 #[event]
 struct EditCollectionEvent {
@@ -21,7 +19,7 @@ pub struct UpdateGroup<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        seeds = ["permissions".as_ref(), collection.key().as_ref(), authority.key().as_ref()], 
+        seeds = ["permissions".as_ref(), group.key().as_ref(), authority.key().as_ref()], 
         bump)]
     pub permissions: Box<Account<'info, Permissions>>,
 
@@ -29,9 +27,9 @@ pub struct UpdateGroup<'info> {
         realloc =  Group::BASE_SIZE + collection_input.get_size(),
         realloc::payer = authority,
         realloc::zero = false,
-        seeds = [COLLECTION.as_ref(), seed.key().as_ref()],
+        seeds = [GROUP.as_ref(), seed.key().as_ref()],
       bump)]
-    pub collection: Box<Account<'info, Group>>,
+    pub group: Box<Account<'info, Group>>,
 
     /// CHECK: The seed address used for initialization of the collection PDA
     pub seed: AccountInfo<'info>,
@@ -42,21 +40,21 @@ pub struct UpdateGroup<'info> {
 pub fn handler(ctx: Context<UpdateGroup>, collection_input: GroupInput) -> Result<()> {
 
 
-    let collection = &mut ctx.accounts.collection;
+    let group =&mut ctx.accounts.group;
     let authority = &mut ctx.accounts.authority;
     let user_permissions = &ctx.accounts.permissions;
 
-    assert_valid_permissions(&user_permissions, collection.key(),  authority.key(), &PermissionType::Admin)?;
+    assert_valid_permissions(&user_permissions, group.key(),  authority.key(), &PermissionType::Admin)?;
 
     
-    update_collection_from_input(collection_input, collection)?;
+    update_collection_from_input(collection_input, group)?;
 
 
     emit!(GroupEvent{
-        creator: ctx.accounts.authority.key(),
-        name: collection.name.clone(),
-        id: collection.key(),
-        event_type: GroupEventType::Edit
+        authority: ctx.accounts.authority.key(),
+        name: group.name.clone(),
+        id: group.key(),
+        event_type: GroupEventType::Update
     });
 
 
