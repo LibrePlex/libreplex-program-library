@@ -4,8 +4,7 @@ use prog_common::{close_account, errors::ErrorCode};
 
 use crate::{
     assert_valid_permissions,
-    instructions::{GroupEvent, GroupEventType},
-    Group, PermissionType, Permissions,
+    Group, PermissionType, Permissions, GroupEvent, GroupEventType,
 };
 
 #[derive(Accounts)]
@@ -58,7 +57,7 @@ pub fn handler(ctx: Context<DeleteGroup>) -> Result<()> {
     );
 
     emit!(GroupEvent {
-        creator: ctx.accounts.signer.key(),
+        authority: ctx.accounts.signer.key(),
         name: collection.name.clone(),
         id: collection.key(),
         event_type: GroupEventType::Delete

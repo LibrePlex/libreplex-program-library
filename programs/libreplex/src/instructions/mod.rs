@@ -6,6 +6,7 @@ pub mod update_permissions;
 pub mod delete_permissions;
 pub mod update_metadata;
 pub mod update_group;
+pub mod extend_metadata;
 
 pub use create_group::*;
 pub use create_metadata::*;
@@ -15,3 +16,4 @@ pub use delete_metadata::*;
 pub use update_permissions::*;
 pub use update_metadata::*;
 pub use update_group::*;
+pub use extend_metadata::*;

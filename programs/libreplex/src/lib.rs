@@ -55,10 +55,21 @@ pub mod libreplex {
     
     pub fn create_metadata(
         ctx: Context<CreateMetadata>,
-        metadata_input: MetadataInput,
+        metadata_input: CreateMetadataInput,
     ) -> Result<()> {
         msg!("creating metadata");
         instructions::create_metadata::handler(
+            ctx,
+            metadata_input
+        )
+    }
+
+    pub fn extend_metadata(
+        ctx: Context<ExtendMetadata>,
+        metadata_input: ExtendMetadataInput,
+    ) -> Result<()> {
+        msg!("extending metadata");
+        instructions::extend_metadata::handler(
             ctx,
             metadata_input
         )
