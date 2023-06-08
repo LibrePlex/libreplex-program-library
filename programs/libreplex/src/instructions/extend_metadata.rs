@@ -1,6 +1,6 @@
 use crate::state::{Group, Metadata};
 use crate::{
-    assert_valid_permissions, MetadataExtended, PermissionType, Permissions, RoyaltyShare, Royalties,
+    assert_valid_permissions, MetadataExtension, PermissionType, Permissions, RoyaltyShare, Royalties,
 };
 use anchor_lang::prelude::*;
 
@@ -98,9 +98,9 @@ pub struct ExtendMetadata<'info> {
               bump)]
     pub metadata: Box<Account<'info, Metadata>>,
 
-    #[account(init, seeds = [b"metadata_extended".as_ref(), metadata.key().as_ref()],
-              bump, payer = signer, space = MetadataExtended::BASE_SIZE + extend_metadata_input.get_size())]
-    pub metadata_extended: Box<Account<'info, MetadataExtended>>,
+    #[account(init, seeds = [b"metadata_extension".as_ref(), metadata.key().as_ref()],
+              bump, payer = signer, space = MetadataExtension::BASE_SIZE + extend_metadata_input.get_size())]
+    pub metadata_extended: Box<Account<'info, MetadataExtension>>,
 
     pub mint: Account<'info, Mint>,
 

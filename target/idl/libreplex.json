@@ -44,7 +44,7 @@
               {
                 "kind": "const",
                 "type": "string",
-                "value": "GROUP"
+                "value": "group"
               },
               {
                 "kind": "account",
@@ -116,7 +116,7 @@
               {
                 "kind": "const",
                 "type": "string",
-                "value": "GROUP"
+                "value": "group"
               },
               {
                 "kind": "account",
@@ -155,7 +155,7 @@
           "isSigner": true
         },
         {
-          "name": "signerCollectionPermissions",
+          "name": "permissions",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -169,7 +169,7 @@
                 "kind": "account",
                 "type": "publicKey",
                 "account": "Group",
-                "path": "collection"
+                "path": "group"
               },
               {
                 "kind": "account",
@@ -185,7 +185,7 @@
           "isSigner": false
         },
         {
-          "name": "collection",
+          "name": "group",
           "isMut": true,
           "isSigner": false
         },
@@ -450,7 +450,7 @@
               {
                 "kind": "const",
                 "type": "string",
-                "value": "metadata_extended"
+                "value": "metadata_extension"
               },
               {
                 "kind": "account",
@@ -653,7 +653,7 @@
       }
     },
     {
-      "name": "MetadataExtended",
+      "name": "MetadataExtension",
       "type": {
         "kind": "struct",
         "fields": [
@@ -680,6 +680,14 @@
             "type": {
               "option": {
                 "defined": "Royalties"
+              }
+            }
+          },
+          {
+            "name": "license",
+            "type": {
+              "option": {
+                "defined": "License"
               }
             }
           }
@@ -860,22 +868,6 @@
           {
             "name": "suffix",
             "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "RoyaltyShare",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "recipient",
-            "type": "publicKey"
-          },
-          {
-            "name": "share",
-            "type": "u16"
           }
         ]
       }
@@ -1181,6 +1173,26 @@
       }
     },
     {
+      "name": "License",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NoLicense"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              {
+                "name": "license_url",
+                "type": "string"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "name": "Asset",
       "type": {
         "kind": "enum",
@@ -1456,5 +1468,8 @@
         }
       ]
     }
-  ]
+  ],
+  "metadata": {
+    "address": "AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6"
+  }
 }
