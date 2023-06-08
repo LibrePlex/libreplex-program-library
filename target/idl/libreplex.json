@@ -482,7 +482,7 @@
       ]
     },
     {
-      "name": "deleteMetadata",
+      "name": "deleteMetadataExtension",
       "accounts": [
         {
           "name": "authority",
@@ -500,32 +500,12 @@
           "isSigner": false
         },
         {
-          "name": "metadata",
+          "name": "metadataExtension",
           "isMut": true,
           "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          },
           "relations": [
-            "mint"
+            "group"
           ]
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "receiver",
@@ -713,16 +693,10 @@
           },
           {
             "name": "name",
-            "docs": [
-              "from input - variable size"
-            ],
             "type": "string"
           },
           {
             "name": "symbol",
-            "docs": [
-              "from input - variable size"
-            ],
             "type": "string"
           },
           {

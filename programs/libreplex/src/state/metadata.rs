@@ -61,6 +61,7 @@ pub enum Asset {
 
 }
 
+
 impl Asset {
     pub const BASE_SIZE: usize = 2;
     pub fn get_size(&self) -> usize {
@@ -94,15 +95,13 @@ pub struct Metadata {
 
     pub is_mutable: bool,
 
-    /// from input - variable size
     pub name: String,
 
-    /// from input - variable size
     pub symbol: String,
 
     pub asset: Asset,
 
-    pub description: Option<String>,
+    pub description: Option<String>
 }
 
 impl Metadata {
@@ -110,16 +109,14 @@ impl Metadata {
 
     pub fn get_size(&self) -> usize {
         let size = Metadata::BASE_SIZE
-            + 4
-            + self.name.len()
+            + 4 + self.name.len()
             + 4
             + self.symbol.len()
             + 4
             + self.asset.get_size()
-            + 1
-            + match &self.description {
-                Some(x) => 4 + x.len(),
-                None => 0,
+            + 1 + match &self.description {
+                None=>0,
+                Some(x)=>4 + x.len()
             };
 
         return size;
@@ -159,16 +156,13 @@ pub struct CreateMetadataInput {
 impl CreateMetadataInput {
     pub fn get_size(&self) -> usize {
         let size = 
-            4
-            + self.name.len()
+            4 + self.name.len()
             + 4
             + self.symbol.len()
             + 4
-            + self.asset.get_size()
-            + 1
             + match &self.description {
-                Some(x) => 4 + x.len(),
-                None => 0,
+                None =>0,
+                Some(x) => 4 + x.len()
             };
 
         return size;
@@ -193,12 +187,10 @@ impl UpdateMetadataInput {
             + self.symbol.len()
             + 4
             + self.asset.get_size()
-            + 1
             + match &self.description {
-                Some(x) => x.len(),
-                None => 0,
-            }
-            + 1;
+                None=>0,
+                Some(x) => x.len()
+            };
 
         return size;
     }

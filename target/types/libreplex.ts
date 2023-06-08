@@ -482,7 +482,7 @@ export type Libreplex = {
       ]
     },
     {
-      "name": "deleteMetadata",
+      "name": "deleteMetadataExtension",
       "accounts": [
         {
           "name": "authority",
@@ -500,32 +500,12 @@ export type Libreplex = {
           "isSigner": false
         },
         {
-          "name": "metadata",
+          "name": "metadataExtension",
           "isMut": true,
           "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          },
           "relations": [
-            "mint"
+            "group"
           ]
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "receiver",
@@ -713,16 +693,10 @@ export type Libreplex = {
           },
           {
             "name": "name",
-            "docs": [
-              "from input - variable size"
-            ],
             "type": "string"
           },
           {
             "name": "symbol",
-            "docs": [
-              "from input - variable size"
-            ],
             "type": "string"
           },
           {
@@ -1955,7 +1929,7 @@ export const IDL: Libreplex = {
       ]
     },
     {
-      "name": "deleteMetadata",
+      "name": "deleteMetadataExtension",
       "accounts": [
         {
           "name": "authority",
@@ -1973,32 +1947,12 @@ export const IDL: Libreplex = {
           "isSigner": false
         },
         {
-          "name": "metadata",
+          "name": "metadataExtension",
           "isMut": true,
           "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          },
           "relations": [
-            "mint"
+            "group"
           ]
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "receiver",
@@ -2186,16 +2140,10 @@ export const IDL: Libreplex = {
           },
           {
             "name": "name",
-            "docs": [
-              "from input - variable size"
-            ],
             "type": "string"
           },
           {
             "name": "symbol",
-            "docs": [
-              "from input - variable size"
-            ],
             "type": "string"
           },
           {
