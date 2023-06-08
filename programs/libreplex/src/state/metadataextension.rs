@@ -18,7 +18,7 @@ pub enum License {
 
 #[repr(C)]
 #[account]
-pub struct MetadataExtended {
+pub struct MetadataExtension {
     
     // base: 8 (discriminator)
 
@@ -36,7 +36,7 @@ pub struct MetadataExtended {
  
 }
 
-impl MetadataExtended {
+impl MetadataExtension {
     
     pub const BASE_SIZE: usize = 8 + 32 + 32  
     + 4 // attributes 
@@ -44,7 +44,7 @@ impl MetadataExtended {
     + 1; // royalties
 
     pub fn get_size(&self) -> usize {
-        MetadataExtended::BASE_SIZE
+        MetadataExtension::BASE_SIZE
             + &self.attributes.len()
             + &self.signers.len() * 32
             + match &self.royalties {

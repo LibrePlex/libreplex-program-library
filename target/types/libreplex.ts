@@ -44,7 +44,7 @@ export type Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "GROUP"
+                "value": "group"
               },
               {
                 "kind": "account",
@@ -116,7 +116,7 @@ export type Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "GROUP"
+                "value": "group"
               },
               {
                 "kind": "account",
@@ -155,7 +155,7 @@ export type Libreplex = {
           "isSigner": true
         },
         {
-          "name": "signerCollectionPermissions",
+          "name": "permissions",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -169,7 +169,7 @@ export type Libreplex = {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "Group",
-                "path": "collection"
+                "path": "group"
               },
               {
                 "kind": "account",
@@ -185,7 +185,7 @@ export type Libreplex = {
           "isSigner": false
         },
         {
-          "name": "collection",
+          "name": "group",
           "isMut": true,
           "isSigner": false
         },
@@ -450,7 +450,7 @@ export type Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "metadata_extended"
+                "value": "metadata_extension"
               },
               {
                 "kind": "account",
@@ -653,7 +653,7 @@ export type Libreplex = {
       }
     },
     {
-      "name": "metadataExtended",
+      "name": "metadataExtension",
       "type": {
         "kind": "struct",
         "fields": [
@@ -680,6 +680,14 @@ export type Libreplex = {
             "type": {
               "option": {
                 "defined": "Royalties"
+              }
+            }
+          },
+          {
+            "name": "license",
+            "type": {
+              "option": {
+                "defined": "License"
               }
             }
           }
@@ -860,22 +868,6 @@ export type Libreplex = {
           {
             "name": "suffix",
             "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "RoyaltyShare",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "recipient",
-            "type": "publicKey"
-          },
-          {
-            "name": "share",
-            "type": "u16"
           }
         ]
       }
@@ -1176,6 +1168,26 @@ export type Libreplex = {
           },
           {
             "name": "Delete"
+          }
+        ]
+      }
+    },
+    {
+      "name": "License",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NoLicense"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              {
+                "name": "license_url",
+                "type": "string"
+              }
+            ]
           }
         ]
       }
@@ -1505,7 +1517,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "GROUP"
+                "value": "group"
               },
               {
                 "kind": "account",
@@ -1577,7 +1589,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "GROUP"
+                "value": "group"
               },
               {
                 "kind": "account",
@@ -1616,7 +1628,7 @@ export const IDL: Libreplex = {
           "isSigner": true
         },
         {
-          "name": "signerCollectionPermissions",
+          "name": "permissions",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -1630,7 +1642,7 @@ export const IDL: Libreplex = {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "Group",
-                "path": "collection"
+                "path": "group"
               },
               {
                 "kind": "account",
@@ -1646,7 +1658,7 @@ export const IDL: Libreplex = {
           "isSigner": false
         },
         {
-          "name": "collection",
+          "name": "group",
           "isMut": true,
           "isSigner": false
         },
@@ -1911,7 +1923,7 @@ export const IDL: Libreplex = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "metadata_extended"
+                "value": "metadata_extension"
               },
               {
                 "kind": "account",
@@ -2114,7 +2126,7 @@ export const IDL: Libreplex = {
       }
     },
     {
-      "name": "metadataExtended",
+      "name": "metadataExtension",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2141,6 +2153,14 @@ export const IDL: Libreplex = {
             "type": {
               "option": {
                 "defined": "Royalties"
+              }
+            }
+          },
+          {
+            "name": "license",
+            "type": {
+              "option": {
+                "defined": "License"
               }
             }
           }
@@ -2321,22 +2341,6 @@ export const IDL: Libreplex = {
           {
             "name": "suffix",
             "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "RoyaltyShare",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "recipient",
-            "type": "publicKey"
-          },
-          {
-            "name": "share",
-            "type": "u16"
           }
         ]
       }
@@ -2637,6 +2641,26 @@ export const IDL: Libreplex = {
           },
           {
             "name": "Delete"
+          }
+        ]
+      }
+    },
+    {
+      "name": "License",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NoLicense"
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              {
+                "name": "license_url",
+                "type": "string"
+              }
+            ]
           }
         ]
       }

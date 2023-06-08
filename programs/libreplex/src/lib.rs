@@ -75,11 +75,11 @@ pub mod libreplex {
         )
     }
 
-    pub fn delete_metadata(
-        ctx: Context<DeleteMetadata>,
+    pub fn delete_metadata_extension(
+        ctx: Context<DeleteMetadataExtension>,
     ) -> Result<()> {
         msg!("deleting metadata");
-        instructions::delete_metadata::handler(ctx)
+        instructions::delete_metadataextension::handler(ctx)
     }
 
     pub fn delete_permissions(

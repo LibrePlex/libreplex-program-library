@@ -236,19 +236,6 @@ impl BaseUrlConfiguration {
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct RoyaltyShare {
-    // royalty address and their share in basis points (0-10,000)
-    pub recipient: Pubkey,
-
-    pub share: u16,
-}
-
-impl RoyaltyShare {
-    pub const SIZE: usize = 32 + 2;
-}
-
-#[repr(C)]
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct GroupInput {
     pub name: String,
     pub symbol: String,
