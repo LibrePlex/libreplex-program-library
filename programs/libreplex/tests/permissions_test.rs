@@ -28,7 +28,6 @@ mod permissions {
         }.to_account_metas(None);
 
 
-        let collection_url = "a";
         let base_url_configuration = None;
 
         let create_collection = libreplex::instruction::CreateGroup {
@@ -40,7 +39,8 @@ mod permissions {
                     metadata_render_mode: libreplex::MetadataRenderMode::Url { base_url_configuration },
                     attribute_types: vec![],
                     royalties: None,
-                    permitted_signers: vec![]
+                    permitted_signers: vec![],
+                    description: "coolio description".to_string()
             }
         };
 
