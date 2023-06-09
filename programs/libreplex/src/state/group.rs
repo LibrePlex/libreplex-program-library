@@ -81,7 +81,7 @@ pub struct Group {
 
     pub url: String,
 
-    // pub description: String,
+    pub description: String,
 
     pub metadata_render_mode: MetadataRenderMode,
 
@@ -104,7 +104,7 @@ impl Group {
         + 4 + self.name.len() // name
         + 4 + self.symbol.len() // symbol
         + 4 + self.url.len() // symbol
-        // + 4 + self.description.len() // symbol
+        + 4 + self.description.len() // symbol
         // + self.collection_render_mode.get_size()
         + self.metadata_render_mode.get_size()
         + 1 + match &self.royalties {
@@ -240,6 +240,7 @@ pub struct GroupInput {
     pub name: String,
     pub symbol: String,
     pub url: String,
+    pub description: String,
     pub metadata_render_mode: MetadataRenderMode,
     pub royalties: Option<Royalties>,
     pub attribute_types: Vec<AttributeType>,
@@ -255,10 +256,7 @@ impl GroupInput {
             = 4 + self.name.len()
             + 4 + self.symbol.len()
             + 4 + self.url.len()
-            // + 1 + match &self.description {
-            //     Some(x)=>self.description.len(),
-            //     None=>0
-            // }
+            + 4 + self.description.len()
             // + self.collection_render_mode.get_size()
             + self.metadata_render_mode.get_size()
             + 1 + match self.royalties.as_ref() {

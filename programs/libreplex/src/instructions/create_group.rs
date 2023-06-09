@@ -86,7 +86,7 @@ pub fn update_collection_from_input<'a>(group_input: GroupInput,
         permitted_signers,
         attribute_types,
         url,
-        // description,
+        description,
     } = group_input;
     let name_length = name.len();
     let symbol_length = symbol.len();
@@ -116,7 +116,7 @@ pub fn update_collection_from_input<'a>(group_input: GroupInput,
     // commenting out until we 
     // figure out a way to expand the 
     // instruction input size limit
-    // collection.description = "".to_owned(); //description;
+    group.description = description;
     // collection.collection_render_mode = collection_render_mode;
     group.metadata_render_mode = metadata_render_mode;
     group.royalties = royalties;

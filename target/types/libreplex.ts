@@ -602,6 +602,10 @@ export type Libreplex = {
             "type": "string"
           },
           {
+            "name": "description",
+            "type": "string"
+          },
+          {
             "name": "metadataRenderMode",
             "type": {
               "defined": "MetadataRenderMode"
@@ -861,6 +865,10 @@ export type Libreplex = {
           },
           {
             "name": "url",
+            "type": "string"
+          },
+          {
+            "name": "description",
             "type": "string"
           },
           {
@@ -2049,6 +2057,10 @@ export const IDL: Libreplex = {
             "type": "string"
           },
           {
+            "name": "description",
+            "type": "string"
+          },
+          {
             "name": "metadataRenderMode",
             "type": {
               "defined": "MetadataRenderMode"
@@ -2308,6 +2320,10 @@ export const IDL: Libreplex = {
           },
           {
             "name": "url",
+            "type": "string"
+          },
+          {
+            "name": "description",
             "type": "string"
           },
           {

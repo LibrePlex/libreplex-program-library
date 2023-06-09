@@ -602,6 +602,10 @@
             "type": "string"
           },
           {
+            "name": "description",
+            "type": "string"
+          },
+          {
             "name": "metadataRenderMode",
             "type": {
               "defined": "MetadataRenderMode"
@@ -861,6 +865,10 @@
           },
           {
             "name": "url",
+            "type": "string"
+          },
+          {
+            "name": "description",
             "type": "string"
           },
           {
