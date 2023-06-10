@@ -4,6 +4,7 @@ skip-lint = false
 
 [programs.localnet]
 libreplex="AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6"
+toybox="toysDBtkQ7P1NWwaTtXZbXBeGdM16fReT5qzCgc7wig"
 
 [registry]
 url = "https://api.apr.dev"
