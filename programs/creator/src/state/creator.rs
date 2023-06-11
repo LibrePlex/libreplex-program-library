@@ -2,6 +2,7 @@
 use anchor_lang::prelude::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
+use libreplex::AttributeType;
 
 
 
@@ -13,10 +14,9 @@ pub struct Phase {
     // price of a phase is always denominated in terms of 
     // SPL tokens. This gives us complete flexibility
     // as the tokens can be generated
-    pub price_mint: Pubkey, 
+    pub price_mint: Option<Pubkey>, 
     pub price_quantity: u64,
     pub max_mints: u64,
-    pub collection: Pubkey
 }
 
 impl Phase {
@@ -33,25 +33,36 @@ impl Phase {
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct Blueprint {
-    // attribute indices
-    pub attributes: Vec<u8>
+pub enum BaseUrl {
+    Json {
+        url: String,
+    },
+    Image {
+        url: String,
+    }
 }
-
 
 #[repr(C)]
 #[account]
-pub struct Toybox {
+pub struct Creator {
+    pub owner: Pubkey,
+    pub seed: Pubkey,
+    pub minted_count: u32,
     pub max_mints: u64,
+    pub symbol: String,
+    pub base_name: BaseUrl,
     pub minted: u64,
+    pub collection: Pubkey, // has available attributes as well if appropriate
+    pub bump: u8,
+    pub description: Option<String>,
     pub phases: Vec<Phase>,
-    pub attributes: Vec<u8>
+    pub attribute_mappings: Option<Pubkey>,
 }
 
-impl Toybox {
+impl Creator {
     pub const BASE_SIZE: usize = 8 + 8 + 8 + 4 + 4;
 
     pub fn get_size (&self) -> usize {
-        return Toybox::BASE_SIZE + &self.phases.len() * Phase::BASE_SIZE + &self.attributes.len()
+        return Creator::BASE_SIZE + &self.phases.len() * Phase::BASE_SIZE 
     }
 }

@@ -14,7 +14,7 @@ pub use constants::*;
 pub use state::*;
 
 #[program]
-pub mod toybox {
+pub mod creator {
 
     use super::*;
 

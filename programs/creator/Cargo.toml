@@ -1,12 +1,12 @@
 [package]
-name = "toybox"
+name = "creator"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "toybox"
+name = "creator"
 
 [features]
 no-entrypoint = []
@@ -14,7 +14,6 @@ no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
 default = []
-
 
 [dependencies]
 anchor-lang = {version = "^0.27", features = ["init-if-needed"]}
@@ -26,11 +25,9 @@ libreplex = {path='../libreplex',  features = ["no-entrypoint"]}
 prog_common = {path='../../lib/prog_common'}
 proc_macros = {path='../../lib/proc_macros'}
 
-
 [dev-dependencies]
 mocha = "0.1.1"
 bincode = "1.3.3"
 assert_matches = "1.5.0"
 solana-program-test = "~1.14"
 solana-sdk= "~1.14"
-

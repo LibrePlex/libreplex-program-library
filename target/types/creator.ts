@@ -1,6 +1,6 @@
-export type Toybox = {
+export type Creator = {
   "version": "0.1.0",
-  "name": "toybox",
+  "name": "creator",
   "instructions": [],
   "accounts": [
     {
@@ -212,9 +212,9 @@ export type Toybox = {
   ]
 };
 
-export const IDL: Toybox = {
+export const IDL: Creator = {
   "version": "0.1.0",
-  "name": "toybox",
+  "name": "creator",
   "instructions": [],
   "accounts": [
     {
