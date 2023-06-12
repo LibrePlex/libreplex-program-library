@@ -1,10 +1,8 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token_interface::spl_token_2022::solana_zk_token_sdk::zk_token_proof_instruction::PubkeyValidityData;
 use libreplex::Permissions;
 
-use crate::{AccountEvent, Creator, AccountEventType, Phase};
+use crate::{AccountEvent, Creator, AccountEventType};
 
-use super::create_creator::CreateCreator;
 
 
 #[derive(Accounts)]

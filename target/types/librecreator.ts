@@ -1,6 +1,6 @@
-export type Creator = {
+export type Librecreator = {
   "version": "0.1.0",
-  "name": "creator",
+  "name": "librecreator",
   "instructions": [
     {
       "name": "createCreator",
@@ -287,9 +287,9 @@ export type Creator = {
   ]
 };
 
-export const IDL: Creator = {
+export const IDL: Librecreator = {
   "version": "0.1.0",
-  "name": "creator",
+  "name": "librecreator",
   "instructions": [
     {
       "name": "createCreator",

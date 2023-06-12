@@ -67,7 +67,7 @@ export type Libreplex = {
       ],
       "args": [
         {
-          "name": "collectionInput",
+          "name": "groupInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -1522,7 +1522,7 @@ export const IDL: Libreplex = {
       ],
       "args": [
         {
-          "name": "collectionInput",
+          "name": "groupInput",
           "type": {
             "defined": "GroupInput"
           }

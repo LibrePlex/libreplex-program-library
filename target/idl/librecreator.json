@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "creator",
+  "name": "librecreator",
   "instructions": [
     {
       "name": "createCreator",
@@ -284,5 +284,8 @@
         }
       ]
     }
-  ]
+  ],
+  "metadata": {
+    "address": "toysDBtkQ7P1NWwaTtXZbXBeGdM16fReT5qzCgc7wig"
+  }
 }

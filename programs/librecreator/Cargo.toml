@@ -1,12 +1,12 @@
 [package]
-name = "creator"
+name = "librecreator"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "creator"
+name = "librecreator"
 
 [features]
 no-entrypoint = []
@@ -24,6 +24,7 @@ winnow="=0.4.1"
 libreplex = {path='../libreplex',  features = ["no-entrypoint"]}
 prog_common = {path='../../lib/prog_common'}
 proc_macros = {path='../../lib/proc_macros'}
+mocha = "0.1.1"
 
 [dev-dependencies]
 mocha = "0.1.1"

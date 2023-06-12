@@ -913,25 +913,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "creator"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "bincode",
- "libreplex",
- "mocha",
- "proc_macros",
- "prog_common",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token",
- "winnow",
-]
-
-[[package]]
 name = "crossbeam-channel"
 version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1965,6 +1946,25 @@ checksum = "b67380fd3b2fbe7527a606e18729d21c6f3951633d0500574c4dc22d2d638b9f"
 dependencies = [
  "cfg-if",
  "winapi",
+]
+
+[[package]]
+name = "librecreator"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "assert_matches",
+ "bincode",
+ "libreplex",
+ "mocha",
+ "proc_macros",
+ "prog_common",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "spl-token",
+ "winnow",
 ]
 
 [[package]]

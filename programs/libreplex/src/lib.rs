@@ -20,12 +20,12 @@ pub mod libreplex {
 
     pub fn create_group(
         ctx: Context<CreateGroup>,
-        collection_input: GroupInput,
+        group_input: GroupInput,
     ) -> Result<()> {
-        msg!("creating collection data");
+        msg!("creating group data");
         instructions::create_group::handler(
             ctx,
-            collection_input
+            group_input
         )
     }
 

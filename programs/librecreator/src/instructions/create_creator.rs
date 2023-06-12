@@ -1,31 +1,31 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token_interface::spl_token_2022::solana_zk_token_sdk::zk_token_proof_instruction::PubkeyValidityData;
-use libreplex::Permissions;
+use libreplex::{Permissions, Group};
 
 use crate::{AccountEvent, Creator, AccountEventType, Phase};
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CreateMakerInput {
-    max_mints: u64,
-    seed: Pubkey,
-    phases: Vec<Phase>,
+pub struct CreateCreatorInput {
+    pub max_mints: u64,
+    pub seed: Pubkey,
+    pub phases: Vec<Phase>,
 }
 
-impl CreateMakerInput {
+impl CreateCreatorInput {
     pub fn get_size (&self) -> usize {
         return 8 + 8 + 32 + 4 + &self.phases.len()
     }
 }
 
 #[derive(Accounts)]
-#[instruction(toybox_input: CreateMakerInput)]
+#[instruction(create_creator_input: CreateCreatorInput)]
 pub struct CreateCreator<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(init, seeds = [b"creator", toybox_input.seed.key().as_ref()],
-              bump, payer = signer, space = Creator::BASE_SIZE + toybox_input.get_size())]
+    #[account(init, seeds = [b"creator", create_creator_input.seed.key().as_ref()],
+              bump, payer = signer, space = Creator::BASE_SIZE + create_creator_input.get_size())]
     pub creator: Box<Account<'info, Creator>>,
 
     #[account(init, seeds = [b"permissions", creator.key().as_ref(), signer.key().as_ref()],
@@ -40,12 +40,12 @@ pub struct CreateCreator<'info> {
         Currently this signer does not need to be a mint,
         but you can tag metadata onto anything.
     */
-    pub collection: Signer<'info>,
+    pub group: Box<Account<'info, Group>>,
 
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateCreator>, input: CreateMakerInput) -> Result<()> {
+pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result<()> {
     let creator = &mut ctx.accounts.creator;
 
     creator.max_mints = input.max_mints;
