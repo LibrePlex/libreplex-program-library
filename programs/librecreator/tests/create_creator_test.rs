@@ -12,23 +12,20 @@ mod permissions {
     use super::*;
     #[tokio::test]
     async fn create_creator() {
-        let program = ProgramTest::new("creator", librecreator::ID, processor!(librecreator::entry));
-    
+        let mut program = ProgramTest::new("creator", librecreator::ID, processor!(librecreator::entry));
+        
+        program.add_program("libreplex", libreplex::ID, processor!(libreplex::entry));
         
         let mut context =  program.start_with_context().await;
         let authority = context.payer.pubkey();
         
         let group_seed = Keypair::new();
         
-
-
-        // create a collection first
-
         let group 
             = Pubkey::find_program_address(&[GROUP.as_ref(), group_seed.pubkey().as_ref()], &libreplex::ID).0;
 
 
-        let group_permissions = Pubkey::find_program_address(&[b"permissions", group.as_ref(), authority.as_ref()], &librecreator::ID).0;
+        let group_permissions = Pubkey::find_program_address(&[b"permissions", group.as_ref(), authority.as_ref()], &libreplex::ID).0;
 
         let create_group_accounts = libreaccounts::CreateGroup {
             authority,
