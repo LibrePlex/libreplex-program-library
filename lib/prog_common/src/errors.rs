@@ -84,8 +84,9 @@ pub enum ErrorCode {
 
     #[msg("Unexpected permission is empty")]
     UnexpectedPermissionsKey, //0x178A
-    
-    Reserved27, //0x178B
+
+    #[msg("Max size exceeded")]
+    MaxSizeExceeded, //0x178B
     Reserved28, //0x178C
     Reserved29, //0x178D
 

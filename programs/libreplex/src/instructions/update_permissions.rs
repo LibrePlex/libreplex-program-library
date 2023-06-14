@@ -61,7 +61,7 @@ pub fn handler(ctx: Context<UpdatePermissions>, edit_permissions_input: EditPerm
 
         match idx {
 
-            Some(pos) =>{
+            Some(_pos) =>{
                 // already found, no need to do anything
                         
             }, None => {

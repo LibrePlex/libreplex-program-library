@@ -3,7 +3,9 @@ pub mod metadata;
 pub mod permissions;
 pub mod metadataextension;
 pub mod royalties;
+pub mod ordinal;
 
+pub use ordinal::*;
 pub use group::*;
 pub use metadata::*;
 pub use permissions::*;

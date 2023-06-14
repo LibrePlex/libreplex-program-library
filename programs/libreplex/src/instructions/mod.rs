@@ -7,8 +7,13 @@ pub mod delete_permissions;
 pub mod update_metadata;
 pub mod update_group;
 pub mod extend_metadata;
+pub mod create_ordinal;
+pub mod append_to_ordinal;
 
+pub use append_to_ordinal::*;
+pub use create_ordinal::*;
 pub use create_group::*;
+pub use create_ordinal::*;
 pub use create_metadata::*;
 pub use delete_group::*;
 pub use delete_permissions::*;

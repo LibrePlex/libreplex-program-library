@@ -58,7 +58,9 @@ pub enum Asset {
     ChainRenderer {
         program_id: Pubkey
     },
-
+    Ordinal {
+        account_id: Pubkey
+    }
 }
 
 
@@ -78,6 +80,9 @@ impl Asset {
             } => 4 + url.len(),
             Asset::ChainRenderer {
                 program_id: _
+            } => 32,
+            Asset::Ordinal {
+                account_id: _
             } => 32
         } 
     }

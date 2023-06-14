@@ -20,12 +20,12 @@ pub mod libreplex {
 
     pub fn create_group(
         ctx: Context<CreateGroup>,
-        collection_input: GroupInput,
+        group_input: GroupInput,
     ) -> Result<()> {
         msg!("creating collection data");
         instructions::create_group::handler(
             ctx,
-            collection_input
+            group_input
         )
     }
 
@@ -63,6 +63,28 @@ pub mod libreplex {
             metadata_input
         )
     }
+
+    pub fn create_ordinal(
+        ctx: Context<CreateOrdinal>,
+        ordinal_input: CreateOrdinalInput,
+    ) -> Result<()> {
+        msg!("creating metadata");
+        instructions::create_ordinal::handler(
+            ctx,
+            ordinal_input
+        )
+    }
+
+    pub fn append_to_ordinal(
+        ctx: Context<AppendToOrdinal>,
+        input: AppendToOrdinalInput,
+    ) -> Result<()> {
+        instructions::append_to_ordinal::handler(
+            ctx,
+            input
+        )
+    }
+
 
     pub fn extend_metadata(
         ctx: Context<ExtendMetadata>,

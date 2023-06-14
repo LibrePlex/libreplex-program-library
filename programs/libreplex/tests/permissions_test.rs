@@ -10,7 +10,7 @@ mod permissions {
     use super::*;
     #[tokio::test]
     async fn create_metadata_delegated() {
-        let program = ProgramTest::new("libreplex", libreplex::ID, None);
+        let program = ProgramTest::new("libreplex", libreplex::ID, processor!(libreplex::entry));
     
         let mut context =  program.start_with_context().await;
         let collection_authority = context.payer.pubkey();
@@ -31,7 +31,7 @@ mod permissions {
         let base_url_configuration = None;
 
         let create_collection = libreplex::instruction::CreateGroup {
-            collection_input: GroupInput {
+            group_input: GroupInput {
                     // collection_url: "COOLIO.COM".to_string(),
                     name: "COOLIO COLLECTION".to_string(),
                     url: "https://collection-url.com".to_owned(),

@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::Mint;
 
-use crate::{state::{Group, Metadata}, METADATA, Permissions, assert_valid_permissions, PermissionType, MetadataExtension, METADATA_EXTENSION};
+use crate::{state::{Group}, Permissions, assert_valid_permissions, PermissionType, MetadataExtension};
 use prog_common::{close_account, TrySub};
 
 

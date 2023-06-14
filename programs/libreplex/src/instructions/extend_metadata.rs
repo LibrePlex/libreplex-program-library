@@ -1,6 +1,6 @@
 use crate::state::{Group, Metadata};
 use crate::{
-    assert_valid_permissions, MetadataExtension, PermissionType, Permissions, RoyaltyShare, Royalties,
+    assert_valid_permissions, MetadataExtension, PermissionType, Permissions, Royalties,
 };
 use anchor_lang::prelude::*;
 
@@ -38,7 +38,7 @@ impl ExtendMetadataInput {
 
 pub fn validate_extend_metadata_input(
     metadata_input: &ExtendMetadataInput,
-    group: &Group,
+    _group: &Group,
 ) -> Result<()> {
   
     match &metadata_input.royalties {
