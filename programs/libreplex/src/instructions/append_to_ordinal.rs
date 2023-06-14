@@ -23,8 +23,8 @@ pub struct AppendToOrdinal<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    // #[account(zero)]
-    #[account(mut)]
+    #[account(mut, 
+    constraint = ordinal.authority == signer.key())]
     pub ordinal: Account<'info, Ordinal>,
 
     pub system_program: Program<'info, System>,
