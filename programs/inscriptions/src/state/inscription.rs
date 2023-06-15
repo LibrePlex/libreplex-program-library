@@ -40,6 +40,12 @@ impl Inscription {
         Ok(())
     }
 
+    pub fn get_authority(
+        current_data: RefMut<&mut [u8]>
+    ) -> Result<Pubkey> {
+        Ok(Pubkey::try_from_slice(&current_data[8..40])?)
+    }
+
     pub fn write_root(
         mut current_data: RefMut<&mut [u8]>,
         root: &Pubkey) -> Result<()> {
