@@ -20,6 +20,7 @@ default = []
 anchor-lang = {version = "^0.27", features = ["init-if-needed"]}
 anchor-spl = "^0.27"
 spl-token = { version = "3.5.0",  features = ["no-entrypoint"] }
+inscriptions = { path='../inscriptions', features =["no-entrypoint"]}
 solana-program = "~1.14"
 winnow="=0.4.1"
 prog_common = {path='../../lib/prog_common'}

@@ -1,4 +1,4 @@
 
-pub mod ordinal;
+pub mod inscription;
 
-pub use ordinal::*;
+pub use inscription::*;
