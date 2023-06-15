@@ -1,7 +1,7 @@
 
-pub mod create_ordinal;
-pub mod append_to_ordinal;
+pub mod create_inscription;
+pub mod append_to_inscription;
 
-pub use append_to_ordinal::*;
-pub use create_ordinal::*;
+pub use append_to_inscription::*;
+pub use create_inscription::*;
 

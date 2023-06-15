@@ -16,22 +16,22 @@ pub mod inscriptions {
 
     use super::*;
 
-    pub fn create_ordinal(
-        ctx: Context<CreateOrdinal>,
-        ordinal_input: CreateOrdinalInput,
+    pub fn create_inscription(
+        ctx: Context<CreateInscription>,
+        ordinal_input: CreateInscriptionInput,
     ) -> Result<()> {
         msg!("creating metadata");
-        instructions::create_ordinal::handler(
+        instructions::create_inscription::handler(
             ctx,
             ordinal_input
         )
     }
 
-    pub fn append_to_ordinal(
-        ctx: Context<AppendToOrdinal>,
-        input: AppendToOrdinalInput,
+    pub fn append_to_inscription(
+        ctx: Context<AppendToInscription>,
+        input: AppendToInscriptionInput,
     ) -> Result<()> {
-        instructions::append_to_ordinal::handler(
+        instructions::append_to_inscription::handler(
             ctx,
             input
         )
