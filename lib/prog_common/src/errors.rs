@@ -87,7 +87,9 @@ pub enum ErrorCode {
 
     #[msg("Max size exceeded")]
     MaxSizeExceeded, //0x178B
-    Reserved28, //0x178C
+
+    #[msg("Bad authority")]
+    BadAuthority, //0x178C
     Reserved29, //0x178D
 
     Reserved30, //0x178E
