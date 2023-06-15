@@ -1,6 +1,8 @@
 pub mod create_creator;
-pub mod add_attributemapping;
+pub mod attributes;
+pub mod mint;
 
 pub use create_creator::*;
-pub use add_attributemapping::*;
+pub use attributes::*;
+pub use mint::*;
 

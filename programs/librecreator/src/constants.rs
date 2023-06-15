@@ -13,3 +13,7 @@ pub const ADG: &str = "adg";
 pub const MAX_NAME_LENGTH: usize = 256;
 pub const MAX_SYMBOL_LENGTH: usize = 8;
 pub const MAX_URL_LENGTH: usize = 256;
+
+
+pub const MINT_NUMBERS_START: usize = 8;
+

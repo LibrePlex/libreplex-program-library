@@ -2,67 +2,74 @@
 use anchor_lang::prelude::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
-use libreplex::AttributeType;
 
 
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct Phase {
-    pub start_time: i64,
-    pub end_time: Option<i64>,
-    // price of a phase is always denominated in terms of 
-    // SPL tokens. This gives us complete flexibility
-    // as the tokens can be generated
-    pub price_mint: Option<Pubkey>, 
-    pub price_quantity: u64,
-    pub max_mints: u64,
-}
-
-impl Phase {
-    // not an account so no need for 8 byte discriminator space
-    pub const BASE_SIZE: usize =  8 + 1 + 32 + 8 + 8 + 32;
-
-    pub fn get_size(&self) -> usize {
-        return Phase::BASE_SIZE + match &self.end_time {
-            None => 0,
-            Some(_) => 8
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum BaseUrl {
-    Json {
+pub enum AssetUrl {
+    JsonPrefix {
         url: String,
     },
-    Image {
+    ImagePrefix {
         url: String,
-    }
+    },
+    ChainRenderer {
+        program_id: Pubkey
+    },
+    Json {
+        url_config: Pubkey,
+    },
+    Image {
+        image_config: Pubkey,
+    },
 }
 
-#[repr(C)]
+// Case off chain meta/image template from a base
+// Case on chain draw from a 
+// Case renderer
+
+
 #[account]
 pub struct Creator {
     pub owner: Pubkey,
+    // Only this key can mint
+    pub mint_authority: Pubkey,
     pub seed: Pubkey,
-    pub minted_count: u32,
-    pub max_mints: u64,
+    pub supply: u32,
     pub symbol: String,
-    pub base_name: BaseUrl,
-    pub minted: u64,
+    pub asset_url: AssetUrl,
+    pub minted: u32,
     pub collection: Pubkey, // has available attributes as well if appropriate
     pub bump: u8,
     pub description: Option<String>,
-    pub phases: Vec<Phase>,
     pub attribute_mappings: Option<Pubkey>,
+    pub is_ordered: bool,
+    pub name: String,
+    pub minter_numbers: Option<Pubkey>,
 }
+
+
 
 impl Creator {
-    pub const BASE_SIZE: usize = 8 + 8 + 8 + 4 + 4;
+    pub const BASE_SIZE: usize = 8 + 32 + 32 + 32 + 4 
+    // Lets say 14 for max symbol
+    + 14
+    + 1 + 32
+    + 4 + 32 + 1
+    // Desc
+    + 1 + 40
+    + 1 + 32
+    + 1
+    // name
+    + 20 
+    + 1 + 32;
 
     pub fn get_size (&self) -> usize {
-        return Creator::BASE_SIZE + &self.phases.len() * Phase::BASE_SIZE 
+        return Creator::BASE_SIZE
     }
 }
+
+// Keeping it for now. Stores available/used mint numbers.
+#[account]
+pub struct MintNumbers {}

@@ -21,7 +21,8 @@ anchor-spl = "^0.27"
 spl-token = { version = "3.5.0",  features = ["no-entrypoint"] }
 solana-program = "~1.14"
 winnow="=0.4.1"
-libreplex = {path='../libreplex',  features = ["no-entrypoint"]}
+libreplex = {path='../libreplex',  features = ["cpi"]}
+arrayref = "0.3.7"
 prog_common = {path='../../lib/prog_common'}
 proc_macros = {path='../../lib/proc_macros'}
 mocha = "0.1.1"

@@ -1,20 +1,27 @@
+use std::mem::size_of;
+
 use anchor_lang::prelude::*;
-use anchor_spl::token_interface::spl_token_2022::solana_zk_token_sdk::zk_token_proof_instruction::PubkeyValidityData;
-use libreplex::{Permissions, Group};
 
-use crate::{AccountEvent, Creator, AccountEventType, Phase};
 
-#[repr(C)]
+use crate::{AccountEvent, Creator, AccountEventType, AssetUrl, MintNumbers, errors::ErrorCode, MINT_NUMBERS_START};
+
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateCreatorInput {
-    pub max_mints: u64,
+    pub max_mints: u32,
     pub seed: Pubkey,
-    pub phases: Vec<Phase>,
+    pub symbol: String,
+    pub asset_url: AssetUrl,
+    pub collection: Pubkey,
+    pub description: Option<String>,
+    pub attribute_mappings: Option<Pubkey>,
+    pub mint_authority: Pubkey,
+    pub is_ordered: bool,
+    pub name: String,
 }
 
 impl CreateCreatorInput {
     pub fn get_size (&self) -> usize {
-        return 8 + 8 + 32 + 4 + &self.phases.len()
+        return 8 + 8 + 32 + 4;
     }
 }
 
@@ -28,19 +35,8 @@ pub struct CreateCreator<'info> {
               bump, payer = signer, space = Creator::BASE_SIZE + create_creator_input.get_size())]
     pub creator: Box<Account<'info, Creator>>,
 
-    #[account(init, seeds = [b"permissions", creator.key().as_ref(), signer.key().as_ref()],
-            // all permissions start out with one permission, hence the +1
-              bump, payer = signer, space = Permissions::BASE_SIZE + 1)]
-    pub permissions: Box<Account<'info, Permissions>>,
-
-    /*
-        Signer constraint to be relaxed later
-        to allow for migration signatures etc.
-
-        Currently this signer does not need to be a mint,
-        but you can tag metadata onto anything.
-    */
-    pub group: Box<Account<'info, Group>>,
+    #[account(zero)]
+    pub minter_numbers: Option<Box<Account<'info, MintNumbers>>>,
 
     pub system_program: Program<'info, System>,
 }
@@ -48,11 +44,38 @@ pub struct CreateCreator<'info> {
 pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result<()> {
     let creator = &mut ctx.accounts.creator;
 
-    creator.max_mints = input.max_mints;
-    creator.minted = 0;
-    creator.phases = input.phases;
     creator.owner = ctx.accounts.signer.key();
     creator.seed = input.seed.key();
+    creator.supply = input.max_mints;
+    creator.symbol = input.symbol;
+    creator.asset_url = input.asset_url;
+
+
+    if !input.is_ordered {
+        let mint_numbers = ctx.accounts.minter_numbers.as_ref().ok_or(ErrorCode::MissingMintNumbers)?;
+
+        creator.minter_numbers = Some(mint_numbers.key());
+
+        let mint_numbers_info: &AccountInfo = mint_numbers.as_ref().as_ref();
+        let mut mint_numbers_data = mint_numbers_info.data.borrow_mut();
+
+        let base_offset = MINT_NUMBERS_START;
+        for i in 0..creator.supply {
+            let bytes = i.to_le_bytes();
+            let offset = base_offset + (i as usize) * size_of::<u32>();
+    
+            mint_numbers_data[offset..offset + size_of::<u32>()].copy_from_slice(&bytes);
+        }
+    }
+
+    creator.name = input.name;
+    creator.collection = input.collection;
+    creator.bump = *ctx.bumps.get("creator").unwrap();
+    creator.description = input.description;
+    creator.attribute_mappings = input.attribute_mappings;
+
+    creator.mint_authority = input.mint_authority;
+    creator.is_ordered = input.is_ordered;
 
     /* OUT FOR ERRANDS - BACK SOON. All code is in  */
 
