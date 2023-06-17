@@ -1,6 +1,6 @@
 use crate::state::{Group, Metadata};
 use crate::{
-    assert_valid_permissions, MetadataExtension, PermissionType, Permissions, RoyaltyShare, Royalties,
+    assert_valid_permissions, MetadataExtension, PermissionType, DelegatePermissions, RoyaltyShare, Royalties,
 };
 use anchor_lang::prelude::*;
 
@@ -84,12 +84,12 @@ pub struct ExtendMetadata<'info> {
     #[account(
         seeds = ["permissions".as_ref(), group.key().as_ref(), signer.key().as_ref()], 
         bump)]
-    pub group_permissions: Box<Account<'info, Permissions>>,
+    pub group_permissions: Box<Account<'info, DelegatePermissions>>,
 
     #[account(
         seeds = ["permissions".as_ref(), metadata.key().as_ref(), signer.key().as_ref()], 
         bump)]
-    pub metadata_permissions: Box<Account<'info, Permissions>>,
+    pub metadata_permissions: Box<Account<'info, DelegatePermissions>>,
 
     #[account(mut)]
     pub group: Box<Account<'info, Group>>,

@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use prog_common::{errors::ErrorCode};
 
-use crate::Permissions;
+use crate::DelegatePermissions;
 
 /* 
     Intended for cleaning up one's own permissions Ø
@@ -19,7 +19,7 @@ pub struct DeletePermissions<'info> {
             collection.key().as_ref(), 
             signer.key().as_ref()], 
         bump)]
-    pub permissions: Box<Account<'info, Permissions>>,
+    pub permissions: Box<Account<'info, DelegatePermissions>>,
 
     /*  
         this account must be empty before permissions can be deleted 

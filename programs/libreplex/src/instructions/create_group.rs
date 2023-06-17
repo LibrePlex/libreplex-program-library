@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::state::{Group, GroupInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, PERMISSIONS_SIZE, GROUP, PermissionEvent, PermissionEventType, Permissions, PermissionType, PERMISSIONS, GroupEventType, GroupEvent};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, PERMISSIONS_SIZE, GROUP, PermissionEvent, PermissionEventType, DelegatePermissions, PermissionType, PERMISSIONS, GroupEventType, GroupEvent};
 use std::result::Result;
 use anchor_lang::prelude::Error as AnchorError;
 
@@ -14,14 +14,6 @@ pub struct CreateGroup<'info> {
 
     #[account(mut)]
     pub authority: Signer<'info>,
-
-    #[account(init, 
-        payer = authority, 
-        space = PERMISSIONS_SIZE, 
-        seeds = [PERMISSIONS.as_ref(), group.key().as_ref(), authority.key().as_ref()], 
-        bump
-    )]
-    pub permissions: Box<Account<'info, Permissions>>,
 
     #[account(init, seeds = [GROUP.as_ref(), seed.key().as_ref()],
         bump, payer = authority, space = Group::BASE_SIZE + group_input.get_size())]
@@ -39,20 +31,13 @@ pub fn handler(ctx: Context<CreateGroup>,
 
 
     let group = &mut ctx.accounts.group;
-    let permissions = &mut ctx.accounts.permissions;
     let authority = &mut ctx.accounts.authority;
     group.creator = authority.key();
+    group.update_authority = authority.key();
     group.seed = ctx.accounts.seed.key();
     group.item_count = 0;
-    
+    group.update_authority = authority.key();
 
-
-    permissions.permissions = vec![PermissionType::Admin];
-    permissions.user = authority.key();
-    permissions.reference = group.key();
-    permissions.bump = *ctx.bumps.get("permissions").unwrap();
-
-    
 
     update_collection_from_input(group_input, group)?;
 

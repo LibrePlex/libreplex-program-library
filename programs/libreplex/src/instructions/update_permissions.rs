@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::{state::{PERMISSIONS_SIZE}, PermissionEvent, PermissionEventType, Permissions, assert_valid_permissions, PermissionType};
+use crate::{state::{PERMISSIONS_SIZE}, PermissionEvent, PermissionEventType, DelegatePermissions, assert_valid_permissions, PermissionType, Metadata, Group};
 
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -8,32 +8,50 @@ pub struct EditPermissionsInput {
     pub remove_permissions: Vec<PermissionType>
 }
 
+
 #[derive(Accounts)]
-pub struct UpdatePermissions<'info> {
-    #[account(mut)]
-    pub authority: Signer<'info>,
+pub struct DelegateMetadataPermissions<'info> {
+    pub update_authority: Signer<'info>,
+
+    #[account(seeds = ["permissions".as_ref(), 
+                        delegated_user.key().as_ref(), 
+                        metadata.update_authority.as_ref(), 
+                        metadata.key().as_ref()], 
+                        
+                        bump)]
+    pub user_permissions: Box<Account<'info, DelegatePermissions>>,
+
+    #[account(has_one = update_authority)]
+    pub metadata: Account<'info, Metadata>,
+
+    pub delegated_user: AccountInfo<'info>,
+}
+
+#[derive(Accounts)]
+pub struct DelegateGroupPermissions<'info> {
+    pub update_authority: Signer<'info>,
+
+    #[account(seeds = ["permissions".as_ref(), 
+                        delegated_user.key().as_ref(), 
+                        group.key().as_ref()], 
+                        bump)]
+    pub user_permissions: Box<Account<'info, DelegatePermissions>>,
+
+    #[account(has_one = update_authority)]
+    pub group: Account<'info, Group>,
+
+    pub delegated_user: AccountInfo<'info>,
+}
+
+#[derive(Accounts)]
+pub struct UpdatePermissionsDelegate<'info> {
+    pub update_authority: Signer<'info>,
 
     /// CHECK: Can be any account
     pub user: AccountInfo<'info>,
 
-    // TODO: Move this check into logic to allow for either collection permission or metadata permission
-    #[account(
-        seeds = ["permissions".as_ref(), reference.key().as_ref(), authority.key().as_ref()], 
-        bump)]
-    pub auth_permissions: Box<Account<'info, Permissions>>,
-
-    #[account(init_if_needed, 
-        payer = authority, 
-        space = PERMISSIONS_SIZE, 
-        seeds = ["permissions".as_ref(), reference.key().as_ref(), user.key().as_ref()], 
-        bump)]
-    pub user_permissions: Box<Account<'info, Permissions>>,
-
-    /// CHECK it doesn't matter what type of account we are editing permissions for. Hence unchecked!
-    #[account(mut)]
-    pub reference: UncheckedAccount<'info>,
-
-    pub system_program: Program<'info, System>,
+    #[account(mut, has_one = update_authority)]
+    pub user_permissions: Box<Account<'info, DelegatePermissions>>,
 }
 
 pub fn has_permission(permissions: &Vec<PermissionType>, permission_type: PermissionType) -> Option<usize> {

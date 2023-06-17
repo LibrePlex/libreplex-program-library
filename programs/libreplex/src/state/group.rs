@@ -66,6 +66,8 @@ pub struct Group {
     // Seed address used to generate unique account PDA address
     pub seed: Pubkey,
 
+    pub update_authority: Pubkey,
+
     // Creator does not convey any privileges
     pub creator: Pubkey,
 
