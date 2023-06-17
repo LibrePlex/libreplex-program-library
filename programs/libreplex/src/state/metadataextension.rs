@@ -21,9 +21,6 @@ pub enum License {
 pub struct MetadataExtension {
     
     // base: 8 (discriminator)
-
-    pub group: Pubkey, // base: 32
-
     pub metadata: Pubkey, // base: 32
 
     pub attributes: Vec<u8>, // base: 4
@@ -38,7 +35,7 @@ pub struct MetadataExtension {
 
 impl MetadataExtension {
     
-    pub const BASE_SIZE: usize = 8 + 32 + 32  
+    pub const BASE_SIZE: usize = 8 + 32  
     + 4 // attributes 
     + 4 // signers
     + 1; // royalties

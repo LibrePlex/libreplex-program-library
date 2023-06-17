@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::instructions::has_permission;
 
-use crate::{Metadata, Permissions, PermissionType, UpdateMetadataInput};
+use crate::{Metadata, DelegatePermissions, PermissionType, UpdateMetadataInput, Group};
 
 
 use prog_common::{errors::ErrorCode};
@@ -12,24 +12,47 @@ struct EditMetadataEvent {
     name: String,
 }
 
+
+
+
+
+// Who can edit the Metadata?
+// The update authority!
+// The editor of delegated_metadata_specific_permissions
+
+// If part of a group
+// The group authority
+// The editor with delegated group wide permissions
+
 #[derive(Accounts)]
 #[instruction(metadata_input: UpdateMetadataInput)]
-pub struct EditMetadata<'info> {
+pub struct UpdateMetadata<'info> {
     #[account(mut)]
     pub editor: Signer<'info>,
 
-    #[account()]
-    pub permissions: Box<Account<'info, Permissions>>,
-
-    /// CHECK: may be empty
-    pub collection: UncheckedAccount<'info>,
-
     pub metadata: Box<Account<'info, Metadata>>,
+
+    // Derived from the editor, the metadata's update auth and the the metadata itself
+    #[account(seeds = ["permissions".as_ref(), 
+
+                        editor.key().as_ref(), 
+                        metadata.update_authority.as_ref(), 
+                        metadata.key().as_ref()], 
+                        
+                        bump)]
+    pub delegated_metadata_specific_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
+
+    #[account(seeds = ["permissions".as_ref(), editor.key().as_ref(), 
+                        group.expect("Group must be provided with group wide permissions").key().as_ref()], bump)]
+    pub delegated_group_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
+
+    #[account(constraint = metadata.group.expect("Metadata must have a group if you provided a group.") == group.key())]
+    pub group: Option<Box<Account<'info, Group>>>,
 
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<EditMetadata>,
+pub fn handler(ctx: Context<UpdateMetadata>,
     update_metadata_input: UpdateMetadataInput,
 ) -> Result<()> {
     let editor = &ctx.accounts.editor;

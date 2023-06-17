@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 
-use crate::{state::{Group, Metadata}, METADATA, Permissions, assert_valid_permissions, PermissionType, MetadataExtension, METADATA_EXTENSION};
+use crate::{state::{Group, Metadata}, METADATA, DelegatePermissions, assert_valid_permissions, PermissionType, MetadataExtension, METADATA_EXTENSION};
 use prog_common::{close_account, TrySub};
 
 
@@ -10,7 +10,7 @@ pub struct DeleteMetadataExtension<'info> {
 
     pub authority: Signer<'info>,
 
-    pub permissions: Box<Account<'info, Permissions>>,
+    pub permissions: Box<Account<'info, DelegatePermissions>>,
 
     #[account(mut)]
     pub group: Box<Account<'info, Group>>,

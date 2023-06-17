@@ -1,7 +1,7 @@
 use crate::instructions::{update_collection_from_input};
 use crate::state::{Group, GroupInput};
 use crate::{
-    GROUP, Permissions, PermissionType, assert_valid_permissions, GroupEvent, GroupEventType
+    GROUP, DelegatePermissions, PermissionType, assert_valid_permissions, GroupEvent, GroupEventType
 };
 use anchor_lang::prelude::*;
 
@@ -21,7 +21,7 @@ pub struct UpdateGroup<'info> {
     #[account(
         seeds = ["permissions".as_ref(), group.key().as_ref(), authority.key().as_ref()], 
         bump)]
-    pub permissions: Box<Account<'info, Permissions>>,
+    pub permissions: Box<Account<'info, DelegatePermissions>>,
 
     #[account(mut, 
         realloc =  Group::BASE_SIZE + collection_input.get_size(),

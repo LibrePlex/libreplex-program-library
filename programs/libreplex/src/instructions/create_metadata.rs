@@ -1,5 +1,5 @@
 use crate::state::{Metadata};
-use crate::{ CreateMetadataInput, Permissions, PermissionType, MetadataEvent, MetadataEventType};
+use crate::{ CreateMetadataInput, DelegatePermissions, PermissionType, MetadataEvent, MetadataEventType};
 use anchor_lang::prelude::*;
 
 
@@ -12,11 +12,6 @@ pub struct CreateMetadata<'info> {
     #[account(init, seeds = [b"metadata", mint.key().as_ref()],
               bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
-
-    #[account(init, seeds = [b"permissions", metadata.key().as_ref(), signer.key().as_ref()],
-            // all permissions start out with one permission, hence the +1
-              bump, payer = signer, space = Permissions::BASE_SIZE + 1)] 
-    pub permissions: Box<Account<'info, Permissions>>,
 
     /*
         Signer constraint to be relaxed later
@@ -33,7 +28,6 @@ pub struct CreateMetadata<'info> {
 pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let authority = &ctx.accounts.signer;
-    let permissions = &mut ctx.accounts.permissions;
 
     // Update the metadata state account
     metadata.mint = ctx.accounts.mint.key();
@@ -43,11 +37,7 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     metadata.creator = authority.key();
     metadata.description = metadata_input.description;
     metadata.asset = metadata_input.asset;
-
-    permissions.bump = *ctx.bumps.get("permissions").unwrap();
-    permissions.user = authority.key();
-    permissions.reference = metadata.key();
-    permissions.permissions = vec![PermissionType::Admin];
+    metadata.update_authority = metadata_input.update_authority;
 
     msg!(
         "metadata created for mint with pubkey {}",

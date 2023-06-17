@@ -90,14 +90,14 @@ impl Asset {
     }
 }
 
-
-
-#[repr(C)]
 #[account]
 pub struct Metadata {
     // the mint address of the token to which the metadata refers
     pub mint: Pubkey,
 
+    pub update_authority: Pubkey,
+
+    // First ever creator cannot be changed
     pub creator: Pubkey,
 
     pub is_mutable: bool,
@@ -108,11 +108,13 @@ pub struct Metadata {
 
     pub asset: Asset,
 
-    pub description: Option<String>
+    pub description: Option<String>,
+
+    pub group: Option<Pubkey>
 }
 
 impl Metadata {
-    pub const BASE_SIZE: usize = 8 + 32 + 32 + 1;
+    pub const BASE_SIZE: usize = 8 + 32 + 32 + 1 + 32;
 
     pub fn get_size(&self) -> usize {
         let size = Metadata::BASE_SIZE
@@ -158,6 +160,7 @@ pub struct CreateMetadataInput {
     pub symbol: String,
     pub asset: Asset,
     pub description: Option<String>,
+    pub update_authority: Pubkey,
 }
 
 impl CreateMetadataInput {

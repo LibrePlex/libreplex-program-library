@@ -26,7 +26,7 @@ pub const PERMISSIONS_SIZE: usize = 32 + 32 + 1 + 1
 + 30;
 
 
-pub fn assert_valid_permissions(permissions: &Account<Permissions>, 
+pub fn assert_valid_permissions(permissions: &Account<DelegatePermissions>, 
     reference: Pubkey, user: Pubkey, permission_type: &PermissionType) -> Result<()> {
 
     // check derivation
@@ -58,37 +58,20 @@ pub enum PermissionType {
     Admin,
 }
 
-#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
-pub enum PermissionCounts {
-    Admin{
-        count: u32,
-    },
-    Create{ 
-        count: u32
-    },
-    Edit{ 
-        count: u32
-    },
-    Delete{ 
-        count: u32
-    }
-}
-
-
-#[repr(C)]
 #[account]
-pub struct Permissions {
+pub struct DelegatePermissions {
     pub bump: u8,
     pub user: Pubkey,
     pub reference: Pubkey,
     pub permissions: Vec<PermissionType>,
+    pub update_authority: Pubkey,
 }
 
-impl Permissions {
+impl DelegatePermissions {
 
     pub const BASE_SIZE: usize = 8 + 1 + 32 + 32 + 4;
 
     pub fn get_size(&self) -> usize {
-        return Permissions::BASE_SIZE + self.permissions.len();
+        return DelegatePermissions::BASE_SIZE + self.permissions.len();
     }
 }
