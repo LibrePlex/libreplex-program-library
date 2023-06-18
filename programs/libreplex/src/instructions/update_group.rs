@@ -48,7 +48,7 @@ pub fn handler(ctx: Context<UpdateGroup>, collection_input: GroupInput) -> Resul
     let mut can_edit = &group.update_authority == authority.key;
 
     if let Some(delegated_group_wide_permissions_account) = user_permissions {
-        let permissions = delegated_group_wide_permissions_account.permissions;
+        let permissions = &delegated_group_wide_permissions_account.permissions;
 
         can_edit = can_edit || permissions.contains(&PermissionType::Update);
     }

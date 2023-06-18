@@ -42,7 +42,7 @@ pub struct UpdateMetadata<'info> {
     pub delegated_metadata_specific_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(seeds = ["permissions".as_ref(), editor.key().as_ref(), 
-                        group.expect("Group must be provided with group wide permissions").key().as_ref()], bump)]
+                        group.as_ref().expect("Group must be provided with group wide permissions").key().as_ref()], bump)]
     pub delegated_group_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(constraint = metadata.group.expect("Metadata must have a group if you provided a group.") == group.key())]
@@ -74,14 +74,14 @@ pub fn handler(ctx: Context<UpdateMetadata>,
 
         if let Some(delegated_group_wide_permissions_account) 
             = ctx.accounts.delegated_group_wide_permissions.as_ref() {
-                let delegated_group_wide_permissions = delegated_group_wide_permissions_account.permissions;
+                let delegated_group_wide_permissions = &delegated_group_wide_permissions_account.permissions;
 
             can_edit = can_edit || delegated_group_wide_permissions.contains(&PermissionType::Update); 
         }
     }
 
     if let Some(delegated_metadata_specific_permissions_account) = ctx.accounts.delegated_metadata_specific_permissions.as_ref() {
-        let delegated_metadata_specific_permissions = delegated_metadata_specific_permissions_account.permissions;
+        let delegated_metadata_specific_permissions = &delegated_metadata_specific_permissions_account.permissions;
 
         can_edit = can_edit || delegated_metadata_specific_permissions.contains(&PermissionType::Update);
     }
