@@ -16,8 +16,8 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = {version = "^0.27", features = ["init-if-needed"]}
-anchor-spl = "^0.27"
+anchor-lang = {version = "~0.27", features = ["init-if-needed"]}
+anchor-spl = "~0.27"
 spl-token = { version = "3.5.0",  features = ["no-entrypoint"] }
 solana-program = "~1.14"
 winnow="=0.4.1"
@@ -26,7 +26,6 @@ libreplex = { path='../libreplex', features =["no-entrypoint"]}
 prog_common = {path='../../lib/prog_common'}
 proc_macros = {path='../../lib/proc_macros'}
 bmp = "0.5.0"
-cargo-expand = "1.0.52"
 
 [dev-dependencies]
 mocha = "0.1.1"

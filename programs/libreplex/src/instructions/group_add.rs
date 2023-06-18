@@ -35,7 +35,7 @@ pub struct GroupAdd<'info> {
 
 pub fn handler(ctx: Context<GroupAdd>
 ) -> Result<()> {
-    let metadata = &ctx.accounts.metadata;
+    let metadata = &mut ctx.accounts.metadata;
 
     if metadata.group.is_some() {
         return Err(ErrorCode::MetadataAlreadyHasAGroup.into())
