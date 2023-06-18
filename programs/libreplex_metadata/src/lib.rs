@@ -14,7 +14,7 @@ pub use constants::*;
 pub use state::*;
 
 #[program]
-pub mod libreplex {
+pub mod libreplex_metadata {
 
     use super::*;
 
