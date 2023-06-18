@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use crate::instructions::has_permission;
 
 use crate::{Metadata, DelegatePermissions, PermissionType, UpdateMetadataInput, Group};
 
@@ -38,7 +37,7 @@ pub struct UpdateMetadata<'info> {
                         editor.key().as_ref(), 
                         metadata.update_authority.as_ref(), 
                         metadata.key().as_ref()], 
-                        
+
                         bump)]
     pub delegated_metadata_specific_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
@@ -56,44 +55,40 @@ pub fn handler(ctx: Context<UpdateMetadata>,
     update_metadata_input: UpdateMetadataInput,
 ) -> Result<()> {
     let editor = &ctx.accounts.editor;
-    let metadata = &ctx.accounts.metadata;
-    let permissions = &ctx.accounts.permissions;
-    
+
 
     let UpdateMetadataInput {name, 
             symbol,
             asset,
             description,
-            invoked_permission
         } = update_metadata_input;
 
-    if invoked_permission != PermissionType::Admin {
-        return Err(ErrorCode::InvalidPermissions.into())
-    }
-    
-    let metadata_key = metadata.key();
-    let editor_key = editor.key();
-
-
-
-    let metadata_permissions_path = &[b"permissions", metadata_key.as_ref(), editor_key.as_ref()];
-    let (metadata_permissions_key, metadata_bump) = Pubkey::find_program_address(metadata_permissions_path, &crate::id());
-
-    if metadata_permissions_key == permissions.key() {
-        if permissions.bump != metadata_bump  {
-            return Err(ErrorCode::InvalidBump.into())
-        }
-
-        if has_permission(&permissions.permissions, invoked_permission).is_none() {
-            // TODO: Add support for edit as well as admin
-            return Err(ErrorCode::InvalidPermissions.into())
-        }
-        
-    }
     
     let metadata = &mut ctx.accounts.metadata;
 
-    
+    let mut can_edit = editor.key == &metadata.update_authority;
+
+
+    if let Some(group) = ctx.accounts.group.as_ref() {
+        can_edit = can_edit || &group.update_authority == editor.key;
+
+        if let Some(delegated_group_wide_permissions_account) 
+            = ctx.accounts.delegated_group_wide_permissions.as_ref() {
+                let delegated_group_wide_permissions = delegated_group_wide_permissions_account.permissions;
+
+            can_edit = can_edit || delegated_group_wide_permissions.contains(&PermissionType::Update); 
+        }
+    }
+
+    if let Some(delegated_metadata_specific_permissions_account) = ctx.accounts.delegated_metadata_specific_permissions.as_ref() {
+        let delegated_metadata_specific_permissions = delegated_metadata_specific_permissions_account.permissions;
+
+        can_edit = can_edit || delegated_metadata_specific_permissions.contains(&PermissionType::Update);
+    }
+
+    if !can_edit {
+        return Err(ErrorCode::InvalidPermissions.into())
+    }
 
     // Update the metadata state account
     metadata.name = name.clone();

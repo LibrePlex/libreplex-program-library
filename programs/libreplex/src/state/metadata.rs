@@ -3,11 +3,6 @@ use anchor_lang::prelude::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-
-use crate::{PermissionType};
-
-
-
 /*
     Asset replaces URL and provides both backwards compatibility and flexibility
 
@@ -187,7 +182,6 @@ pub struct UpdateMetadataInput {
     pub symbol: String,
     pub asset: Asset,
     pub description: Option<String>,
-    pub invoked_permission: PermissionType,
 }
 
 impl UpdateMetadataInput {

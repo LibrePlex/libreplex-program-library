@@ -1,16 +1,14 @@
 use crate::state::{Group, Metadata};
-use crate::{
-    assert_valid_permissions, MetadataExtension, PermissionType, DelegatePermissions, RoyaltyShare, Royalties,
+use crate::{MetadataExtension, PermissionType, Royalties,
 };
 use anchor_lang::prelude::*;
 
 use anchor_spl::token::Mint;
-use prog_common::{errors::ErrorCode, TryAdd};
+use prog_common::{errors::ErrorCode};
 
 #[event]
 struct ExtendMetadataEvent {
     id: Pubkey,
-    group: Pubkey,
     mint: Pubkey,
 }
 
@@ -75,31 +73,14 @@ pub fn validate_extend_metadata_input(
 #[instruction(extend_metadata_input: ExtendMetadataInput)]
 pub struct ExtendMetadata<'info> {
     #[account(mut)]
-    pub signer: Signer<'info>,
-
-    /*
-       To extend metadata and to add it to a group, you must have Admin access to both
-       group and the metadata
-    */
-    #[account(
-        seeds = ["permissions".as_ref(), group.key().as_ref(), signer.key().as_ref()], 
-        bump)]
-    pub group_permissions: Box<Account<'info, DelegatePermissions>>,
-
-    #[account(
-        seeds = ["permissions".as_ref(), metadata.key().as_ref(), signer.key().as_ref()], 
-        bump)]
-    pub metadata_permissions: Box<Account<'info, DelegatePermissions>>,
-
-    #[account(mut)]
-    pub group: Box<Account<'info, Group>>,
+    pub update_authority: Signer<'info>,
 
     #[account(seeds = [b"metadata".as_ref(), mint.key().as_ref()],
-              bump)]
+              bump, has_one = update_authority)]
     pub metadata: Box<Account<'info, Metadata>>,
 
     #[account(init, seeds = [b"metadata_extension".as_ref(), metadata.key().as_ref()],
-              bump, payer = signer, space = MetadataExtension::BASE_SIZE + extend_metadata_input.get_size())]
+              bump, payer = update_authority, space = MetadataExtension::BASE_SIZE + extend_metadata_input.get_size())]
     pub metadata_extended: Box<Account<'info, MetadataExtension>>,
 
     pub mint: Account<'info, Mint>,
@@ -113,12 +94,6 @@ pub fn handler(
 ) -> Result<()> {
     let metadata = &ctx.accounts.metadata;
     let metadata_extended = &mut ctx.accounts.metadata_extended;
-    let group = &mut ctx.accounts.group;
-    let group_permissions = &ctx.accounts.group_permissions;
-    let metadata_permissions = &ctx.accounts.metadata_permissions;
-    let authority = &ctx.accounts.signer;
-
-    validate_extend_metadata_input(&extend_metadata_input, &group)?;
 
     let ExtendMetadataInput {
         attributes,
@@ -126,38 +101,16 @@ pub fn handler(
         invoked_permission,
     } = extend_metadata_input;
 
-    if invoked_permission != PermissionType::Admin {
-        return Err(ErrorCode::InvalidPermissions.into());
-    }
-
-    // ensure we have permissions on the group
-    assert_valid_permissions(
-        group_permissions,
-        group.key(),
-        authority.key(),
-        &invoked_permission,
-    )?;
-
-    // ensure we have permissions on the metadata
-    assert_valid_permissions(
-        metadata_permissions,
-        metadata.key(),
-        authority.key(),
-        &invoked_permission,
-    )?;
 
     // ensure that the mint is in fact a mint
-    Account::<Mint>::try_from(&ctx.accounts.mint.to_account_info())?;
+    //Account::<Mint>::try_from(&ctx.accounts.mint.to_account_info())?;
 
     // Update the metadata state account
     // metadata_extended.render_mode_data = vec![extend_metadata_input.render_mode_data];
-    metadata_extended.group = group.key();
     metadata_extended.attributes = attributes;
     metadata_extended.royalties = royalties;
     metadata_extended.signers = vec![]; // signers always start out empty
 
-    // Increment collection data counter
-    group.item_count.try_add_assign(1)?;
 
     msg!(
         "metadata created for mint with pubkey {}",
@@ -165,7 +118,6 @@ pub fn handler(
     );
 
     emit!(ExtendMetadataEvent {
-        group: group.key(),
         id: metadata_extended.key(),
         mint: ctx.accounts.mint.key(),
     });
