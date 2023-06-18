@@ -1,8 +1,10 @@
 use crate::instructions::{update_collection_from_input};
 use crate::state::{Group, GroupInput};
 use crate::{
-    GROUP, DelegatePermissions, PermissionType, assert_valid_permissions, GroupEvent, GroupEventType
+    GROUP, DelegatePermissions, PermissionType, GroupEvent, GroupEventType
 };
+use prog_common::{errors::ErrorCode};
+
 use anchor_lang::prelude::*;
 
 #[event]
@@ -18,10 +20,8 @@ pub struct UpdateGroup<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    #[account(
-        seeds = ["permissions".as_ref(), group.key().as_ref(), authority.key().as_ref()], 
-        bump)]
-    pub permissions: Box<Account<'info, DelegatePermissions>>,
+    #[account(seeds = ["permissions".as_ref(), authority.key().as_ref(), group.key().as_ref()], bump)]
+    pub delegated_group_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(mut, 
         realloc =  Group::BASE_SIZE + collection_input.get_size(),
@@ -42,13 +42,22 @@ pub fn handler(ctx: Context<UpdateGroup>, collection_input: GroupInput) -> Resul
 
     let group =&mut ctx.accounts.group;
     let authority = &mut ctx.accounts.authority;
-    let user_permissions = &ctx.accounts.permissions;
 
-    assert_valid_permissions(&user_permissions, group.key(),  authority.key(), &PermissionType::Admin)?;
+    let user_permissions = &ctx.accounts.delegated_group_wide_permissions;
 
-    
+    let mut can_edit = &group.update_authority == authority.key;
+
+    if let Some(delegated_group_wide_permissions_account) = user_permissions {
+        let permissions = delegated_group_wide_permissions_account.permissions;
+
+        can_edit = can_edit || permissions.contains(&PermissionType::Update);
+    }
+
+    if !can_edit {
+        return Err(ErrorCode::InvalidPermissions.into())
+    }
+
     update_collection_from_input(collection_input, group)?;
-
 
     emit!(GroupEvent{
         authority: ctx.accounts.authority.key(),

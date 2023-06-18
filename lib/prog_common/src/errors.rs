@@ -90,7 +90,9 @@ pub enum ErrorCode {
 
     #[msg("Bad authority")]
     BadAuthority, //0x178C
-    Reserved29, //0x178D
+
+    #[msg("Metadata already has a group")]
+    MetadataAlreadyHasAGroup, //0x178D
 
     Reserved30, //0x178E
     Reserved31, //0x178F

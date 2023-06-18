@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::state::{Group, GroupInput};
-use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, PERMISSIONS_SIZE, GROUP, PermissionEvent, PermissionEventType, DelegatePermissions, PermissionType, PERMISSIONS, GroupEventType, GroupEvent};
+use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, GROUP, PermissionEvent, PermissionEventType, GroupEventType, GroupEvent};
 use std::result::Result;
 use anchor_lang::prelude::Error as AnchorError;
 

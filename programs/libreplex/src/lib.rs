@@ -40,14 +40,11 @@ pub mod libreplex {
         )
     }
 
-    pub fn delete_group(
-        ctx: Context<DeleteGroup>,
-    ) -> Result<()> {
-        msg!("delete group data");
-        instructions::delete_group::handler(ctx)
+    pub fn group_add(ctx: Context<GroupAdd>) -> Result<()> {
+        instructions::group_add::handler(ctx)
     }
 
-    pub fn edit_permissions(ctx: Context<UpdatePermissions>, 
+    pub fn update_permissions(ctx: Context<UpdatePermissionsDelegate>, 
         input: EditPermissionsInput) -> Result<()> {
         instructions::update_permissions::handler(ctx, input)
     }

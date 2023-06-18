@@ -1,5 +1,5 @@
 use crate::state::{Metadata};
-use crate::{ CreateMetadataInput, DelegatePermissions, PermissionType, MetadataEvent, MetadataEventType};
+use crate::{ CreateMetadataInput, MetadataEvent, MetadataEventType};
 use anchor_lang::prelude::*;
 
 
