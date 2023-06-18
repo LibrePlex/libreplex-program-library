@@ -11,6 +11,8 @@ pub struct RenderInput {
 #[derive(Accounts)]
 pub struct RenderContext<'info> {
 
+
+    /// CHECK: Can be empty
     #[account()]
     pub metadata: UncheckedAccount<'info>,
 

@@ -20,6 +20,7 @@ pub struct DelegateMetadataPermissions<'info> {
     #[account(has_one = update_authority)]
     pub metadata: Account<'info, Metadata>,
 
+    /// CHECK: No checks requires as the authority can assign delegate to anything they want
     pub delegated_user: AccountInfo<'info>,
 
     
