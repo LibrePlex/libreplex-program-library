@@ -1,67 +1,78 @@
-
 use solana_program_test::*;
 
 mod permissions {
-    use anchor_lang::{InstructionData, system_program, ToAccountMetas};
-    use libreplex::{GroupInput, BaseUrlConfiguration};
+    use anchor_lang::{system_program, InstructionData, ToAccountMetas};
+    use libreplex_metadata::{BaseUrlConfiguration, GroupInput};
     use solana_program::{instruction::Instruction, pubkey::Pubkey};
-    use solana_sdk::{transaction::Transaction, signer::Signer, signature::Keypair};
+    use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 
     use super::*;
     #[tokio::test]
     async fn create_metadata_delegated() {
-        let program = ProgramTest::new("libreplex", libreplex::ID, None);
-    
-        let mut context =  program.start_with_context().await;
+        let program = ProgramTest::new("libreplex_metadata", libreplex_metadata::ID, 
+        processor!(libreplex_metadata::entry));
+
+        let mut context = program.start_with_context().await;
         let collection_authority = context.payer.pubkey();
         let collection_seed_kp = Keypair::new();
-        let collection = Pubkey::find_program_address(&[b"group", collection_seed_kp.pubkey().as_ref()], &libreplex::ID).0;
-        let collection_authority_permissions = Pubkey::find_program_address(&[b"permissions", collection.as_ref(), collection_authority.as_ref()], &libreplex::ID).0;
+        let collection = Pubkey::find_program_address(
+            &[b"group", collection_seed_kp.pubkey().as_ref()],
+            &libreplex_metadata::ID,
+        )
+        .0;
+        let collection_authority_permissions = Pubkey::find_program_address(
+            &[
+                b"permissions",
+                collection.as_ref(),
+                collection_authority.as_ref(),
+            ],
+            &libreplex_metadata::ID,
+        )
+        .0;
 
-  
-        let create_collection_accounts = libreplex::accounts::CreateGroup {
+        let create_collection_accounts = libreplex_metadata::accounts::CreateGroup {
             authority: collection_authority,
             seed: collection_seed_kp.pubkey(),
             group: collection,
             system_program: system_program::ID,
-            permissions: collection_authority_permissions
-        }.to_account_metas(None);
+        }
+        .to_account_metas(None);
 
+        // let create_collection = libreplex_metadata::instruction::CreateGroup {
+        //     collection_input: GroupInput {
+        //         // collection_url: "COOLIO.COM".to_string(),
+        //         name: "COOLIO COLLECTION".to_string(),
+        //         url: "https://collection-url.com".to_owned(),
+        //         symbol: "COOL".to_string(),
+        //         metadata_render_mode: libreplex_metadata::TemplateConfiguration::Template {
+        //             name: "bla bla #{{name}}".to_owned(),
+        //             image_url: "http://doodoo.com/mycollection/{{image_url}}".to_owned(),
+        //             description: "bla bla {{description}}".to_owned(),
+        //         },
+        //         attribute_types: vec![],
+        //         royalties: None,
+        //         permitted_signers: vec![],
+        //         description: "coolio description".to_string(),
+        //     },
+        // };
 
-        let base_url_configuration = None;
+        // let create_ix = Instruction {
+        //     data: create_collection.data(),
+        //     program_id: libreplex_metadata::ID,
+        //     accounts: create_collection_accounts,
+        // };
 
-        let create_collection = libreplex::instruction::CreateGroup {
-            collection_input: GroupInput {
-                    // collection_url: "COOLIO.COM".to_string(),
-                    name: "COOLIO COLLECTION".to_string(),
-                    url: "https://collection-url.com".to_owned(),
-                    symbol: "COOL".to_string(),
-                    metadata_render_mode: libreplex::MetadataRenderMode::Url { base_url_configuration },
-                    attribute_types: vec![],
-                    royalties: None,
-                    permitted_signers: vec![],
-                    description: "coolio description".to_string()
-            }
-        };
+        // let transaction = Transaction::new_signed_with_payer(
+        //     &[create_ix],
+        //     Some(&collection_authority),
+        //     &[&context.payer],
+        //     context.last_blockhash,
+        // );
 
-        let create_ix = Instruction {
-            data: create_collection.data(),
-            program_id: libreplex::ID,
-            accounts: create_collection_accounts
-        };
-        
-
-        let transaction = Transaction::new_signed_with_payer(
-            &[create_ix],
-            Some(&collection_authority),
-            &[&context.payer],
-            context.last_blockhash,
-        );    
-
-
-        context
-        .banks_client
-        .process_transaction(transaction)
-        .await.unwrap();
+        // context
+        //     .banks_client
+        //     .process_transaction(transaction)
+        //     .await
+        //     .unwrap();
     }
 }

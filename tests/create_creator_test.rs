@@ -4,8 +4,8 @@ use solana_program_test::*;
 mod permissions {
     use anchor_lang::{InstructionData, system_program, ToAccountMetas, Key};
     use librecreator::{accounts, instruction, instructions::CreateCreatorInput};
-    use libreplex::{accounts as libreaccounts, instruction as libreinstruction, GroupInput};
-    use libreplex::GROUP;
+    use libreplex_metadata::{accounts as libreaccounts, instruction as libreinstruction, GroupInput};
+    use libreplex_metadata::GROUP;
     use solana_program::{instruction::Instruction, pubkey::Pubkey};
     use solana_sdk::{transaction::Transaction, signer::Signer, signature::Keypair};
 
@@ -25,7 +25,7 @@ mod permissions {
         // create a collection first
 
         let group 
-            = Pubkey::find_program_address(&[GROUP.as_ref(), group_seed.pubkey().as_ref()], &libreplex::ID).0;
+            = Pubkey::find_program_address(&[GROUP.as_ref(), group_seed.pubkey().as_ref()], &libreplex_metadata::ID).0;
 
 
         let group_permissions = Pubkey::find_program_address(&[b"permissions", group.as_ref(), authority.as_ref()], &librecreator::ID).0;
@@ -44,7 +44,7 @@ mod permissions {
                 symbol: "".to_owned(),
                 url: "".to_owned(),
                 description: "".to_owned(),
-                metadata_render_mode: libreplex::MetadataRenderMode::None,
+                metadata_render_mode: libreplex_metadata::MetadataRenderMode::None,
                 royalties: None,
                 attribute_types: vec![],
                 permitted_signers: vec![]
@@ -53,7 +53,7 @@ mod permissions {
 
         let create_group_ix =  Instruction {
             data: create_group_data.data(),
-            program_id: libreplex::ID,
+            program_id: libreplex_metadata::ID,
             accounts: create_group_accounts
         };
 

@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "libreplex",
+  "name": "libreplex_metadata",
   "instructions": [
     {
       "name": "createGroup",
@@ -9,31 +9,6 @@
           "name": "authority",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "permissions",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Group",
-                "path": "group"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "authority"
-              }
-            ]
-          }
         },
         {
           "name": "group",
@@ -67,7 +42,7 @@
       ],
       "args": [
         {
-          "name": "groupInput",
+          "name": "collectionInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -83,9 +58,10 @@
           "isSigner": true
         },
         {
-          "name": "permissions",
+          "name": "delegatedGroupWidePermissions",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "pda": {
             "seeds": [
               {
@@ -96,13 +72,13 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Group",
-                "path": "group"
+                "path": "authority"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "path": "authority"
+                "account": "Group",
+                "path": "group"
               }
             ]
           }
@@ -147,17 +123,28 @@
       ]
     },
     {
-      "name": "deleteGroup",
+      "name": "groupAdd",
       "accounts": [
         {
-          "name": "signer",
+          "name": "metadataAuthority",
           "isMut": false,
           "isSigner": true
         },
         {
-          "name": "permissions",
-          "isMut": true,
+          "name": "groupAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "pda": {
             "seeds": [
               {
@@ -168,29 +155,51 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Group",
-                "path": "group"
+                "path": "metadata_authority"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "path": "signer"
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
               }
             ]
           }
         },
         {
-          "name": "creator",
+          "name": "delegatedGroupWidePermissions",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
         },
         {
           "name": "group",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiver",
           "isMut": true,
           "isSigner": false
         },
@@ -203,11 +212,11 @@
       "args": []
     },
     {
-      "name": "editPermissions",
+      "name": "updatePermissions",
       "accounts": [
         {
-          "name": "authority",
-          "isMut": true,
+          "name": "updateAuthority",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -216,65 +225,12 @@
           "isSigner": false
         },
         {
-          "name": "authPermissions",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "reference"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "authority"
-              }
-            ]
-          }
-        },
-        {
           "name": "userPermissions",
           "isMut": true,
           "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "reference"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "user"
-              }
-            ]
-          }
-        },
-        {
-          "name": "reference",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "CHECK it doesn't matter what type of account we are editing permissions for. Hence unchecked!"
+          "relations": [
+            "update_authority"
           ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -314,31 +270,6 @@
           }
         },
         {
-          "name": "permissions",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
           "name": "mint",
           "isMut": false,
           "isSigner": true
@@ -362,64 +293,9 @@
       "name": "extendMetadata",
       "accounts": [
         {
-          "name": "signer",
+          "name": "updateAuthority",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "groupPermissions",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Group",
-                "path": "group"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "metadataPermissions",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "group",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "metadata",
@@ -439,7 +315,10 @@
                 "path": "mint"
               }
             ]
-          }
+          },
+          "relations": [
+            "update_authority"
+          ]
         },
         {
           "name": "metadataExtended",
@@ -485,32 +364,37 @@
       "name": "deleteMetadataExtension",
       "accounts": [
         {
-          "name": "authority",
+          "name": "updateAuthority",
           "isMut": false,
           "isSigner": true
         },
         {
-          "name": "permissions",
+          "name": "metadata",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "group",
-          "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
         },
         {
           "name": "metadataExtension",
           "isMut": true,
           "isSigner": false,
-          "relations": [
-            "group"
-          ]
-        },
-        {
-          "name": "receiver",
-          "isMut": true,
-          "isSigner": false
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "metadata_extension"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
         },
         {
           "name": "systemProgram",
@@ -524,7 +408,7 @@
       "name": "deletePermissions",
       "accounts": [
         {
-          "name": "signer",
+          "name": "updateAuthority",
           "isMut": false,
           "isSigner": true
         },
@@ -532,35 +416,9 @@
           "name": "permissions",
           "isMut": true,
           "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "collection",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiver",
-          "isMut": true,
-          "isSigner": false
+          "relations": [
+            "update_authority"
+          ]
         },
         {
           "name": "systemProgram",
@@ -579,6 +437,10 @@
         "fields": [
           {
             "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "updateAuthority",
             "type": "publicKey"
           },
           {
@@ -606,9 +468,9 @@
             "type": "string"
           },
           {
-            "name": "metadataRenderMode",
+            "name": "templateConfiguration",
             "type": {
-              "defined": "MetadataRenderMode"
+              "defined": "TemplateConfiguration"
             }
           },
           {
@@ -641,10 +503,6 @@
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "group",
-            "type": "publicKey"
-          },
           {
             "name": "metadata",
             "type": "publicKey"
@@ -688,6 +546,10 @@
             "type": "publicKey"
           },
           {
+            "name": "updateAuthority",
+            "type": "publicKey"
+          },
+          {
             "name": "creator",
             "type": "publicKey"
           },
@@ -714,12 +576,18 @@
             "type": {
               "option": "string"
             }
+          },
+          {
+            "name": "group",
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
     },
     {
-      "name": "Permissions",
+      "name": "DelegatePermissions",
       "type": {
         "kind": "struct",
         "fields": [
@@ -742,6 +610,10 @@
                 "defined": "PermissionType"
               }
             }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
           }
         ]
       }
@@ -780,15 +652,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "addPermissions",
-            "type": {
-              "vec": {
-                "defined": "PermissionType"
-              }
-            }
-          },
-          {
-            "name": "removePermissions",
+            "name": "permissions",
             "type": {
               "vec": {
                 "defined": "PermissionType"
@@ -874,7 +738,7 @@
           {
             "name": "metadataRenderMode",
             "type": {
-              "defined": "MetadataRenderMode"
+              "defined": "TemplateConfiguration"
             }
           },
           {
@@ -938,6 +802,10 @@
             "type": {
               "option": "string"
             }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
           }
         ]
       }
@@ -965,12 +833,6 @@
             "name": "description",
             "type": {
               "option": "string"
-            }
-          },
-          {
-            "name": "invokedPermission",
-            "type": {
-              "defined": "PermissionType"
             }
           }
         ]
@@ -1013,7 +875,7 @@
       }
     },
     {
-      "name": "MetadataRenderMode",
+      "name": "TemplateConfiguration",
       "type": {
         "kind": "enum",
         "variants": [
@@ -1021,24 +883,19 @@
             "name": "None"
           },
           {
-            "name": "Program",
+            "name": "Template",
             "fields": [
               {
-                "name": "program_id",
-                "type": "publicKey"
-              }
-            ]
-          },
-          {
-            "name": "Url",
-            "fields": [
+                "name": "name",
+                "type": "string"
+              },
               {
-                "name": "base_url_configuration",
-                "type": {
-                  "option": {
-                    "defined": "BaseUrlConfiguration"
-                  }
-                }
+                "name": "image_url",
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "type": "string"
               }
             ]
           }
@@ -1217,6 +1074,15 @@
                 "type": "publicKey"
               }
             ]
+          },
+          {
+            "name": "Inscription",
+            "fields": [
+              {
+                "name": "account_id",
+                "type": "publicKey"
+              }
+            ]
           }
         ]
       }
@@ -1258,51 +1124,10 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "Admin"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PermissionCounts",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Admin",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
+            "name": "Update"
           },
           {
-            "name": "Create",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
-          },
-          {
-            "name": "Edit",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
-          },
-          {
-            "name": "Delete",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
+            "name": "AddToGroup"
           }
         ]
       }
@@ -1314,11 +1139,6 @@
       "fields": [
         {
           "name": "id",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "group",
           "type": "publicKey",
           "index": false
         },

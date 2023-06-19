@@ -1,6 +1,6 @@
-export type Defaultrenderer = {
+export type LibreplexDefaultrenderer = {
   "version": "0.1.0",
-  "name": "defaultrenderer",
+  "name": "libreplex_defaultrenderer",
   "instructions": [
     {
       "name": "canonical",
@@ -28,7 +28,8 @@ export type Defaultrenderer = {
             "defined": "RenderInput"
           }
         }
-      ]
+      ],
+      "returns": "bytes"
     }
   ],
   "types": [
@@ -42,9 +43,9 @@ export type Defaultrenderer = {
   ]
 };
 
-export const IDL: Defaultrenderer = {
+export const IDL: LibreplexDefaultrenderer = {
   "version": "0.1.0",
-  "name": "defaultrenderer",
+  "name": "libreplex_defaultrenderer",
   "instructions": [
     {
       "name": "canonical",
@@ -72,7 +73,8 @@ export const IDL: Defaultrenderer = {
             "defined": "RenderInput"
           }
         }
-      ]
+      ],
+      "returns": "bytes"
     }
   ],
   "types": [

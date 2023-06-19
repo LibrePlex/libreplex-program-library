@@ -1,13 +1,18 @@
 {
   "version": "0.1.0",
-  "name": "inscriptions",
+  "name": "libreplex_inscriptions",
   "instructions": [
     {
-      "name": "createOrdinal",
+      "name": "createInscription",
       "accounts": [
         {
           "name": "payer",
           "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "root",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -25,13 +30,13 @@
         {
           "name": "ordinalInput",
           "type": {
-            "defined": "CreateOrdinalInput"
+            "defined": "CreateInscriptionInput"
           }
         }
       ]
     },
     {
-      "name": "appendToOrdinal",
+      "name": "appendToInscription",
       "accounts": [
         {
           "name": "signer",
@@ -39,7 +44,7 @@
           "isSigner": true
         },
         {
-          "name": "ordinal",
+          "name": "inscription",
           "isMut": true,
           "isSigner": false
         },
@@ -53,7 +58,7 @@
         {
           "name": "input",
           "type": {
-            "defined": "AppendToOrdinalInput"
+            "defined": "AppendToInscriptionInput"
           }
         }
       ]
@@ -61,12 +66,16 @@
   ],
   "accounts": [
     {
-      "name": "Ordinal",
+      "name": "Inscription",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
             "type": "publicKey"
           },
           {
@@ -83,7 +92,7 @@
   ],
   "types": [
     {
-      "name": "AppendToOrdinalInput",
+      "name": "AppendToInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -95,7 +104,7 @@
       }
     },
     {
-      "name": "CreateOrdinalInput",
+      "name": "CreateInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -111,7 +120,7 @@
       }
     },
     {
-      "name": "OrdinalEventType",
+      "name": "InscriptionEventType",
       "type": {
         "kind": "enum",
         "variants": [
@@ -127,7 +136,7 @@
   ],
   "events": [
     {
-      "name": "OrdinalEvent",
+      "name": "InscriptionEvent",
       "fields": [
         {
           "name": "id",
@@ -137,7 +146,7 @@
         {
           "name": "eventType",
           "type": {
-            "defined": "OrdinalEventType"
+            "defined": "InscriptionEventType"
           },
           "index": false
         }

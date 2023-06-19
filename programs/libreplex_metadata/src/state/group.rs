@@ -6,56 +6,24 @@ use crate::Royalties;
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum MetadataRenderMode {
+pub enum TemplateConfiguration {
     None,
-    /*
-        Pubkey here is the address of the rendering program
-        * BETA functionality (to be validated against
-            validator resourcing limitations) *
-
-        the id of the external METADATA rendering program
-        that implements the LibrePlex rendering
-        interface standard
-        the interface will have the following
-        signature (roughly, still in discussions):
-
-        to obtain a rendering, it is enough
-        to simulate the transaction.
-
-        input accounts:
-        1) group
-        2) metadata
-        3) mint
-        4) (optional) token account
-
-        output:
-        1) JSON
-        2) image URL (including ordinal / base64)
-        3) something else
-    */
-    Program {
-        program_id: Pubkey,
-    },
-    Url {
-        base_url_configuration: Option<BaseUrlConfiguration>,
+    Template {
+        name: String,
+        image_url: String,
+        description: String
     },
 }
 
-impl MetadataRenderMode {
+impl TemplateConfiguration {
     pub fn get_size(&self) -> usize {
         2 + match self {
-            MetadataRenderMode::None => 1,
-            MetadataRenderMode::Url {
-                base_url_configuration,
-            } => {
-                1 + match base_url_configuration {
-                    Some(base_config) => {
-                        4 + 4 + base_config.prefix.len() + base_config.suffix.len()
-                    }
-                    None => 0,
-                }
-            }
-            MetadataRenderMode::Program { program_id: _ } => 32,
+            TemplateConfiguration::None => 1,
+            TemplateConfiguration::Template {
+                name,
+                image_url,
+                description
+            } => name.len() + image_url.len() + description.len(),
         }
     }
 }
@@ -85,7 +53,7 @@ pub struct Group {
 
     pub description: String,
 
-    pub metadata_render_mode: MetadataRenderMode,
+    pub template_configuration: TemplateConfiguration,
 
     pub royalties: Option<Royalties>,
     
@@ -108,7 +76,7 @@ impl Group {
         + 4 + self.url.len() // symbol
         + 4 + self.description.len() // symbol
         // + self.collection_render_mode.get_size()
-        + self.metadata_render_mode.get_size()
+        + self.template_configuration.get_size()
         + 1 + match &self.royalties {
             Some(x)=>x.get_size(),
             None=>0
@@ -243,7 +211,7 @@ pub struct GroupInput {
     pub symbol: String,
     pub url: String,
     pub description: String,
-    pub metadata_render_mode: MetadataRenderMode,
+    pub metadata_render_mode: TemplateConfiguration,
     pub royalties: Option<Royalties>,
     pub attribute_types: Vec<AttributeType>,
     pub permitted_signers: Vec<Pubkey>

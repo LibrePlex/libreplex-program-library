@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "defaultrenderer",
+  "name": "libreplex_defaultrenderer",
   "instructions": [
     {
       "name": "canonical",
@@ -28,7 +28,8 @@
             "defined": "RenderInput"
           }
         }
-      ]
+      ],
+      "returns": "bytes"
     }
   ],
   "types": [

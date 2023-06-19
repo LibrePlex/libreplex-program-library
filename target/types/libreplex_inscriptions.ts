@@ -1,13 +1,18 @@
-export type Inscriptions = {
+export type LibreplexInscriptions = {
   "version": "0.1.0",
-  "name": "inscriptions",
+  "name": "libreplex_inscriptions",
   "instructions": [
     {
-      "name": "createOrdinal",
+      "name": "createInscription",
       "accounts": [
         {
           "name": "payer",
           "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "root",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -25,13 +30,13 @@ export type Inscriptions = {
         {
           "name": "ordinalInput",
           "type": {
-            "defined": "CreateOrdinalInput"
+            "defined": "CreateInscriptionInput"
           }
         }
       ]
     },
     {
-      "name": "appendToOrdinal",
+      "name": "appendToInscription",
       "accounts": [
         {
           "name": "signer",
@@ -39,7 +44,7 @@ export type Inscriptions = {
           "isSigner": true
         },
         {
-          "name": "ordinal",
+          "name": "inscription",
           "isMut": true,
           "isSigner": false
         },
@@ -53,7 +58,7 @@ export type Inscriptions = {
         {
           "name": "input",
           "type": {
-            "defined": "AppendToOrdinalInput"
+            "defined": "AppendToInscriptionInput"
           }
         }
       ]
@@ -61,12 +66,16 @@ export type Inscriptions = {
   ],
   "accounts": [
     {
-      "name": "ordinal",
+      "name": "inscription",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
             "type": "publicKey"
           },
           {
@@ -83,7 +92,7 @@ export type Inscriptions = {
   ],
   "types": [
     {
-      "name": "AppendToOrdinalInput",
+      "name": "AppendToInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -95,7 +104,7 @@ export type Inscriptions = {
       }
     },
     {
-      "name": "CreateOrdinalInput",
+      "name": "CreateInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -111,7 +120,7 @@ export type Inscriptions = {
       }
     },
     {
-      "name": "OrdinalEventType",
+      "name": "InscriptionEventType",
       "type": {
         "kind": "enum",
         "variants": [
@@ -127,7 +136,7 @@ export type Inscriptions = {
   ],
   "events": [
     {
-      "name": "OrdinalEvent",
+      "name": "InscriptionEvent",
       "fields": [
         {
           "name": "id",
@@ -137,7 +146,7 @@ export type Inscriptions = {
         {
           "name": "eventType",
           "type": {
-            "defined": "OrdinalEventType"
+            "defined": "InscriptionEventType"
           },
           "index": false
         }
@@ -146,16 +155,21 @@ export type Inscriptions = {
   ]
 };
 
-export const IDL: Inscriptions = {
+export const IDL: LibreplexInscriptions = {
   "version": "0.1.0",
-  "name": "inscriptions",
+  "name": "libreplex_inscriptions",
   "instructions": [
     {
-      "name": "createOrdinal",
+      "name": "createInscription",
       "accounts": [
         {
           "name": "payer",
           "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "root",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -173,13 +187,13 @@ export const IDL: Inscriptions = {
         {
           "name": "ordinalInput",
           "type": {
-            "defined": "CreateOrdinalInput"
+            "defined": "CreateInscriptionInput"
           }
         }
       ]
     },
     {
-      "name": "appendToOrdinal",
+      "name": "appendToInscription",
       "accounts": [
         {
           "name": "signer",
@@ -187,7 +201,7 @@ export const IDL: Inscriptions = {
           "isSigner": true
         },
         {
-          "name": "ordinal",
+          "name": "inscription",
           "isMut": true,
           "isSigner": false
         },
@@ -201,7 +215,7 @@ export const IDL: Inscriptions = {
         {
           "name": "input",
           "type": {
-            "defined": "AppendToOrdinalInput"
+            "defined": "AppendToInscriptionInput"
           }
         }
       ]
@@ -209,12 +223,16 @@ export const IDL: Inscriptions = {
   ],
   "accounts": [
     {
-      "name": "ordinal",
+      "name": "inscription",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
             "type": "publicKey"
           },
           {
@@ -231,7 +249,7 @@ export const IDL: Inscriptions = {
   ],
   "types": [
     {
-      "name": "AppendToOrdinalInput",
+      "name": "AppendToInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -243,7 +261,7 @@ export const IDL: Inscriptions = {
       }
     },
     {
-      "name": "CreateOrdinalInput",
+      "name": "CreateInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -259,7 +277,7 @@ export const IDL: Inscriptions = {
       }
     },
     {
-      "name": "OrdinalEventType",
+      "name": "InscriptionEventType",
       "type": {
         "kind": "enum",
         "variants": [
@@ -275,7 +293,7 @@ export const IDL: Inscriptions = {
   ],
   "events": [
     {
-      "name": "OrdinalEvent",
+      "name": "InscriptionEvent",
       "fields": [
         {
           "name": "id",
@@ -285,7 +303,7 @@ export const IDL: Inscriptions = {
         {
           "name": "eventType",
           "type": {
-            "defined": "OrdinalEventType"
+            "defined": "InscriptionEventType"
           },
           "index": false
         }

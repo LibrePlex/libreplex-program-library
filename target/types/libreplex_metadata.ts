@@ -1,6 +1,6 @@
-export type Libreplex = {
+export type LibreplexMetadata = {
   "version": "0.1.0",
-  "name": "libreplex",
+  "name": "libreplex_metadata",
   "instructions": [
     {
       "name": "createGroup",
@@ -9,31 +9,6 @@ export type Libreplex = {
           "name": "authority",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "permissions",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Group",
-                "path": "group"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "authority"
-              }
-            ]
-          }
         },
         {
           "name": "group",
@@ -67,7 +42,7 @@ export type Libreplex = {
       ],
       "args": [
         {
-          "name": "groupInput",
+          "name": "collectionInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -83,9 +58,10 @@ export type Libreplex = {
           "isSigner": true
         },
         {
-          "name": "permissions",
+          "name": "delegatedGroupWidePermissions",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "pda": {
             "seeds": [
               {
@@ -96,13 +72,13 @@ export type Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Group",
-                "path": "group"
+                "path": "authority"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "path": "authority"
+                "account": "Group",
+                "path": "group"
               }
             ]
           }
@@ -147,17 +123,28 @@ export type Libreplex = {
       ]
     },
     {
-      "name": "deleteGroup",
+      "name": "groupAdd",
       "accounts": [
         {
-          "name": "signer",
+          "name": "metadataAuthority",
           "isMut": false,
           "isSigner": true
         },
         {
-          "name": "permissions",
-          "isMut": true,
+          "name": "groupAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "pda": {
             "seeds": [
               {
@@ -168,29 +155,51 @@ export type Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Group",
-                "path": "group"
+                "path": "metadata_authority"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "path": "signer"
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
               }
             ]
           }
         },
         {
-          "name": "creator",
+          "name": "delegatedGroupWidePermissions",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
         },
         {
           "name": "group",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiver",
           "isMut": true,
           "isSigner": false
         },
@@ -203,11 +212,11 @@ export type Libreplex = {
       "args": []
     },
     {
-      "name": "editPermissions",
+      "name": "updatePermissions",
       "accounts": [
         {
-          "name": "authority",
-          "isMut": true,
+          "name": "updateAuthority",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -216,65 +225,12 @@ export type Libreplex = {
           "isSigner": false
         },
         {
-          "name": "authPermissions",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "reference"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "authority"
-              }
-            ]
-          }
-        },
-        {
           "name": "userPermissions",
           "isMut": true,
           "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "reference"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "user"
-              }
-            ]
-          }
-        },
-        {
-          "name": "reference",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "CHECK it doesn't matter what type of account we are editing permissions for. Hence unchecked!"
+          "relations": [
+            "update_authority"
           ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -314,31 +270,6 @@ export type Libreplex = {
           }
         },
         {
-          "name": "permissions",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
           "name": "mint",
           "isMut": false,
           "isSigner": true
@@ -362,64 +293,9 @@ export type Libreplex = {
       "name": "extendMetadata",
       "accounts": [
         {
-          "name": "signer",
+          "name": "updateAuthority",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "groupPermissions",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Group",
-                "path": "group"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "metadataPermissions",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "group",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "metadata",
@@ -439,7 +315,10 @@ export type Libreplex = {
                 "path": "mint"
               }
             ]
-          }
+          },
+          "relations": [
+            "update_authority"
+          ]
         },
         {
           "name": "metadataExtended",
@@ -485,32 +364,37 @@ export type Libreplex = {
       "name": "deleteMetadataExtension",
       "accounts": [
         {
-          "name": "authority",
+          "name": "updateAuthority",
           "isMut": false,
           "isSigner": true
         },
         {
-          "name": "permissions",
+          "name": "metadata",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "group",
-          "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
         },
         {
           "name": "metadataExtension",
           "isMut": true,
           "isSigner": false,
-          "relations": [
-            "group"
-          ]
-        },
-        {
-          "name": "receiver",
-          "isMut": true,
-          "isSigner": false
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "metadata_extension"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
         },
         {
           "name": "systemProgram",
@@ -524,7 +408,7 @@ export type Libreplex = {
       "name": "deletePermissions",
       "accounts": [
         {
-          "name": "signer",
+          "name": "updateAuthority",
           "isMut": false,
           "isSigner": true
         },
@@ -532,35 +416,9 @@ export type Libreplex = {
           "name": "permissions",
           "isMut": true,
           "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "collection",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiver",
-          "isMut": true,
-          "isSigner": false
+          "relations": [
+            "update_authority"
+          ]
         },
         {
           "name": "systemProgram",
@@ -579,6 +437,10 @@ export type Libreplex = {
         "fields": [
           {
             "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "updateAuthority",
             "type": "publicKey"
           },
           {
@@ -606,9 +468,9 @@ export type Libreplex = {
             "type": "string"
           },
           {
-            "name": "metadataRenderMode",
+            "name": "templateConfiguration",
             "type": {
-              "defined": "MetadataRenderMode"
+              "defined": "TemplateConfiguration"
             }
           },
           {
@@ -641,10 +503,6 @@ export type Libreplex = {
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "group",
-            "type": "publicKey"
-          },
           {
             "name": "metadata",
             "type": "publicKey"
@@ -688,6 +546,10 @@ export type Libreplex = {
             "type": "publicKey"
           },
           {
+            "name": "updateAuthority",
+            "type": "publicKey"
+          },
+          {
             "name": "creator",
             "type": "publicKey"
           },
@@ -714,12 +576,18 @@ export type Libreplex = {
             "type": {
               "option": "string"
             }
+          },
+          {
+            "name": "group",
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
     },
     {
-      "name": "permissions",
+      "name": "delegatePermissions",
       "type": {
         "kind": "struct",
         "fields": [
@@ -742,6 +610,10 @@ export type Libreplex = {
                 "defined": "PermissionType"
               }
             }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
           }
         ]
       }
@@ -780,15 +652,7 @@ export type Libreplex = {
         "kind": "struct",
         "fields": [
           {
-            "name": "addPermissions",
-            "type": {
-              "vec": {
-                "defined": "PermissionType"
-              }
-            }
-          },
-          {
-            "name": "removePermissions",
+            "name": "permissions",
             "type": {
               "vec": {
                 "defined": "PermissionType"
@@ -874,7 +738,7 @@ export type Libreplex = {
           {
             "name": "metadataRenderMode",
             "type": {
-              "defined": "MetadataRenderMode"
+              "defined": "TemplateConfiguration"
             }
           },
           {
@@ -938,6 +802,10 @@ export type Libreplex = {
             "type": {
               "option": "string"
             }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
           }
         ]
       }
@@ -965,12 +833,6 @@ export type Libreplex = {
             "name": "description",
             "type": {
               "option": "string"
-            }
-          },
-          {
-            "name": "invokedPermission",
-            "type": {
-              "defined": "PermissionType"
             }
           }
         ]
@@ -1013,7 +875,7 @@ export type Libreplex = {
       }
     },
     {
-      "name": "MetadataRenderMode",
+      "name": "TemplateConfiguration",
       "type": {
         "kind": "enum",
         "variants": [
@@ -1021,24 +883,19 @@ export type Libreplex = {
             "name": "None"
           },
           {
-            "name": "Program",
+            "name": "Template",
             "fields": [
               {
-                "name": "program_id",
-                "type": "publicKey"
-              }
-            ]
-          },
-          {
-            "name": "Url",
-            "fields": [
+                "name": "name",
+                "type": "string"
+              },
               {
-                "name": "base_url_configuration",
-                "type": {
-                  "option": {
-                    "defined": "BaseUrlConfiguration"
-                  }
-                }
+                "name": "image_url",
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "type": "string"
               }
             ]
           }
@@ -1217,6 +1074,15 @@ export type Libreplex = {
                 "type": "publicKey"
               }
             ]
+          },
+          {
+            "name": "Inscription",
+            "fields": [
+              {
+                "name": "account_id",
+                "type": "publicKey"
+              }
+            ]
           }
         ]
       }
@@ -1258,51 +1124,10 @@ export type Libreplex = {
         "kind": "enum",
         "variants": [
           {
-            "name": "Admin"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PermissionCounts",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Admin",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
+            "name": "Update"
           },
           {
-            "name": "Create",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
-          },
-          {
-            "name": "Edit",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
-          },
-          {
-            "name": "Delete",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
+            "name": "AddToGroup"
           }
         ]
       }
@@ -1314,11 +1139,6 @@ export type Libreplex = {
       "fields": [
         {
           "name": "id",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "group",
           "type": "publicKey",
           "index": false
         },
@@ -1453,9 +1273,9 @@ export type Libreplex = {
   ]
 };
 
-export const IDL: Libreplex = {
+export const IDL: LibreplexMetadata = {
   "version": "0.1.0",
-  "name": "libreplex",
+  "name": "libreplex_metadata",
   "instructions": [
     {
       "name": "createGroup",
@@ -1464,31 +1284,6 @@ export const IDL: Libreplex = {
           "name": "authority",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "permissions",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Group",
-                "path": "group"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "authority"
-              }
-            ]
-          }
         },
         {
           "name": "group",
@@ -1522,7 +1317,7 @@ export const IDL: Libreplex = {
       ],
       "args": [
         {
-          "name": "groupInput",
+          "name": "collectionInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -1538,9 +1333,10 @@ export const IDL: Libreplex = {
           "isSigner": true
         },
         {
-          "name": "permissions",
+          "name": "delegatedGroupWidePermissions",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "pda": {
             "seeds": [
               {
@@ -1551,13 +1347,13 @@ export const IDL: Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Group",
-                "path": "group"
+                "path": "authority"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "path": "authority"
+                "account": "Group",
+                "path": "group"
               }
             ]
           }
@@ -1602,17 +1398,28 @@ export const IDL: Libreplex = {
       ]
     },
     {
-      "name": "deleteGroup",
+      "name": "groupAdd",
       "accounts": [
         {
-          "name": "signer",
+          "name": "metadataAuthority",
           "isMut": false,
           "isSigner": true
         },
         {
-          "name": "permissions",
-          "isMut": true,
+          "name": "groupAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "pda": {
             "seeds": [
               {
@@ -1623,29 +1430,51 @@ export const IDL: Libreplex = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Group",
-                "path": "group"
+                "path": "metadata_authority"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "path": "signer"
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
               }
             ]
           }
         },
         {
-          "name": "creator",
+          "name": "delegatedGroupWidePermissions",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
         },
         {
           "name": "group",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiver",
           "isMut": true,
           "isSigner": false
         },
@@ -1658,11 +1487,11 @@ export const IDL: Libreplex = {
       "args": []
     },
     {
-      "name": "editPermissions",
+      "name": "updatePermissions",
       "accounts": [
         {
-          "name": "authority",
-          "isMut": true,
+          "name": "updateAuthority",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -1671,65 +1500,12 @@ export const IDL: Libreplex = {
           "isSigner": false
         },
         {
-          "name": "authPermissions",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "reference"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "authority"
-              }
-            ]
-          }
-        },
-        {
           "name": "userPermissions",
           "isMut": true,
           "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "reference"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "user"
-              }
-            ]
-          }
-        },
-        {
-          "name": "reference",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "CHECK it doesn't matter what type of account we are editing permissions for. Hence unchecked!"
+          "relations": [
+            "update_authority"
           ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -1769,31 +1545,6 @@ export const IDL: Libreplex = {
           }
         },
         {
-          "name": "permissions",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
           "name": "mint",
           "isMut": false,
           "isSigner": true
@@ -1817,64 +1568,9 @@ export const IDL: Libreplex = {
       "name": "extendMetadata",
       "accounts": [
         {
-          "name": "signer",
+          "name": "updateAuthority",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "groupPermissions",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Group",
-                "path": "group"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "metadataPermissions",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "group",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "metadata",
@@ -1894,7 +1590,10 @@ export const IDL: Libreplex = {
                 "path": "mint"
               }
             ]
-          }
+          },
+          "relations": [
+            "update_authority"
+          ]
         },
         {
           "name": "metadataExtended",
@@ -1940,32 +1639,37 @@ export const IDL: Libreplex = {
       "name": "deleteMetadataExtension",
       "accounts": [
         {
-          "name": "authority",
+          "name": "updateAuthority",
           "isMut": false,
           "isSigner": true
         },
         {
-          "name": "permissions",
+          "name": "metadata",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "group",
-          "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
         },
         {
           "name": "metadataExtension",
           "isMut": true,
           "isSigner": false,
-          "relations": [
-            "group"
-          ]
-        },
-        {
-          "name": "receiver",
-          "isMut": true,
-          "isSigner": false
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "metadata_extension"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
         },
         {
           "name": "systemProgram",
@@ -1979,7 +1683,7 @@ export const IDL: Libreplex = {
       "name": "deletePermissions",
       "accounts": [
         {
-          "name": "signer",
+          "name": "updateAuthority",
           "isMut": false,
           "isSigner": true
         },
@@ -1987,35 +1691,9 @@ export const IDL: Libreplex = {
           "name": "permissions",
           "isMut": true,
           "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "permissions"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "collection"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "collection",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "receiver",
-          "isMut": true,
-          "isSigner": false
+          "relations": [
+            "update_authority"
+          ]
         },
         {
           "name": "systemProgram",
@@ -2034,6 +1712,10 @@ export const IDL: Libreplex = {
         "fields": [
           {
             "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "updateAuthority",
             "type": "publicKey"
           },
           {
@@ -2061,9 +1743,9 @@ export const IDL: Libreplex = {
             "type": "string"
           },
           {
-            "name": "metadataRenderMode",
+            "name": "templateConfiguration",
             "type": {
-              "defined": "MetadataRenderMode"
+              "defined": "TemplateConfiguration"
             }
           },
           {
@@ -2096,10 +1778,6 @@ export const IDL: Libreplex = {
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "group",
-            "type": "publicKey"
-          },
           {
             "name": "metadata",
             "type": "publicKey"
@@ -2143,6 +1821,10 @@ export const IDL: Libreplex = {
             "type": "publicKey"
           },
           {
+            "name": "updateAuthority",
+            "type": "publicKey"
+          },
+          {
             "name": "creator",
             "type": "publicKey"
           },
@@ -2169,12 +1851,18 @@ export const IDL: Libreplex = {
             "type": {
               "option": "string"
             }
+          },
+          {
+            "name": "group",
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
     },
     {
-      "name": "permissions",
+      "name": "delegatePermissions",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2197,6 +1885,10 @@ export const IDL: Libreplex = {
                 "defined": "PermissionType"
               }
             }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
           }
         ]
       }
@@ -2235,15 +1927,7 @@ export const IDL: Libreplex = {
         "kind": "struct",
         "fields": [
           {
-            "name": "addPermissions",
-            "type": {
-              "vec": {
-                "defined": "PermissionType"
-              }
-            }
-          },
-          {
-            "name": "removePermissions",
+            "name": "permissions",
             "type": {
               "vec": {
                 "defined": "PermissionType"
@@ -2329,7 +2013,7 @@ export const IDL: Libreplex = {
           {
             "name": "metadataRenderMode",
             "type": {
-              "defined": "MetadataRenderMode"
+              "defined": "TemplateConfiguration"
             }
           },
           {
@@ -2393,6 +2077,10 @@ export const IDL: Libreplex = {
             "type": {
               "option": "string"
             }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
           }
         ]
       }
@@ -2420,12 +2108,6 @@ export const IDL: Libreplex = {
             "name": "description",
             "type": {
               "option": "string"
-            }
-          },
-          {
-            "name": "invokedPermission",
-            "type": {
-              "defined": "PermissionType"
             }
           }
         ]
@@ -2468,7 +2150,7 @@ export const IDL: Libreplex = {
       }
     },
     {
-      "name": "MetadataRenderMode",
+      "name": "TemplateConfiguration",
       "type": {
         "kind": "enum",
         "variants": [
@@ -2476,24 +2158,19 @@ export const IDL: Libreplex = {
             "name": "None"
           },
           {
-            "name": "Program",
+            "name": "Template",
             "fields": [
               {
-                "name": "program_id",
-                "type": "publicKey"
-              }
-            ]
-          },
-          {
-            "name": "Url",
-            "fields": [
+                "name": "name",
+                "type": "string"
+              },
               {
-                "name": "base_url_configuration",
-                "type": {
-                  "option": {
-                    "defined": "BaseUrlConfiguration"
-                  }
-                }
+                "name": "image_url",
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "type": "string"
               }
             ]
           }
@@ -2672,6 +2349,15 @@ export const IDL: Libreplex = {
                 "type": "publicKey"
               }
             ]
+          },
+          {
+            "name": "Inscription",
+            "fields": [
+              {
+                "name": "account_id",
+                "type": "publicKey"
+              }
+            ]
           }
         ]
       }
@@ -2713,51 +2399,10 @@ export const IDL: Libreplex = {
         "kind": "enum",
         "variants": [
           {
-            "name": "Admin"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PermissionCounts",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Admin",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
+            "name": "Update"
           },
           {
-            "name": "Create",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
-          },
-          {
-            "name": "Edit",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
-          },
-          {
-            "name": "Delete",
-            "fields": [
-              {
-                "name": "count",
-                "type": "u32"
-              }
-            ]
+            "name": "AddToGroup"
           }
         ]
       }
@@ -2769,11 +2414,6 @@ export const IDL: Libreplex = {
       "fields": [
         {
           "name": "id",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "group",
           "type": "publicKey",
           "index": false
         },

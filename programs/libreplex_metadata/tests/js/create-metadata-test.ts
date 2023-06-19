@@ -1,18 +1,19 @@
+
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { Libreplex } from "../../../../target/types/libreplex";
 import { Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram } from "@solana/web3.js";
 import { expect } from 'chai';
 import exp from "constants";
+import { LibreplexMetadata } from "../../../../target/types/libreplex_metadata";
 
 describe("libreplex", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
-  const program = anchor.workspace.Libreplex as Program<Libreplex>;
+  const program = anchor.workspace.LibreplexMetadata as Program<LibreplexMetadata>;
   const authority = anchor.getProvider().publicKey
   const collectionSeed = Keypair.generate();
-  const collection = PublicKey.findProgramAddressSync([Buffer.from("collection"), collectionSeed.publicKey.toBuffer()], program.programId)[0]
-  const userPermissions = PublicKey.findProgramAddressSync([Buffer.from("permissions"), collection.toBuffer(), authority.toBuffer()], program.programId)[0]
+  const group = PublicKey.findProgramAddressSync([Buffer.from("group"), collectionSeed.publicKey.toBuffer()], program.programId)[0]
+  const userPermissions = PublicKey.findProgramAddressSync([Buffer.from("permissions"), group.toBuffer(), authority.toBuffer()], program.programId)[0]
 
   it("has created a collection and metadata", async () => {
     const createCollectionEventPromise = new Promise<any>((resolve, reject) => {
@@ -35,17 +36,20 @@ describe("libreplex", () => {
 
     const collectionName = "COOL COLLECTION"
 
-    const tx = await program.methods.createCollection({
-      collectionUrl: "COOL.com",
+    const tx = await program.methods.createGroup({
+      url: "COOL.com",
       name: collectionName,
       symbol: "COOL",
-      nftCollectionData: null,
+      description: "",
+      metadataRenderMode: undefined,
+      royalties: undefined,
+      attributeTypes: [],
+      permittedSigners: []
     }).accounts({
       authority,
       seed: collectionSeed.publicKey,
-      collection,
+      group,
       systemProgram: SystemProgram.programId,
-      userPermissions
     }).rpc();
 
     console.log("Your transaction signature", tx);
@@ -55,11 +59,11 @@ describe("libreplex", () => {
     expect(createCollectionEvent).to.deep.equal({
       creator: authority,
       name: collectionName,
-      id: collection,
+      id: group,
     })
 
     expect(permissionEvent).to.deep.equal({
-      collection,
+      group,
       user: authority,
       eventType: {
         update: {},
@@ -73,23 +77,23 @@ describe("libreplex", () => {
     const metadataName = "COOLMETA"
 
     await program.methods.createMetadata({
-      metadataUrl: "COOLURL.com",
       name: metadataName,
-      nftMetadata: null,
+      symbol: "",
+      asset: undefined,
+      description: "",
+      updateAuthority: Keypair.generate().publicKey
     }).accounts({
       mint: mint.publicKey,
-      collection,
       metadata,
       systemProgram: SystemProgram.programId,
       signer: authority, 
-      signerCollectionPermissions: userPermissions,
     }).signers([mint]).rpc()
 
     const createMetadataEvent = await createMetadataEventPromise
 
     expect(createMetadataEvent).to.deep.equal({
       id: metadata,
-      collection,
+      group,
       mint: mint.publicKey,
       name: metadataName,
     })

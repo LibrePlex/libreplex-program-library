@@ -3,7 +3,7 @@ use solana_program_test::*;
 mod metadata_tests {
     use anchor_lang::{InstructionData,  ToAccountMetas};
     
-    use inscriptions::{
+    use libreplex_inscriptions::{
         accounts::AppendToInscription,
         accounts::CreateInscription,
         instructions::{AppendToInscriptionInput, CreateInscriptionInput}, Inscription,
@@ -31,7 +31,7 @@ mod metadata_tests {
             0, 240, 184, 120, 56, 240, 208, 0, 40, 40, 104, 96, 128, 16, 152, 216, 248, 208, 48,
             128, 8, 136, 152, 64, 224, 240,
         ];
-        let program = ProgramTest::new("inscriptions", inscriptions::ID, processor!(inscriptions::entry));
+        let program = ProgramTest::new("inscriptions", libreplex_inscriptions::ID, processor!(libreplex_inscriptions::entry));
 
         let mut context = program.start_with_context().await;
         let authority = context.payer.pubkey();
@@ -42,7 +42,7 @@ mod metadata_tests {
      
         let inscription = Keypair::new();
 
-        let create_ordinal_input = inscriptions::instruction::CreateInscription {
+        let create_ordinal_input = libreplex_inscriptions::instruction::CreateInscription {
             ordinal_input: CreateInscriptionInput {
                 max_data_length: 500,
                 initial_data: initial_data.clone(),
@@ -69,7 +69,7 @@ mod metadata_tests {
                 rent.minimum_balance(Inscription::BASE_SIZE + create_ordinal_input.ordinal_input.max_data_length as usize),
                 
                 Inscription::BASE_SIZE as u64 + create_ordinal_input.ordinal_input.max_data_length as u64,
-                &inscriptions::id(),
+                &libreplex_inscriptions::id(),
             )],
             Some(&context.payer.pubkey()),
             &[&context.payer, &inscription],
@@ -80,7 +80,7 @@ mod metadata_tests {
         context.banks_client.process_transaction(create_account_tx).await.unwrap();
      
         let create_ordinal_ix = Instruction {
-            program_id: inscriptions::id(),
+            program_id: libreplex_inscriptions::id(),
             data: create_ordinal_input.data(),
             accounts: ordinal_account.to_account_metas(None),
         };
@@ -108,14 +108,14 @@ mod metadata_tests {
             system_program: system_program::id(),
         };
 
-        let append_to_ordinal_input: inscriptions::instruction::AppendToInscription = inscriptions::instruction::AppendToInscription {
+        let append_to_ordinal_input: libreplex_inscriptions::instruction::AppendToInscription = libreplex_inscriptions::instruction::AppendToInscription {
             input: AppendToInscriptionInput {
                 append_data: append_data.clone(),
             },
         };
 
         let append_to_ordinal_ix = Instruction {
-            program_id: inscriptions::id(),
+            program_id: libreplex_inscriptions::id(),
             data: append_to_ordinal_input.data(),
             accounts: append_to_ordinal_accounts.to_account_metas(None),
         };
@@ -134,11 +134,11 @@ mod metadata_tests {
             .unwrap();
 
         let metadata =
-            Pubkey::find_program_address(&[b"metadata", mint.pubkey().as_ref()], &inscriptions::ID).0;
+            Pubkey::find_program_address(&[b"metadata", mint.pubkey().as_ref()], &libreplex_inscriptions::ID).0;
 
         let permissions = Pubkey::find_program_address(
             &[b"permissions", metadata.as_ref(), authority.as_ref()],
-            &inscriptions::ID,
+            &libreplex_inscriptions::ID,
         )
         .0;
 

@@ -2,9 +2,9 @@ use solana_program_test::*;
 
 mod defaultrenderer_test {
     use anchor_lang::{InstructionData, ToAccountMetas};
-    use defaultrenderer::accounts::RenderContext;
-    use defaultrenderer::instruction::Canonical;
-    use defaultrenderer::instructions::RenderInput;
+    use libreplex_defaultrenderer::accounts::RenderContext;
+    use libreplex_defaultrenderer::instruction::Canonical;
+    use libreplex_defaultrenderer::instructions::RenderInput;
     use solana_program::{instruction::Instruction, pubkey::Pubkey};
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 
@@ -13,8 +13,8 @@ mod defaultrenderer_test {
     async fn create_creator() {
         let program = ProgramTest::new(
             "defaultrenderer",
-            defaultrenderer::ID,
-            processor!(defaultrenderer::entry),
+            libreplex_defaultrenderer::ID,
+            processor!(libreplex_defaultrenderer::entry),
         );
 
         let mut context = program.start_with_context().await;
@@ -36,7 +36,7 @@ mod defaultrenderer_test {
 
         let render_ix = Instruction {
             data: render_input.data(),
-            program_id: defaultrenderer::ID,
+            program_id: libreplex_defaultrenderer::ID,
             accounts: render_canonical.to_account_metas(None),
         };
 
