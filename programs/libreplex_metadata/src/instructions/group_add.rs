@@ -64,6 +64,7 @@ pub fn handler(ctx: Context<GroupAdd>
     }
 
     metadata.group = Some(group.key());
+    metadata.update_authority = group.key();
     
     Ok(())
 }
