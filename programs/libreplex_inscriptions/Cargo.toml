@@ -1,8 +1,10 @@
 [package]
 name = "libreplex_inscriptions"
 version = "0.1.0"
-description = "Created with Anchor"
+description = "Inscriptions from LibrePlex"
+license = "MIT"
 edition = "2021"
+repository = "https://github.com/LibrePlex/metadata"
 
 [lib]
 crate-type = ["cdylib", "lib"]
@@ -17,8 +19,6 @@ default = []
 
 [dependencies]
 anchor-lang = {version = "^0.27", features = ["init-if-needed"]}
-anchor-spl = "^0.27"
-spl-token = { version = "3.5.0",  features = ["no-entrypoint"] }
 solana-program = "~1.14"
 winnow="=0.4.1"
 bytemuck = "1.13.1"
