@@ -1987,7 +1987,6 @@ dependencies = [
  "bincode",
  "bytemuck",
  "libreplex_proc_macros",
- "libreplex_prog_common",
  "mocha",
  "solana-program",
  "solana-program-test",

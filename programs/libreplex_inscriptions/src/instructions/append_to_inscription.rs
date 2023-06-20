@@ -1,6 +1,5 @@
 
 use anchor_lang::{prelude::*, accounts::signer};
-use libreplex_prog_common::errors::ErrorCode;
 
 use crate::{Inscription, InscriptionEvent, InscriptionEventType};
 

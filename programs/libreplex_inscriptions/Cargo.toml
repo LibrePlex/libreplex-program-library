@@ -21,7 +21,6 @@ anchor-spl = "^0.27"
 spl-token = { version = "3.5.0",  features = ["no-entrypoint"] }
 solana-program = "~1.14"
 winnow="=0.4.1"
-libreplex_prog_common = {version = '0.1.0', path='../../lib/libreplex_prog_common'}
 libreplex_proc_macros = {version = '0.1.0', path='../../lib/libreplex_proc_macros'}
 bytemuck = "1.13.1"
 

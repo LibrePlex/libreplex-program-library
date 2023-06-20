@@ -8,7 +8,8 @@ declare_id!("inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp");
 
 pub mod instructions;
 pub mod state;
-
+pub mod errors;
+pub use errors::*;
 pub use state::*;
 
 #[program]

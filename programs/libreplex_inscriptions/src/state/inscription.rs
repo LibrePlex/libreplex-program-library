@@ -4,7 +4,7 @@ use std::cell::RefMut;
 use anchor_lang::prelude::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
-use libreplex_prog_common::{errors::ErrorCode};
+use crate::{errors::ErrorCode};
 
 #[repr(C)]
 #[account(zero_copy)]
