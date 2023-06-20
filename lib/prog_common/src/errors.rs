@@ -84,10 +84,15 @@ pub enum ErrorCode {
 
     #[msg("Unexpected permission is empty")]
     UnexpectedPermissionsKey, //0x178A
-    
-    Reserved27, //0x178B
-    Reserved28, //0x178C
-    Reserved29, //0x178D
+
+    #[msg("Max size exceeded")]
+    MaxSizeExceeded, //0x178B
+
+    #[msg("Bad authority")]
+    BadAuthority, //0x178C
+
+    #[msg("Metadata already has a group")]
+    MetadataAlreadyHasAGroup, //0x178D
 
     Reserved30, //0x178E
     Reserved31, //0x178F
