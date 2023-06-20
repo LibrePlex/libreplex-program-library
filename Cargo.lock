@@ -1967,9 +1967,9 @@ dependencies = [
  "bincode",
  "bmp",
  "libreplex_metadata",
+ "libreplex_proc_macros",
+ "libreplex_prog_common",
  "mocha",
- "proc_macros",
- "prog_common",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -1986,9 +1986,9 @@ dependencies = [
  "assert_matches",
  "bincode",
  "bytemuck",
+ "libreplex_proc_macros",
+ "libreplex_prog_common",
  "mocha",
- "proc_macros",
- "prog_common",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -2005,14 +2005,35 @@ dependencies = [
  "assert_matches",
  "bincode",
  "libreplex_inscriptions",
+ "libreplex_proc_macros",
+ "libreplex_prog_common",
  "mocha",
- "proc_macros",
- "prog_common",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
  "spl-token",
  "winnow",
+]
+
+[[package]]
+name = "libreplex_proc_macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2 1.0.60",
+ "quote 1.0.28",
+ "static_assertions",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "libreplex_prog_common"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "spl-math",
+ "static_assertions",
+ "thiserror",
 ]
 
 [[package]]
@@ -2711,27 +2732,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dec2b086b7a862cf4de201096214fa870344cf922b2b30c167badb3af3195406"
 dependencies = [
  "unicode-ident",
-]
-
-[[package]]
-name = "proc_macros"
-version = "0.1.0"
-dependencies = [
- "proc-macro2 1.0.60",
- "quote 1.0.28",
- "static_assertions",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "prog_common"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "spl-math",
- "static_assertions",
- "thiserror",
 ]
 
 [[package]]

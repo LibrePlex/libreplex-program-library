@@ -67,7 +67,7 @@ mod defaultrenderer_test {
 
         let result_data = result.simulation_details.unwrap().return_data.unwrap().data;
         println!("RESULT: {:?}", result_data);
-        std::fs::write("c.bmp", result_data).unwrap();
+        // std::fs::write("c.bmp", result_data).unwrap();
         // msg!("{}", result)
     }
 }

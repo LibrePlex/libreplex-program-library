@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use prog_common::{errors::ErrorCode};
+use libreplex_prog_common::{errors::ErrorCode};
 
 
 

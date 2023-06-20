@@ -4,7 +4,7 @@ use crate::{MetadataExtension, PermissionType, Royalties,
 use anchor_lang::prelude::*;
 
 use anchor_spl::token::Mint;
-use prog_common::{errors::ErrorCode};
+use libreplex_prog_common::{errors::ErrorCode};
 
 #[event]
 struct ExtendMetadataEvent {

@@ -4,7 +4,7 @@ use crate::{MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH, GROUP, PermissionEvent, Permissi
 use std::result::Result;
 use anchor_lang::prelude::Error as AnchorError;
 
-use prog_common::{errors::ErrorCode};
+use libreplex_prog_common::{errors::ErrorCode};
 
 
 

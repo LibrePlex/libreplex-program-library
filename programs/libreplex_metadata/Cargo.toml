@@ -23,8 +23,8 @@ spl-token = { version = "3.5.0",  features = ["no-entrypoint"] }
 libreplex_inscriptions = { path='../libreplex_inscriptions', features =["no-entrypoint"]}
 solana-program = "~1.14"
 winnow="=0.4.1"
-prog_common = {path='../../lib/prog_common'}
-proc_macros = {path='../../lib/proc_macros'}
+libreplex_prog_common = {version = '0.1.0', path='../../lib/libreplex_prog_common'}
+libreplex_proc_macros = {version = '0.1.0', path='../../lib/libreplex_proc_macros'}
 
 
 [dev-dependencies]

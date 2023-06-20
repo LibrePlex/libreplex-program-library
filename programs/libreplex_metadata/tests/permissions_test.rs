@@ -1,10 +1,9 @@
 use solana_program_test::*;
 
 mod permissions {
-    use anchor_lang::{system_program, InstructionData, ToAccountMetas};
-    use libreplex_metadata::{BaseUrlConfiguration, GroupInput};
-    use solana_program::{instruction::Instruction, pubkey::Pubkey};
-    use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
+    use anchor_lang::{system_program, ToAccountMetas};
+    use solana_program::{pubkey::Pubkey};
+    use solana_sdk::{signature::Keypair, signer::Signer};
 
     use super::*;
     #[tokio::test]
@@ -12,7 +11,7 @@ mod permissions {
         let program = ProgramTest::new("libreplex_metadata", libreplex_metadata::ID, 
         processor!(libreplex_metadata::entry));
 
-        let mut context = program.start_with_context().await;
+        let context = program.start_with_context().await;
         let collection_authority = context.payer.pubkey();
         let collection_seed_kp = Keypair::new();
         let collection = Pubkey::find_program_address(

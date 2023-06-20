@@ -23,8 +23,8 @@ solana-program = "~1.14"
 winnow="=0.4.1"
 libreplex_metadata = { path='../libreplex_metadata', features =["no-entrypoint"]}
 
-prog_common = {path='../../lib/prog_common'}
-proc_macros = {path='../../lib/proc_macros'}
+libreplex_prog_common = {version = '0.1.0', path='../../lib/libreplex_prog_common'}
+libreplex_proc_macros = {version = '0.1.0', path='../../lib/libreplex_proc_macros'}
 bmp = "0.5.0"
 
 [dev-dependencies]
