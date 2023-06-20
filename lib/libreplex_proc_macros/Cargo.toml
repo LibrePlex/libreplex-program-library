@@ -2,6 +2,8 @@
 name = "libreplex_proc_macros"
 version = "0.1.0"
 edition = "2021"
+description = "proc_macros shared lib from LibrePlex"
+license = "MIT"
 
 [lib]
 proc-macro = true
