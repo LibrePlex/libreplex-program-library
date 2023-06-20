@@ -1,7 +1,7 @@
 
-use anchor_lang::{prelude::*, accounts::signer};
+use anchor_lang::{prelude::*};
 
-use crate::{Inscription, InscriptionEvent, InscriptionEventType};
+use crate::{Inscription, InscriptionEvent, InscriptionEventType, errors::{ErrorCode}};
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]

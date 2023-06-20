@@ -152,6 +152,18 @@ export type LibreplexInscriptions = {
         }
       ]
     }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "BadAuthority",
+      "msg": "Bad authority"
+    },
+    {
+      "code": 6001,
+      "name": "MaxSizeExceeded",
+      "msg": "Max size exceeded"
+    }
   ]
 };
 
@@ -308,6 +320,18 @@ export const IDL: LibreplexInscriptions = {
           "index": false
         }
       ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "BadAuthority",
+      "msg": "Bad authority"
+    },
+    {
+      "code": 6001,
+      "name": "MaxSizeExceeded",
+      "msg": "Max size exceeded"
     }
   ]
 };

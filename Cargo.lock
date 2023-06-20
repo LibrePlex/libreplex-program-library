@@ -1986,7 +1986,6 @@ dependencies = [
  "assert_matches",
  "bincode",
  "bytemuck",
- "libreplex_proc_macros",
  "mocha",
  "solana-program",
  "solana-program-test",
