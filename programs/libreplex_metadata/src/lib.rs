@@ -9,6 +9,9 @@ declare_id!("AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6");
 pub mod instructions;
 pub mod state;
 pub mod constants;
+pub mod errors;
+
+pub use errors::*;
 
 pub use constants::*;
 pub use state::*;

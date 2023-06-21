@@ -1,6 +1,6 @@
-export type LibreplexInscriptions = {
+export type Inscriptions = {
   "version": "0.1.1",
-  "name": "libreplex_inscriptions",
+  "name": "inscriptions",
   "instructions": [
     {
       "name": "createInscription",
@@ -36,16 +36,16 @@ export type LibreplexInscriptions = {
       ]
     },
     {
-      "name": "appendToInscription",
+      "name": "resizeInscription",
       "accounts": [
         {
-          "name": "signer",
+          "name": "authority",
           "isMut": true,
           "isSigner": true
         },
         {
           "name": "inscription",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -58,7 +58,35 @@ export type LibreplexInscriptions = {
         {
           "name": "input",
           "type": {
-            "defined": "AppendToInscriptionInput"
+            "defined": "ResizeInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "writeToInscription",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "WriteToInscriptionInput"
           }
         }
       ]
@@ -79,11 +107,7 @@ export type LibreplexInscriptions = {
             "type": "publicKey"
           },
           {
-            "name": "dataLengthCurrent",
-            "type": "u32"
-          },
-          {
-            "name": "dataLengthMax",
+            "name": "size",
             "type": "u32"
           }
         ]
@@ -91,18 +115,6 @@ export type LibreplexInscriptions = {
     }
   ],
   "types": [
-    {
-      "name": "AppendToInscriptionInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "appendData",
-            "type": "bytes"
-          }
-        ]
-      }
-    },
     {
       "name": "CreateInscriptionInput",
       "type": {
@@ -113,8 +125,74 @@ export type LibreplexInscriptions = {
             "type": "u32"
           },
           {
-            "name": "initialData",
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResizeInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "change",
+            "type": {
+              "defined": "Change"
+            }
+          },
+          {
+            "name": "expectedStartSize",
+            "type": "u32"
+          },
+          {
+            "name": "targetSize",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WriteToInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "data",
             "type": "bytes"
+          },
+          {
+            "name": "startPos",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Change",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Reduce",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u32"
+              }
+            ]
+          },
+          {
+            "name": "Increase",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u32"
+              }
+            ]
           }
         ]
       }
@@ -128,7 +206,10 @@ export type LibreplexInscriptions = {
             "name": "Create"
           },
           {
-            "name": "Append"
+            "name": "Update"
+          },
+          {
+            "name": "Resize"
           }
         ]
       }
@@ -167,9 +248,9 @@ export type LibreplexInscriptions = {
   ]
 };
 
-export const IDL: LibreplexInscriptions = {
+export const IDL: Inscriptions = {
   "version": "0.1.1",
-  "name": "libreplex_inscriptions",
+  "name": "inscriptions",
   "instructions": [
     {
       "name": "createInscription",
@@ -205,16 +286,16 @@ export const IDL: LibreplexInscriptions = {
       ]
     },
     {
-      "name": "appendToInscription",
+      "name": "resizeInscription",
       "accounts": [
         {
-          "name": "signer",
+          "name": "authority",
           "isMut": true,
           "isSigner": true
         },
         {
           "name": "inscription",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -227,7 +308,35 @@ export const IDL: LibreplexInscriptions = {
         {
           "name": "input",
           "type": {
-            "defined": "AppendToInscriptionInput"
+            "defined": "ResizeInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "writeToInscription",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "WriteToInscriptionInput"
           }
         }
       ]
@@ -248,11 +357,7 @@ export const IDL: LibreplexInscriptions = {
             "type": "publicKey"
           },
           {
-            "name": "dataLengthCurrent",
-            "type": "u32"
-          },
-          {
-            "name": "dataLengthMax",
+            "name": "size",
             "type": "u32"
           }
         ]
@@ -260,18 +365,6 @@ export const IDL: LibreplexInscriptions = {
     }
   ],
   "types": [
-    {
-      "name": "AppendToInscriptionInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "appendData",
-            "type": "bytes"
-          }
-        ]
-      }
-    },
     {
       "name": "CreateInscriptionInput",
       "type": {
@@ -282,8 +375,74 @@ export const IDL: LibreplexInscriptions = {
             "type": "u32"
           },
           {
-            "name": "initialData",
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResizeInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "change",
+            "type": {
+              "defined": "Change"
+            }
+          },
+          {
+            "name": "expectedStartSize",
+            "type": "u32"
+          },
+          {
+            "name": "targetSize",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WriteToInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "data",
             "type": "bytes"
+          },
+          {
+            "name": "startPos",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Change",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Reduce",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u32"
+              }
+            ]
+          },
+          {
+            "name": "Increase",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u32"
+              }
+            ]
           }
         ]
       }
@@ -297,7 +456,10 @@ export const IDL: LibreplexInscriptions = {
             "name": "Create"
           },
           {
-            "name": "Append"
+            "name": "Update"
+          },
+          {
+            "name": "Resize"
           }
         ]
       }

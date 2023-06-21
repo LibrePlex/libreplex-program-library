@@ -3,7 +3,7 @@ use crate::state::{Group, GroupInput};
 use crate::{
     GROUP, DelegatePermissions, PermissionType, GroupEvent, GroupEventType
 };
-use libreplex_prog_common::{errors::ErrorCode};
+use crate::{errors::ErrorCode};
 
 use anchor_lang::prelude::*;
 

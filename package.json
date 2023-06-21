@@ -46,7 +46,7 @@
     "typescript": "5.0.4"
   },
   "devDependencies": {
-    "@coral-xyz/anchor": "^0.27.0",
+    "@coral-xyz/anchor": "^0.28.0",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^9.0.0",
     "@types/node": "20.2.3",

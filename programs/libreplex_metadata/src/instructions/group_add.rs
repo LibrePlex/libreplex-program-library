@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{Metadata, DelegatePermissions, PermissionType, Group};
 
-use libreplex_prog_common::{errors::ErrorCode};
+use crate::{errors::ErrorCode};
 
 
 // Adds a metadata to a group

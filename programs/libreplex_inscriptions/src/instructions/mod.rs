@@ -1,7 +1,8 @@
 
 pub mod create_inscription;
-pub mod append_to_inscription;
+pub mod resize_inscription;
+pub mod write_to_inscription;
 
-pub use append_to_inscription::*;
+pub use resize_inscription::*;
+pub use write_to_inscription::*;
 pub use create_inscription::*;
-

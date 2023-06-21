@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 use crate::{Metadata, DelegatePermissions, PermissionType, UpdateMetadataInput, Group};
 
 
-use libreplex_prog_common::{errors::ErrorCode};
+use crate::{errors::ErrorCode};
 
 #[event]
 struct EditMetadataEvent {
