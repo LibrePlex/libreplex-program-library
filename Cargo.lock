@@ -2040,7 +2040,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_inscriptions"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anchor-attribute-event",
  "anchor-derive-accounts",

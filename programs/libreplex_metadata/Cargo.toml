@@ -20,7 +20,7 @@ default = []
 [dependencies]
 anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
 anchor-spl = "0.28.0"
-libreplex_inscriptions = {version = '0.1.0', path='../libreplex_inscriptions'}
+libreplex_inscriptions = {version = '0.1.2', path='../libreplex_inscriptions', features=["cpi"]}
 
 [dev-dependencies]
 mocha = "0.1.1"
