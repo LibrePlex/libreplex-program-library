@@ -37,6 +37,7 @@ pub fn handler(ctx: Context<CreateGroup>,
     group.seed = ctx.accounts.seed.key();
     group.item_count = 0;
     group.update_authority = authority.key();
+    
 
 
     update_collection_from_input(group_input, group)?;
@@ -85,14 +86,6 @@ pub fn update_collection_from_input<'a>(group_input: GroupInput,
         // Ensure that basis points are between 0-10,000
         if royalty_bps > 10_000 {
             return Err(error!(ErrorCode::InvalidBpsInput));
-        }
-
-        let royalty_shares_vec: Vec<u16> = royalties_data.shares.iter().map(|x| x.share).collect();
-
-        for rs in royalty_shares_vec {
-            if rs != 10_000 {
-                return Err(error!(ErrorCode::InvalidBpsInput));
-            }
         }
     }
     

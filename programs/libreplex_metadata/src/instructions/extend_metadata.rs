@@ -18,7 +18,6 @@ struct ExtendMetadataEvent {
 pub struct ExtendMetadataInput {
     pub attributes: Vec<u8>,  // base: 4
     pub royalties: Option<Royalties>,
-    pub invoked_permission: PermissionType,
 }
 
 impl ExtendMetadataInput {
@@ -75,15 +74,15 @@ pub struct ExtendMetadata<'info> {
     #[account(mut)]
     pub update_authority: Signer<'info>,
 
-    #[account(seeds = [b"metadata".as_ref(), mint.key().as_ref()],
-              bump, has_one = update_authority)]
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account(has_one = update_authority)]
     pub metadata: Box<Account<'info, Metadata>>,
 
     #[account(init, seeds = [b"metadata_extension".as_ref(), metadata.key().as_ref()],
-              bump, payer = update_authority, space = MetadataExtension::BASE_SIZE + extend_metadata_input.get_size())]
+              bump, payer = payer, space = MetadataExtension::BASE_SIZE + extend_metadata_input.get_size())]
     pub metadata_extended: Box<Account<'info, MetadataExtension>>,
-
-    pub mint: Account<'info, Mint>,
 
     pub system_program: Program<'info, System>,
 }
@@ -92,13 +91,11 @@ pub fn handler(
     ctx: Context<ExtendMetadata>,
     extend_metadata_input: ExtendMetadataInput,
 ) -> Result<()> {
-    let metadata = &ctx.accounts.metadata;
     let metadata_extended = &mut ctx.accounts.metadata_extended;
 
     let ExtendMetadataInput {
         attributes,
         royalties,
-        invoked_permission,
     } = extend_metadata_input;
 
 
@@ -111,15 +108,16 @@ pub fn handler(
     metadata_extended.royalties = royalties;
     metadata_extended.signers = vec![]; // signers always start out empty
 
+    let metadata = &ctx.accounts.metadata;
 
     msg!(
         "metadata created for mint with pubkey {}",
-        ctx.accounts.mint.key()
+        metadata.mint
     );
 
     emit!(ExtendMetadataEvent {
         id: metadata_extended.key(),
-        mint: ctx.accounts.mint.key(),
+        mint: metadata.mint.key(),
     });
 
     Ok(())

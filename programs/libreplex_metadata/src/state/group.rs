@@ -28,7 +28,6 @@ impl TemplateConfiguration {
     }
 }
 
-#[repr(C)]
 #[account]
 pub struct Group {
     // Seed address used to generate unique account PDA address
@@ -67,7 +66,7 @@ pub struct Group {
 
 impl Group {
 
-    pub const BASE_SIZE: usize  = 8 + 32 + 32 + 4; // anchor + seed + creator + item count
+    pub const BASE_SIZE: usize  = 8 + 32 + 32 + 32 + 4; // anchor + seed + creator + item count
 
     pub fn get_size(&self) -> usize {
         Group::BASE_SIZE

@@ -72,4 +72,6 @@ impl Creator {
 
 // Keeping it for now. Stores available/used mint numbers.
 #[account]
-pub struct MintNumbers {}
+pub struct MintNumbers {
+    pub creator: Pubkey,
+}

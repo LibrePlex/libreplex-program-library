@@ -35,5 +35,10 @@ pub mod librecreator {
     }
 
 
+    pub fn mint(ctx: Context<Mint>,) -> Result<()> {
+        instructions::mint::handler(ctx)
+    }
+
+
 
 }

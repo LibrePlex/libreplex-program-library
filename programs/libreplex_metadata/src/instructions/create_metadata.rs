@@ -9,8 +9,11 @@ pub struct CreateMetadata<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
     #[account(init, seeds = [b"metadata", mint.key().as_ref()],
-              bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
+              bump, payer = payer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
 
     /*

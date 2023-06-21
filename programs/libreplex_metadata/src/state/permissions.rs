@@ -70,7 +70,7 @@ pub struct DelegatePermissions {
 
 impl DelegatePermissions {
 
-    pub const BASE_SIZE: usize = 8 + 1 + 32 + 32 + 4;
+    pub const BASE_SIZE: usize = 8 + 1 + 32 + 32 + 4 + 32;
 
     pub fn get_size(&self) -> usize {
         return DelegatePermissions::BASE_SIZE + self.permissions.len();

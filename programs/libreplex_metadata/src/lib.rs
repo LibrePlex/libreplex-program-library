@@ -16,6 +16,8 @@ pub use state::*;
 #[program]
 pub mod libreplex_metadata {
 
+    use instructions::delegate_group_permissions::DelegateGroupPermissions;
+
     use super::*;
 
     pub fn create_group(
@@ -43,6 +45,15 @@ pub mod libreplex_metadata {
     pub fn group_add(ctx: Context<GroupAdd>) -> Result<()> {
         instructions::group_add::handler(ctx)
     }
+
+    pub fn delegate_group_permissions(ctx: Context<DelegateGroupPermissions>, input: EditPermissionsInput) -> Result<()> {
+        instructions::delegate_group_permissions::handler(ctx, input)
+    }
+
+    pub fn delegate_metadata_permissions(ctx: Context<DelegateMetadataPermissions>, input: EditPermissionsInput) -> Result<()> {
+        instructions::delegate_metadata_permissions::handler(ctx, input)
+    }
+
 
     pub fn update_permissions(ctx: Context<UpdatePermissionsDelegate>, 
         input: EditPermissionsInput) -> Result<()> {

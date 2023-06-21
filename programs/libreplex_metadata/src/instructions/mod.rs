@@ -19,3 +19,5 @@ pub use update_metadata::*;
 pub use update_group::*;
 pub use extend_metadata::*;
 pub use group_add::*;
+pub use delegate_group_permissions::*;
+pub use delegate_metadata_permissions::*;
