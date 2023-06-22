@@ -94,8 +94,11 @@ pub enum ErrorCode {
     #[msg("Metadata already has a group")]
     MetadataAlreadyHasAGroup, //0x178D
 
-    Reserved30, //0x178E
-    Reserved31, //0x178F
+    #[msg("Derived key invalid")]
+    DerivedKeyInvalid, //0x178E
+
+    #[msg("Invalid signer program")]
+    InvalidSignedProgram, //0x178F
     Reserved32, //0x1790
     Reserved33, //0x1791
     Reserved34, //0x1792

@@ -10,8 +10,10 @@ pub mod instructions;
 pub mod state;
 pub mod constants;
 pub mod errors;
-
 pub use errors::*;
+
+pub mod shared;
+pub use shared::*;
 
 pub use constants::*;
 pub use state::*;

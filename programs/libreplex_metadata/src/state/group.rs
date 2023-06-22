@@ -67,7 +67,7 @@ pub struct Group {
 
 impl Group {
 
-    pub const BASE_SIZE: usize  = 8 + 32 + 32 + 4; // anchor + seed + creator + item count
+    pub const BASE_SIZE: usize  = 8 + 32 + 32 + 32 + 4; // anchor + seed + creator + item count
 
     pub fn get_size(&self) -> usize {
         Group::BASE_SIZE
@@ -211,7 +211,7 @@ pub struct GroupInput {
     pub symbol: String,
     pub url: String,
     pub description: String,
-    pub metadata_render_mode: TemplateConfiguration,
+    pub template_configuration: TemplateConfiguration,
     pub royalties: Option<Royalties>,
     pub attribute_types: Vec<AttributeType>,
     pub permitted_signers: Vec<Pubkey>
@@ -228,7 +228,7 @@ impl GroupInput {
             + 4 + self.url.len()
             + 4 + self.description.len()
             // + self.collection_render_mode.get_size()
-            + self.metadata_render_mode.get_size()
+            + self.template_configuration.get_size()
             + 1 + match self.royalties.as_ref() {
                 Some(data) => data.get_size(),
                 None => 0,
