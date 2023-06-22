@@ -1,6 +1,6 @@
 [package]
 name = "libreplex_inscriptions"
-version = "0.1.2"
+version = "0.1.6"
 description = "Inscriptions from LibrePlex"
 license = "MIT"
 edition = "2021"
@@ -25,6 +25,7 @@ anchor-debug = [
     "anchor-derive-accounts/anchor-debug"
 ]
 cpi = []
+no-entrypoint = []
 
 [dependencies]
 anchor-lang = {version = "0.28.0"}

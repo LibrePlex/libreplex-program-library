@@ -1,5 +1,5 @@
 export type LibreplexMetadata = {
-  "version": "0.1.1",
+  "version": "0.3.4",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -264,6 +264,7 @@ export type LibreplexMetadata = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "Mint",
                 "path": "mint"
               }
             ]
@@ -272,12 +273,23 @@ export type LibreplexMetadata = {
         {
           "name": "mint",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
           "isSigner": true
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "invokedMigratorProgram",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
         }
       ],
       "args": [
@@ -621,6 +633,38 @@ export type LibreplexMetadata = {
   ],
   "types": [
     {
+      "name": "CreateOrdinalMetadataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "inscriptionInput",
+            "type": {
+              "defined": "CreateInscriptionInput"
+            }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExtendMetadataInput",
       "type": {
         "kind": "struct",
@@ -736,7 +780,7 @@ export type LibreplexMetadata = {
             "type": "string"
           },
           {
-            "name": "metadataRenderMode",
+            "name": "templateConfiguration",
             "type": {
               "defined": "TemplateConfiguration"
             }
@@ -1419,11 +1463,13 @@ export type LibreplexMetadata = {
     },
     {
       "code": 6030,
-      "name": "Reserved30"
+      "name": "DerivedKeyInvalid",
+      "msg": "Derived key invalid"
     },
     {
       "code": 6031,
-      "name": "Reserved31"
+      "name": "InvalidSignedProgram",
+      "msg": "Invalid signer program"
     },
     {
       "code": 6032,
@@ -1621,7 +1667,7 @@ export type LibreplexMetadata = {
 };
 
 export const IDL: LibreplexMetadata = {
-  "version": "0.1.1",
+  "version": "0.3.4",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -1886,6 +1932,7 @@ export const IDL: LibreplexMetadata = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "Mint",
                 "path": "mint"
               }
             ]
@@ -1894,12 +1941,23 @@ export const IDL: LibreplexMetadata = {
         {
           "name": "mint",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
           "isSigner": true
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "invokedMigratorProgram",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
         }
       ],
       "args": [
@@ -2243,6 +2301,38 @@ export const IDL: LibreplexMetadata = {
   ],
   "types": [
     {
+      "name": "CreateOrdinalMetadataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "inscriptionInput",
+            "type": {
+              "defined": "CreateInscriptionInput"
+            }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExtendMetadataInput",
       "type": {
         "kind": "struct",
@@ -2358,7 +2448,7 @@ export const IDL: LibreplexMetadata = {
             "type": "string"
           },
           {
-            "name": "metadataRenderMode",
+            "name": "templateConfiguration",
             "type": {
               "defined": "TemplateConfiguration"
             }
@@ -3041,11 +3131,13 @@ export const IDL: LibreplexMetadata = {
     },
     {
       "code": 6030,
-      "name": "Reserved30"
+      "name": "DerivedKeyInvalid",
+      "msg": "Derived key invalid"
     },
     {
       "code": 6031,
-      "name": "Reserved31"
+      "name": "InvalidSignedProgram",
+      "msg": "Invalid signer program"
     },
     {
       "code": 6032,

@@ -1,6 +1,6 @@
 [package]
 name = "libreplex_metadata"
-version = "0.3.0"
+version = "0.3.4"
 description = "Created with Anchor"
 edition = "2021"
 license = "MIT"
@@ -20,7 +20,7 @@ default = []
 [dependencies]
 anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
 anchor-spl = "0.28.0"
-libreplex_inscriptions = {version = '0.1.2', path='../libreplex_inscriptions', features=["cpi"]}
+libreplex_inscriptions = {version = '0.1.6', path='../libreplex_inscriptions', features=["cpi", "no-entrypoint"]}
 
 [dev-dependencies]
 mocha = "0.1.1"

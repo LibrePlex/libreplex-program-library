@@ -1,5 +1,5 @@
 export type LibreplexDefaultrenderer = {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "name": "libreplex_defaultrenderer",
   "instructions": [
     {
@@ -44,7 +44,7 @@ export type LibreplexDefaultrenderer = {
 };
 
 export const IDL: LibreplexDefaultrenderer = {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "name": "libreplex_defaultrenderer",
   "instructions": [
     {

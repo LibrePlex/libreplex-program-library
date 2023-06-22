@@ -2026,12 +2026,12 @@ checksum = "f92be4933c13fd498862a9e02a3055f8a8d9c039ce33db97306fd5a6caa7f29b"
 
 [[package]]
 name = "libreplex_default_renderer"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anchor-lang",
  "assert_matches",
  "bmp",
- "libreplex_metadata 0.2.0",
+ "libreplex_metadata 0.3.2",
  "mocha",
  "solana-program",
  "solana-program-test",
@@ -2040,7 +2040,18 @@ dependencies = [
 
 [[package]]
 name = "libreplex_inscriptions"
-version = "0.1.2"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ffa9370323a1dbfe63f1dc78869b0a1668a68f32af1f8c51d5438701e1973a1"
+dependencies = [
+ "anchor-attribute-event",
+ "anchor-derive-accounts",
+ "anchor-lang",
+]
+
+[[package]]
+name = "libreplex_inscriptions"
+version = "0.1.6"
 dependencies = [
  "anchor-attribute-event",
  "anchor-derive-accounts",
@@ -2053,35 +2064,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "libreplex_inscriptions"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbeffada95fe6b0c6b53eb8bf3cb18ae624bf4980409be32c0a100586226fb79"
-dependencies = [
- "anchor-attribute-event",
- "anchor-derive-accounts",
- "anchor-lang",
-]
-
-[[package]]
 name = "libreplex_metadata"
-version = "0.2.0"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42a912d788a200c106b568c06057afe9cdd7a0dbfdb951d9ee2713cfa92a994c"
+checksum = "a39dc1cfbe889472ec2c3e0c9c2ca3e3c56399030c83f1290256f224396e1a7b"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "libreplex_inscriptions 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libreplex_inscriptions 0.1.4",
 ]
 
 [[package]]
 name = "libreplex_metadata"
-version = "0.3.0"
+version = "0.3.4"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "assert_matches",
- "libreplex_inscriptions 0.1.2",
+ "libreplex_inscriptions 0.1.6",
  "mocha",
  "solana-program",
  "solana-program-test",
@@ -5007,9 +5007,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-attributes"
-version = "0.1.25"
+version = "0.1.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8803eee176538f94ae9a14b55b2804eb7e1441f8210b1c31290b3bccdccff73b"
+checksum = "5f4f31f56159e98206da9efd823404b79b6ef3143b4a7ab76e67b1751b25a4ab"
 dependencies = [
  "proc-macro2 1.0.60",
  "quote 1.0.28",

@@ -1,5 +1,5 @@
 export type Inscriptions = {
-  "version": "0.1.1",
+  "version": "0.1.6",
   "name": "inscriptions",
   "instructions": [
     {
@@ -249,7 +249,7 @@ export type Inscriptions = {
 };
 
 export const IDL: Inscriptions = {
-  "version": "0.1.1",
+  "version": "0.1.6",
   "name": "inscriptions",
   "instructions": [
     {
