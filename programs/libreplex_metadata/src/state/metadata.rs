@@ -156,14 +156,7 @@ pub struct CreateMetadataInput {
     pub asset: Asset,
     pub description: Option<String>,
     pub update_authority: Pubkey,
-    /*
-     only to be supplied if the migration is invoked by a whitelisted 
-     migrator program.
-
-     if a migrator program is invoked, then the signer account must be
-     a PDA derived by the migrator program from seed [mint].
-    */
-    pub invoked_migrator_program: Option<Pubkey> 
+ 
 }
 
 impl CreateMetadataInput {

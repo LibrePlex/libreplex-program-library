@@ -78,7 +78,6 @@ mod permissions {
                     url: "https://collection-url.com".to_owned()
                 },
                 update_authority: collection_authority,
-                invoked_migrator_program: None,
                 symbol: "COOL".to_string(),
                 description: Some("coolio description".to_string()),
             },

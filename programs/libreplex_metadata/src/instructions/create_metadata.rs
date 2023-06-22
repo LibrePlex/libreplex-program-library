@@ -51,7 +51,7 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     let invoked_migrator_program = &ctx.accounts.invoked_migrator_program;
 
 
-    assert_is_valid_signer(&authority.key(), &mint.key(), invoked_migrator_program);
+    assert_is_valid_signer(&authority.key(), &mint.key(), invoked_migrator_program)?;
 
     // Update the metadata state account
     metadata.mint = ctx.accounts.mint.key();
