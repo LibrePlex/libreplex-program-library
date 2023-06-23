@@ -12,6 +12,7 @@
     "dev": "next dev",
     "build": "anchor build -p libreplex",
     "start": "next start",
+    "libre-cli": "ts-node src/cli/index.ts",
     "libreplex_metadata:deploy:localnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster http://localhost:8899 --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_metadata:deploy:devnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_metadata:deploy:mainnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
@@ -35,6 +36,8 @@
     "@types/react-dom": "18.2.4",
     "autoprefixer": "10.4.14",
     "bmp-js": "^0.1.0",
+    "commander": "^11.0.0",
+    "dotenv": "^16.3.1",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.3",
     "framer-motion": "^10.12.16",
@@ -46,7 +49,7 @@
     "typescript": "5.0.4"
   },
   "devDependencies": {
-    "@coral-xyz/anchor": "^0.28.0",
+    "@coral-xyz/anchor": "^0.28.1-beta.1",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^9.0.0",
     "@types/node": "20.2.3",
