@@ -12,9 +12,9 @@
     "dev": "next dev",
     "build": "anchor build -p libreplex",
     "start": "next start",
-    "libreplex:deploy:localnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster http://localhost:8899 --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex:deploy:devnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex:deploy:mainnet": "anchor build -p libreplex && anchor deploy -p libreplex --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_metadata:deploy:localnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster http://localhost:8899 --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_metadata:deploy:devnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_metadata:deploy:mainnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "lint": "next lint"
   },
   "dependencies": {

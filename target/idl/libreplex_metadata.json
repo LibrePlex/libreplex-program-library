@@ -1,5 +1,5 @@
 {
-  "version": "0.3.4",
+  "version": "0.4.0",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -1663,5 +1663,8 @@
       "code": 6079,
       "name": "Reserved79"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p"
+  }
 }
