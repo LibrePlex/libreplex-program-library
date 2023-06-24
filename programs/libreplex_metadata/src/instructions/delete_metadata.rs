@@ -48,5 +48,9 @@ pub fn handler(ctx: Context<DeleteMetadata>
             can_delete_metadata = can_delete_metadata || delegated_metadata_specific_permissions_account.permissions.contains(&PermissionType::Delete)
     }
 
+    if( !can_delete_metadata) {
+        return Err(ErrorCode::MissingPermissionDeleteMetadata.into())
+    }
+
     Ok(())
 }
