@@ -9,9 +9,11 @@ pub mod update_group;
 pub mod extend_metadata;
 pub mod delegate_group_permissions;
 pub mod group_add;
+pub mod group_remove;
 pub mod create_ordinal_metadata;
 
 pub use create_group::*;
+pub use group_remove::*;
 pub use create_ordinal_metadata::*;
 pub use create_metadata::*;
 pub use delete_permissions::*;

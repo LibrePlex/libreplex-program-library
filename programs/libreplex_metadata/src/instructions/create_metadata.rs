@@ -1,4 +1,4 @@
-use crate::state::{Metadata};
+    use crate::state::{Metadata};
 use crate::{ CreateMetadataInput, MetadataEvent, MetadataEventType, assert_pda_derivation::assert_pda_derivation};
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
@@ -47,7 +47,7 @@ pub struct CreateMetadata<'info> {
 pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let mint = &mut ctx.accounts.mint;
-    let authority = &ctx.accounts.signer;
+    let authority = &ctx.accounts.authority;
     let invoked_migrator_program = &ctx.accounts.invoked_migrator_program;
 
 
@@ -87,8 +87,11 @@ fn assert_is_valid_signer<'info> (signer: &Pubkey, mint: &Pubkey, invoked_migrat
             }
 
             let seeds = [
+                b"metadata_signer",
                 mint.as_ref()
             ];
+
+            msg!("{} {}", x.key(), signer.key());
             assert_pda_derivation(&x.key(), signer, &seeds)?;
 
         },

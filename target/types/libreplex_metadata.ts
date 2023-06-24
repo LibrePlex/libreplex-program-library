@@ -132,12 +132,12 @@ export type LibreplexMetadata = {
         },
         {
           "name": "groupAuthority",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "metadata",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -171,6 +171,58 @@ export type LibreplexMetadata = {
               }
             ]
           }
+        },
+        {
+          "name": "delegatedGroupWidePermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
+        },
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "groupRemove",
+      "accounts": [
+        {
+          "name": "groupAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "delegatedGroupWidePermissions",
@@ -297,6 +349,63 @@ export type LibreplexMetadata = {
           "name": "metadataInput",
           "type": {
             "defined": "CreateMetadataInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createOrdinalMetadata",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "metadata"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "ordinal",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "metadataInput",
+          "type": {
+            "defined": "CreateOrdinalMetadataInput"
           }
         }
       ]
@@ -1473,7 +1582,8 @@ export type LibreplexMetadata = {
     },
     {
       "code": 6032,
-      "name": "Reserved32"
+      "name": "MetadataDoesNotHaveAGroup",
+      "msg": "Metadata does not have a group"
     },
     {
       "code": 6033,
@@ -1800,12 +1910,12 @@ export const IDL: LibreplexMetadata = {
         },
         {
           "name": "groupAuthority",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "metadata",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -1839,6 +1949,58 @@ export const IDL: LibreplexMetadata = {
               }
             ]
           }
+        },
+        {
+          "name": "delegatedGroupWidePermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
+        },
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "groupRemove",
+      "accounts": [
+        {
+          "name": "groupAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "delegatedGroupWidePermissions",
@@ -1965,6 +2127,63 @@ export const IDL: LibreplexMetadata = {
           "name": "metadataInput",
           "type": {
             "defined": "CreateMetadataInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createOrdinalMetadata",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "metadata"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "ordinal",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "metadataInput",
+          "type": {
+            "defined": "CreateOrdinalMetadataInput"
           }
         }
       ]
@@ -3141,7 +3360,8 @@ export const IDL: LibreplexMetadata = {
     },
     {
       "code": 6032,
-      "name": "Reserved32"
+      "name": "MetadataDoesNotHaveAGroup",
+      "msg": "Metadata does not have a group"
     },
     {
       "code": 6033,

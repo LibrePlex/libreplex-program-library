@@ -10,8 +10,17 @@ use crate::{errors::ErrorCode};
 pub struct GroupAdd<'info> {
     pub metadata_authority: Signer<'info>,
 
+    #[account(mut)]
     pub group_authority: Signer<'info>,
 
+    #[account(mut,
+        realloc = metadata.get_size() + match &metadata.group {
+            Some(x) => 0,
+            None => 32 // we need to add to the size if group doesn't yet exist
+        },
+        realloc::payer = group_authority,
+        realloc::zero = false
+    )]
     pub metadata: Box<Account<'info, Metadata>>,
 
     // Derived from the editor, the metadata's update auth and the the metadata itself
@@ -62,6 +71,9 @@ pub fn handler(ctx: Context<GroupAdd>
     if !can_edit_group || !can_edit_metadata {
         return Err(ErrorCode::InvalidPermissions.into());
     }
+
+    msg!("Setting group to {}", group.key());
+    
 
     metadata.group = Some(group.key());
     metadata.update_authority = group.key();

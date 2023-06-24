@@ -49,6 +49,10 @@ pub mod libreplex_metadata {
         instructions::group_add::handler(ctx)
     }
 
+    pub fn group_remove(ctx: Context<GroupRemove>) -> Result<()> {
+        instructions::group_remove::handler(ctx)
+    }
+
     pub fn update_permissions(ctx: Context<UpdatePermissionsDelegate>, 
         input: EditPermissionsInput) -> Result<()> {
         instructions::update_permissions::handler(ctx, input)
@@ -65,6 +69,18 @@ pub mod libreplex_metadata {
             metadata_input
         )
     }
+
+    pub fn create_ordinal_metadata(
+        ctx: Context<CreateOrdinalMetadata>,
+        metadata_input: CreateOrdinalMetadataInput,
+    ) -> Result<()> {
+        msg!("creating metadata");
+        instructions::create_ordinal_metadata::handler(
+            ctx,
+            metadata_input
+        )
+    }
+
 
     pub fn extend_metadata(
         ctx: Context<ExtendMetadata>,

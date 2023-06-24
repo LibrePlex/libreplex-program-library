@@ -99,7 +99,9 @@ pub enum ErrorCode {
 
     #[msg("Invalid signer program")]
     InvalidSignedProgram, //0x178F
-    Reserved32, //0x1790
+
+    #[msg("Metadata does not have a group")]
+    MetadataDoesNotHaveAGroup, //0x1790
     Reserved33, //0x1791
     Reserved34, //0x1792
     Reserved35, //0x1793

@@ -1,11 +1,13 @@
+
 const dotenv = require('dotenv');
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
-import { Keypair, SystemProgram, sendAndConfirmRawTransaction, sendAndConfirmTransaction } from '@solana/web3.js';
+import { Keypair, PublicKey, SystemProgram, sendAndConfirmRawTransaction, sendAndConfirmTransaction } from '@solana/web3.js';
 import { Connection, Transaction } from '@solana/web3.js';
 import { getProgramInstance } from '../program/getProgramInstance';
 import fs from 'fs';
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 import { getGroupPda } from '../pdas/getCollectionPda';
+import { getMetadataPda } from '../pdas/getMetadataPda';
 
 const { program } = require('commander');
 
@@ -65,6 +67,7 @@ group
 
     const [group] = getGroupPda(seed);
 
+    
     const {keypair, name, symbol, description, url} = options
 
     const instruction = await program.methods
@@ -91,6 +94,113 @@ group
 
 
     await sendAndConfirmTransaction(connection, transaction, [updateAuthKeypair])
+  });
+
+group.command('remove')
+  .description('Removes metadata from a group')
+  .argument('<mintId>', 'mintId to migrate')
+  .option(
+    '-k, --keypair <keypair>',
+    'keypair to use, defaults to ~/.config/solana/id.json',
+    '~/.config/solana/id.json'
+  )
+  .action(async (mintId: string, options: { 
+    keypair: string | undefined
+}) => {
+    const keyfile = JSON.parse(fs.readFileSync(options.keypair, 'utf8'));
+
+    const updateAuthKeypair = Keypair.fromSecretKey(new Uint8Array(keyfile));
+
+    console.log({uauth: updateAuthKeypair.publicKey.toBase58()})
+
+    const connection = new Connection(process.env.RPC_ENDPOINT);
+
+    const wallet = new NodeWallet(Keypair.generate());
+
+    const program = getProgramInstance(connection, wallet);
+
+    const [metadata] = getMetadataPda(new PublicKey(mintId));
+
+    
+
+    const metadataAccount = await program.account.metadata.fetch(metadata)
+
+    if( !metadataAccount.group) {
+      console.log('Metadata does not belong to a group');
+      return
+    }
+
+    const instruction = await program.methods
+      .groupRemove()
+      .accounts({
+        groupAuthority: updateAuthKeypair.publicKey,
+        delegatedGroupWidePermissions: null,
+        metadata,
+        group: metadataAccount.group,
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
+
+    const transaction = new Transaction().add(instruction);
+    transaction.feePayer = updateAuthKeypair.publicKey;
+
+
+    await sendAndConfirmTransaction(connection, transaction, [updateAuthKeypair], {
+      skipPreflight: true
+    })
+  });
+
+
+  group.command('add')
+  .description('Add metadata from a group')
+  .argument('<mintId>', 'mintId to migrate')
+  .argument('<groupId>', 'groupId to add the mint to')
+  .option(
+    '-k, --keypair <keypair>',
+    'keypair to use, defaults to ~/.config/solana/id.json',
+    '~/.config/solana/id.json'
+  )
+  .action(async (mintId: string, groupId: string, options: { 
+    keypair: string | undefined
+}) => {
+    const keyfile = JSON.parse(fs.readFileSync(options.keypair, 'utf8'));
+
+    const updateAuthKeypair = Keypair.fromSecretKey(new Uint8Array(keyfile));
+
+    console.log({uauth: updateAuthKeypair.publicKey.toBase58()})
+
+    const connection = new Connection(process.env.RPC_ENDPOINT);
+
+    const wallet = new NodeWallet(Keypair.generate());
+
+    const program = getProgramInstance(connection, wallet);
+
+    const [metadata] = getMetadataPda(new PublicKey(mintId));
+
+    
+
+    const metadataAccount = await program.account.metadata.fetch(metadata)
+
+    const instruction = await program.methods
+      .groupAdd()
+      .accounts({
+        metadataAuthority: updateAuthKeypair.publicKey,
+        groupAuthority: updateAuthKeypair.publicKey,
+        delegatedGroupWidePermissions: null,
+        delegatedMetadataSpecificPermissions: null,
+        metadata,
+        group: new PublicKey(groupId),
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
+
+    const transaction = new Transaction().add(instruction);
+    transaction.feePayer = updateAuthKeypair.publicKey;
+
+
+    await sendAndConfirmTransaction(connection, transaction, [updateAuthKeypair], {
+      skipPreflight: true
+    })
   });
 
 program.parse();
