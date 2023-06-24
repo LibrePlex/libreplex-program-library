@@ -70,6 +70,17 @@ pub mod libreplex_metadata {
         )
     }
 
+
+    
+    pub fn delete_metadata(
+        ctx: Context<DeleteMetadata>
+    ) -> Result<()> {
+        msg!("creating metadata");
+        instructions::delete_metadata::handler(
+            ctx
+        )
+    }
+
     pub fn create_ordinal_metadata(
         ctx: Context<CreateOrdinalMetadata>,
         metadata_input: CreateOrdinalMetadataInput,

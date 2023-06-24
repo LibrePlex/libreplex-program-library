@@ -47,7 +47,7 @@ pub fn handler(ctx: Context<GroupAdd>
     let metadata = &mut ctx.accounts.metadata;
 
     if metadata.group.is_some() {
-        return Err(ErrorCode::MetadataAlreadyHasAGroup.into())
+        return Err(ErrorCode::MetadataBelongsToGroup.into())
     }
 
     let group = &ctx.accounts.group;

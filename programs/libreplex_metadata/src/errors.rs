@@ -91,8 +91,8 @@ pub enum ErrorCode {
     #[msg("Bad authority")]
     BadAuthority, //0x178C
 
-    #[msg("Metadata already has a group")]
-    MetadataAlreadyHasAGroup, //0x178D
+    #[msg("Metadata belongs to a group")]
+    MetadataBelongsToGroup, //0x178D
 
     #[msg("Derived key invalid")]
     DerivedKeyInvalid, //0x178E
@@ -102,7 +102,9 @@ pub enum ErrorCode {
 
     #[msg("Metadata does not have a group")]
     MetadataDoesNotHaveAGroup, //0x1790
-    Reserved33, //0x1791
+
+    #[msg("Metadata is not mutable")]
+    MetadataIsNotMutable, //0x1791
     Reserved34, //0x1792
     Reserved35, //0x1793
     Reserved36, //0x1794

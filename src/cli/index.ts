@@ -1,4 +1,5 @@
 
+
 const dotenv = require('dotenv');
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 import { Keypair, PublicKey, SystemProgram, sendAndConfirmRawTransaction, sendAndConfirmTransaction } from '@solana/web3.js';
@@ -15,6 +16,54 @@ program
   .name('libre-cli')
   .description('CLI to some JavaScript string utilities')
   .version('0.1.0');
+
+const metadata = program.command('metadata');
+
+metadata
+.command('delete')
+.description('Deletes libre metadata instance')
+.argument('<mintId>', 'mintId to migrate')
+.option(
+  '-k, --keypair <keypair>',
+  'keypair to use, defaults to ~/.config/solana/id.json',
+  '~/.config/solana/id.json'
+)
+.action(async (mintId: string, options: { 
+  keypair: string | undefined
+}) => {
+  const keyfile = JSON.parse(fs.readFileSync(options.keypair, 'utf8'));
+
+  const updateAuthKeypair = Keypair.fromSecretKey(new Uint8Array(keyfile));
+
+  console.log({uauth: updateAuthKeypair.publicKey.toBase58()})
+
+  const connection = new Connection(process.env.RPC_ENDPOINT);
+
+  const wallet = new NodeWallet(Keypair.generate());
+
+  const program = getProgramInstance(connection, wallet);
+
+
+  const [metadata] = getMetadataPda(new PublicKey(mintId));
+  
+
+
+  const instruction = await program.methods
+    .deleteMetadata()
+    .accounts({
+      metadataAuthority: updateAuthKeypair.publicKey,
+      metadata,
+      delegatedMetadataSpecificPermissions: null,
+      systemProgram: SystemProgram.programId,
+    })
+    .instruction();
+
+  const transaction = new Transaction().add(instruction);
+  transaction.feePayer = updateAuthKeypair.publicKey;
+
+
+  await sendAndConfirmTransaction(connection, transaction, [updateAuthKeypair])
+});
 
 const group = program.command('group');
 
@@ -152,7 +201,7 @@ group.command('remove')
 
 
   group.command('add')
-  .description('Add metadata from a group')
+  .description('Add metadata to a group')
   .argument('<mintId>', 'mintId to migrate')
   .argument('<groupId>', 'groupId to add the mint to')
   .option(

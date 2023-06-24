@@ -1,5 +1,5 @@
 export type LibreplexMetadata = {
-  "version": "0.4.0",
+  "version": "0.4.1",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -352,6 +352,59 @@ export type LibreplexMetadata = {
           }
         }
       ]
+    },
+    {
+      "name": "deleteMetadata",
+      "accounts": [
+        {
+          "name": "metadataAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "metadata_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "createOrdinalMetadata",
@@ -1280,6 +1333,9 @@ export type LibreplexMetadata = {
             "name": "Update"
           },
           {
+            "name": "Delete"
+          },
+          {
             "name": "AddToGroup"
           }
         ]
@@ -1567,8 +1623,8 @@ export type LibreplexMetadata = {
     },
     {
       "code": 6029,
-      "name": "MetadataAlreadyHasAGroup",
-      "msg": "Metadata already has a group"
+      "name": "MetadataBelongsToGroup",
+      "msg": "Metadata belongs to a group"
     },
     {
       "code": 6030,
@@ -1587,7 +1643,8 @@ export type LibreplexMetadata = {
     },
     {
       "code": 6033,
-      "name": "Reserved33"
+      "name": "MetadataIsNotMutable",
+      "msg": "Metadata is not mutable"
     },
     {
       "code": 6034,
@@ -1777,7 +1834,7 @@ export type LibreplexMetadata = {
 };
 
 export const IDL: LibreplexMetadata = {
-  "version": "0.4.0",
+  "version": "0.4.1",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -2130,6 +2187,59 @@ export const IDL: LibreplexMetadata = {
           }
         }
       ]
+    },
+    {
+      "name": "deleteMetadata",
+      "accounts": [
+        {
+          "name": "metadataAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "metadata_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "createOrdinalMetadata",
@@ -3058,6 +3168,9 @@ export const IDL: LibreplexMetadata = {
             "name": "Update"
           },
           {
+            "name": "Delete"
+          },
+          {
             "name": "AddToGroup"
           }
         ]
@@ -3345,8 +3458,8 @@ export const IDL: LibreplexMetadata = {
     },
     {
       "code": 6029,
-      "name": "MetadataAlreadyHasAGroup",
-      "msg": "Metadata already has a group"
+      "name": "MetadataBelongsToGroup",
+      "msg": "Metadata belongs to a group"
     },
     {
       "code": 6030,
@@ -3365,7 +3478,8 @@ export const IDL: LibreplexMetadata = {
     },
     {
       "code": 6033,
-      "name": "Reserved33"
+      "name": "MetadataIsNotMutable",
+      "msg": "Metadata is not mutable"
     },
     {
       "code": 6034,
