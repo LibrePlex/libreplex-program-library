@@ -1,5 +1,5 @@
 export type LibreplexMetadata = {
-  "version": "0.4.1",
+  "version": "0.4.3",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -1834,7 +1834,7 @@ export type LibreplexMetadata = {
 };
 
 export const IDL: LibreplexMetadata = {
-  "version": "0.4.1",
+  "version": "0.4.3",
   "name": "libreplex_metadata",
   "instructions": [
     {

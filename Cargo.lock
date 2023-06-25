@@ -2064,6 +2064,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "libreplex_marketplace"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "assert_matches",
+ "mocha",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+]
+
+[[package]]
 name = "libreplex_metadata"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
