@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "libreplex_market",
+  "name": "libreplex_shop",
   "instructions": [
     {
       "name": "list",
@@ -100,7 +100,7 @@
       "name": "execute",
       "accounts": [
         {
-          "name": "lister",
+          "name": "seller",
           "isMut": true,
           "isSigner": false
         },
@@ -108,6 +108,17 @@
           "name": "mint",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "listing",
@@ -126,6 +137,21 @@
         },
         {
           "name": "buyerTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "listerPaymentTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "buyerPaymentTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "paymentMint",
           "isMut": false,
           "isSigner": false
         },
@@ -171,6 +197,10 @@
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "escrowWalletBump",
+            "type": "u8"
           }
         ]
       }
@@ -191,6 +221,10 @@
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "escrowWalletBump",
+            "type": "u8"
           }
         ]
       }

@@ -1,12 +1,12 @@
 [package]
-name = "libreplex_default_renderer"
-version = "0.1.2"
+name = "libreplex_shop"
+version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "libreplex_default_renderer"
+name = "libreplex_shop"
 
 [features]
 no-entrypoint = []
@@ -17,15 +17,13 @@ default = []
 
 [dependencies]
 anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
-libreplex_metadata = { version='0.3.4', features =["no-entrypoint"]}
-
-bmp = "0.5.0"
-
+anchor-spl = {version = "0.28.0"}
+libreplex_shared = {version = "*", path="../libreplex_shared"}
+libreplex_metadata = {version = "0.4.3", features =["cpi", "no-entrypoint"]}
+ 
 [dev-dependencies]
 mocha = "0.1.1"
 assert_matches = "1.5.0"
 solana-program-test = ">1.14"
 solana-sdk = ">1.14"
 solana-program = ">1.14"
-
-

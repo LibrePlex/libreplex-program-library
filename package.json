@@ -15,7 +15,7 @@
     "libre-cli": "ts-node src/cli/index.ts",
     "libreplex_metadata:deploy:localnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster http://localhost:8899 --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_metadata:deploy:devnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_marketplace:deploy:devnet": "anchor build -p libreplex_marketplace && anchor deploy -p libreplex_marketplace --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_shop:deploy:devnet": "anchor build -p libreplex_shop && anchor deploy -p libreplex_shop --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_metadata:deploy:mainnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "lint": "next lint"
   },

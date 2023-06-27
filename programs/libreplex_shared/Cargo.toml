@@ -1,0 +1,21 @@
+[package]
+name = "libreplex_shared"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "libreplex_shared"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "^0.28"
+anchor-spl = "^0.28"
+solana-program = "~1.16"

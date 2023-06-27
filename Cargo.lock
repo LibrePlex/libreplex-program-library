@@ -2031,22 +2031,11 @@ dependencies = [
  "anchor-lang",
  "assert_matches",
  "bmp",
- "libreplex_metadata 0.3.2",
+ "libreplex_metadata 0.3.4",
  "mocha",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
-]
-
-[[package]]
-name = "libreplex_inscriptions"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ffa9370323a1dbfe63f1dc78869b0a1668a68f32af1f8c51d5438701e1973a1"
-dependencies = [
- "anchor-attribute-event",
- "anchor-derive-accounts",
- "anchor-lang",
 ]
 
 [[package]]
@@ -2064,27 +2053,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "libreplex_marketplace"
-version = "0.1.0"
+name = "libreplex_inscriptions"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0dd52507b2e7783f2bf63c00a79d0c6c8fda77ddcc14a41641cccf5ce8225a00"
 dependencies = [
+ "anchor-attribute-event",
+ "anchor-derive-accounts",
  "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
 ]
 
 [[package]]
 name = "libreplex_metadata"
-version = "0.3.2"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a39dc1cfbe889472ec2c3e0c9c2ca3e3c56399030c83f1290256f224396e1a7b"
+checksum = "38165ae9076bb9582d66869dc1a14d44bbba0c2b10ac4cb4fca33f3cf56d2bdc"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "libreplex_inscriptions 0.1.4",
+ "libreplex_inscriptions 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -2095,6 +2082,41 @@ dependencies = [
  "anchor-spl",
  "assert_matches",
  "libreplex_inscriptions 0.1.6",
+ "mocha",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+]
+
+[[package]]
+name = "libreplex_metadata"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "822d040c3bfd25659f21f5c2ca4de67055b771c4f8973883c5a75b419ff9db82"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "libreplex_inscriptions 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "libreplex_shared"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "solana-program",
+]
+
+[[package]]
+name = "libreplex_shop"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "assert_matches",
+ "libreplex_metadata 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libreplex_shared",
  "mocha",
  "solana-program",
  "solana-program-test",

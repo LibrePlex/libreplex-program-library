@@ -1,6 +1,6 @@
-export type LibreplexMarket = {
+export type LibreplexShop = {
   "version": "0.1.0",
-  "name": "libreplex_market",
+  "name": "libreplex_shop",
   "instructions": [
     {
       "name": "list",
@@ -100,7 +100,7 @@ export type LibreplexMarket = {
       "name": "execute",
       "accounts": [
         {
-          "name": "lister",
+          "name": "seller",
           "isMut": true,
           "isSigner": false
         },
@@ -108,6 +108,17 @@ export type LibreplexMarket = {
           "name": "mint",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "listing",
@@ -126,6 +137,21 @@ export type LibreplexMarket = {
         },
         {
           "name": "buyerTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "listerPaymentTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "buyerPaymentTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "paymentMint",
           "isMut": false,
           "isSigner": false
         },
@@ -171,6 +197,10 @@ export type LibreplexMarket = {
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "escrowWalletBump",
+            "type": "u8"
           }
         ]
       }
@@ -191,6 +221,10 @@ export type LibreplexMarket = {
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "escrowWalletBump",
+            "type": "u8"
           }
         ]
       }
@@ -240,9 +274,9 @@ export type LibreplexMarket = {
   ]
 };
 
-export const IDL: LibreplexMarket = {
+export const IDL: LibreplexShop = {
   "version": "0.1.0",
-  "name": "libreplex_market",
+  "name": "libreplex_shop",
   "instructions": [
     {
       "name": "list",
@@ -342,7 +376,7 @@ export const IDL: LibreplexMarket = {
       "name": "execute",
       "accounts": [
         {
-          "name": "lister",
+          "name": "seller",
           "isMut": true,
           "isSigner": false
         },
@@ -350,6 +384,17 @@ export const IDL: LibreplexMarket = {
           "name": "mint",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "listing",
@@ -368,6 +413,21 @@ export const IDL: LibreplexMarket = {
         },
         {
           "name": "buyerTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "listerPaymentTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "buyerPaymentTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "paymentMint",
           "isMut": false,
           "isSigner": false
         },
@@ -413,6 +473,10 @@ export const IDL: LibreplexMarket = {
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "escrowWalletBump",
+            "type": "u8"
           }
         ]
       }
@@ -433,6 +497,10 @@ export const IDL: LibreplexMarket = {
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "escrowWalletBump",
+            "type": "u8"
           }
         ]
       }
