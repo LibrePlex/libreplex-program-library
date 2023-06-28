@@ -34,6 +34,10 @@ pub mod librecreator {
         )
     }
 
+    pub fn update(ctx: Context<UpdateCreator>, input: UpdateInput) -> Result<()> {
+        instructions::update::handler(ctx, input)
+    }
+
 
     pub fn mint(ctx: Context<Mint>,) -> Result<()> {
         instructions::mint::handler(ctx)

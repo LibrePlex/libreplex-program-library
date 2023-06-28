@@ -32,7 +32,7 @@ pub enum AssetUrl {
 
 #[account]
 pub struct Creator {
-    pub owner: Pubkey,
+    pub update_authority: Pubkey,
     // Only this key can mint
     pub mint_authority: Pubkey,
     pub seed: Pubkey,

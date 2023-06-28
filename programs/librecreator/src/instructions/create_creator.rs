@@ -44,7 +44,7 @@ pub struct CreateCreator<'info> {
 pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result<()> {
     let creator = &mut ctx.accounts.creator;
 
-    creator.owner = ctx.accounts.signer.key();
+    creator.update_authority = ctx.accounts.signer.key();
     creator.seed = input.seed.key();
     creator.supply = input.max_mints;
     creator.symbol = input.symbol;
