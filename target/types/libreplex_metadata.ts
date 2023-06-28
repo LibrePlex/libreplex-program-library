@@ -472,6 +472,11 @@ export type LibreplexMetadata = {
           "isSigner": true
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "metadata",
           "isMut": false,
           "isSigner": false,
@@ -841,12 +846,6 @@ export type LibreplexMetadata = {
               "option": {
                 "defined": "Royalties"
               }
-            }
-          },
-          {
-            "name": "invokedPermission",
-            "type": {
-              "defined": "PermissionType"
             }
           }
         ]
@@ -2307,6 +2306,11 @@ export const IDL: LibreplexMetadata = {
           "isSigner": true
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "metadata",
           "isMut": false,
           "isSigner": false,
@@ -2676,12 +2680,6 @@ export const IDL: LibreplexMetadata = {
               "option": {
                 "defined": "Royalties"
               }
-            }
-          },
-          {
-            "name": "invokedPermission",
-            "type": {
-              "defined": "PermissionType"
             }
           }
         ]

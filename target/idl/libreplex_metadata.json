@@ -472,6 +472,11 @@
           "isSigner": true
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "metadata",
           "isMut": false,
           "isSigner": false,
@@ -841,12 +846,6 @@
               "option": {
                 "defined": "Royalties"
               }
-            }
-          },
-          {
-            "name": "invokedPermission",
-            "type": {
-              "defined": "PermissionType"
             }
           }
         ]

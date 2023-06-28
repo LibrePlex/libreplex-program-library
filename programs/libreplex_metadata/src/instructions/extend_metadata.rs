@@ -18,7 +18,6 @@ struct ExtendMetadataEvent {
 pub struct ExtendMetadataInput {
     pub attributes: Vec<u8>,  // base: 4
     pub royalties: Option<Royalties>,
-    pub invoked_permission: PermissionType,
 }
 
 impl ExtendMetadataInput {
@@ -75,6 +74,9 @@ pub struct ExtendMetadata<'info> {
     #[account(mut)]
     pub update_authority: Signer<'info>,
 
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
     #[account(seeds = [b"metadata".as_ref(), mint.key().as_ref()],
               bump, has_one = update_authority)]
     pub metadata: Box<Account<'info, Metadata>>,
@@ -98,7 +100,6 @@ pub fn handler(
     let ExtendMetadataInput {
         attributes,
         royalties,
-        invoked_permission,
     } = extend_metadata_input;
 
 
