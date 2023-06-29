@@ -3,18 +3,18 @@ use solana_program_test::*;
 
 mod permissions {
     use anchor_lang::{InstructionData, system_program, ToAccountMetas, Key};
-    use librecreator::{accounts, instruction, instructions::CreateCreatorInput};
-    use libreplex::{accounts as libreaccounts, instruction as libreinstruction, GroupInput};
-    use libreplex::GROUP;
+    use libreplex_creator::{accounts, instruction, instructions::CreateCreatorInput};
+    use libreplex_metadata::{accounts as libreaccounts, instruction as libreinstruction, GroupInput};
+    use libreplex_metadata::GROUP;
     use solana_program::{instruction::Instruction, pubkey::Pubkey};
     use solana_sdk::{transaction::Transaction, signer::Signer, signature::Keypair};
 
     use super::*;
     #[tokio::test]
     async fn create_creator() {
-        let mut program = ProgramTest::new("creator", librecreator::ID, processor!(librecreator::entry));
+        let mut program = ProgramTest::new("creator", libreplex_creator::ID, processor!(libreplex_creator::entry));
         
-        program.add_program("libreplex", libreplex::ID, processor!(libreplex::entry));
+        program.add_program("libreplex", libreplex_metadata::ID, processor!(libreplex_metadata::entry));
         
         let mut context =  program.start_with_context().await;
         let authority = context.payer.pubkey();
@@ -22,14 +22,13 @@ mod permissions {
         let group_seed = Keypair::new();
         
         let group 
-            = Pubkey::find_program_address(&[GROUP.as_ref(), group_seed.pubkey().as_ref()], &libreplex::ID).0;
+            = Pubkey::find_program_address(&[GROUP.as_ref(), group_seed.pubkey().as_ref()], &libreplex_metadata::ID).0;
 
 
-        let group_permissions = Pubkey::find_program_address(&[b"permissions", group.as_ref(), authority.as_ref()], &libreplex::ID).0;
+        let group_permissions = Pubkey::find_program_address(&[b"permissions", group.as_ref(), authority.as_ref()], &libreplex_metadata::ID).0;
 
         let create_group_accounts = libreaccounts::CreateGroup {
             authority,
-            permissions: group_permissions,
             group,
             seed: group_seed.pubkey(),
             system_program: system_program::ID
@@ -41,16 +40,16 @@ mod permissions {
                 symbol: "".to_owned(),
                 url: "".to_owned(),
                 description: "".to_owned(),
-                metadata_render_mode: libreplex::MetadataRenderMode::None,
                 royalties: None,
                 attribute_types: vec![],
-                permitted_signers: vec![]
+                permitted_signers: vec![],
+                template_configuration: libreplex_metadata::TemplateConfiguration::None
             }
         };
 
         let create_group_ix =  Instruction {
             data: create_group_data.data(),
-            program_id: libreplex::ID,
+            program_id: libreplex_metadata::ID,
             accounts: create_group_accounts
         };
 

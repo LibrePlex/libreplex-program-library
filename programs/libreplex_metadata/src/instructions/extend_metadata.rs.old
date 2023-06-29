@@ -15,16 +15,16 @@ struct ExtendMetadataEvent {
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct ExtendMetadataInput {
+pub struct MetadataExtensionInput {
     pub attributes: Vec<u8>,  // base: 4
     pub royalties: Option<Royalties>,
 }
 
-impl ExtendMetadataInput {
+impl MetadataExtensionInput {
     pub const BASE_SIZE: usize = 4 + 1 + 1;
 
     pub fn get_size(&self) -> usize {
-        ExtendMetadataInput::BASE_SIZE
+        MetadataExtensionInput::BASE_SIZE
             + self.attributes.len()
             + match &self.royalties {
                 Some(x) => x.get_size(),
@@ -34,7 +34,7 @@ impl ExtendMetadataInput {
 }
 
 pub fn validate_extend_metadata_input(
-    metadata_input: &ExtendMetadataInput,
+    metadata_input: &MetadataExtensionInput,
     group: &Group,
 ) -> Result<()> {
   
@@ -68,36 +68,14 @@ pub fn validate_extend_metadata_input(
     Ok(())
 }
 
-#[derive(Accounts)]
-#[instruction(extend_metadata_input: ExtendMetadataInput)]
-pub struct ExtendMetadata<'info> {
-    #[account(mut)]
-    pub update_authority: Signer<'info>,
-
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
-    #[account(seeds = [b"metadata".as_ref(), mint.key().as_ref()],
-              bump, has_one = update_authority)]
-    pub metadata: Box<Account<'info, Metadata>>,
-
-    #[account(init, seeds = [b"metadata_extension".as_ref(), metadata.key().as_ref()],
-              bump, payer = update_authority, space = MetadataExtension::BASE_SIZE + extend_metadata_input.get_size())]
-    pub metadata_extended: Box<Account<'info, MetadataExtension>>,
-
-    pub mint: Account<'info, Mint>,
-
-    pub system_program: Program<'info, System>,
-}
-
 pub fn handler(
     ctx: Context<ExtendMetadata>,
-    extend_metadata_input: ExtendMetadataInput,
+    extend_metadata_input: MetadataExtensionInput,
 ) -> Result<()> {
     let metadata = &ctx.accounts.metadata;
     let metadata_extended = &mut ctx.accounts.metadata_extended;
 
-    let ExtendMetadataInput {
+    let MetadataExtensionInput {
         attributes,
         royalties,
     } = extend_metadata_input;

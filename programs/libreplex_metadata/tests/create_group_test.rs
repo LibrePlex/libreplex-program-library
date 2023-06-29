@@ -31,7 +31,7 @@ mod permissions {
         .to_account_metas(None);
 
         let create_collection = libreplex_metadata::instruction::CreateGroup {
-            collection_input: GroupInput {
+            group_input: GroupInput {
                 // collection_url: "COOLIO.COM".to_string(),
                 name: "COOLIO COLLECTION".to_string(),
                 url: "https://collection-url.com".to_owned(),

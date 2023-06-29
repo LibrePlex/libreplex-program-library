@@ -42,7 +42,7 @@ export type LibreplexMetadata = {
       ],
       "args": [
         {
-          "name": "collectionInput",
+          "name": "groupInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -115,7 +115,7 @@ export type LibreplexMetadata = {
       ],
       "args": [
         {
-          "name": "collectionInput",
+          "name": "groupInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -464,126 +464,6 @@ export type LibreplexMetadata = {
       ]
     },
     {
-      "name": "extendMetadata",
-      "accounts": [
-        {
-          "name": "updateAuthority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "metadata",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          },
-          "relations": [
-            "update_authority"
-          ]
-        },
-        {
-          "name": "metadataExtended",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata_extension"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              }
-            ]
-          }
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "metadataInput",
-          "type": {
-            "defined": "ExtendMetadataInput"
-          }
-        }
-      ]
-    },
-    {
-      "name": "deleteMetadataExtension",
-      "accounts": [
-        {
-          "name": "updateAuthority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "metadata",
-          "isMut": false,
-          "isSigner": false,
-          "relations": [
-            "update_authority"
-          ]
-        },
-        {
-          "name": "metadataExtension",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata_extension"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "deletePermissions",
       "accounts": [
         {
@@ -678,44 +558,6 @@ export type LibreplexMetadata = {
       }
     },
     {
-      "name": "metadataExtension",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "metadata",
-            "type": "publicKey"
-          },
-          {
-            "name": "attributes",
-            "type": "bytes"
-          },
-          {
-            "name": "signers",
-            "type": {
-              "vec": "publicKey"
-            }
-          },
-          {
-            "name": "royalties",
-            "type": {
-              "option": {
-                "defined": "Royalties"
-              }
-            }
-          },
-          {
-            "name": "license",
-            "type": {
-              "option": {
-                "defined": "License"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "metadata",
       "type": {
         "kind": "struct",
@@ -760,6 +602,20 @@ export type LibreplexMetadata = {
             "name": "group",
             "type": {
               "option": "publicKey"
+            }
+          },
+          {
+            "name": "license",
+            "type": {
+              "option": {
+                "defined": "License"
+              }
+            }
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
             }
           }
         ]
@@ -827,26 +683,6 @@ export type LibreplexMetadata = {
           {
             "name": "updateAuthority",
             "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ExtendMetadataInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "attributes",
-            "type": "bytes"
-          },
-          {
-            "name": "royalties",
-            "type": {
-              "option": {
-                "defined": "Royalties"
-              }
-            }
           }
         ]
       }
@@ -984,6 +820,26 @@ export type LibreplexMetadata = {
       }
     },
     {
+      "name": "MetadataExtensionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attributes",
+            "type": "bytes"
+          },
+          {
+            "name": "royalties",
+            "type": {
+              "option": {
+                "defined": "Royalties"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "CreateMetadataInput",
       "type": {
         "kind": "struct",
@@ -1011,6 +867,20 @@ export type LibreplexMetadata = {
           {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "license",
+            "type": {
+              "option": {
+                "defined": "License"
+              }
+            }
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
+            }
           }
         ]
       }
@@ -1237,6 +1107,40 @@ export type LibreplexMetadata = {
       }
     },
     {
+      "name": "MetadataExtension",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Nft",
+            "fields": [
+              {
+                "name": "attributes",
+                "type": "bytes"
+              },
+              {
+                "name": "signers",
+                "type": {
+                  "vec": "publicKey"
+                }
+              },
+              {
+                "name": "royalties",
+                "type": {
+                  "option": {
+                    "defined": "Royalties"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "name": "Asset",
       "type": {
         "kind": "enum",
@@ -1342,21 +1246,6 @@ export type LibreplexMetadata = {
     }
   ],
   "events": [
-    {
-      "name": "ExtendMetadataEvent",
-      "fields": [
-        {
-          "name": "id",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "mint",
-          "type": "publicKey",
-          "index": false
-        }
-      ]
-    },
     {
       "name": "EditCollectionEvent",
       "fields": [
@@ -1876,7 +1765,7 @@ export const IDL: LibreplexMetadata = {
       ],
       "args": [
         {
-          "name": "collectionInput",
+          "name": "groupInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -1949,7 +1838,7 @@ export const IDL: LibreplexMetadata = {
       ],
       "args": [
         {
-          "name": "collectionInput",
+          "name": "groupInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -2298,126 +2187,6 @@ export const IDL: LibreplexMetadata = {
       ]
     },
     {
-      "name": "extendMetadata",
-      "accounts": [
-        {
-          "name": "updateAuthority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "metadata",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          },
-          "relations": [
-            "update_authority"
-          ]
-        },
-        {
-          "name": "metadataExtended",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata_extension"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              }
-            ]
-          }
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "metadataInput",
-          "type": {
-            "defined": "ExtendMetadataInput"
-          }
-        }
-      ]
-    },
-    {
-      "name": "deleteMetadataExtension",
-      "accounts": [
-        {
-          "name": "updateAuthority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "metadata",
-          "isMut": false,
-          "isSigner": false,
-          "relations": [
-            "update_authority"
-          ]
-        },
-        {
-          "name": "metadataExtension",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata_extension"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "deletePermissions",
       "accounts": [
         {
@@ -2512,44 +2281,6 @@ export const IDL: LibreplexMetadata = {
       }
     },
     {
-      "name": "metadataExtension",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "metadata",
-            "type": "publicKey"
-          },
-          {
-            "name": "attributes",
-            "type": "bytes"
-          },
-          {
-            "name": "signers",
-            "type": {
-              "vec": "publicKey"
-            }
-          },
-          {
-            "name": "royalties",
-            "type": {
-              "option": {
-                "defined": "Royalties"
-              }
-            }
-          },
-          {
-            "name": "license",
-            "type": {
-              "option": {
-                "defined": "License"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "metadata",
       "type": {
         "kind": "struct",
@@ -2594,6 +2325,20 @@ export const IDL: LibreplexMetadata = {
             "name": "group",
             "type": {
               "option": "publicKey"
+            }
+          },
+          {
+            "name": "license",
+            "type": {
+              "option": {
+                "defined": "License"
+              }
+            }
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
             }
           }
         ]
@@ -2661,26 +2406,6 @@ export const IDL: LibreplexMetadata = {
           {
             "name": "updateAuthority",
             "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ExtendMetadataInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "attributes",
-            "type": "bytes"
-          },
-          {
-            "name": "royalties",
-            "type": {
-              "option": {
-                "defined": "Royalties"
-              }
-            }
           }
         ]
       }
@@ -2818,6 +2543,26 @@ export const IDL: LibreplexMetadata = {
       }
     },
     {
+      "name": "MetadataExtensionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attributes",
+            "type": "bytes"
+          },
+          {
+            "name": "royalties",
+            "type": {
+              "option": {
+                "defined": "Royalties"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "CreateMetadataInput",
       "type": {
         "kind": "struct",
@@ -2845,6 +2590,20 @@ export const IDL: LibreplexMetadata = {
           {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "license",
+            "type": {
+              "option": {
+                "defined": "License"
+              }
+            }
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
+            }
           }
         ]
       }
@@ -3071,6 +2830,40 @@ export const IDL: LibreplexMetadata = {
       }
     },
     {
+      "name": "MetadataExtension",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Nft",
+            "fields": [
+              {
+                "name": "attributes",
+                "type": "bytes"
+              },
+              {
+                "name": "signers",
+                "type": {
+                  "vec": "publicKey"
+                }
+              },
+              {
+                "name": "royalties",
+                "type": {
+                  "option": {
+                    "defined": "Royalties"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "name": "Asset",
       "type": {
         "kind": "enum",
@@ -3176,21 +2969,6 @@ export const IDL: LibreplexMetadata = {
     }
   ],
   "events": [
-    {
-      "name": "ExtendMetadataEvent",
-      "fields": [
-        {
-          "name": "id",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "mint",
-          "type": "publicKey",
-          "index": false
-        }
-      ]
-    },
     {
       "name": "EditCollectionEvent",
       "fields": [
