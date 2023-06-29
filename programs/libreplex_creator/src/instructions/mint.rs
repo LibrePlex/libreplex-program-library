@@ -134,8 +134,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         asset,
         description: creator.description.clone(),
         update_authority: creator.key(),
-        license: None,
-        extension: libreplex_metadata::MetadataExtension::Nft { attributes, signers: vec![], royalties: None }
+        extension: libreplex_metadata::MetadataExtension::Nft { attributes, signers: vec![], royalties: None, license: None }
     })?;
 
     let group_add_accounts = libreplex_metadata::cpi::accounts::GroupAdd {

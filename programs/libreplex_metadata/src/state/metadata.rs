@@ -202,7 +202,6 @@ pub struct CreateMetadataInput {
     pub asset: Asset,
     pub description: Option<String>,
     pub update_authority: Pubkey,
-    pub license: Option<License>,
     pub extension: MetadataExtension
 }
 

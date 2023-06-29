@@ -80,7 +80,6 @@ mod permissions {
                 update_authority: collection_authority,
                 symbol: "COOL".to_string(),
                 description: Some("coolio description".to_string()),
-                license: None,
                 extension: libreplex_metadata::MetadataExtension::None
             },
         };

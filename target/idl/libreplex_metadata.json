@@ -869,14 +869,6 @@
             "type": "publicKey"
           },
           {
-            "name": "license",
-            "type": {
-              "option": {
-                "defined": "License"
-              }
-            }
-          },
-          {
             "name": "extension",
             "type": {
               "defined": "MetadataExtension"
@@ -1132,6 +1124,14 @@
                 "type": {
                   "option": {
                     "defined": "Royalties"
+                  }
+                }
+              },
+              {
+                "name": "license",
+                "type": {
+                  "option": {
+                    "defined": "License"
                   }
                 }
               }

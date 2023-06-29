@@ -869,14 +869,6 @@ export type LibreplexMetadata = {
             "type": "publicKey"
           },
           {
-            "name": "license",
-            "type": {
-              "option": {
-                "defined": "License"
-              }
-            }
-          },
-          {
             "name": "extension",
             "type": {
               "defined": "MetadataExtension"
@@ -1132,6 +1124,14 @@ export type LibreplexMetadata = {
                 "type": {
                   "option": {
                     "defined": "Royalties"
+                  }
+                }
+              },
+              {
+                "name": "license",
+                "type": {
+                  "option": {
+                    "defined": "License"
                   }
                 }
               }
@@ -2592,14 +2592,6 @@ export const IDL: LibreplexMetadata = {
             "type": "publicKey"
           },
           {
-            "name": "license",
-            "type": {
-              "option": {
-                "defined": "License"
-              }
-            }
-          },
-          {
             "name": "extension",
             "type": {
               "defined": "MetadataExtension"
@@ -2855,6 +2847,14 @@ export const IDL: LibreplexMetadata = {
                 "type": {
                   "option": {
                     "defined": "Royalties"
+                  }
+                }
+              },
+              {
+                "name": "license",
+                "type": {
+                  "option": {
+                    "defined": "License"
                   }
                 }
               }
