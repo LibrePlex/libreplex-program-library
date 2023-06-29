@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0",
-  "name": "libreplex_inscriptions",
+  "version": "0.1.6",
+  "name": "inscriptions",
   "instructions": [
     {
       "name": "createInscription",
@@ -36,7 +36,35 @@
       ]
     },
     {
-      "name": "appendToInscription",
+      "name": "resizeInscription",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "ResizeInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "writeToInscription",
       "accounts": [
         {
           "name": "signer",
@@ -58,7 +86,7 @@
         {
           "name": "input",
           "type": {
-            "defined": "AppendToInscriptionInput"
+            "defined": "WriteToInscriptionInput"
           }
         }
       ]
@@ -79,11 +107,7 @@
             "type": "publicKey"
           },
           {
-            "name": "dataLengthCurrent",
-            "type": "u32"
-          },
-          {
-            "name": "dataLengthMax",
+            "name": "size",
             "type": "u32"
           }
         ]
@@ -91,18 +115,6 @@
     }
   ],
   "types": [
-    {
-      "name": "AppendToInscriptionInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "appendData",
-            "type": "bytes"
-          }
-        ]
-      }
-    },
     {
       "name": "CreateInscriptionInput",
       "type": {
@@ -113,8 +125,74 @@
             "type": "u32"
           },
           {
-            "name": "initialData",
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResizeInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "change",
+            "type": {
+              "defined": "Change"
+            }
+          },
+          {
+            "name": "expectedStartSize",
+            "type": "u32"
+          },
+          {
+            "name": "targetSize",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WriteToInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "data",
             "type": "bytes"
+          },
+          {
+            "name": "startPos",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Change",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Reduce",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u32"
+              }
+            ]
+          },
+          {
+            "name": "Increase",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u32"
+              }
+            ]
           }
         ]
       }
@@ -128,7 +206,10 @@
             "name": "Create"
           },
           {
-            "name": "Append"
+            "name": "Update"
+          },
+          {
+            "name": "Resize"
           }
         ]
       }
@@ -151,6 +232,18 @@
           "index": false
         }
       ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "BadAuthority",
+      "msg": "Bad authority"
+    },
+    {
+      "code": 6001,
+      "name": "MaxSizeExceeded",
+      "msg": "Max size exceeded"
     }
   ]
 }

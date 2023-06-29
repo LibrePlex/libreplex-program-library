@@ -1,5 +1,5 @@
 export type LibreplexMetadata = {
-  "version": "0.1.0",
+  "version": "0.4.3",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -132,12 +132,12 @@ export type LibreplexMetadata = {
         },
         {
           "name": "groupAuthority",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "metadata",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -171,6 +171,58 @@ export type LibreplexMetadata = {
               }
             ]
           }
+        },
+        {
+          "name": "delegatedGroupWidePermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
+        },
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "groupRemove",
+      "accounts": [
+        {
+          "name": "groupAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "delegatedGroupWidePermissions",
@@ -264,6 +316,118 @@ export type LibreplexMetadata = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "Mint",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "invokedMigratorProgram",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "metadataInput",
+          "type": {
+            "defined": "CreateMetadataInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deleteMetadata",
+      "accounts": [
+        {
+          "name": "metadataAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "metadata_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createOrdinalMetadata",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "metadata"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
                 "path": "mint"
               }
             ]
@@ -275,7 +439,17 @@ export type LibreplexMetadata = {
           "isSigner": true
         },
         {
+          "name": "ordinal",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -284,7 +458,7 @@ export type LibreplexMetadata = {
         {
           "name": "metadataInput",
           "type": {
-            "defined": "CreateMetadataInput"
+            "defined": "CreateOrdinalMetadataInput"
           }
         }
       ]
@@ -621,6 +795,38 @@ export type LibreplexMetadata = {
   ],
   "types": [
     {
+      "name": "CreateOrdinalMetadataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "inscriptionInput",
+            "type": {
+              "defined": "CreateInscriptionInput"
+            }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExtendMetadataInput",
       "type": {
         "kind": "struct",
@@ -736,7 +942,7 @@ export type LibreplexMetadata = {
             "type": "string"
           },
           {
-            "name": "metadataRenderMode",
+            "name": "templateConfiguration",
             "type": {
               "defined": "TemplateConfiguration"
             }
@@ -1127,6 +1333,9 @@ export type LibreplexMetadata = {
             "name": "Update"
           },
           {
+            "name": "Delete"
+          },
+          {
             "name": "AddToGroup"
           }
         ]
@@ -1269,12 +1478,363 @@ export type LibreplexMetadata = {
           "index": false
         }
       ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ArithmeticError",
+      "msg": "failed to perform some math operation safely"
+    },
+    {
+      "code": 6001,
+      "name": "UnknownInstruction",
+      "msg": "unknown instruction called"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidParameter",
+      "msg": "invalid parameter passed in"
+    },
+    {
+      "code": 6003,
+      "name": "AnchorSerializationIssue",
+      "msg": "anchor serialization issue"
+    },
+    {
+      "code": 6004,
+      "name": "AmountMismatch",
+      "msg": "two amounts that are supposed to be equal are not"
+    },
+    {
+      "code": 6005,
+      "name": "AccountDiscriminatorMismatch",
+      "msg": "account discriminator doesn't match"
+    },
+    {
+      "code": 6006,
+      "name": "Reserved6"
+    },
+    {
+      "code": 6007,
+      "name": "Reserved7"
+    },
+    {
+      "code": 6008,
+      "name": "Reserved8"
+    },
+    {
+      "code": 6009,
+      "name": "Reserved9"
+    },
+    {
+      "code": 6010,
+      "name": "Reserved10"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidStringInput",
+      "msg": "A constraint on max string length was violated"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidBpsInput",
+      "msg": "The value of the basis points input must not exceed 10,000"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidPermissions",
+      "msg": "Invalid Permissions"
+    },
+    {
+      "code": 6014,
+      "name": "MissingPermissionAdmin",
+      "msg": "Missing admin permission"
+    },
+    {
+      "code": 6015,
+      "name": "MissingPermissionEditCollection",
+      "msg": "Missing edit collection permission"
+    },
+    {
+      "code": 6016,
+      "name": "MissingPermissionDeleteCollection",
+      "msg": "Missing delete collection permission"
+    },
+    {
+      "code": 6017,
+      "name": "MissingPermissionCreateMetadata",
+      "msg": "Missing create metadata permission"
+    },
+    {
+      "code": 6018,
+      "name": "MissingPermissionEditMetadata",
+      "msg": "Missing edit metadata permission"
+    },
+    {
+      "code": 6019,
+      "name": "MissingPermissionDeleteMetadata",
+      "msg": "Missing delete metadata permission"
+    },
+    {
+      "code": 6020,
+      "name": "CollectionExists",
+      "msg": "Collection exists"
+    },
+    {
+      "code": 6021,
+      "name": "IncompatibleMetadataType",
+      "msg": "Incompatible metadata type"
+    },
+    {
+      "code": 6022,
+      "name": "CollectionHasItems",
+      "msg": "Collection has items"
+    },
+    {
+      "code": 6023,
+      "name": "PermissionAccountEmpty",
+      "msg": "Permission account is empty"
+    },
+    {
+      "code": 6024,
+      "name": "InvalidBump",
+      "msg": "Invalid bump"
+    },
+    {
+      "code": 6025,
+      "name": "RoyaltiesBadSum",
+      "msg": "Royalties must add up to 10000"
+    },
+    {
+      "code": 6026,
+      "name": "UnexpectedPermissionsKey",
+      "msg": "Unexpected permission is empty"
+    },
+    {
+      "code": 6027,
+      "name": "MaxSizeExceeded",
+      "msg": "Max size exceeded"
+    },
+    {
+      "code": 6028,
+      "name": "BadAuthority",
+      "msg": "Bad authority"
+    },
+    {
+      "code": 6029,
+      "name": "MetadataBelongsToGroup",
+      "msg": "Metadata belongs to a group"
+    },
+    {
+      "code": 6030,
+      "name": "DerivedKeyInvalid",
+      "msg": "Derived key invalid"
+    },
+    {
+      "code": 6031,
+      "name": "InvalidSignedProgram",
+      "msg": "Invalid signer program"
+    },
+    {
+      "code": 6032,
+      "name": "MetadataDoesNotHaveAGroup",
+      "msg": "Metadata does not have a group"
+    },
+    {
+      "code": 6033,
+      "name": "MetadataIsNotMutable",
+      "msg": "Metadata is not mutable"
+    },
+    {
+      "code": 6034,
+      "name": "Reserved34"
+    },
+    {
+      "code": 6035,
+      "name": "Reserved35"
+    },
+    {
+      "code": 6036,
+      "name": "Reserved36"
+    },
+    {
+      "code": 6037,
+      "name": "Reserved37"
+    },
+    {
+      "code": 6038,
+      "name": "Reserved38"
+    },
+    {
+      "code": 6039,
+      "name": "Reserved39"
+    },
+    {
+      "code": 6040,
+      "name": "Reserved40"
+    },
+    {
+      "code": 6041,
+      "name": "Reserved41"
+    },
+    {
+      "code": 6042,
+      "name": "Reserved42"
+    },
+    {
+      "code": 6043,
+      "name": "Reserved43"
+    },
+    {
+      "code": 6044,
+      "name": "Reserved44"
+    },
+    {
+      "code": 6045,
+      "name": "Reserved45"
+    },
+    {
+      "code": 6046,
+      "name": "Reserved46"
+    },
+    {
+      "code": 6047,
+      "name": "Reserved47"
+    },
+    {
+      "code": 6048,
+      "name": "Reserved48"
+    },
+    {
+      "code": 6049,
+      "name": "Reserved49"
+    },
+    {
+      "code": 6050,
+      "name": "Reserved50"
+    },
+    {
+      "code": 6051,
+      "name": "Reserved51"
+    },
+    {
+      "code": 6052,
+      "name": "Reserved52"
+    },
+    {
+      "code": 6053,
+      "name": "Reserved53"
+    },
+    {
+      "code": 6054,
+      "name": "Reserved54"
+    },
+    {
+      "code": 6055,
+      "name": "Reserved55"
+    },
+    {
+      "code": 6056,
+      "name": "Reserved56"
+    },
+    {
+      "code": 6057,
+      "name": "Reserved57"
+    },
+    {
+      "code": 6058,
+      "name": "Reserved58"
+    },
+    {
+      "code": 6059,
+      "name": "Reserved59"
+    },
+    {
+      "code": 6060,
+      "name": "Reserved60"
+    },
+    {
+      "code": 6061,
+      "name": "Reserved61"
+    },
+    {
+      "code": 6062,
+      "name": "Reserved62"
+    },
+    {
+      "code": 6063,
+      "name": "Reserved63"
+    },
+    {
+      "code": 6064,
+      "name": "Reserved64"
+    },
+    {
+      "code": 6065,
+      "name": "Reserved65"
+    },
+    {
+      "code": 6066,
+      "name": "Reserved66"
+    },
+    {
+      "code": 6067,
+      "name": "Reserved67"
+    },
+    {
+      "code": 6068,
+      "name": "Reserved68"
+    },
+    {
+      "code": 6069,
+      "name": "Reserved69"
+    },
+    {
+      "code": 6070,
+      "name": "Reserved70"
+    },
+    {
+      "code": 6071,
+      "name": "Reserved71"
+    },
+    {
+      "code": 6072,
+      "name": "Reserved72"
+    },
+    {
+      "code": 6073,
+      "name": "Reserved73"
+    },
+    {
+      "code": 6074,
+      "name": "Reserved74"
+    },
+    {
+      "code": 6075,
+      "name": "Reserved75"
+    },
+    {
+      "code": 6076,
+      "name": "Reserved76"
+    },
+    {
+      "code": 6077,
+      "name": "Reserved77"
+    },
+    {
+      "code": 6078,
+      "name": "Reserved78"
+    },
+    {
+      "code": 6079,
+      "name": "Reserved79"
     }
   ]
 };
 
 export const IDL: LibreplexMetadata = {
-  "version": "0.1.0",
+  "version": "0.4.3",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -1407,12 +1967,12 @@ export const IDL: LibreplexMetadata = {
         },
         {
           "name": "groupAuthority",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "metadata",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -1446,6 +2006,58 @@ export const IDL: LibreplexMetadata = {
               }
             ]
           }
+        },
+        {
+          "name": "delegatedGroupWidePermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
+        },
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "groupRemove",
+      "accounts": [
+        {
+          "name": "groupAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "delegatedGroupWidePermissions",
@@ -1539,6 +2151,118 @@ export const IDL: LibreplexMetadata = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "Mint",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "invokedMigratorProgram",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "metadataInput",
+          "type": {
+            "defined": "CreateMetadataInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deleteMetadata",
+      "accounts": [
+        {
+          "name": "metadataAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "metadata_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createOrdinalMetadata",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "metadata"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
                 "path": "mint"
               }
             ]
@@ -1550,7 +2274,17 @@ export const IDL: LibreplexMetadata = {
           "isSigner": true
         },
         {
+          "name": "ordinal",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1559,7 +2293,7 @@ export const IDL: LibreplexMetadata = {
         {
           "name": "metadataInput",
           "type": {
-            "defined": "CreateMetadataInput"
+            "defined": "CreateOrdinalMetadataInput"
           }
         }
       ]
@@ -1896,6 +2630,38 @@ export const IDL: LibreplexMetadata = {
   ],
   "types": [
     {
+      "name": "CreateOrdinalMetadataInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "inscriptionInput",
+            "type": {
+              "defined": "CreateInscriptionInput"
+            }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExtendMetadataInput",
       "type": {
         "kind": "struct",
@@ -2011,7 +2777,7 @@ export const IDL: LibreplexMetadata = {
             "type": "string"
           },
           {
-            "name": "metadataRenderMode",
+            "name": "templateConfiguration",
             "type": {
               "defined": "TemplateConfiguration"
             }
@@ -2402,6 +3168,9 @@ export const IDL: LibreplexMetadata = {
             "name": "Update"
           },
           {
+            "name": "Delete"
+          },
+          {
             "name": "AddToGroup"
           }
         ]
@@ -2544,6 +3313,357 @@ export const IDL: LibreplexMetadata = {
           "index": false
         }
       ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ArithmeticError",
+      "msg": "failed to perform some math operation safely"
+    },
+    {
+      "code": 6001,
+      "name": "UnknownInstruction",
+      "msg": "unknown instruction called"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidParameter",
+      "msg": "invalid parameter passed in"
+    },
+    {
+      "code": 6003,
+      "name": "AnchorSerializationIssue",
+      "msg": "anchor serialization issue"
+    },
+    {
+      "code": 6004,
+      "name": "AmountMismatch",
+      "msg": "two amounts that are supposed to be equal are not"
+    },
+    {
+      "code": 6005,
+      "name": "AccountDiscriminatorMismatch",
+      "msg": "account discriminator doesn't match"
+    },
+    {
+      "code": 6006,
+      "name": "Reserved6"
+    },
+    {
+      "code": 6007,
+      "name": "Reserved7"
+    },
+    {
+      "code": 6008,
+      "name": "Reserved8"
+    },
+    {
+      "code": 6009,
+      "name": "Reserved9"
+    },
+    {
+      "code": 6010,
+      "name": "Reserved10"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidStringInput",
+      "msg": "A constraint on max string length was violated"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidBpsInput",
+      "msg": "The value of the basis points input must not exceed 10,000"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidPermissions",
+      "msg": "Invalid Permissions"
+    },
+    {
+      "code": 6014,
+      "name": "MissingPermissionAdmin",
+      "msg": "Missing admin permission"
+    },
+    {
+      "code": 6015,
+      "name": "MissingPermissionEditCollection",
+      "msg": "Missing edit collection permission"
+    },
+    {
+      "code": 6016,
+      "name": "MissingPermissionDeleteCollection",
+      "msg": "Missing delete collection permission"
+    },
+    {
+      "code": 6017,
+      "name": "MissingPermissionCreateMetadata",
+      "msg": "Missing create metadata permission"
+    },
+    {
+      "code": 6018,
+      "name": "MissingPermissionEditMetadata",
+      "msg": "Missing edit metadata permission"
+    },
+    {
+      "code": 6019,
+      "name": "MissingPermissionDeleteMetadata",
+      "msg": "Missing delete metadata permission"
+    },
+    {
+      "code": 6020,
+      "name": "CollectionExists",
+      "msg": "Collection exists"
+    },
+    {
+      "code": 6021,
+      "name": "IncompatibleMetadataType",
+      "msg": "Incompatible metadata type"
+    },
+    {
+      "code": 6022,
+      "name": "CollectionHasItems",
+      "msg": "Collection has items"
+    },
+    {
+      "code": 6023,
+      "name": "PermissionAccountEmpty",
+      "msg": "Permission account is empty"
+    },
+    {
+      "code": 6024,
+      "name": "InvalidBump",
+      "msg": "Invalid bump"
+    },
+    {
+      "code": 6025,
+      "name": "RoyaltiesBadSum",
+      "msg": "Royalties must add up to 10000"
+    },
+    {
+      "code": 6026,
+      "name": "UnexpectedPermissionsKey",
+      "msg": "Unexpected permission is empty"
+    },
+    {
+      "code": 6027,
+      "name": "MaxSizeExceeded",
+      "msg": "Max size exceeded"
+    },
+    {
+      "code": 6028,
+      "name": "BadAuthority",
+      "msg": "Bad authority"
+    },
+    {
+      "code": 6029,
+      "name": "MetadataBelongsToGroup",
+      "msg": "Metadata belongs to a group"
+    },
+    {
+      "code": 6030,
+      "name": "DerivedKeyInvalid",
+      "msg": "Derived key invalid"
+    },
+    {
+      "code": 6031,
+      "name": "InvalidSignedProgram",
+      "msg": "Invalid signer program"
+    },
+    {
+      "code": 6032,
+      "name": "MetadataDoesNotHaveAGroup",
+      "msg": "Metadata does not have a group"
+    },
+    {
+      "code": 6033,
+      "name": "MetadataIsNotMutable",
+      "msg": "Metadata is not mutable"
+    },
+    {
+      "code": 6034,
+      "name": "Reserved34"
+    },
+    {
+      "code": 6035,
+      "name": "Reserved35"
+    },
+    {
+      "code": 6036,
+      "name": "Reserved36"
+    },
+    {
+      "code": 6037,
+      "name": "Reserved37"
+    },
+    {
+      "code": 6038,
+      "name": "Reserved38"
+    },
+    {
+      "code": 6039,
+      "name": "Reserved39"
+    },
+    {
+      "code": 6040,
+      "name": "Reserved40"
+    },
+    {
+      "code": 6041,
+      "name": "Reserved41"
+    },
+    {
+      "code": 6042,
+      "name": "Reserved42"
+    },
+    {
+      "code": 6043,
+      "name": "Reserved43"
+    },
+    {
+      "code": 6044,
+      "name": "Reserved44"
+    },
+    {
+      "code": 6045,
+      "name": "Reserved45"
+    },
+    {
+      "code": 6046,
+      "name": "Reserved46"
+    },
+    {
+      "code": 6047,
+      "name": "Reserved47"
+    },
+    {
+      "code": 6048,
+      "name": "Reserved48"
+    },
+    {
+      "code": 6049,
+      "name": "Reserved49"
+    },
+    {
+      "code": 6050,
+      "name": "Reserved50"
+    },
+    {
+      "code": 6051,
+      "name": "Reserved51"
+    },
+    {
+      "code": 6052,
+      "name": "Reserved52"
+    },
+    {
+      "code": 6053,
+      "name": "Reserved53"
+    },
+    {
+      "code": 6054,
+      "name": "Reserved54"
+    },
+    {
+      "code": 6055,
+      "name": "Reserved55"
+    },
+    {
+      "code": 6056,
+      "name": "Reserved56"
+    },
+    {
+      "code": 6057,
+      "name": "Reserved57"
+    },
+    {
+      "code": 6058,
+      "name": "Reserved58"
+    },
+    {
+      "code": 6059,
+      "name": "Reserved59"
+    },
+    {
+      "code": 6060,
+      "name": "Reserved60"
+    },
+    {
+      "code": 6061,
+      "name": "Reserved61"
+    },
+    {
+      "code": 6062,
+      "name": "Reserved62"
+    },
+    {
+      "code": 6063,
+      "name": "Reserved63"
+    },
+    {
+      "code": 6064,
+      "name": "Reserved64"
+    },
+    {
+      "code": 6065,
+      "name": "Reserved65"
+    },
+    {
+      "code": 6066,
+      "name": "Reserved66"
+    },
+    {
+      "code": 6067,
+      "name": "Reserved67"
+    },
+    {
+      "code": 6068,
+      "name": "Reserved68"
+    },
+    {
+      "code": 6069,
+      "name": "Reserved69"
+    },
+    {
+      "code": 6070,
+      "name": "Reserved70"
+    },
+    {
+      "code": 6071,
+      "name": "Reserved71"
+    },
+    {
+      "code": 6072,
+      "name": "Reserved72"
+    },
+    {
+      "code": 6073,
+      "name": "Reserved73"
+    },
+    {
+      "code": 6074,
+      "name": "Reserved74"
+    },
+    {
+      "code": 6075,
+      "name": "Reserved75"
+    },
+    {
+      "code": 6076,
+      "name": "Reserved76"
+    },
+    {
+      "code": 6077,
+      "name": "Reserved77"
+    },
+    {
+      "code": 6078,
+      "name": "Reserved78"
+    },
+    {
+      "code": 6079,
+      "name": "Reserved79"
     }
   ]
 };

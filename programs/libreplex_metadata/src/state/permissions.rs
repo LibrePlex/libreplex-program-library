@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use prog_common::{errors::ErrorCode};
+use crate::{errors::ErrorCode};
 
 
 
@@ -56,6 +56,7 @@ pub fn assert_valid_permissions(permissions: &Account<DelegatePermissions>,
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, PartialEq)]
 pub enum PermissionType {
     Update,
+    Delete,
     AddToGroup,
 }
 

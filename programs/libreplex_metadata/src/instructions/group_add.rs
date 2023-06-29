@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{Metadata, DelegatePermissions, PermissionType, Group};
 
-use prog_common::{errors::ErrorCode};
+use crate::{errors::ErrorCode};
 
 
 // Adds a metadata to a group
@@ -10,8 +10,17 @@ use prog_common::{errors::ErrorCode};
 pub struct GroupAdd<'info> {
     pub metadata_authority: Signer<'info>,
 
+    #[account(mut)]
     pub group_authority: Signer<'info>,
 
+    #[account(mut,
+        realloc = metadata.get_size() + match &metadata.group {
+            Some(x) => 0,
+            None => 32 // we need to add to the size if group doesn't yet exist
+        },
+        realloc::payer = group_authority,
+        realloc::zero = false
+    )]
     pub metadata: Box<Account<'info, Metadata>>,
 
     // Derived from the editor, the metadata's update auth and the the metadata itself
@@ -38,7 +47,7 @@ pub fn handler(ctx: Context<GroupAdd>
     let metadata = &mut ctx.accounts.metadata;
 
     if metadata.group.is_some() {
-        return Err(ErrorCode::MetadataAlreadyHasAGroup.into())
+        return Err(ErrorCode::MetadataBelongsToGroup.into())
     }
 
     let group = &ctx.accounts.group;
@@ -62,6 +71,9 @@ pub fn handler(ctx: Context<GroupAdd>
     if !can_edit_group || !can_edit_metadata {
         return Err(ErrorCode::InvalidPermissions.into());
     }
+
+    msg!("Setting group to {}", group.key());
+    
 
     metadata.group = Some(group.key());
     metadata.update_authority = group.key();

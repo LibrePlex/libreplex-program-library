@@ -1,12 +1,12 @@
 [package]
-name = "libreplex_defaultrenderer"
-version = "0.1.0"
+name = "libreplex_default_renderer"
+version = "0.1.2"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "libreplex_defaultrenderer"
+name = "libreplex_default_renderer"
 
 [features]
 no-entrypoint = []
@@ -16,20 +16,16 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = {version = "~0.27", features = ["init-if-needed"]}
-anchor-spl = "~0.27"
-spl-token = { version = "3.5.0",  features = ["no-entrypoint"] }
-solana-program = "~1.14"
-winnow="=0.4.1"
-libreplex_metadata = { path='../libreplex_metadata', features =["no-entrypoint"]}
+anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
+libreplex_metadata = { version='0.3.4', features =["no-entrypoint"]}
 
-prog_common = {path='../../lib/prog_common'}
-proc_macros = {path='../../lib/proc_macros'}
 bmp = "0.5.0"
 
 [dev-dependencies]
 mocha = "0.1.1"
-bincode = "1.3.3"
 assert_matches = "1.5.0"
-solana-program-test = "~1.14"
-solana-sdk= "~1.14"
+solana-program-test = ">1.14"
+solana-sdk = ">1.14"
+solana-program = ">1.14"
+
+

@@ -4,11 +4,16 @@ use instructions::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-declare_id!("AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6");
+declare_id!("LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p");
 
 pub mod instructions;
 pub mod state;
 pub mod constants;
+pub mod errors;
+pub use errors::*;
+
+pub mod shared;
+pub use shared::*;
 
 pub use constants::*;
 pub use state::*;
@@ -46,14 +51,9 @@ pub mod libreplex_metadata {
         instructions::group_add::handler(ctx)
     }
 
-    pub fn delegate_group_permissions(ctx: Context<DelegateGroupPermissions>, input: EditPermissionsInput) -> Result<()> {
-        instructions::delegate_group_permissions::handler(ctx, input)
+    pub fn group_remove(ctx: Context<GroupRemove>) -> Result<()> {
+        instructions::group_remove::handler(ctx)
     }
-
-    pub fn delegate_metadata_permissions(ctx: Context<DelegateMetadataPermissions>, input: EditPermissionsInput) -> Result<()> {
-        instructions::delegate_metadata_permissions::handler(ctx, input)
-    }
-
 
     pub fn update_permissions(ctx: Context<UpdatePermissionsDelegate>, 
         input: EditPermissionsInput) -> Result<()> {
@@ -71,6 +71,29 @@ pub mod libreplex_metadata {
             metadata_input
         )
     }
+
+
+    
+    pub fn delete_metadata(
+        ctx: Context<DeleteMetadata>
+    ) -> Result<()> {
+        msg!("creating metadata");
+        instructions::delete_metadata::handler(
+            ctx
+        )
+    }
+
+    pub fn create_ordinal_metadata(
+        ctx: Context<CreateOrdinalMetadata>,
+        metadata_input: CreateOrdinalMetadataInput,
+    ) -> Result<()> {
+        msg!("creating metadata");
+        instructions::create_ordinal_metadata::handler(
+            ctx,
+            metadata_input
+        )
+    }
+
 
     pub fn extend_metadata(
         ctx: Context<ExtendMetadata>,

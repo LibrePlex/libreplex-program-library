@@ -9,10 +9,13 @@ declare_id!("inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp");
 pub mod instructions;
 pub mod state;
 
+pub mod errors;
+pub use errors::*;
+
 pub use state::*;
 
 #[program]
-pub mod libreplex_inscriptions {
+pub mod inscriptions {
 
     use super::*;
 
@@ -20,18 +23,28 @@ pub mod libreplex_inscriptions {
         ctx: Context<CreateInscription>,
         ordinal_input: CreateInscriptionInput,
     ) -> Result<()> {
-        msg!("creating metadata");
         instructions::create_inscription::handler(
             ctx,
             ordinal_input
         )
     }
 
-    pub fn append_to_inscription(
-        ctx: Context<AppendToInscription>,
-        input: AppendToInscriptionInput,
+    pub fn resize_inscription(
+        ctx: Context<ResizeInscription>,
+        input: ResizeInscriptionInput,
     ) -> Result<()> {
-        instructions::append_to_inscription::handler(
+        instructions::resize_inscription::handler(
+            ctx,
+            input
+        )
+    }
+
+
+    pub fn write_to_inscription(
+        ctx: Context<WriteToInscription>,
+        input: WriteToInscriptionInput,
+    ) -> Result<()> {
+        instructions::write_to_inscription::handler(
             ctx,
             input
         )

@@ -3,6 +3,7 @@
 target/deploy
 target/debug
 target/release
+target/package
 target/bpfel-unknown-unknown
 target/sbf-solana-solana/
 target/.rustc_info.json

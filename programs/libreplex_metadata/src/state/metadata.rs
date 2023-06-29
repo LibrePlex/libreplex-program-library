@@ -121,6 +121,9 @@ impl Metadata {
             + 1 + match &self.description {
                 None=>0,
                 Some(x)=>4 + x.len()
+            } + 1 + match &self.group {
+                None=>0,
+                Some(_)=>32
             };
 
         return size;
@@ -156,6 +159,7 @@ pub struct CreateMetadataInput {
     pub asset: Asset,
     pub description: Option<String>,
     pub update_authority: Pubkey,
+ 
 }
 
 impl CreateMetadataInput {

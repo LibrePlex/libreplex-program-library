@@ -2,9 +2,9 @@ use crate::state::{Group, Metadata};
 use crate::{MetadataExtension, PermissionType, Royalties,
 };
 use anchor_lang::prelude::*;
-
 use anchor_spl::token::Mint;
-use prog_common::{errors::ErrorCode};
+
+use crate::{errors::ErrorCode};
 
 #[event]
 struct ExtendMetadataEvent {
