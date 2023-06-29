@@ -42,7 +42,7 @@
       ],
       "args": [
         {
-          "name": "collectionInput",
+          "name": "groupInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -115,7 +115,7 @@
       ],
       "args": [
         {
-          "name": "collectionInput",
+          "name": "groupInput",
           "type": {
             "defined": "GroupInput"
           }
@@ -464,121 +464,6 @@
       ]
     },
     {
-      "name": "extendMetadata",
-      "accounts": [
-        {
-          "name": "updateAuthority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "metadata",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          },
-          "relations": [
-            "update_authority"
-          ]
-        },
-        {
-          "name": "metadataExtended",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata_extension"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              }
-            ]
-          }
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "metadataInput",
-          "type": {
-            "defined": "ExtendMetadataInput"
-          }
-        }
-      ]
-    },
-    {
-      "name": "deleteMetadataExtension",
-      "accounts": [
-        {
-          "name": "updateAuthority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "metadata",
-          "isMut": false,
-          "isSigner": false,
-          "relations": [
-            "update_authority"
-          ]
-        },
-        {
-          "name": "metadataExtension",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata_extension"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Metadata",
-                "path": "metadata"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "deletePermissions",
       "accounts": [
         {
@@ -673,44 +558,6 @@
       }
     },
     {
-      "name": "MetadataExtension",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "metadata",
-            "type": "publicKey"
-          },
-          {
-            "name": "attributes",
-            "type": "bytes"
-          },
-          {
-            "name": "signers",
-            "type": {
-              "vec": "publicKey"
-            }
-          },
-          {
-            "name": "royalties",
-            "type": {
-              "option": {
-                "defined": "Royalties"
-              }
-            }
-          },
-          {
-            "name": "license",
-            "type": {
-              "option": {
-                "defined": "License"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "Metadata",
       "type": {
         "kind": "struct",
@@ -755,6 +602,20 @@
             "name": "group",
             "type": {
               "option": "publicKey"
+            }
+          },
+          {
+            "name": "license",
+            "type": {
+              "option": {
+                "defined": "License"
+              }
+            }
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
             }
           }
         ]
@@ -822,32 +683,6 @@
           {
             "name": "updateAuthority",
             "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ExtendMetadataInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "attributes",
-            "type": "bytes"
-          },
-          {
-            "name": "royalties",
-            "type": {
-              "option": {
-                "defined": "Royalties"
-              }
-            }
-          },
-          {
-            "name": "invokedPermission",
-            "type": {
-              "defined": "PermissionType"
-            }
           }
         ]
       }
@@ -985,6 +820,26 @@
       }
     },
     {
+      "name": "MetadataExtensionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attributes",
+            "type": "bytes"
+          },
+          {
+            "name": "royalties",
+            "type": {
+              "option": {
+                "defined": "Royalties"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "CreateMetadataInput",
       "type": {
         "kind": "struct",
@@ -1012,6 +867,12 @@
           {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
+            }
           }
         ]
       }
@@ -1238,6 +1099,48 @@
       }
     },
     {
+      "name": "MetadataExtension",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Nft",
+            "fields": [
+              {
+                "name": "attributes",
+                "type": "bytes"
+              },
+              {
+                "name": "signers",
+                "type": {
+                  "vec": "publicKey"
+                }
+              },
+              {
+                "name": "royalties",
+                "type": {
+                  "option": {
+                    "defined": "Royalties"
+                  }
+                }
+              },
+              {
+                "name": "license",
+                "type": {
+                  "option": {
+                    "defined": "License"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "name": "Asset",
       "type": {
         "kind": "enum",
@@ -1343,21 +1246,6 @@
     }
   ],
   "events": [
-    {
-      "name": "ExtendMetadataEvent",
-      "fields": [
-        {
-          "name": "id",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "mint",
-          "type": "publicKey",
-          "index": false
-        }
-      ]
-    },
     {
       "name": "EditCollectionEvent",
       "fields": [

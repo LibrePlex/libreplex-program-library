@@ -25,23 +25,23 @@ pub mod libreplex_metadata {
 
     pub fn create_group(
         ctx: Context<CreateGroup>,
-        collection_input: GroupInput,
+        group_input: GroupInput,
     ) -> Result<()> {
         msg!("creating collection data");
         instructions::create_group::handler(
             ctx,
-            collection_input
+            group_input
         )
     }
 
     pub fn update_group(
         ctx: Context<UpdateGroup>,
-        collection_input: GroupInput,
+        group_input: GroupInput,
     ) -> Result<()> {
         msg!("Update group");
         instructions::update_group::handler(
             ctx,
-            collection_input
+            group_input
         )
     }
 
@@ -93,23 +93,23 @@ pub mod libreplex_metadata {
     }
 
 
-    pub fn extend_metadata(
-        ctx: Context<ExtendMetadata>,
-        metadata_input: ExtendMetadataInput,
-    ) -> Result<()> {
-        msg!("extending metadata");
-        instructions::extend_metadata::handler(
-            ctx,
-            metadata_input
-        )
-    }
+    // pub fn extend_metadata(
+    //     ctx: Context<ExtendMetadata>,
+    //     metadata_input: MetadataExtensionInput,
+    // ) -> Result<()> {
+    //     msg!("extending metadata");
+    //     instructions::extend_metadata::handler(
+    //         ctx,
+    //         metadata_input
+    //     )
+    // }
 
-    pub fn delete_metadata_extension(
-        ctx: Context<DeleteMetadataExtension>,
-    ) -> Result<()> {
-        msg!("deleting metadata");
-        instructions::delete_metadataextension::handler(ctx)
-    }
+    // pub fn delete_metadata_extension(
+    //     ctx: Context<DeleteMetadataExtension>,
+    // ) -> Result<()> {
+    //     msg!("deleting metadata");
+    //     instructions::delete_metadataextension::handler(ctx)
+    // }
 
     pub fn delete_permissions(
         ctx: Context<DeletePermissions>,
