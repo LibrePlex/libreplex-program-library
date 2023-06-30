@@ -1,7 +1,8 @@
 use crate::state::{Metadata};
-use crate::{ MetadataEvent, MetadataEventType, Asset};
-use anchor_lang::{prelude::*};
-use libreplex_inscriptions::program::Inscriptions;
+use crate::{ CreateMetadataInput, PermissionType, MetadataEvent, MetadataEventType, Asset};
+use anchor_lang::{prelude::*, system_program};
+use libreplex_inscriptions::instructions::CreateInscriptionInput;
+use libreplex_inscriptions::program::LibreplexInscriptions;
 
 
 use libreplex_inscriptions::cpi::accounts::{CreateInscription};
@@ -83,7 +84,7 @@ pub struct CreateOrdinalMetadata<'info> {
 
     pub system_program: Program<'info, System>,
 
-    pub inscriptions_program: Program<'info, Inscriptions>
+    pub inscriptions_program: Program<'info, LibreplexInscriptions>
 
 }
 

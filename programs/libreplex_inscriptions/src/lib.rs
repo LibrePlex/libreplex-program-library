@@ -15,7 +15,7 @@ pub use errors::*;
 pub use state::*;
 
 #[program]
-pub mod inscriptions {
+pub mod libreplex_inscriptions {
 
     use super::*;
 

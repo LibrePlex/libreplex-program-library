@@ -65,6 +65,7 @@ mod permissions {
             authority: collection_authority,
             metadata:  metadata.key(),
             mint: mint.pubkey(),
+            group: None,
             invoked_migrator_program: None,
             system_program: system_program::ID,
         }
