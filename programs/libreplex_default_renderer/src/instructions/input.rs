@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 
 
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct RenderInput {
     

@@ -136,6 +136,11 @@ export type LibreplexMetadata = {
           "isSigner": true
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "metadata",
           "isMut": true,
           "isSigner": false
@@ -295,10 +300,143 @@ export type LibreplexMetadata = {
       ]
     },
     {
+      "name": "delegateGroupPermissions",
+      "accounts": [
+        {
+          "name": "updateAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "delegated_user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
+        },
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
+        },
+        {
+          "name": "delegatedUser",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "editPermissionsInput",
+          "type": {
+            "defined": "EditPermissionsInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "delegateMetadataPermissions",
+      "accounts": [
+        {
+          "name": "updateAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "delegated_user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
+        },
+        {
+          "name": "delegatedUser",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "editPermissionsInput",
+          "type": {
+            "defined": "EditPermissionsInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "createMetadata",
       "accounts": [
         {
           "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -336,12 +474,6 @@ export type LibreplexMetadata = {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "group",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
         },
         {
           "name": "invokedMigratorProgram",
@@ -661,6 +793,24 @@ export type LibreplexMetadata = {
     }
   ],
   "types": [
+    {
+      "name": "CreateInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxDataLength",
+            "type": "u32"
+          },
+          {
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "CreateOrdinalMetadataInput",
       "type": {
@@ -1865,6 +2015,11 @@ export const IDL: LibreplexMetadata = {
           "isSigner": true
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "metadata",
           "isMut": true,
           "isSigner": false
@@ -2024,10 +2179,143 @@ export const IDL: LibreplexMetadata = {
       ]
     },
     {
+      "name": "delegateGroupPermissions",
+      "accounts": [
+        {
+          "name": "updateAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "delegated_user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
+        },
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
+        },
+        {
+          "name": "delegatedUser",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "editPermissionsInput",
+          "type": {
+            "defined": "EditPermissionsInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "delegateMetadataPermissions",
+      "accounts": [
+        {
+          "name": "updateAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userPermissions",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "delegated_user"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
+        },
+        {
+          "name": "delegatedUser",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "editPermissionsInput",
+          "type": {
+            "defined": "EditPermissionsInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "createMetadata",
       "accounts": [
         {
           "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -2065,12 +2353,6 @@ export const IDL: LibreplexMetadata = {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "group",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
         },
         {
           "name": "invokedMigratorProgram",
@@ -2390,6 +2672,24 @@ export const IDL: LibreplexMetadata = {
     }
   ],
   "types": [
+    {
+      "name": "CreateInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxDataLength",
+            "type": "u32"
+          },
+          {
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "CreateOrdinalMetadataInput",
       "type": {

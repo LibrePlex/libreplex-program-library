@@ -3,7 +3,6 @@ use std::cmp::{Ordering, self};
 use crate::{Inscription, InscriptionEvent, InscriptionEventType};
 use anchor_lang::prelude::*;
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum Change {
     Reduce {
@@ -14,7 +13,6 @@ pub enum Change {
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct ResizeInscriptionInput {
     pub change: Change,

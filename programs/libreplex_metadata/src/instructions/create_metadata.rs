@@ -1,10 +1,8 @@
-    use crate::Group;
 use crate::state::{Metadata};
 use crate::{ CreateMetadataInput, MetadataEvent, MetadataEventType, assert_pda_derivation::assert_pda_derivation};
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use crate::{errors::ErrorCode};
-
 
 
 // whitelisted signer programs
@@ -21,8 +19,11 @@ pub struct CreateMetadata<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
     #[account(init, seeds = [b"metadata", mint.key().as_ref()],
-              bump, payer = signer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
+              bump, payer = payer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
 
     pub mint: Box<Account<'info, Mint>>,
@@ -33,8 +34,6 @@ pub struct CreateMetadata<'info> {
     pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>,
-
-    pub group: Option<Account<'info, Group>>,
 
     /*
      only to be supplied if the migration is invoked by a whitelisted 
@@ -51,7 +50,6 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     let mint = &mut ctx.accounts.mint;
     let authority = &ctx.accounts.authority;
     let invoked_migrator_program = &ctx.accounts.invoked_migrator_program;
-    let group = &ctx.accounts.group;
 
     assert_is_valid_signer(&authority.key(), &mint.key(), invoked_migrator_program)?;
 
@@ -66,10 +64,7 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     metadata.update_authority = metadata_input.update_authority;
     metadata.extension = metadata_input.extension;
 
-    metadata.group = match group {
-        Some(x)=>Some(x.key()),
-        None=>None       
-    };
+    metadata.group = None;
 
     msg!(
         "metadata created for mint with pubkey {}",

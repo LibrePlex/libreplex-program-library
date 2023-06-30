@@ -6,20 +6,25 @@ skip-lint = false
 libreplex_metadata="AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6"
 libreplex_default_renderer="rndbQFmFfiQ4tTG9QPhfJeq1J9fLCSBMAPj3EbLQ7Co"
 libreplex_inscriptions="inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
+libreplex_creator="toysDBtkQ7P1NWwaTtXZbXBeGdM16fReT5qzCgc7wig"
 libreplex_shop="ListjawGEdhxuAErSyYwcTEGWQswFoi6FScnGG1RKSB"
+
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "Localnet"
-wallet = "~/.config/solana/devnet-test1.json"
+wallet = "~/.config/solana/id.json"
 
 [test]
 startup_wait = 100000
 
 [test.validator]
-url = "https://api.devnet.solana.com"
+#url = "https://api.devnet.solana.com"
+url = "http://localhost:8899"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 programs/**/**/tests/**/*.ts"
+#test_rust = "mocha -t 1000000 tests2/"
+#test= "mocha -t 1000000 tests"

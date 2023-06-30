@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{Metadata, DelegatePermissions, PermissionType, Group};
+use crate::{Metadata, DelegatePermissions, PermissionType};
 
 use crate::{errors::ErrorCode};
 
@@ -48,7 +48,7 @@ pub fn handler(ctx: Context<DeleteMetadata>
             can_delete_metadata = can_delete_metadata || delegated_metadata_specific_permissions_account.permissions.contains(&PermissionType::Delete)
     }
 
-    if( !can_delete_metadata) {
+    if !can_delete_metadata {
         return Err(ErrorCode::MissingPermissionDeleteMetadata.into())
     }
 

@@ -4,9 +4,8 @@ use anchor_lang::prelude::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-use crate::{Royalties, Metadata};
+use crate::{Royalties};
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum License {
     NoLicense,
@@ -17,14 +16,13 @@ pub enum License {
 
 impl License {
     pub fn get_size(&self)-> usize {
-        return match &self {
+        return 2 + match &self {
             License::NoLicense => 0,
             License::Custom { license_url } => 4 + license_url.len()
         }
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum MetadataExtension {
     None,
@@ -46,9 +44,9 @@ impl MetadataExtension {
         + match self {
             MetadataExtension::None => 0,
             MetadataExtension::Nft {attributes, signers, royalties, license} =>  
-            &attributes.len()
-            + &signers.len() * 32
-            + match &royalties {
+              4 + &attributes.len()
+            + 4 + &signers.len() * 32
+            + 1 + match &royalties {
                 Some(x)=>x.get_size(),
                 None=>0
             } 

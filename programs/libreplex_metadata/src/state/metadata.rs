@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-use crate::{License, MetadataExtension, Royalties, Group};
+use crate::{License, MetadataExtension, Royalties};
 
 /*
     Asset replaces URL and provides both backwards compatibility and flexibility
@@ -39,7 +39,6 @@ use crate::{License, MetadataExtension, Royalties, Group};
                 program_id = <address of on-chain rendering program that generates image content>
 
 */
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum Asset {
     None,
@@ -79,11 +78,11 @@ pub struct Metadata {
 
     pub group: Option<Pubkey>,
 
+    // END BASE
+
     pub name: String,
 
     pub symbol: String,
-
-  
 
     pub asset: Asset,
 
@@ -95,7 +94,17 @@ pub struct Metadata {
 }
 
 impl Metadata {
-    pub const BASE_SIZE: usize = 8 + 32 + 32 + 1 + 32;
+    pub const BASE_SIZE: usize = 8 
+        // mint
+        + 32 
+        // ua
+        + 32 
+        // creator
+        + 32 
+        // is mutable
+        + 1 
+        // group
+        + 1 + 32;
 
     pub fn get_size(&self) -> usize {
         let size = Metadata::BASE_SIZE
@@ -111,10 +120,6 @@ impl Metadata {
                 Some(x) => 4 + x.len(),
             }
             + 1
-            + match &self.group {
-                None => 0,
-                Some(_) => 32,
-            }
             + 1
             + match &self.license {
                 None => 0,
@@ -148,7 +153,6 @@ impl AttributesInput {
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct MetadataExtensionInput {
     pub attributes: Vec<u8>, // base: 4
@@ -215,16 +219,15 @@ impl CreateMetadataInput {
             + self.symbol.len()
             + 4
             + self.asset.get_size()
-            + match &self.description {
+            + 1 + match &self.description {
                 None => 0,
                 Some(x) => 4 + x.len(),
-            };
+            } + self.extension.get_size();
 
         return size;
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct UpdateMetadataInput {
     pub name: String,
@@ -250,7 +253,6 @@ impl UpdateMetadataInput {
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum MetadataEventType {
     Create,

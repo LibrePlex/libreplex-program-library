@@ -4,7 +4,7 @@ use instructions::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-declare_id!("LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p");
+declare_id!("AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6");
 
 pub mod instructions;
 pub mod state;
@@ -20,14 +20,13 @@ pub use state::*;
 
 #[program]
 pub mod libreplex_metadata {
-
     use super::*;
 
     pub fn create_group(
         ctx: Context<CreateGroup>,
         group_input: GroupInput,
     ) -> Result<()> {
-        msg!("creating collection data");
+        msg!("creating group data");
         instructions::create_group::handler(
             ctx,
             group_input
@@ -58,7 +57,14 @@ pub mod libreplex_metadata {
         instructions::update_permissions::handler(ctx, input)
     }
 
-    
+    pub fn delegate_group_permissions(ctx: Context<DelegateGroupPermissions>, edit_permissions_input: EditPermissionsInput) -> Result<()> {
+        instructions::delegate_group_permissions::handler(ctx, edit_permissions_input)
+    }
+
+    pub fn delegate_metadata_permissions(ctx: Context<DelegateMetadataPermissions>, edit_permissions_input: EditPermissionsInput) -> Result<()> {
+        instructions::delegate_metadata_permissions::handler(ctx, edit_permissions_input)
+    }
+
     pub fn create_metadata(
         ctx: Context<CreateMetadata>,
         metadata_input: CreateMetadataInput,
