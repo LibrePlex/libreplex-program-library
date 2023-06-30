@@ -4,9 +4,7 @@ use anchor_lang::{prelude::*, system_program};
 use libreplex_inscriptions::instructions::CreateInscriptionInput;
 use libreplex_inscriptions::program::LibreplexInscriptions;
 
-
 use libreplex_inscriptions::cpi::accounts::{CreateInscription};
-
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateInscriptionInput {
@@ -23,15 +21,14 @@ impl CreateInscriptionInput {
     }
 }
 
-
-/* 
-    we need a separate method since we want to 
+/*
+    we need a separate method since we want to
     1) create ordinal and the metadata together (this requires metadata to sign)
     2) have metadata as the ordinal target
     3) have metadata asset type = Ordinal with account_id pointing to the ordinal
 
     (two-way link ensures that the mapping is 1-1)
-*/ 
+*/
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateOrdinalMetadataInput {
     pub name: String,
@@ -43,7 +40,7 @@ pub struct CreateOrdinalMetadataInput {
 
 impl CreateOrdinalMetadataInput {
     pub fn get_size(&self) -> usize {
-        let size = 
+        let size =
             4 + self.name.len()
             + 4
             + self.symbol.len()
@@ -58,7 +55,6 @@ impl CreateOrdinalMetadataInput {
         return size;
     }
 }
-
 
 #[derive(Accounts)]
 #[instruction(metadata_input: CreateOrdinalMetadataInput)]
@@ -79,7 +75,7 @@ pub struct CreateOrdinalMetadata<'info> {
     */
     pub mint: Signer<'info>,
 
-    // ordinal must sign otherwise 
+    // ordinal must sign otherwise
     pub ordinal: Signer<'info>,
 
     pub system_program: Program<'info, System>,
@@ -103,7 +99,7 @@ pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdina
         mint_key.as_ref(),
         &[ctx.bumps["metadata"]],
     ];
-    
+
     libreplex_inscriptions::cpi::create_inscription(
         CpiContext::new_with_signer(
             inscriptions_program.to_account_info(),
@@ -133,7 +129,6 @@ pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdina
             account_id: ctx.accounts.ordinal.key()
     };
 
-   
     msg!(
         "metadata created for mint with pubkey {}",
         ctx.accounts.mint.key()
