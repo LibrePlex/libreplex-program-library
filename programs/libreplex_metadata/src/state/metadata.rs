@@ -88,8 +88,6 @@ pub struct Metadata {
 
     pub description: Option<String>,
 
-    pub license: Option<License>,
-
     pub extension: MetadataExtension,
 }
 
@@ -119,15 +117,7 @@ impl Metadata {
                 None => 0,
                 Some(x) => 4 + x.len(),
             }
-            + 1
-            + 1
-            + match &self.license {
-                None => 0,
-                Some(license) => match license {
-                    License::NoLicense => 0,
-                    License::Custom { license_url } => 4 + license_url.len(),
-                },
-            }
+            
             + self.extension.get_size();
 
         return size;

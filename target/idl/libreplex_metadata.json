@@ -743,14 +743,6 @@
             }
           },
           {
-            "name": "license",
-            "type": {
-              "option": {
-                "defined": "License"
-              }
-            }
-          },
-          {
             "name": "extension",
             "type": {
               "defined": "MetadataExtension"
@@ -793,24 +785,6 @@
     }
   ],
   "types": [
-    {
-      "name": "CreateInscriptionInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "maxDataLength",
-            "type": "u32"
-          },
-          {
-            "name": "authority",
-            "type": {
-              "option": "publicKey"
-            }
-          }
-        ]
-      }
-    },
     {
       "name": "CreateOrdinalMetadataInput",
       "type": {
@@ -1874,8 +1848,5 @@
       "code": 6079,
       "name": "Reserved79"
     }
-  ],
-  "metadata": {
-    "address": "AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6"
-  }
+  ]
 }

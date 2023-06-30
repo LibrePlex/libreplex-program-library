@@ -743,14 +743,6 @@ export type LibreplexMetadata = {
             }
           },
           {
-            "name": "license",
-            "type": {
-              "option": {
-                "defined": "License"
-              }
-            }
-          },
-          {
             "name": "extension",
             "type": {
               "defined": "MetadataExtension"
@@ -793,24 +785,6 @@ export type LibreplexMetadata = {
     }
   ],
   "types": [
-    {
-      "name": "CreateInscriptionInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "maxDataLength",
-            "type": "u32"
-          },
-          {
-            "name": "authority",
-            "type": {
-              "option": "publicKey"
-            }
-          }
-        ]
-      }
-    },
     {
       "name": "CreateOrdinalMetadataInput",
       "type": {
@@ -2622,14 +2596,6 @@ export const IDL: LibreplexMetadata = {
             }
           },
           {
-            "name": "license",
-            "type": {
-              "option": {
-                "defined": "License"
-              }
-            }
-          },
-          {
             "name": "extension",
             "type": {
               "defined": "MetadataExtension"
@@ -2672,24 +2638,6 @@ export const IDL: LibreplexMetadata = {
     }
   ],
   "types": [
-    {
-      "name": "CreateInscriptionInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "maxDataLength",
-            "type": "u32"
-          },
-          {
-            "name": "authority",
-            "type": {
-              "option": "publicKey"
-            }
-          }
-        ]
-      }
-    },
     {
       "name": "CreateOrdinalMetadataInput",
       "type": {
