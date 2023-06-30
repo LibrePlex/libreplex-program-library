@@ -585,18 +585,18 @@ export type LibreplexMetadata = {
             "type": "bool"
           },
           {
+            "name": "group",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
             "name": "name",
             "type": "string"
           },
           {
             "name": "symbol",
             "type": "string"
-          },
-          {
-            "name": "group",
-            "type": {
-              "option": "publicKey"
-            }
           },
           {
             "name": "asset",
@@ -2314,18 +2314,18 @@ export const IDL: LibreplexMetadata = {
             "type": "bool"
           },
           {
+            "name": "group",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
             "name": "name",
             "type": "string"
           },
           {
             "name": "symbol",
             "type": "string"
-          },
-          {
-            "name": "group",
-            "type": {
-              "option": "publicKey"
-            }
           },
           {
             "name": "asset",
