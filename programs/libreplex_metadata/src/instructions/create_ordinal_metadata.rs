@@ -2,9 +2,9 @@ use crate::state::{Metadata};
 use crate::{ CreateMetadataInput, PermissionType, MetadataEvent, MetadataEventType, Asset};
 use anchor_lang::{prelude::*, system_program};
 use libreplex_inscriptions::instructions::CreateInscriptionInput;
-use libreplex_inscriptions::program::LibreplexInscriptions;
 
 use libreplex_inscriptions::cpi::accounts::{CreateInscription};
+use libreplex_inscriptions::program::LibreplexInscriptions;
 
 /*
     we need a separate method since we want to
