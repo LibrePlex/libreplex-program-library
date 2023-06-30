@@ -3,7 +3,6 @@ use crate::errors::ErrorCode;
 
 use crate::{Inscription, InscriptionEvent, InscriptionEventType};
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct WriteToInscriptionInput {
     pub data: Vec<u8>,

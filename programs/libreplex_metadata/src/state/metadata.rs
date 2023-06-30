@@ -37,7 +37,6 @@ use anchor_lang::{AnchorDeserialize, AnchorSerialize};
                 program_id = <address of on-chain rendering program that generates image content>
     
 */
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum Asset {
     None,
@@ -151,7 +150,6 @@ impl AttributesInput {
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateMetadataInput {
     pub name: String,
@@ -179,7 +177,6 @@ impl CreateMetadataInput {
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct UpdateMetadataInput {
     pub name: String,
@@ -207,7 +204,6 @@ impl UpdateMetadataInput {
 
 
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum MetadataEventType {
     Create,

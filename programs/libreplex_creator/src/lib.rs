@@ -17,10 +17,7 @@ pub use state::*;
 declare_id!("toysDBtkQ7P1NWwaTtXZbXBeGdM16fReT5qzCgc7wig");
 
 #[program]
-pub mod librecreator {
-
-    
-
+pub mod libreplex_creator {
     use super::*;
 
     pub fn create_creator(

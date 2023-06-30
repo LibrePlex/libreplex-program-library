@@ -6,7 +6,6 @@ use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 use crate::{errors::ErrorCode};
 
-#[repr(C)]
 #[account]
 pub struct Inscription {
     
@@ -92,7 +91,6 @@ impl Inscription {
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum InscriptionEventType {
     Create,

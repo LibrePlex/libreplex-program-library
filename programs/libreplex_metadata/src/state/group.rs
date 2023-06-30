@@ -3,8 +3,6 @@ use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
 use crate::Royalties;
 
-
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum TemplateConfiguration {
     None,
@@ -111,7 +109,6 @@ impl Group {
 
 */
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum AttributeValue {
     None,
@@ -152,7 +149,6 @@ impl AttributeValue {
     #3 BACKGROUND - "yellow", "black"
 */
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct AttributeType {
     // royalty address and their share in basis points (0-10,000)
@@ -188,7 +184,6 @@ impl AttributeType {
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct BaseUrlConfiguration {
     // royalty address and their share in basis points (0-10,000)
@@ -203,7 +198,6 @@ impl BaseUrlConfiguration {
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct GroupInput {
     pub name: String,
@@ -239,7 +233,6 @@ impl GroupInput {
     }
 }
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum GroupEventType {
     Create,

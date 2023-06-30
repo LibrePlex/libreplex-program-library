@@ -6,7 +6,6 @@ use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
 use crate::Royalties;
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum License {
     NoLicense,
@@ -16,7 +15,6 @@ pub enum License {
 }
 
 
-#[repr(C)]
 #[account]
 pub struct MetadataExtension {
     

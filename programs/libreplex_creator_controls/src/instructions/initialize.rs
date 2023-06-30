@@ -1,5 +1,5 @@
 use anchor_lang::{prelude::*};
-use librecreator::{Creator, instructions::UpdateInput};
+use libreplex_creator::{Creator, instructions::UpdateInput};
 
 use crate::state::{Phase, CreatorController};
 
@@ -26,7 +26,7 @@ pub struct Initialize<'info> {
     pub system_program: Program<'info, System>,
 
     /// CHECK: Only check the address
-    #[account(address = librecreator::id())]
+    #[account(address = libreplex_creator::id())]
     pub libreplex_creator_program: AccountInfo<'info>,
 }
 
@@ -39,13 +39,13 @@ pub fn handler(ctx: Context<Initialize>, input: InitializeInput) -> Result<()> {
     controller.bump = *ctx.bumps.get("creator_controller").unwrap();
 
 
-    let cpi_ctx = CpiContext::new(ctx.accounts.libreplex_creator_program.to_account_info(), librecreator::cpi::accounts::UpdateCreator {
+    let cpi_ctx = CpiContext::new(ctx.accounts.libreplex_creator_program.to_account_info(), libreplex_creator::cpi::accounts::UpdateCreator {
         creator: ctx.accounts.creator.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
         update_authority: ctx.accounts.update_authority.to_account_info(),
     });
 
-    librecreator::cpi::update(cpi_ctx, UpdateInput {
+    libreplex_creator::cpi::update(cpi_ctx, UpdateInput {
         mint_authority: controller.key(),
     })
 }

@@ -6,10 +6,13 @@ import { Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY, System
 import { expect } from 'chai';
 import exp from "constants";
 
+import {createMint} from "@solana/spl-token"
+import { Transaction } from "@solana/web3.js";
+
 describe("libreplex creator", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
-  const program = anchor.workspace.Librecreator as Program<Librecreator>;
+  const program = anchor.workspace.LibreplexCreator as Program<Librecreator>;
   const metadataProgram = anchor.workspace.LibreplexMetadata as Program<LibreplexMetadata>;
 
   console.log(Object.keys(anchor.workspace))
@@ -33,7 +36,7 @@ describe("libreplex creator", () => {
       permittedSigners: [],
       attributeTypes: [],
       description: "A very cool group",
-      metadataRenderMode: {
+      templateConfiguration: {
         none: {},
       },
       name: "COOL GROUP",
@@ -95,11 +98,23 @@ describe("libreplex creator", () => {
 
     console.log("Creator initialised")
 
+    const payer = Keypair.generate()
+    await program.provider.sendAndConfirm(new Transaction().add(SystemProgram.createAccount({
+      fromPubkey: program.provider.publicKey,
+      lamports: LAMPORTS_PER_SOL,
+      newAccountPubkey: payer.publicKey,
+      programId: SystemProgram.programId,
+      space: 0,
+    })), [payer])
+  
     const mint = Keypair.generate()
+
+    await createMint(program.provider.connection, payer, program.provider.publicKey,  program.provider.publicKey, 0, mint)
+
+
     const metadata = PublicKey.findProgramAddressSync([Buffer.from("metadata"), 
       mint.publicKey.toBuffer()], metadataProgram.programId)[0]
     const metadataExtension = PublicKey.findProgramAddressSync([Buffer.from("metadata_extension"), metadata.toBuffer()], metadataProgram.programId)[0]
-
 
     await program.methods.mint().accounts({
       attributeConfig: null,

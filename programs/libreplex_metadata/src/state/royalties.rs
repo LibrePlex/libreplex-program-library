@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct RoyaltyShare {
     // royalty address and their share in basis points (0-10,000)
@@ -16,7 +15,6 @@ impl RoyaltyShare {
 }
 
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct Royalties {
     pub bps: u16,

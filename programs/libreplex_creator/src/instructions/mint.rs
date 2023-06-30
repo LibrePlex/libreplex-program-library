@@ -18,7 +18,7 @@ pub struct Mint<'info> {
 
     pub mint: Signer<'info>,
 
-    #[account(mut)]
+    #[account(mut, has_one = mint_authority)]
     pub creator: Box<Account<'info, Creator>>,
 
 
@@ -71,6 +71,8 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         mint: ctx.accounts.mint.to_account_info(),
         signer: creator.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
+        authority: ctx.accounts.buyer.to_account_info(),
+        invoked_migrator_program: None,
     };
 
     let mint_number = match creator.is_ordered {
@@ -155,6 +157,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
     })?;
 
     let group_add_accounts = libreplex_metadata::cpi::accounts::GroupAdd {
+        payer: ctx.accounts.buyer.to_account_info(),
         metadata_authority: creator.to_account_info(),
         group_authority: creator.to_account_info(),
         metadata: ctx.accounts.metadata.to_account_info(),

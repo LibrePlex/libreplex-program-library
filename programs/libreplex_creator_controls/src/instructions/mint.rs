@@ -63,7 +63,7 @@ pub struct Mint<'info> {
     pub attribute_config: Option<AccountInfo<'info>,>,
 
     /// CHECK: Only check address
-    #[account(address = librecreator::id())]
+    #[account(address = libreplex_creator::id())]
     pub libreplex_creator_program: AccountInfo<'info>,
 }                 
 
@@ -131,7 +131,7 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, 
     let signer_seeds = [controller_seeds.as_slice()];
 
     
-    let mint_accounts = librecreator::cpi::accounts::Mint {
+    let mint_accounts = libreplex_creator::cpi::accounts::Mint {
         buyer: accounts.buyer,
         mint_authority: controller.to_account_info(),
         mint: accounts.mint,
@@ -149,5 +149,5 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, 
 
     let mint_ctx = CpiContext::new_with_signer(ctx.accounts.libreplex_creator_program.to_account_info(), mint_accounts, &signer_seeds);
 
-    librecreator::cpi::mint(mint_ctx)
+    libreplex_creator::cpi::mint(mint_ctx)
 }

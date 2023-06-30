@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use solana_program::pubkey::Pubkey;
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum AccountEventType {
     Create,

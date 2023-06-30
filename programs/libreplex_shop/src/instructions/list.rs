@@ -6,7 +6,6 @@ use anchor_spl::{
 };
 use libreplex_shared::transfer_tokens;
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct ListInput {
     pub price: Price,

@@ -1,7 +1,6 @@
 use crate::{Inscription, InscriptionEvent, InscriptionEventType};
 use anchor_lang::prelude::*;
 
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateInscriptionInput {
     pub max_data_length: u32,

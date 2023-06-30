@@ -1,8 +1,7 @@
 use crate::state::{Group, Metadata};
-use crate::{MetadataExtension, PermissionType, Royalties,
+use crate::{MetadataExtension, Royalties,
 };
 use anchor_lang::prelude::*;
-use anchor_spl::token::Mint;
 
 use crate::{errors::ErrorCode};
 
@@ -12,8 +11,6 @@ struct ExtendMetadataEvent {
     mint: Pubkey,
 }
 
-
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct ExtendMetadataInput {
     pub attributes: Vec<u8>,  // base: 4
@@ -35,7 +32,7 @@ impl ExtendMetadataInput {
 
 pub fn validate_extend_metadata_input(
     metadata_input: &ExtendMetadataInput,
-    group: &Group,
+    _group: &Group,
 ) -> Result<()> {
   
     match &metadata_input.royalties {

@@ -1,11 +1,27 @@
 use crate::state::{Metadata};
-use crate::{ CreateMetadataInput, PermissionType, MetadataEvent, MetadataEventType, Asset};
-use anchor_lang::{prelude::*, system_program};
-use libreplex_inscriptions::instructions::CreateInscriptionInput;
+use crate::{ MetadataEvent, MetadataEventType, Asset};
+use anchor_lang::{prelude::*};
 use libreplex_inscriptions::program::Inscriptions;
 
 
 use libreplex_inscriptions::cpi::accounts::{CreateInscription};
+
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct CreateInscriptionInput {
+    pub max_data_length: u32,
+    pub authority: Option<Pubkey>,
+}
+
+impl CreateInscriptionInput {
+    pub fn get_size(&self) -> u32 {
+        return self.max_data_length + 1 + match self.authority {
+            Some(_)=>32,
+            None=>0
+        }
+    }
+}
+
 
 /* 
     we need a separate method since we want to 
@@ -15,8 +31,6 @@ use libreplex_inscriptions::cpi::accounts::{CreateInscription};
 
     (two-way link ensures that the mapping is 1-1)
 */ 
-
-#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateOrdinalMetadataInput {
     pub name: String,
@@ -76,7 +90,6 @@ pub struct CreateOrdinalMetadata<'info> {
 pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdinalMetadataInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let ordinal = &mut ctx.accounts.ordinal;
-    let authority = &ctx.accounts.signer;
 
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let system_program = &ctx.accounts.system_program;
@@ -102,7 +115,10 @@ pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdina
             },
             &[&metadata_seeds]
         ),
-        metadata_input.inscription_input
+        libreplex_inscriptions::instructions::CreateInscriptionInput {
+            authority: metadata_input.inscription_input.authority,
+            max_data_length: metadata_input.inscription_input.max_data_length,
+        }
     )?;
 
     // Update the metadata state account
