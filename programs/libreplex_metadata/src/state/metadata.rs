@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-use crate::{License, MetadataExtension, Royalties};
+use crate::{License, MetadataExtension, Royalties, Group};
 
 /*
     Asset replaces URL and provides both backwards compatibility and flexibility
@@ -77,15 +77,17 @@ pub struct Metadata {
 
     pub is_mutable: bool,
 
+    pub group: Option<Pubkey>,
+
     pub name: String,
 
     pub symbol: String,
 
+  
+
     pub asset: Asset,
 
     pub description: Option<String>,
-
-    pub group: Option<Pubkey>,
 
     pub license: Option<License>,
 
@@ -202,7 +204,7 @@ pub struct CreateMetadataInput {
     pub asset: Asset,
     pub description: Option<String>,
     pub update_authority: Pubkey,
-    pub extension: MetadataExtension
+    pub extension: MetadataExtension,
 }
 
 impl CreateMetadataInput {

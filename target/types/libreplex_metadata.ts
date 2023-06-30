@@ -338,6 +338,12 @@ export type LibreplexMetadata = {
           "isSigner": false
         },
         {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "invokedMigratorProgram",
           "isMut": false,
           "isSigner": false,
@@ -587,6 +593,12 @@ export type LibreplexMetadata = {
             "type": "string"
           },
           {
+            "name": "group",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
             "name": "asset",
             "type": {
               "defined": "Asset"
@@ -596,12 +608,6 @@ export type LibreplexMetadata = {
             "name": "description",
             "type": {
               "option": "string"
-            }
-          },
-          {
-            "name": "group",
-            "type": {
-              "option": "publicKey"
             }
           },
           {
@@ -2061,6 +2067,12 @@ export const IDL: LibreplexMetadata = {
           "isSigner": false
         },
         {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "invokedMigratorProgram",
           "isMut": false,
           "isSigner": false,
@@ -2310,6 +2322,12 @@ export const IDL: LibreplexMetadata = {
             "type": "string"
           },
           {
+            "name": "group",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
             "name": "asset",
             "type": {
               "defined": "Asset"
@@ -2319,12 +2337,6 @@ export const IDL: LibreplexMetadata = {
             "name": "description",
             "type": {
               "option": "string"
-            }
-          },
-          {
-            "name": "group",
-            "type": {
-              "option": "publicKey"
             }
           },
           {

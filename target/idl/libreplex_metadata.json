@@ -338,6 +338,12 @@
           "isSigner": false
         },
         {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "invokedMigratorProgram",
           "isMut": false,
           "isSigner": false,
@@ -587,6 +593,12 @@
             "type": "string"
           },
           {
+            "name": "group",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
             "name": "asset",
             "type": {
               "defined": "Asset"
@@ -596,12 +608,6 @@
             "name": "description",
             "type": {
               "option": "string"
-            }
-          },
-          {
-            "name": "group",
-            "type": {
-              "option": "publicKey"
             }
           },
           {
