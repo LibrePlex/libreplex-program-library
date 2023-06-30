@@ -6,21 +6,6 @@ use libreplex_inscriptions::program::LibreplexInscriptions;
 
 use libreplex_inscriptions::cpi::accounts::{CreateInscription};
 
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CreateInscriptionInput {
-    pub max_data_length: u32,
-    pub authority: Option<Pubkey>,
-}
-
-impl CreateInscriptionInput {
-    pub fn get_size(&self) -> u32 {
-        return self.max_data_length + 1 + match self.authority {
-            Some(_)=>32,
-            None=>0
-        }
-    }
-}
-
 /*
     we need a separate method since we want to
     1) create ordinal and the metadata together (this requires metadata to sign)
