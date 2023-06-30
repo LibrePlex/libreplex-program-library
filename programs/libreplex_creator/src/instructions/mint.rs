@@ -2,7 +2,7 @@
 
 use anchor_lang::prelude::*;
 use arrayref::array_ref;
-use libreplex_metadata::{Group, CreateMetadataInput, instructions::ExtendMetadataInput};
+use libreplex_metadata::{Group, CreateMetadataInput};
 
 use crate::{Creator, AssetUrl, MintNumbers, errors::ErrorCode, MINT_NUMBERS_START, AttributeConfig};
 
@@ -107,25 +107,6 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
 
     let name = format!("{}{}", creator.name, mint_number);   
 
-    libreplex_metadata::cpi::create_metadata(create_ctx, CreateMetadataInput {
-        name,
-        symbol: creator.symbol.clone(),
-        asset,
-        description: creator.description.clone(),
-        update_authority: creator.key(),
-    })?;
-
-    let extend_ix_accounts = libreplex_metadata::cpi::accounts::ExtendMetadata {
-        metadata: ctx.accounts.metadata.to_account_info(),
-        payer: ctx.accounts.buyer.to_account_info(),
-        metadata_extended: ctx.accounts.metadata_extension.to_account_info(),
-        system_program: ctx.accounts.system_program.to_account_info(),
-        update_authority: creator.to_account_info(),
-    };
-
-    
-    let extend_ctx 
-        = CpiContext::new_with_signer(ctx.accounts.libreplex_metadata_program.to_account_info(), extend_ix_accounts, signer_seeds.as_slice());
 
 
     let attributes = match creator.attribute_mappings {
@@ -151,10 +132,15 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
     };
 
     // I assume collection level royalties
-    libreplex_metadata::cpi::extend_metadata(extend_ctx, ExtendMetadataInput {
-        attributes,
-        royalties: None,
+    libreplex_metadata::cpi::create_metadata(create_ctx, CreateMetadataInput {
+        name,
+        symbol: creator.symbol.clone(),
+        asset,
+        description: creator.description.clone(),
+        update_authority: creator.key(),
+        extension: libreplex_metadata::MetadataExtension::Nft { attributes: attributes, signers: vec![], royalties: None, license: None },
     })?;
+    
 
     let group_add_accounts = libreplex_metadata::cpi::accounts::GroupAdd {
         payer: ctx.accounts.buyer.to_account_info(),

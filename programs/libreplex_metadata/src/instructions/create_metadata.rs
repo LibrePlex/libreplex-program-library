@@ -1,9 +1,8 @@
-    use crate::state::{Metadata};
+use crate::state::{Metadata};
 use crate::{ CreateMetadataInput, MetadataEvent, MetadataEventType, assert_pda_derivation::assert_pda_derivation};
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use crate::{errors::ErrorCode};
-
 
 
 // whitelisted signer programs
@@ -36,7 +35,6 @@ pub struct CreateMetadata<'info> {
 
     pub system_program: Program<'info, System>,
 
-
     /*
      only to be supplied if the migration is invoked by a whitelisted 
      migrator program.
@@ -53,7 +51,6 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     let authority = &ctx.accounts.authority;
     let invoked_migrator_program = &ctx.accounts.invoked_migrator_program;
 
-
     assert_is_valid_signer(&authority.key(), &mint.key(), invoked_migrator_program)?;
 
     // Update the metadata state account
@@ -65,6 +62,9 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     metadata.description = metadata_input.description;
     metadata.asset = metadata_input.asset;
     metadata.update_authority = metadata_input.update_authority;
+    metadata.extension = metadata_input.extension;
+
+    metadata.group = None;
 
     msg!(
         "metadata created for mint with pubkey {}",

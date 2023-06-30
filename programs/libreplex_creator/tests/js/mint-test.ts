@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { Librecreator } from "../../../../target/types/librecreator";
+import { LibreplexCreator } from "../../../../target/types/libreplex_creator";
 import { LibreplexMetadata } from "../../../../target/types/libreplex_metadata";
 import { Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY, SystemProgram } from "@solana/web3.js";
 import { expect } from 'chai';
@@ -12,7 +12,7 @@ import { Transaction } from "@solana/web3.js";
 describe("libreplex creator", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
-  const program = anchor.workspace.LibreplexCreator as Program<Librecreator>;
+  const program = anchor.workspace.LibreplexCreator as Program<LibreplexCreator>;
   const metadataProgram = anchor.workspace.LibreplexMetadata as Program<LibreplexMetadata>;
 
   console.log(Object.keys(anchor.workspace))
@@ -75,6 +75,7 @@ describe("libreplex creator", () => {
     console.log("Group permissions delegated")
 
     await program.methods.createCreator({
+
       attributeMappings: null,
       collection: group,
       description: "The coolest metadatas",
