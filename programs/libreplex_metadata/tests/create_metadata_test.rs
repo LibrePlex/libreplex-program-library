@@ -62,10 +62,10 @@ mod permissions {
 
         let create_metadata_accounts = CreateMetadata {
             signer: collection_authority,
+            payer: collection_authority,
             authority: collection_authority,
             metadata:  metadata.key(),
             mint: mint.pubkey(),
-            group: None,
             invoked_migrator_program: None,
             system_program: system_program::ID,
         }
