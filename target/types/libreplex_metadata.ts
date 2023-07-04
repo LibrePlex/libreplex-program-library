@@ -1,5 +1,5 @@
 export type LibreplexMetadata = {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -454,7 +454,6 @@ export type LibreplexMetadata = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Mint",
                 "path": "mint"
               }
             ]
@@ -1852,7 +1851,7 @@ export type LibreplexMetadata = {
 };
 
 export const IDL: LibreplexMetadata = {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -2307,7 +2306,6 @@ export const IDL: LibreplexMetadata = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Mint",
                 "path": "mint"
               }
             ]

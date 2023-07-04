@@ -2,8 +2,10 @@ use crate::state::{Listing, Price};
 use anchor_lang::{prelude::*, AnchorDeserialize, AnchorSerialize};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{Mint, Token, TokenAccount},
+    token::{Mint, TokenAccount},
 };
+use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
+
 use libreplex_shared::transfer_tokens;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -49,7 +51,11 @@ pub struct List<'info> {
 
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    pub token_program: Program<'info, Token>,
+    /// CHECK: Checked against ID constraint
+    #[account(
+        constraint = token_program.key.eq(&TOKEN_2022_PROGRAM_ID)
+    )]
+    pub token_program: UncheckedAccount<'info>,
 }
 
 pub fn handler(ctx: Context<List>, list_input: ListInput) -> Result<()> {
