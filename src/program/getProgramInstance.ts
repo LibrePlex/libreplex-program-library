@@ -6,6 +6,9 @@ export const PROGRAM_ID_METADATA =
 export const PROGRAM_ID_INSCRIPTIONS =
   "inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp";
 
+export const PROGRAM_ID_LISTINGS =
+  "ListjawGEdhxuAErSyYwcTEGWQswFoi6FScnGG1RKSB"
+
 import { IDL as IDLMetadata, LibreplexMetadata } from "../../target/types/libreplex_metadata";
 import { IDL as IDLOrdinals, Inscriptions } from "../../target/types/inscriptions";
 

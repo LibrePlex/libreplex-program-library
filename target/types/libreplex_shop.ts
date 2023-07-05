@@ -29,7 +29,6 @@ export type LibreplexShop = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Mint",
                 "path": "mint"
               }
             ]
@@ -42,7 +41,7 @@ export type LibreplexShop = {
         },
         {
           "name": "listerTokenAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -199,7 +198,7 @@ export type LibreplexShop = {
             "type": "u64"
           },
           {
-            "name": "escrowWalletBump",
+            "name": "listingBump",
             "type": "u8"
           }
         ]
@@ -223,7 +222,7 @@ export type LibreplexShop = {
             "type": "u64"
           },
           {
-            "name": "escrowWalletBump",
+            "name": "listingBump",
             "type": "u8"
           }
         ]
@@ -305,7 +304,6 @@ export const IDL: LibreplexShop = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Mint",
                 "path": "mint"
               }
             ]
@@ -318,7 +316,7 @@ export const IDL: LibreplexShop = {
         },
         {
           "name": "listerTokenAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -475,7 +473,7 @@ export const IDL: LibreplexShop = {
             "type": "u64"
           },
           {
-            "name": "escrowWalletBump",
+            "name": "listingBump",
             "type": "u8"
           }
         ]
@@ -499,7 +497,7 @@ export const IDL: LibreplexShop = {
             "type": "u64"
           },
           {
-            "name": "escrowWalletBump",
+            "name": "listingBump",
             "type": "u8"
           }
         ]

@@ -2124,11 +2124,12 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "solana-program",
+ "spl-token-2022",
 ]
 
 [[package]]
 name = "libreplex_shop"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

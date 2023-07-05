@@ -19,7 +19,7 @@ pub struct Listing {
     pub lister: Pubkey,
     pub price: Price,
     pub amount: u64,
-    pub escrow_wallet_bump: u8
+    pub listing_bump: u8
 }
 
 impl Listing{

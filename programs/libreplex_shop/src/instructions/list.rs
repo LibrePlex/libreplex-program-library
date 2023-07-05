@@ -2,7 +2,7 @@ use crate::state::{Listing, Price};
 use anchor_lang::{prelude::*, AnchorDeserialize, AnchorSerialize};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{Mint, TokenAccount},
+    token::{TokenAccount},
 };
 use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
 
@@ -12,12 +12,12 @@ use libreplex_shared::transfer_tokens;
 pub struct ListInput {
     pub price: Price,
     pub amount: u64,
-    pub escrow_wallet_bump: u8
+    pub listing_bump: u8
 }
 
 impl ListInput {
     pub fn get_size(&self) -> u32 {
-        1 + match &self.price {
+        2 + match &self.price {
             Price::Native { lamports: _ } => 8,
             Price::Spl { mint: _, amount: _ } => 32 + 8,
         }
@@ -30,8 +30,11 @@ pub struct List<'info> {
     #[account(mut)]
     pub lister: Signer<'info>,
 
-    #[account()]
-    pub mint: Account<'info, Mint>,
+    /// CHECK: Checked against ID constraint
+    #[account(
+        constraint = mint.owner.eq(&TOKEN_2022_PROGRAM_ID)
+    )]
+    pub mint: UncheckedAccount<'info>,
 
     #[account(init,
     payer=lister,
@@ -45,7 +48,12 @@ pub struct List<'info> {
     pub escrow_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Is allowed to be empty in which case we create it
-    pub lister_token_account: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        constraint = token_program.key.eq(&TOKEN_2022_PROGRAM_ID)
+    )]
+    pub lister_token_account:  UncheckedAccount<'info>,
+    // Account<'info, TokenAccount>,
 
     pub system_program: Program<'info, System>,
 
@@ -72,7 +80,9 @@ pub fn handler(ctx: Context<List>, list_input: ListInput) -> Result<()> {
     listing.lister = lister.key();
     listing.mint = mint.key();
     listing.price = list_input.price;
-    listing.escrow_wallet_bump = list_input.escrow_wallet_bump;
+    listing.listing_bump = list_input.listing_bump;
+
+    
 
     transfer_tokens(
         &token_program.to_account_info(),

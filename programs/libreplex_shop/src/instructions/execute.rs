@@ -1,5 +1,5 @@
 use crate::{
-    constants::ESCROW_WALLET,
+    constants::{ESCROW_WALLET, LISTING},
     state::{Listing, Price},
 };
 use anchor_lang::{prelude::*, AnchorDeserialize, AnchorSerialize};
@@ -81,11 +81,11 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
 
     let mut remaining_accounts = ctx.remaining_accounts.to_vec();
 
-    let listing_key = listing.key();
+    let mint_key = &mint.key();
     let auth_seeds = &[
-        ESCROW_WALLET.as_bytes(),
-        listing_key.as_ref(),
-        &[listing.escrow_wallet_bump],
+        LISTING.as_bytes(),
+        &mint_key.as_ref(),
+        &[listing.listing_bump],
     ];
 
     match &metadata.group {

@@ -29,7 +29,6 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Mint",
                 "path": "mint"
               }
             ]
@@ -42,7 +41,7 @@
         },
         {
           "name": "listerTokenAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -199,7 +198,7 @@
             "type": "u64"
           },
           {
-            "name": "escrowWalletBump",
+            "name": "listingBump",
             "type": "u8"
           }
         ]
@@ -223,7 +222,7 @@
             "type": "u64"
           },
           {
-            "name": "escrowWalletBump",
+            "name": "listingBump",
             "type": "u8"
           }
         ]
@@ -271,5 +270,8 @@
       "name": "BadMint",
       "msg": "Bad mint"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "ListjawGEdhxuAErSyYwcTEGWQswFoi6FScnGG1RKSB"
+  }
 }

@@ -19,3 +19,4 @@ default = []
 anchor-lang = "^0.28"
 anchor-spl = "^0.28"
 solana-program = "~1.16"
+spl-token-2022 = "0.6.1"
