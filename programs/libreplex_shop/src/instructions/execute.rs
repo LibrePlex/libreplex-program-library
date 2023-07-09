@@ -1,14 +1,18 @@
 use crate::{
-    constants::{ESCROW_WALLET, LISTING},
+    constants::{LISTING},
     state::{Listing, Price},
 };
-use anchor_lang::{prelude::*, AnchorDeserialize, AnchorSerialize};
+use anchor_lang::{prelude::*};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{Mint, Token, TokenAccount},
+    token::{Token},
 };
 use libreplex_metadata::{Group, Metadata, RoyaltyShare};
 use libreplex_shared::{transfer_tokens, SharedError};
+
+
+
+use spl_token_2022::{ID as TOKEN_2022_PROGRAM_ID, instruction::close_account};
 
 struct RoyaltyAmount {
     amount: u64,
@@ -21,47 +25,57 @@ pub struct Execute<'info> {
     #[account(mut)]
     pub seller: UncheckedAccount<'info>,
 
-    #[account()]
-    pub mint: Account<'info, Mint>,
+   /// CHECK: Checked against ID constraint
+   #[account(
+        constraint = mint.owner.eq(&TOKEN_2022_PROGRAM_ID)
+    )]
+    pub mint: UncheckedAccount<'info>,
+
 
     #[account()]
-    pub metadata: Account<'info, Metadata>,
+    pub metadata: Box<Account<'info, Metadata>>,
 
     #[account()]
-    pub group: Option<Account<'info, Group>>,
+    pub group: Option<Box<Account<'info, Group>>>,
 
     #[account(mut,
         close=seller,
         constraint = listing.lister == seller.key()
         )]
-    pub listing: Account<'info, Listing>,
+    pub listing: Box<Account<'info, Listing>>,
 
     pub buyer: Signer<'info>,
 
-    #[account(mut,
-        close=seller,
-        constraint = escrow_token_account.mint == listing.mint,
-        constraint = escrow_token_account.owner == listing.key(),
-    )]
-    pub escrow_token_account: Account<'info, TokenAccount>,
+    /// CHECK: Checked in logic
+    #[account(mut)]
+    pub escrow_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Is allowed to be empty in which case we create it
+    #[account(mut)]
     pub buyer_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Ignored for native price
+    #[account(mut)]
     pub lister_payment_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Ignored for native price
+    #[account(mut)]
     pub buyer_payment_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Ignored for native price
-    pub payment_mint: UncheckedAccount<'info>,
+    pub payment_mint: Option<UncheckedAccount<'info>>,
 
     pub system_program: Program<'info, System>,
 
     pub associated_token_program: Program<'info, AssociatedToken>,
 
     pub token_program: Program<'info, Token>,
+    
+    /// CHECK: Checked against ID constraint
+    #[account(
+        constraint = token_program_2022.key.eq(&TOKEN_2022_PROGRAM_ID)
+    )]
+    pub token_program_2022: UncheckedAccount<'info>,
 }
 
 pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result<()> {
@@ -73,6 +87,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
+    let token_program_2022 = &ctx.accounts.token_program_2022;
     let group = &ctx.accounts.group;
     let payment_mint = &ctx.accounts.payment_mint;
     let metadata = &ctx.accounts.metadata;
@@ -87,6 +102,8 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
         &mint_key.as_ref(),
         &[listing.listing_bump],
     ];
+
+
 
     match &metadata.group {
         Some(g) => match group {
@@ -104,19 +121,25 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
         }
     }
 
+    // let's handle both 2022 and trad here just in case.
+    let mint_token_program = match escrow_token_account.owner {
+        &TOKEN_2022_PROGRAM_ID => token_program_2022.to_account_info(),
+        _ => token_program.to_account_info()
+    };
+    msg!("amount: {}", listing.amount);
     // transfer listing to the buyer
     transfer_tokens(
-        &token_program.to_account_info(),
+        &mint_token_program,
         &escrow_token_account.to_account_info(),
         &recipient_token_account.to_account_info(),
         &listing.to_account_info(),
         &mint.to_account_info(),
         &buyer_account_info,
         &associated_token_program.to_account_info(),
-        &associated_token_program.to_account_info(),
+        &system_program.to_account_info(),
         Some(&[auth_seeds]),
         &buyer_account_info,
-        listing.amount,
+       listing.amount,
     )?;
 
     let mut shares: Vec<RoyaltyShare> = vec![];
@@ -175,54 +198,100 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
             let buyer_payment_token_account = &ctx.accounts.buyer_payment_token_account;
             let lister_payment_token_account = &ctx.accounts.lister_payment_token_account;
 
-            if mint != payment_mint.key() {
-                return Err(SharedError::BadMint.into());
+            match payment_mint {
+                None => {
+                    return Err(SharedError::BadMint.into());
+                }
+                Some(x) => {
+                    if mint != x.key() {
+                        return Err(SharedError::BadMint.into());
+                    }
+
+                    let total_royalty_amount = (amount as u128)
+                        .checked_mul(royalty_bps as u128)
+                        .unwrap()
+                        .checked_div(10000)
+                        .unwrap() as u64;
+
+                    let royalty_amounts =
+                        calculate_royalty_amounts(total_royalty_amount, amount, shares)?;
+
+                    // like above, let's handle both trad and 2022 for royalties as well
+                    let payment_mint_token_program = match buyer_payment_token_account.owner {
+                        &TOKEN_2022_PROGRAM_ID => token_program_2022.to_account_info(),
+                        _ => token_program.to_account_info()
+                    };
+
+
+                    for royalty_amount in royalty_amounts {
+                        let royalty_wallet = remaining_accounts.pop().unwrap();
+                        let royalty_token_account = remaining_accounts.pop().unwrap();
+
+                        transfer_tokens(
+                            &payment_mint_token_program,
+                            &buyer_payment_token_account.to_account_info(),
+                            &royalty_token_account.to_account_info(),
+                            &buyer_account_info.to_account_info(),
+                            &x.to_account_info(),
+                            &royalty_wallet.to_account_info(),
+                            associated_token_program,
+                            system_program,
+                            None,
+                            &buyer_account_info,
+                            royalty_amount.amount,
+                        )?;
+                    }
+
+                    transfer_tokens(
+                        &payment_mint_token_program,
+                        &buyer_payment_token_account.to_account_info(),
+                        &lister_payment_token_account.to_account_info(),
+                        &buyer_account_info.to_account_info(),
+                        &x.to_account_info(),
+                        &seller.to_account_info(),
+                        associated_token_program,
+                        system_program,
+                        None,
+                        &buyer_account_info,
+                        amount - total_royalty_amount,
+                    )?;
+                }
             }
-
-            let total_royalty_amount = (amount as u128)
-                .checked_mul(royalty_bps as u128)
-                .unwrap()
-                .checked_div(10000)
-                .unwrap() as u64;
-
-            let royalty_amounts =
-                calculate_royalty_amounts(total_royalty_amount, amount, shares)?;
-
-            for royalty_amount in royalty_amounts {
-             
-                let royalty_wallet = remaining_accounts.pop().unwrap();
-                let royalty_token_account = remaining_accounts.pop().unwrap();
-
-                transfer_tokens(
-                    &token_program.to_account_info(),
-                    &buyer_payment_token_account.to_account_info(),
-                    &royalty_token_account.to_account_info(),
-                    &buyer_account_info.to_account_info(),
-                    &payment_mint.to_account_info(),
-                    &royalty_wallet.to_account_info(),
-                    associated_token_program,
-                    system_program,
-                    None,
-                    token_program,
-                    royalty_amount.amount,
-                )?;
-            }
-
-            transfer_tokens(
-                &token_program.to_account_info(),
-                &buyer_payment_token_account.to_account_info(),
-                &lister_payment_token_account.to_account_info(),
-                &buyer_account_info.to_account_info(),
-                &payment_mint.to_account_info(),
-                &seller.to_account_info(),
-                associated_token_program,
-                system_program,
-                None,
-                token_program,
-                amount - total_royalty_amount,
-            )?;
         }
     }
+
+    solana_program::program::invoke_signed(
+        &close_account(&token_program_2022.key(), 
+            &escrow_token_account.key(), 
+            &listing.lister, 
+            &listing.key(), 
+            &[])?
+            ,
+        &[
+            escrow_token_account.to_account_info().clone(),
+            seller.to_account_info().clone(),
+            listing.to_account_info().clone(),
+            token_program_2022.to_account_info().clone(),
+        ],
+        &[auth_seeds],
+    )?;
+
+    // check token account is kosher - a sanity check for mint + owner
+    // let acc_data = &escrow_token_account.try_borrow_mut_data().unwrap()[..][..];
+    // let escrow_token_account_obj = spl_token_2022::state::Account::unpack_from_slice(acc_data).unwrap();
+    // drop(acc_data);
+
+    // if escrow_token_account_obj.mint != listing.mint.key() {
+    //     return Err(SharedError::BadMint.into());
+    // }
+
+    // msg!("owner: {}", escrow_token_account_obj.owner.key());
+
+    // msg!("listing: {}", listing.key());
+
+    // if !escrow_token_account_obj.owner.eq(&listing.key()) {
+    //     return Err(SharedError::BadOwner.into());
+    // }
 
     Ok(())
 }

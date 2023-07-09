@@ -37,36 +37,40 @@ pub fn transfer_tokens<'info>(
     }
     msg!("{}", amount);
 
-    let acc_data = &mint.try_borrow_data().unwrap()[..];
+
+    let acc_data = &mint.try_borrow_data().unwrap()[..][..];
     let mint_obj = spl_token_2022::state::Mint::unpack_from_slice(acc_data).unwrap();
-    
-    
+    drop(acc_data);
 
     if target_token_account.data_is_empty() {
         // msg!("{}",payer.key() );
         anchor_spl::associated_token::create(CpiContext::new(
             associated_token_program.to_account_info(),
             anchor_spl::associated_token::Create {
-                payer: payer.to_account_info(),
-                associated_token: target_token_account.to_account_info(),
-                authority: target_wallet.to_account_info(),
-                mint: mint.to_account_info(),
-                system_program: system_program.to_account_info(),
-                token_program: token_program.to_account_info(),
+                payer: payer.clone(),
+                associated_token: target_token_account.clone(),
+                authority: target_wallet.clone(),
+                mint: mint.clone(),
+                system_program: system_program.clone(),
+                token_program: token_program.clone(),
             },
         ))?;
     }
 
+    msg!("b");
+
     let ix = spl_token_2022::instruction::transfer_checked(
-        &token_program.key(),
-        &source_token_account.key(),
-        &mint.key(),
-        &target_token_account.key(),
-        &source_wallet.key(),
-        &[&source_wallet.key()],
+        token_program.key,
+        source_token_account.key,
+        mint.key,
+        target_token_account.key,
+        source_wallet.key,
+        &[],
         amount,
         mint_obj.decimals
     )?;
+
+    msg!("c");
 
     match authority_seeds {
         Some(x) => {
@@ -74,23 +78,12 @@ pub fn transfer_tokens<'info>(
                 &ix,
                 &[
                     source_token_account.clone(),
+                    mint.clone(),
                     target_token_account.clone(),
                     source_wallet.clone(),
+                    token_program.clone()
                 ],
                 x,
-            )?;
-
-            anchor_spl::token::transfer(
-                CpiContext::new_with_signer(
-                    token_program.to_account_info(),
-                    anchor_spl::token::Transfer {
-                        to: target_token_account.clone(),
-                        from: source_token_account.clone(),
-                        authority: source_wallet.clone(),
-                    },
-                    x
-                ),
-                amount
             )?;
         }
         None => {
