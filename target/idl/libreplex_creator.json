@@ -482,5 +482,8 @@
       "name": "SoldOut",
       "msg": "Sold out"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "78deTr7qycJ6498vSd3pNMhdCKKWxMipniitVHQcM8RM"
+  }
 }

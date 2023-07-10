@@ -271,5 +271,8 @@
       "name": "BadMint",
       "msg": "Bad mint"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "ListjawGEdhxuAErSyYwcTEGWQswFoi6FScnGG1RKSB"
+  }
 }

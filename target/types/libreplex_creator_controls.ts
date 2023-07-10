@@ -140,6 +140,42 @@ export type LibreplexCreatorControls = {
           }
         }
       ]
+    },
+    {
+      "name": "update",
+      "accounts": [
+        {
+          "name": "updateAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creatorController",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "UpdateInput"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -221,7 +257,9 @@ export type LibreplexCreatorControls = {
           },
           {
             "name": "accountKey",
-            "type": "string"
+            "type": {
+              "vec": "publicKey"
+            }
           },
           {
             "name": "scopedToBuyer",
@@ -238,6 +276,10 @@ export type LibreplexCreatorControls = {
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
           },
           {
             "name": "recepient",
@@ -281,6 +323,22 @@ export type LibreplexCreatorControls = {
             "name": "chosenPhase",
             "type": {
               "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "phases",
+            "type": {
+              "vec": {
+                "defined": "Phase"
+              }
             }
           }
         ]
@@ -548,6 +606,42 @@ export const IDL: LibreplexCreatorControls = {
           }
         }
       ]
+    },
+    {
+      "name": "update",
+      "accounts": [
+        {
+          "name": "updateAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creatorController",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "UpdateInput"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -629,7 +723,9 @@ export const IDL: LibreplexCreatorControls = {
           },
           {
             "name": "accountKey",
-            "type": "string"
+            "type": {
+              "vec": "publicKey"
+            }
           },
           {
             "name": "scopedToBuyer",
@@ -646,6 +742,10 @@ export const IDL: LibreplexCreatorControls = {
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
           },
           {
             "name": "recepient",
@@ -689,6 +789,22 @@ export const IDL: LibreplexCreatorControls = {
             "name": "chosenPhase",
             "type": {
               "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "phases",
+            "type": {
+              "vec": {
+                "defined": "Phase"
+              }
             }
           }
         ]

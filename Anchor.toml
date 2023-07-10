@@ -6,9 +6,9 @@ skip-lint = false
 libreplex_metadata="AJ5Hh5q4HegZWWu1ScY7ZRA6zELXmRzEWS5EXFSKqBC6"
 libreplex_default_renderer="rndbQFmFfiQ4tTG9QPhfJeq1J9fLCSBMAPj3EbLQ7Co"
 libreplex_inscriptions="inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
-libreplex_creator="toysDBtkQ7P1NWwaTtXZbXBeGdM16fReT5qzCgc7wig"
+libreplex_creator="78deTr7qycJ6498vSd3pNMhdCKKWxMipniitVHQcM8RM"
 libreplex_shop="ListjawGEdhxuAErSyYwcTEGWQswFoi6FScnGG1RKSB"
-
+libreplex_creator_controls="G9whLiLT9nSkxwWzWvbiKKrTL6yWxvzh2UXqNht5VXqV"
 
 [registry]
 url = "https://api.apr.dev"

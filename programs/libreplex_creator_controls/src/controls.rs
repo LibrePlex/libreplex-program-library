@@ -98,7 +98,7 @@ impl Control for Payment {
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct MintLimit {
     pub limit: u32,
-    pub account_key: String,
+    pub account_key: Vec<Pubkey>,
     pub scoped_to_buyer: bool,
 }
 
@@ -115,11 +115,15 @@ impl Control for MintLimit {
 
         accounts.remaining_accounts.current += 1;
 
+        let mut account_key_bytes: Vec<&[u8]> = self.account_key.iter().map(|c| {c.as_ref()}).collect();
+
         let mut expected_seeds = if self.scoped_to_buyer {
-            vec!["mint_limit".as_bytes(), accounts.buyer.key.as_ref(), self.account_key.as_bytes()]
+            vec!["mint_limit".as_bytes(), accounts.buyer.key.as_ref()]
         } else {
-            vec!["mint_limit".as_bytes(), self.account_key.as_bytes()]
+            vec!["mint_limit".as_bytes()]
         };
+
+        expected_seeds.append(&mut account_key_bytes);
 
         let expected_key = Pubkey::find_program_address(&expected_seeds, &crate::id());
 
@@ -158,6 +162,7 @@ impl Control for MintLimit {
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct SplPayment {
     pub amount: u64,
+    pub mint: Pubkey,
     pub recepient: Pubkey,
 }
 

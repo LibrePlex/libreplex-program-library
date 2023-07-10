@@ -14,7 +14,7 @@ pub mod errors;
 pub use constants::*;
 pub use state::*;
 
-declare_id!("toysDBtkQ7P1NWwaTtXZbXBeGdM16fReT5qzCgc7wig");
+declare_id!("78deTr7qycJ6498vSd3pNMhdCKKWxMipniitVHQcM8RM");
 
 #[program]
 pub mod libreplex_creator {
