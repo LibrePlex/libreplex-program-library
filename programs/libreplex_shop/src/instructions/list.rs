@@ -1,21 +1,37 @@
-use crate::state::{Listing, Price};
-use anchor_lang::{prelude::*, AnchorDeserialize, AnchorSerialize};
-use anchor_spl::{
-    associated_token::AssociatedToken,
-    token::{Mint, Token, TokenAccount},
+
+use crate::{
+    errors::ShopError,
+    state::{Listing, ListingFilter, ListingFilterType, ListingGroup, Price}, empty_account_placeholder,
 };
+use anchor_lang::{
+    error::{Error as AnchorError},
+    prelude::{
+        error,
+        require_keys_neq,
+        borsh, Account, Accounts, Context, Program, Result as AnchorResult, Signer, System,
+        Rent,
+        Pubkey,
+        UncheckedAccount,
+        SolanaSysvar
+    },
+    AnchorDeserialize, AnchorSerialize, Key, ToAccountInfo,
+};
+use anchor_spl::{associated_token::AssociatedToken};
+use libreplex_metadata::Metadata;
+use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
+
 use libreplex_shared::transfer_tokens;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct ListInput {
     pub price: Price,
     pub amount: u64,
-    pub escrow_wallet_bump: u8
+    pub listing_bump: u8,
 }
 
 impl ListInput {
     pub fn get_size(&self) -> u32 {
-        1 + match &self.price {
+        2 + match &self.price {
             Price::Native { lamports: _ } => 8,
             Price::Spl { mint: _, amount: _ } => 32 + 8,
         }
@@ -28,8 +44,25 @@ pub struct List<'info> {
     #[account(mut)]
     pub lister: Signer<'info>,
 
-    #[account()]
-    pub mint: Account<'info, Mint>,
+    /// CHECK: Checked against ID constraint
+    #[account(
+        constraint = mint.owner.eq(&TOKEN_2022_PROGRAM_ID)
+    )]
+    pub mint: UncheckedAccount<'info>,
+
+    #[account(
+        constraint = metadata.mint == mint.key()
+    )]
+    pub metadata: Account<'info, Metadata>,
+
+    // one filter must always be invoked to list
+    #[account(mut)]
+    pub listing_filter: Account<'info, ListingFilter>,
+
+    // one filter must always be invoked to list
+    #[account(mut,
+    constraint = listing_filter.listing_group == listing_group.key())]
+    pub listing_group: Account<'info, ListingGroup>,
 
     #[account(init,
     payer=lister,
@@ -43,16 +76,24 @@ pub struct List<'info> {
     pub escrow_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Is allowed to be empty in which case we create it
-    pub lister_token_account: Account<'info, TokenAccount>,
-
+    #[account(
+        mut,
+        constraint = token_program.key.eq(&TOKEN_2022_PROGRAM_ID)
+    )]
+    pub lister_token_account: UncheckedAccount<'info>,
+    // Account<'info, TokenAccount>,
     pub system_program: Program<'info, System>,
 
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    pub token_program: Program<'info, Token>,
+    /// CHECK: Checked against ID constraint
+    #[account(
+        constraint = token_program.key.eq(&TOKEN_2022_PROGRAM_ID)
+    )]
+    pub token_program: UncheckedAccount<'info>,
 }
 
-pub fn handler(ctx: Context<List>, list_input: ListInput) -> Result<()> {
+pub fn handler(ctx: Context<List>, list_input: ListInput) -> AnchorResult<()> {
     let listing = &mut ctx.accounts.listing;
     let lister = &mut ctx.accounts.lister;
     let lister_token_account = &mut ctx.accounts.lister_token_account;
@@ -61,12 +102,21 @@ pub fn handler(ctx: Context<List>, list_input: ListInput) -> Result<()> {
     let associated_token_program = &mut ctx.accounts.associated_token_program;
     let system_program = &mut ctx.accounts.system_program;
     let token_program = &mut ctx.accounts.token_program;
-    
+    let metadata = &mut ctx.accounts.metadata;
+    let listing_filter = &mut ctx.accounts.listing_filter;
+    let listing_group = &mut ctx.accounts.listing_group;
+
+    listing_group.listings_active += 1;
+    listing_group.listings_created += 1;
 
     listing.lister = lister.key();
     listing.mint = mint.key();
     listing.price = list_input.price;
-    listing.escrow_wallet_bump = list_input.escrow_wallet_bump;
+    listing.listing_bump = list_input.listing_bump;
+    listing.amount = list_input.amount;
+    listing.group = listing_group.key();
+
+    validate_filters(listing_filter, lister, metadata)?;
 
     transfer_tokens(
         &token_program.to_account_info(),
@@ -82,5 +132,29 @@ pub fn handler(ctx: Context<List>, list_input: ListInput) -> Result<()> {
         listing.amount,
     )?;
 
+    Ok(())
+}
+
+pub fn validate_filters<'info>(
+    listing_filter: &Account<'info, ListingFilter>,
+    lister: &Signer<'info>,
+    metadata: &Account<'info, Metadata>
+) -> Result<(), AnchorError> {
+    match listing_filter.filter_type {
+        ListingFilterType::Lister { pubkey } => {
+            if !lister.key().eq(&pubkey) && !pubkey.eq(&empty_account_placeholder::ID) {
+                return Err(ShopError::ListerNotAllowed.into())
+            }
+        },
+        ListingFilterType::Group { pubkey } => {
+            if !metadata.group.unwrap().key().eq(&pubkey) && !pubkey.eq(&empty_account_placeholder::ID) {
+                return Err(ShopError::GroupNotAllowed.into())
+            }
+        }
+        _ => {
+            // other filter types are not supported yet
+            return Err(ShopError::UnsupportFilterType.into());
+        }
+    }
     Ok(())
 }

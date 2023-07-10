@@ -2024,7 +2024,7 @@ dependencies = [
  "arrayref",
  "assert_matches",
  "bincode",
- "libreplex_metadata 0.5.0",
+ "libreplex_metadata 0.6.0",
  "mocha",
  "solana-program",
  "solana-program-test",
@@ -2043,7 +2043,7 @@ dependencies = [
  "assert_matches",
  "bincode",
  "libreplex_creator",
- "libreplex_metadata 0.5.0",
+ "libreplex_metadata 0.6.0",
  "mocha",
  "solana-program",
  "solana-program-test",
@@ -2059,7 +2059,7 @@ dependencies = [
  "anchor-lang",
  "assert_matches",
  "bmp",
- "libreplex_metadata 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libreplex_metadata 0.5.0",
  "mocha",
  "solana-program",
  "solana-program-test",
@@ -2094,20 +2094,6 @@ dependencies = [
 [[package]]
 name = "libreplex_metadata"
 version = "0.5.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "libreplex_inscriptions 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
-]
-
-[[package]]
-name = "libreplex_metadata"
-version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "26a782b3628b740bae2ddcd7d8056f37033b9d290c860adb4318c471c96564a5"
 dependencies = [
@@ -2117,27 +2103,56 @@ dependencies = [
 ]
 
 [[package]]
+name = "libreplex_metadata"
+version = "0.6.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "assert_matches",
+ "libreplex_inscriptions 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mocha",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "spl-token-2022",
+]
+
+[[package]]
+name = "libreplex_metadata"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aad702be698157c816587e8ac24b15a32457f40953873dd36ac54bb587590fde"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "libreplex_inscriptions 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "spl-token-2022",
+]
+
+[[package]]
 name = "libreplex_shared"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "solana-program",
+ "spl-token-2022",
 ]
 
 [[package]]
 name = "libreplex_shop"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "assert_matches",
- "libreplex_metadata 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libreplex_metadata 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libreplex_shared",
  "mocha",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
+ "spl-token-2022",
 ]
 
 [[package]]

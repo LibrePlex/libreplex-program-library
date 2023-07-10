@@ -10,10 +10,21 @@ use anchor_lang::prelude::*;
 ///
 /// todo to revisit in v1
 #[error_code]
-pub enum ErrorCode {
-    #[msg("Bad owner")]
-    BadOwner,
+pub enum ShopError {
+    #[msg("Group has active filters")]
+    GroupHasActiveFilters,
 
-    #[msg("Bad mint")]
-    BadMint,
+    #[msg("Unsupported filter type")]
+    UnsupportFilterType,
+
+    #[msg("Lister not allowed")]
+    ListerNotAllowed,
+
+    #[msg("Group not allowed")]
+    GroupNotAllowed,
+
+
+    #[msg("Group has active listings")]
+    GroupHasActiveListings,
+
 }

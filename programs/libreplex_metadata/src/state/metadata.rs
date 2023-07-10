@@ -78,8 +78,6 @@ pub struct Metadata {
 
     pub group: Option<Pubkey>,
 
-    // END BASE
-
     pub name: String,
 
     pub symbol: String,
