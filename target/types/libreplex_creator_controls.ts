@@ -36,11 +36,6 @@ export type LibreplexCreatorControls = {
           "isSigner": false
         },
         {
-          "name": "metadataExtension",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "groupPermissions",
           "isMut": true,
           "isSigner": false
@@ -498,11 +493,6 @@ export const IDL: LibreplexCreatorControls = {
         },
         {
           "name": "group",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "metadataExtension",
           "isMut": true,
           "isSigner": false
         },

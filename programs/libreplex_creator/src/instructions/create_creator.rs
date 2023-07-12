@@ -50,7 +50,6 @@ pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result
     creator.symbol = input.symbol;
     creator.asset_url = input.asset_url;
 
-
     if !input.is_ordered {
         let mint_numbers = ctx.accounts.minter_numbers.as_ref().ok_or(ErrorCode::MissingMintNumbers)?;
 
@@ -62,10 +61,14 @@ pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result
         let base_offset = MINT_NUMBERS_START;
         for i in 0..creator.supply {
             let bytes = i.to_le_bytes();
-            let offset = base_offset + (i as usize) * size_of::<u32>();
+            let offset = base_offset + (i as usize) * 4;
+
+            msg!("{} {} {:?} {}", i , offset, bytes, bytes.len());
     
-            mint_numbers_data[offset..offset + size_of::<u32>()].copy_from_slice(&bytes);
+            mint_numbers_data[offset..offset + 4].copy_from_slice(&bytes);
         }
+
+        msg!("{:?}", mint_numbers_data);
     }
 
     creator.name = input.name;
@@ -76,8 +79,6 @@ pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result
 
     creator.mint_authority = input.mint_authority;
     creator.is_ordered = input.is_ordered;
-
-    /* OUT FOR ERRANDS - BACK SOON. All code is in  */
 
     emit!(AccountEvent {
         reference: creator.key(),

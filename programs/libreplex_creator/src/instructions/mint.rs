@@ -8,6 +8,14 @@ use crate::{Creator, AssetUrl, MintNumbers, errors::ErrorCode, MINT_NUMBERS_STAR
 
 use super::attributes::ATTRIBUTE_DATA_START;
 
+#[event]
+pub struct MintEvent {
+    pub group: Pubkey,
+    pub number: u32,
+    pub authority: Pubkey,
+    pub holder: Pubkey,
+}
+
 
 #[derive(Accounts)]
 pub struct Mint<'info> {
@@ -28,12 +36,6 @@ pub struct Mint<'info> {
 
     #[account(mut)]
     pub group: Box<Account<'info, Group>>,
-
-
-    /// CHECK: checked in cpi
-    #[account(mut)]
-    pub metadata_extension: AccountInfo<'info>,
-
 
     /// CHECK: checked in cpi
     #[account(mut)]
@@ -88,6 +90,8 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
             select_mint_number(mint_numbers.as_ref(), &ctx.accounts.recent_slothashes, (creator.supply - creator.minted) as usize)
         },
     };
+
+    msg!("{}", mint_number);
 
     let signer_seeds = [creator_seeds.as_slice()];
 
@@ -161,6 +165,13 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
 
     creator.minted += 1;
 
+    emit!(MintEvent {
+        group: creator.collection,
+        authority: creator.update_authority,
+        holder: ctx.accounts.buyer.key(),
+        number: mint_number,
+    });
+
     Ok(())
 }
 
@@ -174,10 +185,11 @@ pub fn select_mint_number(
             = (4 * (u64::from_le_bytes( array_ref![recent_slothash_data, 12, 8].clone()) % (mints_left as u64)) + (MINT_NUMBERS_START as u64)) as usize;
         let end: usize = MINT_NUMBERS_START + 4 * (mints_left - 1);
 
+        msg!("{}", chosen_index);
         let mut mint_number_data = mints_numbers_info.data.borrow_mut();
         let chosen_value = u32::from_le_bytes(*array_ref![mint_number_data, chosen_index, 4]);
 
-
+        msg!("{}", chosen_value);
         let end_data = *array_ref![mint_number_data, end, 4];
         mint_number_data[chosen_index..chosen_index + 4]
             .copy_from_slice(&end_data);

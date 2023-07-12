@@ -33,12 +33,6 @@ pub struct Mint<'info> {
     #[account(mut)]
     pub group: AccountInfo<'info>,
 
-
-    /// CHECK: checked in cpi
-    #[account(mut)]
-    pub metadata_extension: AccountInfo<'info>,
-
-
     /// CHECK: checked in cpi
     #[account(mut)]
     pub group_permissions: AccountInfo<'info>,
@@ -76,7 +70,6 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, 
         mint: ctx.accounts.mint.to_account_info(),
         metadata: ctx.accounts.metadata.to_account_info(),
         group: ctx.accounts.group.to_account_info(),
-        metadata_extension: ctx.accounts.metadata_extension.to_account_info(),
         group_permissions: ctx.accounts.group_permissions.to_account_info(),
         minter_numbers: ctx.accounts.minter_numbers.as_ref().map(|c| c.to_account_info()),
         system_program: ctx.accounts.system_program.to_account_info(),
@@ -138,7 +131,6 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, 
         creator: accounts.creator,
         metadata: accounts.metadata,
         group: accounts.group,
-        metadata_extension: accounts.metadata_extension,
         group_permissions: accounts.group_permissions,
         minter_numbers: accounts.minter_numbers,
         system_program: accounts.system_program,

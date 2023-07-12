@@ -36,11 +36,6 @@
           "isSigner": false
         },
         {
-          "name": "metadataExtension",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "groupPermissions",
           "isMut": true,
           "isSigner": false
