@@ -113,6 +113,7 @@ pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdina
     metadata.asset = Asset::Inscription {
             account_id: ctx.accounts.ordinal.key()
     };
+    metadata.creator = signer.key();
 
     msg!(
         "metadata created for mint with pubkey {}",
