@@ -812,6 +812,12 @@ export type LibreplexMetadata = {
           {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
+            }
           }
         ]
       }
@@ -2664,6 +2670,12 @@ export const IDL: LibreplexMetadata = {
           {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
+            }
           }
         ]
       }

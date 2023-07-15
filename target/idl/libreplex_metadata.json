@@ -812,6 +812,12 @@
           {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
+            }
           }
         ]
       }

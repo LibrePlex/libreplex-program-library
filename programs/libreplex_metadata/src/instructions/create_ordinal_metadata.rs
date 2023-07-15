@@ -1,5 +1,5 @@
 use crate::state::{Metadata};
-use crate::{ CreateMetadataInput, PermissionType, MetadataEvent, MetadataEventType, Asset};
+use crate::{ CreateMetadataInput, PermissionType, MetadataEvent, MetadataEventType, Asset, MetadataExtension};
 use anchor_lang::{prelude::*, system_program};
 use libreplex_inscriptions::instructions::CreateInscriptionInput;
 
@@ -21,6 +21,7 @@ pub struct CreateOrdinalMetadataInput {
     pub description: Option<String>,
     pub inscription_input: CreateInscriptionInput,
     pub update_authority: Pubkey,
+    pub extension: MetadataExtension,
 }
 
 impl CreateOrdinalMetadataInput {
@@ -35,7 +36,7 @@ impl CreateOrdinalMetadataInput {
             + match &self.description {
                 None =>0,
                 Some(x) => 4 + x.len()
-            };
+            } + self.extension.get_size();
 
         return size;
     }
@@ -114,6 +115,7 @@ pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdina
             account_id: ctx.accounts.ordinal.key()
     };
     metadata.creator = signer.key();
+    metadata.extension = metadata_input.extension;
 
     msg!(
         "metadata created for mint with pubkey {}",
