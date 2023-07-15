@@ -1,7 +1,7 @@
 
 use crate::{
     errors::ShopError,
-    state::{Listing, ListingFilter, ListingFilterType, ListingGroup, Price}, empty_account_placeholder,
+    state::{Listing, ListingFilter, ListingFilterType, Price}, empty_account_placeholder,
 };
 use anchor_lang::{
     error::{Error as AnchorError},
@@ -55,14 +55,14 @@ pub struct List<'info> {
     )]
     pub metadata: Account<'info, Metadata>,
 
-    // one filter must always be invoked to list
-    #[account(mut)]
-    pub listing_filter: Account<'info, ListingFilter>,
+    // // one filter must always be invoked to list
+    // #[account(mut)]
+    // pub listing_filter: Account<'info, ListingFilter>,
 
-    // one filter must always be invoked to list
-    #[account(mut,
-    constraint = listing_filter.listing_group == listing_group.key())]
-    pub listing_group: Account<'info, ListingGroup>,
+    // // one filter must always be invoked to list
+    // #[account(mut,
+    // constraint = listing_filter.listing_group == listing_group.key())]
+    // pub listing_group: Account<'info, ListingGroup>,
 
     #[account(init,
     payer=lister,
@@ -103,20 +103,15 @@ pub fn handler(ctx: Context<List>, list_input: ListInput) -> AnchorResult<()> {
     let system_program = &mut ctx.accounts.system_program;
     let token_program = &mut ctx.accounts.token_program;
     let metadata = &mut ctx.accounts.metadata;
-    let listing_filter = &mut ctx.accounts.listing_filter;
-    let listing_group = &mut ctx.accounts.listing_group;
-
-    listing_group.listings_active += 1;
-    listing_group.listings_created += 1;
-
+    
     listing.lister = lister.key();
     listing.mint = mint.key();
     listing.price = list_input.price;
     listing.listing_bump = list_input.listing_bump;
     listing.amount = list_input.amount;
-    listing.group = listing_group.key();
+    listing.group = metadata.group;
 
-    validate_filters(listing_filter, lister, metadata)?;
+    // validate_filters(listing_filter, lister, metadata)?;
 
     transfer_tokens(
         &token_program.to_account_info(),
@@ -131,6 +126,8 @@ pub fn handler(ctx: Context<List>, list_input: ListInput) -> AnchorResult<()> {
         &lister.to_account_info(),
         listing.amount,
     )?;
+
+    
 
     Ok(())
 }

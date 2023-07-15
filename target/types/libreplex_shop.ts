@@ -21,16 +21,6 @@ export type LibreplexShop = {
           "isSigner": false
         },
         {
-          "name": "listingFilter",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "listing",
           "isMut": true,
           "isSigner": false,
@@ -109,11 +99,6 @@ export type LibreplexShop = {
         },
         {
           "name": "listerTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "listingGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -222,156 +207,6 @@ export type LibreplexShop = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "createListingGroup",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "listing_group"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "admin"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "CreateListingGroupInput"
-                },
-                "path": "create_listing_group_input.seed"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "CreateListingGroupInput"
-          }
-        }
-      ]
-    },
-    {
-      "name": "deleteListingGroup",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "createListingFilter",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "listingFilter",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "listing_filter"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "admin"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "CreateListingFilterInput"
-                },
-                "path": "create_listing_filter_input.seed"
-              }
-            ]
-          }
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "CreateListingFilterInput"
-          }
-        }
-      ]
-    },
-    {
-      "name": "deleteListingFilter",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "listingFilter",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     }
   ],
   "accounts": [
@@ -398,49 +233,15 @@ export type LibreplexShop = {
           },
           {
             "name": "group",
-            "type": "publicKey"
+            "type": {
+              "option": "publicKey"
+            }
           },
           {
             "name": "price",
             "type": {
               "defined": "Price"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "listingGroup",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "admin",
-            "type": "publicKey"
-          },
-          {
-            "name": "seed",
-            "type": "publicKey"
-          },
-          {
-            "name": "listingsActive",
-            "type": "u32"
-          },
-          {
-            "name": "listingsCreated",
-            "type": "u32"
-          },
-          {
-            "name": "listingsSold",
-            "type": "u32"
-          },
-          {
-            "name": "filterCount",
-            "type": "u32"
-          },
-          {
-            "name": "name",
-            "type": "string"
           }
         ]
       }
@@ -481,40 +282,6 @@ export type LibreplexShop = {
     }
   ],
   "types": [
-    {
-      "name": "CreateListingFilterInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "filterType",
-            "type": {
-              "defined": "ListingFilterType"
-            }
-          },
-          {
-            "name": "seed",
-            "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "CreateListingGroupInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "seed",
-            "type": "publicKey"
-          },
-          {
-            "name": "name",
-            "type": "string"
-          }
-        ]
-      }
-    },
     {
       "name": "ListInput",
       "type": {
@@ -605,7 +372,7 @@ export type LibreplexShop = {
   ],
   "events": [
     {
-      "name": "DeleteListingFilterEvent",
+      "name": "DelistEvent",
       "fields": [
         {
           "name": "id",
@@ -615,7 +382,7 @@ export type LibreplexShop = {
       ]
     },
     {
-      "name": "DeleteListingGroupEvent",
+      "name": "ExecuteEvent",
       "fields": [
         {
           "name": "id",
@@ -677,16 +444,6 @@ export const IDL: LibreplexShop = {
           "isSigner": false
         },
         {
-          "name": "listingFilter",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "listing",
           "isMut": true,
           "isSigner": false,
@@ -765,11 +522,6 @@ export const IDL: LibreplexShop = {
         },
         {
           "name": "listerTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "listingGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -878,156 +630,6 @@ export const IDL: LibreplexShop = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "createListingGroup",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "listing_group"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "admin"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "CreateListingGroupInput"
-                },
-                "path": "create_listing_group_input.seed"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "CreateListingGroupInput"
-          }
-        }
-      ]
-    },
-    {
-      "name": "deleteListingGroup",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "createListingFilter",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "listingFilter",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "listing_filter"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "admin"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "CreateListingFilterInput"
-                },
-                "path": "create_listing_filter_input.seed"
-              }
-            ]
-          }
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "CreateListingFilterInput"
-          }
-        }
-      ]
-    },
-    {
-      "name": "deleteListingFilter",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "listingFilter",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "listingGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     }
   ],
   "accounts": [
@@ -1054,49 +656,15 @@ export const IDL: LibreplexShop = {
           },
           {
             "name": "group",
-            "type": "publicKey"
+            "type": {
+              "option": "publicKey"
+            }
           },
           {
             "name": "price",
             "type": {
               "defined": "Price"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "listingGroup",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "admin",
-            "type": "publicKey"
-          },
-          {
-            "name": "seed",
-            "type": "publicKey"
-          },
-          {
-            "name": "listingsActive",
-            "type": "u32"
-          },
-          {
-            "name": "listingsCreated",
-            "type": "u32"
-          },
-          {
-            "name": "listingsSold",
-            "type": "u32"
-          },
-          {
-            "name": "filterCount",
-            "type": "u32"
-          },
-          {
-            "name": "name",
-            "type": "string"
           }
         ]
       }
@@ -1137,40 +705,6 @@ export const IDL: LibreplexShop = {
     }
   ],
   "types": [
-    {
-      "name": "CreateListingFilterInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "filterType",
-            "type": {
-              "defined": "ListingFilterType"
-            }
-          },
-          {
-            "name": "seed",
-            "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "CreateListingGroupInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "seed",
-            "type": "publicKey"
-          },
-          {
-            "name": "name",
-            "type": "string"
-          }
-        ]
-      }
-    },
     {
       "name": "ListInput",
       "type": {
@@ -1261,7 +795,7 @@ export const IDL: LibreplexShop = {
   ],
   "events": [
     {
-      "name": "DeleteListingFilterEvent",
+      "name": "DelistEvent",
       "fields": [
         {
           "name": "id",
@@ -1271,7 +805,7 @@ export const IDL: LibreplexShop = {
       ]
     },
     {
-      "name": "DeleteListingGroupEvent",
+      "name": "ExecuteEvent",
       "fields": [
         {
           "name": "id",

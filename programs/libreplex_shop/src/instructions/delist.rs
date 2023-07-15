@@ -1,8 +1,14 @@
-use crate::{state::{Listing, ListingGroup}, constants::LISTING};
+use crate::{state::{Listing}, constants::LISTING};
 use anchor_lang::prelude::*;
 use anchor_spl::{associated_token::AssociatedToken, token::Token};
 use libreplex_shared::transfer_tokens;
 use spl_token_2022::{ID as TOKEN_2022_PROGRAM_ID, instruction::close_account};
+
+#[event]
+pub struct DelistEvent {
+    pub id: Pubkey,
+}
+
 
 #[derive(Accounts)]
 pub struct Delist<'info> {
@@ -19,7 +25,6 @@ pub struct Delist<'info> {
         close=lister,
         constraint = listing.lister == lister.key(),
         constraint = listing.mint == mint.key(),
-        constraint = listing.group == listing_group.key()
         )]
     pub listing: Account<'info, Listing>,
 
@@ -30,10 +35,6 @@ pub struct Delist<'info> {
     /// CHECK: Is allowed to be empty in which case we create it
     #[account(mut)]
     pub lister_token_account: UncheckedAccount<'info>,
-
-    /// CHECK: can be empty if the group has been deleted.
-    #[account(mut)]
-    pub listing_group: UncheckedAccount<'info>,
 
     pub system_program: Program<'info, System>,
 
@@ -54,7 +55,6 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Delist<'info>>) -> Result<
     let lister_token_account = &ctx.accounts.lister_token_account;
     let mint = &ctx.accounts.mint;
     let listing = &ctx.accounts.listing;
-    let listing_group = &mut ctx.accounts.listing_group;
     let lister = &ctx.accounts.lister;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
@@ -78,18 +78,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Delist<'info>>) -> Result<
 
     let lister_account_info = &ctx.accounts.lister.to_account_info().clone();
     
-    let listing_group_account_info = listing_group.to_account_info();
-    if !listing_group_account_info.data_is_empty() {
-        let mut listing_group_data = listing_group_account_info.data.borrow_mut();
-        // read current number of active listings
-        let active_listings = u32::from_le_bytes(listing_group_data[72..76].try_into().unwrap());
-        let listing_count_slice: &mut [u8] = &mut listing_group_data[
-            72..76
-        ];
-        
-        listing_count_slice.copy_from_slice(&(active_listings-1).to_le_bytes())
-        
-    } 
+    
     transfer_tokens(
         &mint_token_program,
         &escrow_token_account.to_account_info(),
@@ -120,6 +109,12 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Delist<'info>>) -> Result<
         ],
         &[auth_seeds],
     )?;
+
+    emit!(DelistEvent {
+        id: listing.key(),
+    });
+
+
 
     Ok(())
 }
