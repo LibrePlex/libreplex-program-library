@@ -10,9 +10,11 @@ pub enum AssetUrl {
     },
     ImagePrefix {
         url: String,
+        description: Option<String>
     },
     ChainRenderer {
-        program_id: Pubkey
+        program_id: Pubkey,
+        description: Option<String>
     },
     Json {
         url_config: Pubkey,
