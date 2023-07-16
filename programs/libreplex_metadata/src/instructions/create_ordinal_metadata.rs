@@ -18,9 +18,9 @@ use libreplex_inscriptions::program::LibreplexInscriptions;
 pub struct CreateOrdinalMetadataInput {
     pub name: String,
     pub symbol: String,
-    pub description: Option<String>,
     pub inscription_input: CreateInscriptionInput,
     pub update_authority: Pubkey,
+    pub description: Option<String>,
     pub extension: MetadataExtension,
 }
 
@@ -33,10 +33,7 @@ impl CreateOrdinalMetadataInput {
             + 4
             + self.inscription_input.get_size() as usize
             + 2 + 32 // for ordinal asset type
-            + match &self.description {
-                None =>0,
-                Some(x) => 4 + x.len()
-            } + self.extension.get_size();
+            + self.extension.get_size();
 
         return size;
     }
@@ -110,9 +107,9 @@ pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdina
     metadata.symbol = metadata_input.symbol.clone();
     metadata.name = metadata_input.name.clone();
     metadata.update_authority = metadata_input.update_authority;
-    metadata.description = metadata_input.description;
     metadata.asset = Asset::Inscription {
-            account_id: ctx.accounts.ordinal.key()
+            account_id: ctx.accounts.ordinal.key(),
+            description: metadata_input.description
     };
     metadata.creator = signer.key();
     metadata.extension = metadata_input.extension;

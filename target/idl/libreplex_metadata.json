@@ -736,12 +736,6 @@
             }
           },
           {
-            "name": "description",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
             "name": "extension",
             "type": {
               "defined": "MetadataExtension"
@@ -798,12 +792,6 @@
             "type": "string"
           },
           {
-            "name": "description",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
             "name": "inscriptionInput",
             "type": {
               "defined": "CreateInscriptionInput"
@@ -812,6 +800,12 @@
           {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
           },
           {
             "name": "extension",
@@ -994,12 +988,6 @@
             }
           },
           {
-            "name": "description",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
             "name": "updateAuthority",
             "type": "publicKey"
           },
@@ -1029,12 +1017,6 @@
             "name": "asset",
             "type": {
               "defined": "Asset"
-            }
-          },
-          {
-            "name": "description",
-            "type": {
-              "option": "string"
             }
           }
         ]
@@ -1307,6 +1289,12 @@
               {
                 "name": "url",
                 "type": "string"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -1316,6 +1304,12 @@
               {
                 "name": "program_id",
                 "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -1325,6 +1319,12 @@
               {
                 "name": "account_id",
                 "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           }
@@ -1853,8 +1853,5 @@
       "code": 6079,
       "name": "Reserved79"
     }
-  ],
-  "metadata": {
-    "address": "LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p"
-  }
+  ]
 }

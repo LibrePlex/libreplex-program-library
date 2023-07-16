@@ -63,7 +63,6 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     metadata.symbol = metadata_input.symbol.clone();
     metadata.name = metadata_input.name.clone();
     metadata.creator = authority.key();
-    metadata.description = metadata_input.description;
     metadata.asset = metadata_input.asset;
     metadata.update_authority = metadata_input.update_authority;
     metadata.extension = metadata_input.extension;
