@@ -736,12 +736,6 @@ export type LibreplexMetadata = {
             }
           },
           {
-            "name": "description",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
             "name": "extension",
             "type": {
               "defined": "MetadataExtension"
@@ -798,12 +792,6 @@ export type LibreplexMetadata = {
             "type": "string"
           },
           {
-            "name": "description",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
             "name": "inscriptionInput",
             "type": {
               "defined": "CreateInscriptionInput"
@@ -812,6 +800,12 @@ export type LibreplexMetadata = {
           {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
           },
           {
             "name": "extension",
@@ -994,12 +988,6 @@ export type LibreplexMetadata = {
             }
           },
           {
-            "name": "description",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
             "name": "updateAuthority",
             "type": "publicKey"
           },
@@ -1029,12 +1017,6 @@ export type LibreplexMetadata = {
             "name": "asset",
             "type": {
               "defined": "Asset"
-            }
-          },
-          {
-            "name": "description",
-            "type": {
-              "option": "string"
             }
           }
         ]
@@ -1307,6 +1289,12 @@ export type LibreplexMetadata = {
               {
                 "name": "url",
                 "type": "string"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -1316,6 +1304,12 @@ export type LibreplexMetadata = {
               {
                 "name": "program_id",
                 "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -1325,6 +1319,12 @@ export type LibreplexMetadata = {
               {
                 "name": "account_id",
                 "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           }
@@ -2594,12 +2594,6 @@ export const IDL: LibreplexMetadata = {
             }
           },
           {
-            "name": "description",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
             "name": "extension",
             "type": {
               "defined": "MetadataExtension"
@@ -2656,12 +2650,6 @@ export const IDL: LibreplexMetadata = {
             "type": "string"
           },
           {
-            "name": "description",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
             "name": "inscriptionInput",
             "type": {
               "defined": "CreateInscriptionInput"
@@ -2670,6 +2658,12 @@ export const IDL: LibreplexMetadata = {
           {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "description",
+            "type": {
+              "option": "string"
+            }
           },
           {
             "name": "extension",
@@ -2852,12 +2846,6 @@ export const IDL: LibreplexMetadata = {
             }
           },
           {
-            "name": "description",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
             "name": "updateAuthority",
             "type": "publicKey"
           },
@@ -2887,12 +2875,6 @@ export const IDL: LibreplexMetadata = {
             "name": "asset",
             "type": {
               "defined": "Asset"
-            }
-          },
-          {
-            "name": "description",
-            "type": {
-              "option": "string"
             }
           }
         ]
@@ -3165,6 +3147,12 @@ export const IDL: LibreplexMetadata = {
               {
                 "name": "url",
                 "type": "string"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -3174,6 +3162,12 @@ export const IDL: LibreplexMetadata = {
               {
                 "name": "program_id",
                 "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -3183,6 +3177,12 @@ export const IDL: LibreplexMetadata = {
               {
                 "name": "account_id",
                 "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           }

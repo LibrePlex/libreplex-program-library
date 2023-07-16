@@ -60,7 +60,6 @@ pub fn handler(ctx: Context<UpdateMetadata>,
     let UpdateMetadataInput {name, 
             symbol,
             asset,
-            description,
         } = update_metadata_input;
 
     
@@ -93,7 +92,6 @@ pub fn handler(ctx: Context<UpdateMetadata>,
     // Update the metadata state account
     metadata.name = name.clone();
     metadata.asset = asset.clone();
-    metadata.description = description;
     metadata.symbol= symbol;
     
     emit!(EditMetadataEvent{
