@@ -99,8 +99,8 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         AssetUrl::JsonPrefix { url } => {
             libreplex_metadata::Asset::Json { url: format!("{}{}.json", url, mint_number) }
         },
-        AssetUrl::ImagePrefix { url } => libreplex_metadata::Asset::Image { url: format!("{}{}.json", url, mint_number) },
-        AssetUrl::ChainRenderer { program_id } => libreplex_metadata::Asset::ChainRenderer { program_id: *program_id },
+        AssetUrl::ImagePrefix { url , description} => libreplex_metadata::Asset::Image { description: description.clone(), url: format!("{}{}.json", url, mint_number) },
+        AssetUrl::ChainRenderer { program_id, description } => libreplex_metadata::Asset::ChainRenderer { description: description.clone(), program_id: *program_id },
         AssetUrl::Json { url_config: _ } => todo!(),
         AssetUrl::Image { image_config: _ } => todo!(),
     };
@@ -136,7 +136,6 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         name,
         symbol: creator.symbol.clone(),
         asset,
-        description: creator.description.clone(),
         update_authority: creator.key(),
         extension: libreplex_metadata::MetadataExtension::Nft { attributes: attributes, signers: vec![], royalties: None, license: None },
     })?;

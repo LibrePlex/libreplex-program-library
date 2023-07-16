@@ -391,6 +391,12 @@
               {
                 "name": "url",
                 "type": "string"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -400,6 +406,12 @@
               {
                 "name": "program_id",
                 "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
