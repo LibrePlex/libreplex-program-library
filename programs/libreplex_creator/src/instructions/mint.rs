@@ -14,6 +14,7 @@ pub struct MintEvent {
     pub number: u32,
     pub authority: Pubkey,
     pub holder: Pubkey,
+    pub mint: Pubkey,
 }
 
 
@@ -170,6 +171,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         authority: creator.update_authority,
         holder: ctx.accounts.buyer.key(),
         number: mint_number,
+        mint: ctx.accounts.mint.key(),
     });
 
     Ok(())

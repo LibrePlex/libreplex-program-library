@@ -67,8 +67,6 @@ pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result
     
             mint_numbers_data[offset..offset + 4].copy_from_slice(&bytes);
         }
-
-        msg!("{:?}", mint_numbers_data);
     }
 
     creator.name = input.name;
