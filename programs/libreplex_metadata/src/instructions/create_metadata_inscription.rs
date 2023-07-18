@@ -1,9 +1,9 @@
 use crate::state::{Metadata};
 use crate::{ CreateMetadataInput, PermissionType, MetadataEvent, MetadataEventType, Asset, MetadataExtension};
 use anchor_lang::{prelude::*, system_program};
-use libreplex_inscriptions::instructions::CreateInscriptionInput;
 
 use libreplex_inscriptions::cpi::accounts::{CreateInscription};
+use libreplex_inscriptions::instructions::CreateInscriptionInput;
 use libreplex_inscriptions::program::LibreplexInscriptions;
 
 /*
@@ -15,7 +15,7 @@ use libreplex_inscriptions::program::LibreplexInscriptions;
     (two-way link ensures that the mapping is 1-1)
 */
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CreateOrdinalMetadataInput {
+pub struct CreateMetadataInscriptionInput {
     pub name: String,
     pub symbol: String,
     pub inscription_input: CreateInscriptionInput,
@@ -24,7 +24,7 @@ pub struct CreateOrdinalMetadataInput {
     pub extension: MetadataExtension,
 }
 
-impl CreateOrdinalMetadataInput {
+impl CreateMetadataInscriptionInput {
     pub fn get_size(&self) -> usize {
         let size =
             4 + self.name.len()
@@ -40,8 +40,8 @@ impl CreateOrdinalMetadataInput {
 }
 
 #[derive(Accounts)]
-#[instruction(metadata_input: CreateOrdinalMetadataInput)]
-pub struct CreateOrdinalMetadata<'info> {
+#[instruction(metadata_input: CreateMetadataInscriptionInput)]
+pub struct CreateInscriptionMetadata<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -67,7 +67,7 @@ pub struct CreateOrdinalMetadata<'info> {
 
 }
 
-pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdinalMetadataInput) -> Result<()> {
+pub fn handler(ctx: Context<CreateInscriptionMetadata>, metadata_input: CreateMetadataInscriptionInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let ordinal = &mut ctx.accounts.ordinal;
 

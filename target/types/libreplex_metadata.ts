@@ -1,5 +1,5 @@
 export type LibreplexMetadata = {
-  "version": "0.6.0",
+  "version": "0.8.1",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -595,10 +595,135 @@ export type LibreplexMetadata = {
         {
           "name": "metadataInput",
           "type": {
-            "defined": "CreateOrdinalMetadataInput"
+            "defined": "CreateMetadataInscriptionInput"
           }
         }
       ]
+    },
+    {
+      "name": "createInscriptionMetadata",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "metadata"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "ordinal",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "metadataInput",
+          "type": {
+            "defined": "CreateMetadataInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deleteMetadataInscription",
+      "accounts": [
+        {
+          "name": "metadataAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "metadata_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "inscription",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "deletePermissions",
@@ -779,7 +904,7 @@ export type LibreplexMetadata = {
   ],
   "types": [
     {
-      "name": "CreateOrdinalMetadataInput",
+      "name": "CreateMetadataInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1671,7 +1796,8 @@ export type LibreplexMetadata = {
     },
     {
       "code": 6034,
-      "name": "Reserved34"
+      "name": "InvokeDeleteInscriptionMetadata",
+      "msg": "Inscription metadata is deleted via a separate method"
     },
     {
       "code": 6035,
@@ -1857,7 +1983,7 @@ export type LibreplexMetadata = {
 };
 
 export const IDL: LibreplexMetadata = {
-  "version": "0.6.0",
+  "version": "0.8.1",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -2453,10 +2579,135 @@ export const IDL: LibreplexMetadata = {
         {
           "name": "metadataInput",
           "type": {
-            "defined": "CreateOrdinalMetadataInput"
+            "defined": "CreateMetadataInscriptionInput"
           }
         }
       ]
+    },
+    {
+      "name": "createInscriptionMetadata",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "metadata"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "ordinal",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "metadataInput",
+          "type": {
+            "defined": "CreateMetadataInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deleteMetadataInscription",
+      "accounts": [
+        {
+          "name": "metadataAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "metadata_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "inscription",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "deletePermissions",
@@ -2637,7 +2888,7 @@ export const IDL: LibreplexMetadata = {
   ],
   "types": [
     {
-      "name": "CreateOrdinalMetadataInput",
+      "name": "CreateMetadataInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -3529,7 +3780,8 @@ export const IDL: LibreplexMetadata = {
     },
     {
       "code": 6034,
-      "name": "Reserved34"
+      "name": "InvokeDeleteInscriptionMetadata",
+      "msg": "Inscription metadata is deleted via a separate method"
     },
     {
       "code": 6035,

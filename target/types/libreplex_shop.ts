@@ -1,5 +1,5 @@
 export type LibreplexShop = {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "name": "libreplex_shop",
   "instructions": [
     {
@@ -422,7 +422,7 @@ export type LibreplexShop = {
 };
 
 export const IDL: LibreplexShop = {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "name": "libreplex_shop",
   "instructions": [
     {

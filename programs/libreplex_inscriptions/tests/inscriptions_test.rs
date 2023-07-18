@@ -6,7 +6,7 @@ mod metadata_tests {
     use libreplex_inscriptions::{
         accounts::WriteToInscription,
         accounts::CreateInscription,
-        instructions::{WriteToInscriptionInput, CreateInscriptionInput}, Inscription,
+        instructions::{WriteToInscriptionInput, create_inscription::CreateInscriptionInput}, Inscription,
     };
     use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program, system_instruction, program::invoke, rent::Rent};
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};

@@ -1,4 +1,6 @@
 use anchor_lang::prelude::*;
+use libreplex_inscriptions::Inscription;
+use libreplex_inscriptions::program::LibreplexInscriptions;
 
 use crate::{Metadata, DelegatePermissions, PermissionType, Asset};
 
@@ -7,7 +9,7 @@ use crate::{errors::ErrorCode};
 
 // Adds a metadata to a group
 #[derive(Accounts)]
-pub struct DeleteMetadata<'info> {
+pub struct DeleteMetadataInscription<'info> {
     pub metadata_authority: Signer<'info>,
 
     #[account(
@@ -24,16 +26,25 @@ pub struct DeleteMetadata<'info> {
                         bump)]
     pub delegated_metadata_specific_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
+    pub inscription: Account<'info, Inscription>,
+
+    pub inscription_authority: Signer<'info>,
+
+
     pub system_program: Program<'info, System>,
+
+    pub inscriptions_program: Program<'info, LibreplexInscriptions>
 }
 
-pub fn handler(ctx: Context<DeleteMetadata>
+pub fn handler(ctx: Context<DeleteMetadataInscription>
 ) -> Result<()> {
 
     
 
     let metadata = &mut ctx.accounts.metadata;
+    let inscriptions_program = &mut ctx.accounts.inscriptions_program;
 
+    let  inscription_authority = &ctx.accounts.inscription_authority;
     match &metadata.asset {
         Asset::Inscription {
             account_id: _,
@@ -64,6 +75,22 @@ pub fn handler(ctx: Context<DeleteMetadata>
     if !can_delete_metadata {
         return Err(ErrorCode::MissingPermissionDeleteMetadata.into())
     }
+    
+    // libreplex_inscriptions::cpi::delete_inscription(
+    //     CpiContext::new(
+    //         inscriptions_program.to_account_info(),
+    //         DeleteInscription {
+    //             // raffle is the owner of the pod
+    //             inscription: inscription.to_account_info(),
+    //             system_program: system_program.to_account_info(),
+    //             payer: signer.to_account_info()
+    //         }
+    //     ),
+    //     libreplex_inscriptions::instructions::CreateInscriptionInput {
+    //         authority: metadata_input.inscription_input.authority,
+    //         max_data_length: metadata_input.inscription_input.max_data_length,
+    //     }
+    // )?;
 
     Ok(())
 }

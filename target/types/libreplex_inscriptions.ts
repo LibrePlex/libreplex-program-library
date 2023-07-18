@@ -1,5 +1,5 @@
 export type LibreplexInscriptions = {
-  "version": "0.1.7",
+  "version": "0.1.9",
   "name": "libreplex_inscriptions",
   "instructions": [
     {
@@ -34,6 +34,27 @@ export type LibreplexInscriptions = {
           }
         }
       ]
+    },
+    {
+      "name": "deleteInscription",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ordinal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "resizeInscription",
@@ -216,6 +237,16 @@ export type LibreplexInscriptions = {
     }
   ],
   "events": [
+    {
+      "name": "InscriptionEventDelete",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "InscriptionEvent",
       "fields": [
@@ -249,7 +280,7 @@ export type LibreplexInscriptions = {
 };
 
 export const IDL: LibreplexInscriptions = {
-  "version": "0.1.7",
+  "version": "0.1.9",
   "name": "libreplex_inscriptions",
   "instructions": [
     {
@@ -284,6 +315,27 @@ export const IDL: LibreplexInscriptions = {
           }
         }
       ]
+    },
+    {
+      "name": "deleteInscription",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ordinal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "resizeInscription",
@@ -466,6 +518,16 @@ export const IDL: LibreplexInscriptions = {
     }
   ],
   "events": [
+    {
+      "name": "InscriptionEventDelete",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "InscriptionEvent",
       "fields": [

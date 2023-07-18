@@ -20,6 +20,7 @@ pub use state::*;
 
 #[program]
 pub mod libreplex_metadata {
+    
     use super::*;
 
     pub fn create_group(
@@ -81,20 +82,39 @@ pub mod libreplex_metadata {
     pub fn delete_metadata(
         ctx: Context<DeleteMetadata>
     ) -> Result<()> {
-        msg!("creating metadata");
+        msg!("delete metadata");
         instructions::delete_metadata::handler(
             ctx
         )
     }
 
     pub fn create_ordinal_metadata(
-        ctx: Context<CreateOrdinalMetadata>,
-        metadata_input: CreateOrdinalMetadataInput,
+        ctx: Context<CreateInscriptionMetadata>,
+        metadata_input: CreateMetadataInscriptionInput,
     ) -> Result<()> {
         msg!("creating metadata");
-        instructions::create_ordinal_metadata::handler(
+        instructions::create_metadata_inscription::handler(
             ctx,
             metadata_input
+        )
+    }
+
+    pub fn create_inscription_metadata(
+        ctx: Context<CreateInscriptionMetadata>,
+        metadata_input: CreateMetadataInscriptionInput,
+    ) -> Result<()> {
+        msg!("creating metadata");
+        instructions::create_metadata_inscription::handler(
+            ctx,
+            metadata_input
+        )
+    }
+
+    pub fn delete_metadata_inscription(
+        ctx: Context<DeleteMetadataInscription>
+    ) -> Result<()> {
+        instructions::delete_metadata_inscription::handler(
+            ctx
         )
     }
 
