@@ -431,11 +431,6 @@ export type LibreplexMetadata = {
       "name": "createMetadata",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -915,12 +910,6 @@ export type LibreplexMetadata = {
           {
             "name": "symbol",
             "type": "string"
-          },
-          {
-            "name": "inscriptionInput",
-            "type": {
-              "defined": "CreateInscriptionInput"
-            }
           },
           {
             "name": "updateAuthority",
@@ -1426,6 +1415,10 @@ export type LibreplexMetadata = {
           {
             "name": "ChainRenderer",
             "fields": [
+              {
+                "name": "render_output_address",
+                "type": "publicKey"
+              },
               {
                 "name": "program_id",
                 "type": "publicKey"
@@ -2415,11 +2408,6 @@ export const IDL: LibreplexMetadata = {
       "name": "createMetadata",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -2900,12 +2888,7 @@ export const IDL: LibreplexMetadata = {
             "name": "symbol",
             "type": "string"
           },
-          {
-            "name": "inscriptionInput",
-            "type": {
-              "defined": "CreateInscriptionInput"
-            }
-          },
+
           {
             "name": "updateAuthority",
             "type": "publicKey"
@@ -3410,6 +3393,10 @@ export const IDL: LibreplexMetadata = {
           {
             "name": "ChainRenderer",
             "fields": [
+              {
+                "name": "render_output_address",
+                "type": "publicKey"
+              },
               {
                 "name": "program_id",
                 "type": "publicKey"

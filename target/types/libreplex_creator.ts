@@ -412,6 +412,10 @@ export type LibreplexCreator = {
                 "type": {
                   "option": "string"
                 }
+              },
+              {
+                "name": "output_address",
+                "type": "publicKey"
               }
             ]
           },
@@ -911,6 +915,10 @@ export const IDL: LibreplexCreator = {
                 "type": {
                   "option": "string"
                 }
+              },
+              {
+                "name": "output_address",
+                "type": "publicKey"
               }
             ]
           },

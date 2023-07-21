@@ -6,7 +6,7 @@ import { Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY, System
 import { expect } from 'chai';
 import exp from "constants";
 
-import {createMint} from "@solana/spl-token"
+import {createMint, TOKEN_2022_PROGRAM_ID} from "@solana/spl-token"
 import { Transaction } from "@solana/web3.js";
 
 describe("libreplex creator", () => {
@@ -110,7 +110,7 @@ describe("libreplex creator", () => {
   
     const mint = Keypair.generate()
 
-    await createMint(program.provider.connection, payer, program.provider.publicKey,  program.provider.publicKey, 0, mint)
+    await createMint(program.provider.connection, payer, program.provider.publicKey,  program.provider.publicKey, 0, mint, undefined, TOKEN_2022_PROGRAM_ID)
 
 
     const metadata = PublicKey.findProgramAddressSync([Buffer.from("metadata"), 
