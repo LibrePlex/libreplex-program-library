@@ -1,5 +1,5 @@
 {
-  "version": "0.8.1",
+  "version": "0.9.0",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -910,6 +910,12 @@
           {
             "name": "symbol",
             "type": "string"
+          },
+          {
+            "name": "inscriptionInput",
+            "type": {
+              "defined": "CreateInscriptionInput"
+            }
           },
           {
             "name": "updateAuthority",
@@ -1972,8 +1978,5 @@
       "code": 6079,
       "name": "Reserved79"
     }
-  ],
-  "metadata": {
-    "address": "LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p"
-  }
+  ]
 }

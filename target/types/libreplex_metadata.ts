@@ -1,5 +1,5 @@
 export type LibreplexMetadata = {
-  "version": "0.8.1",
+  "version": "0.9.0",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -910,6 +910,12 @@ export type LibreplexMetadata = {
           {
             "name": "symbol",
             "type": "string"
+          },
+          {
+            "name": "inscriptionInput",
+            "type": {
+              "defined": "CreateInscriptionInput"
+            }
           },
           {
             "name": "updateAuthority",
@@ -1976,7 +1982,7 @@ export type LibreplexMetadata = {
 };
 
 export const IDL: LibreplexMetadata = {
-  "version": "0.8.1",
+  "version": "0.9.0",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -2888,7 +2894,12 @@ export const IDL: LibreplexMetadata = {
             "name": "symbol",
             "type": "string"
           },
-
+          {
+            "name": "inscriptionInput",
+            "type": {
+              "defined": "CreateInscriptionInput"
+            }
+          },
           {
             "name": "updateAuthority",
             "type": "publicKey"
