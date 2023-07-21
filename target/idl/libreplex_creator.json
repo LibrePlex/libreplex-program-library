@@ -412,6 +412,10 @@
                 "type": {
                   "option": "string"
                 }
+              },
+              {
+                "name": "output_address",
+                "type": "publicKey"
               }
             ]
           },

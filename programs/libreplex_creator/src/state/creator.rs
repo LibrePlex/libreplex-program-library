@@ -14,7 +14,8 @@ pub enum AssetUrl {
     },
     ChainRenderer {
         program_id: Pubkey,
-        description: Option<String>
+        description: Option<String>,
+        output_address: Pubkey,
     },
     Json {
         url_config: Pubkey,
