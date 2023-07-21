@@ -3,7 +3,7 @@ use crate::{ CreateMetadataInput, MetadataEvent, MetadataEventType, assert_pda_d
 use anchor_lang::prelude::*;
 use crate::{errors::ErrorCode};
 use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
-
+use anchor_spl::token_interface::Mint;
 
 // whitelisted signer programs
 
@@ -16,9 +16,6 @@ pub mod migrator_lite {
 #[derive(Accounts)]
 #[instruction(metadata_input: CreateMetadataInput)]
 pub struct CreateMetadata<'info> {
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
     #[account(mut)]
     pub payer: Signer<'info>,
 

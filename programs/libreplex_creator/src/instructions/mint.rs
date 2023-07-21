@@ -69,7 +69,6 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         metadata: ctx.accounts.metadata.to_account_info(),
         payer: ctx.accounts.buyer.to_account_info(),
         mint: ctx.accounts.mint.to_account_info(),
-        signer: creator.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
         authority: ctx.accounts.buyer.to_account_info(),
         invoked_migrator_program: None,
@@ -100,7 +99,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
             libreplex_metadata::Asset::Json { url: format!("{}{}.json", url, mint_number) }
         },
         AssetUrl::ImagePrefix { url , description} => libreplex_metadata::Asset::Image { description: description.clone(), url: format!("{}{}.json", url, mint_number) },
-        AssetUrl::ChainRenderer { program_id, description } => libreplex_metadata::Asset::ChainRenderer { description: description.clone(), program_id: *program_id },
+        AssetUrl::ChainRenderer { output_address, program_id, description } => libreplex_metadata::Asset::ChainRenderer { render_output_address: *output_address, description: description.clone(), program_id: *program_id },
         AssetUrl::Json { url_config: _ } => todo!(),
         AssetUrl::Image { image_config: _ } => todo!(),
     };

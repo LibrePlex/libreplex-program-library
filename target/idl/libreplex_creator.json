@@ -412,6 +412,10 @@
                 "type": {
                   "option": "string"
                 }
+              },
+              {
+                "name": "output_address",
+                "type": "publicKey"
               }
             ]
           },
@@ -494,5 +498,8 @@
       "name": "SoldOut",
       "msg": "Sold out"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "toysDBtkQ7P1NWwaTtXZbXBeGdM16fReT5qzCgc7wig"
+  }
 }
