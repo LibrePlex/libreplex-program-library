@@ -1,5 +1,5 @@
 export type LibreplexInscriptions = {
-  "version": "0.1.9",
+  "version": "0.1.10",
   "name": "libreplex_inscriptions",
   "instructions": [
     {
@@ -320,7 +320,7 @@ export type LibreplexInscriptions = {
 };
 
 export const IDL: LibreplexInscriptions = {
-  "version": "0.1.9",
+  "version": "0.1.10",
   "name": "libreplex_inscriptions",
   "instructions": [
     {

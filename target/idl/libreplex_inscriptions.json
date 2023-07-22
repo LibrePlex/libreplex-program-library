@@ -1,5 +1,5 @@
 {
-  "version": "0.1.9",
+  "version": "0.1.10",
   "name": "libreplex_inscriptions",
   "instructions": [
     {
@@ -316,8 +316,5 @@
       "name": "MaxSizeExceeded",
       "msg": "Max size exceeded"
     }
-  ],
-  "metadata": {
-    "address": "inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
-  }
+  ]
 }
