@@ -1,5 +1,5 @@
 export type LibreplexCreator = {
-  "version": "0.1.0",
+  "version": "0.9.0",
   "name": "libreplex_creator",
   "instructions": [
     {
@@ -502,7 +502,7 @@ export type LibreplexCreator = {
 };
 
 export const IDL: LibreplexCreator = {
-  "version": "0.1.0",
+  "version": "0.9.0",
   "name": "libreplex_creator",
   "instructions": [
     {

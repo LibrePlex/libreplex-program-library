@@ -1,6 +1,6 @@
 use std::cmp::{Ordering, self};
 
-use crate::{Inscription, InscriptionEvent, InscriptionEventType};
+use crate::{Inscription};
 use anchor_lang::prelude::*;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -11,6 +11,32 @@ pub enum Change {
     Increase {
         amount: u32
     }
+}
+
+
+/*
+  inscription size changes are limited by the maximum increase per call.
+  hence, inscription sizes need to be chunked and this means for large 
+  increases you require multiple calls. 
+
+  We have two different events as it helps keep the client logic tidy. 
+  Typically you would only be interested in InscriptionResizeFinalEvent although
+  you could use the interim InscriptionResizeEvent for progress monitoring etc.
+*/ 
+
+// fired whenever inscription size is changed, whether it hits the target or not.
+#[event]
+pub struct InscriptionResizeEvent {
+    id: Pubkey,
+    size: u32
+}
+
+
+// fired when inscription size hits the target (i.e. this is the final increase / decrease)
+#[event]
+pub struct InscriptionResizeFinal {
+    id: Pubkey,
+    size: u32
 }
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -63,11 +89,19 @@ inscription_input: ResizeInscriptionInput,
         Change::Increase {amount} => cmp::min(inscription.size + amount, inscription_input.target_size),
         Change::Reduce {amount} => cmp::max(inscription.size - amount, inscription_input.target_size) ,
     };
-
-    emit!(InscriptionEvent {
-        id: inscription.key(),
-        event_type: InscriptionEventType::Resize
-    });
+    
+  
+    if inscription.size == inscription_input.target_size {
+        emit!(InscriptionResizeFinal {
+            id: inscription.key(),
+            size: inscription_input.target_size,
+        });
+    } else {
+        emit!(InscriptionResizeEvent {
+            id: inscription.key(),
+            size: inscription.size,
+        });
+    }
 
     Ok(())
 }

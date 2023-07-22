@@ -1,9 +1,9 @@
 use crate::state::{Metadata};
-use crate::{ CreateMetadataInput, PermissionType, MetadataEvent, MetadataEventType, Asset, MetadataExtension};
-use anchor_lang::{prelude::*, system_program};
+use crate::{MetadataEvent, MetadataEventType, Asset, MetadataExtension};
+use anchor_lang::{prelude::*};
 
 use libreplex_inscriptions::cpi::accounts::{CreateInscription};
-use libreplex_inscriptions::instructions::CreateInscriptionInput;
+
 use libreplex_inscriptions::program::LibreplexInscriptions;
 
 /*
@@ -18,7 +18,6 @@ use libreplex_inscriptions::program::LibreplexInscriptions;
 pub struct CreateMetadataInscriptionInput {
     pub name: String,
     pub symbol: String,
-    pub inscription_input: CreateInscriptionInput,
     pub update_authority: Pubkey,
     pub description: Option<String>,
     pub extension: MetadataExtension,
@@ -27,13 +26,15 @@ pub struct CreateMetadataInscriptionInput {
 impl CreateMetadataInscriptionInput {
     pub fn get_size(&self) -> usize {
         let size =
+            // name
             4 + self.name.len()
-            + 4
-            + self.symbol.len()
-            + 4
-            + self.inscription_input.get_size() as usize
-            + 2 + 32 // for ordinal asset type
-            + self.extension.get_size();
+            // symbol
+            + 4 + self.symbol.len()
+            // asset (inscription)
+            + 2 + 32 + 1 + match &self.description {
+                Some(x)=>4 + x.len(),
+                None => 0
+            } + self.extension.get_size();
 
         return size;
     }
@@ -96,8 +97,8 @@ pub fn handler(ctx: Context<CreateInscriptionMetadata>, metadata_input: CreateMe
             &[&metadata_seeds]
         ),
         libreplex_inscriptions::instructions::CreateInscriptionInput {
-            authority: metadata_input.inscription_input.authority,
-            max_data_length: metadata_input.inscription_input.max_data_length,
+            authority: Some(signer.key()),
+            max_data_length: 0,
         }
     )?;
 

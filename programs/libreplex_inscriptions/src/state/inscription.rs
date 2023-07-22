@@ -39,12 +39,12 @@ impl Inscription {
     }
 
     pub fn get_authority(
-        current_data: RefMut<&mut [u8]>
+        current_data: Ref<&mut [u8]>
     ) -> Result<Pubkey> {
         Ok(Pubkey::try_from_slice(&current_data[8..40])?)
     }
 
-    pub fn get_data_length_current(
+    pub fn get_data_length(
         current_data: Ref<&mut [u8]>
     ) -> Result<u32> {
         Ok(u32::try_from_slice(&current_data[72..76])?)
@@ -75,14 +75,14 @@ impl Inscription {
 
         let data_length_max = u32::from_le_bytes(current_data[72..76].try_into().unwrap());
 
-        msg!("{} {} {} ", start_pos,  data_to_add.len(),  data_length_max);
+        // msg!("{} {} {} ", start_pos,  data_to_add.len(),  data_length_max);
         if start_pos + data_to_add.len() as u32 > data_length_max {
             return Err(ErrorCode::MaxSizeExceeded.into());
         }
-        msg!("LENGTH: {:?}", data_to_add.len());
+        // msg!("LENGTH: {:?}", data_to_add.len());
        
         let current_index = Inscription::BASE_SIZE + start_pos as usize;
-        msg!("current_index: {:?}", current_index);
+        // msg!("current_index: {:?}", current_index);
         let data_slice: &mut [u8] = &mut current_data[current_index..current_index 
         + data_to_add.len()];
         data_slice.copy_from_slice(&data_to_add);

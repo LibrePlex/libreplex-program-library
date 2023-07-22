@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use libreplex_inscriptions::Inscription;
 use libreplex_inscriptions::program::LibreplexInscriptions;
 
+use crate::instructions::DeleteEvent;
 use crate::{Metadata, DelegatePermissions, PermissionType, Asset};
 
 use crate::{errors::ErrorCode};
@@ -50,9 +51,11 @@ pub fn handler(ctx: Context<DeleteMetadataInscription>
             account_id: _,
             description: _
         } =>  {
-            return Err(ErrorCode::InvokeDeleteInscriptionMetadata.into())    
+            
         },
-        _ => {}
+        _ => {
+            return Err(ErrorCode::OnlyUsedForInscriptionMetadata.into())    
+        }
     };
 
     if metadata.group.is_some() {
@@ -91,6 +94,10 @@ pub fn handler(ctx: Context<DeleteMetadataInscription>
     //         max_data_length: metadata_input.inscription_input.max_data_length,
     //     }
     // )?;
+
+    emit!(DeleteEvent {
+        id: metadata.mint.key(),
+    });
 
     Ok(())
 }

@@ -27,6 +27,11 @@ pub struct DeleteMetadata<'info> {
     pub system_program: Program<'info, System>,
 }
 
+#[event]
+pub struct DeleteEvent {
+    pub id: Pubkey
+}
+
 pub fn handler(ctx: Context<DeleteMetadata>
 ) -> Result<()> {
 
@@ -64,6 +69,10 @@ pub fn handler(ctx: Context<DeleteMetadata>
     if !can_delete_metadata {
         return Err(ErrorCode::MissingPermissionDeleteMetadata.into())
     }
+
+    emit!(DeleteEvent {
+        id: metadata.mint.key(),
+    });
 
     Ok(())
 }

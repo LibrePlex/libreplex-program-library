@@ -88,17 +88,6 @@ pub mod libreplex_metadata {
         )
     }
 
-    pub fn create_ordinal_metadata(
-        ctx: Context<CreateInscriptionMetadata>,
-        metadata_input: CreateMetadataInscriptionInput,
-    ) -> Result<()> {
-        msg!("creating metadata");
-        instructions::create_metadata_inscription::handler(
-            ctx,
-            metadata_input
-        )
-    }
-
     pub fn create_inscription_metadata(
         ctx: Context<CreateInscriptionMetadata>,
         metadata_input: CreateMetadataInscriptionInput,

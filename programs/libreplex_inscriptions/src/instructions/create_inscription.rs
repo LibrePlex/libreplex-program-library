@@ -18,7 +18,7 @@ impl CreateInscriptionInput {
 
 
 #[derive(Accounts)]
-#[instruction(ordinal_input: CreateInscriptionInput)]
+#[instruction(inscription_input: CreateInscriptionInput)]
 pub struct CreateInscription<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -39,7 +39,7 @@ pub fn handler(
 ) -> Result<()> {
     let inscription = &mut ctx.accounts.ordinal;
 
-    let inscription_account_info = inscription.to_account_info();
+    // let inscription_account_info = inscription.to_account_info();
     msg!("Writing authority");
 
     let authority = match inscription_input.authority {
