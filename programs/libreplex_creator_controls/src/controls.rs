@@ -1,12 +1,20 @@
 use anchor_lang::{prelude::*, system_program};
 use arrayref::array_ref;
+use solana_program::instruction::Instruction;
+use solana_program::program::invoke;
 use solana_program::{keccak};
 use crate::errors::ErrorCode;
 use crate::state::{Accounts, ArgCtx};
 
 
 pub trait Control {
-    fn before_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()>;
+    fn before_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+        Ok(())
+    }
+
+    fn after_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+        Ok(())
+    }
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
@@ -191,5 +199,56 @@ impl Control for SplPayment {
             to: token_recepient.to_account_info(),
             authority: accounts.buyer.to_account_info(),
         }), self.amount)
+    }
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct CustomProgram {
+    pub program_id: Pubkey,
+    pub instruction_data: Vec<u8>,
+    pub remaining_accounts_to_use: u32,
+}
+
+
+impl Control for CustomProgram {
+  
+    fn after_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
+        let current_remaining_accounts_pointer = accounts.remaining_accounts.current as usize;
+        let remaining_accounts = accounts.remaining_accounts.accounts;
+
+        let target_remaining_accounts = &remaining_accounts[current_remaining_accounts_pointer..self.remaining_accounts_to_use as usize];
+
+        let mut account_metas = vec![accounts.buyer.to_account_metas(None).pop().unwrap(), 
+            accounts.mint.to_account_metas(None).pop().unwrap(), 
+            accounts.metadata.to_account_metas(None).pop().unwrap(), 
+            accounts.group.to_account_metas(None).pop().unwrap()];
+
+
+
+        account_metas.extend(target_remaining_accounts.iter()
+        .map(|acc| match acc.is_writable {
+            false => AccountMeta::new_readonly(*acc.key, acc.is_signer),
+            true => AccountMeta::new(*acc.key, acc.is_signer),
+        }));
+
+        let ix = Instruction {
+            accounts: account_metas,
+            data: self.instruction_data.clone(),
+            program_id: self.program_id,
+        };
+
+        let mut infos = vec![accounts.mint.to_account_info(), 
+        accounts.metadata.to_account_info(), 
+        accounts.group.to_account_info()];
+
+        infos.extend(target_remaining_accounts.iter().map(|acc| acc.to_account_info()));
+
+
+        invoke(&ix, 
+            infos.as_slice())?;
+
+        accounts.remaining_accounts.current += self.remaining_accounts_to_use;
+
+        Ok(())
     }
 }

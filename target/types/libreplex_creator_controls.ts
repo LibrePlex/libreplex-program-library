@@ -247,6 +247,26 @@ export type LibreplexCreatorControls = {
       }
     },
     {
+      "name": "CustomProgram",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "programId",
+            "type": "publicKey"
+          },
+          {
+            "name": "instructionData",
+            "type": "bytes"
+          },
+          {
+            "name": "remainingAccountsToUse",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitializeInput",
       "type": {
         "kind": "struct",
@@ -650,6 +670,26 @@ export const IDL: LibreplexCreatorControls = {
           {
             "name": "recepient",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CustomProgram",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "programId",
+            "type": "publicKey"
+          },
+          {
+            "name": "instructionData",
+            "type": "bytes"
+          },
+          {
+            "name": "remainingAccountsToUse",
+            "type": "u32"
           }
         ]
       }
