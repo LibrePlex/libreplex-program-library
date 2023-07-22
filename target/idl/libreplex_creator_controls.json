@@ -247,6 +247,26 @@
       }
     },
     {
+      "name": "CustomProgram",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "programId",
+            "type": "publicKey"
+          },
+          {
+            "name": "instructionData",
+            "type": "bytes"
+          },
+          {
+            "name": "remainingAccountsToUse",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitializeInput",
       "type": {
         "kind": "struct",
@@ -403,5 +423,8 @@
       "name": "PhaseNotSpecified",
       "msg": "Phase not specified"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "5DvMusEoyx8yBhYjmnRoYH6KSxf6DTMmowiTrygyzAvV"
+  }
 }
