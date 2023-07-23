@@ -1,9 +1,9 @@
 use crate::state::{Metadata};
-use crate::{ CreateMetadataInput, PermissionType, MetadataEvent, MetadataEventType, Asset};
+use crate::{ CreateMetadataInput, PermissionType, MetadataEvent, MetadataEventType, Asset, MetadataExtension};
 use anchor_lang::{prelude::*, system_program};
-use libreplex_inscriptions::instructions::CreateInscriptionInput;
 
 use libreplex_inscriptions::cpi::accounts::{CreateInscription};
+use libreplex_inscriptions::instructions::CreateInscriptionInput;
 use libreplex_inscriptions::program::LibreplexInscriptions;
 
 /*
@@ -15,15 +15,16 @@ use libreplex_inscriptions::program::LibreplexInscriptions;
     (two-way link ensures that the mapping is 1-1)
 */
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CreateOrdinalMetadataInput {
+pub struct CreateMetadataInscriptionInput {
     pub name: String,
     pub symbol: String,
-    pub description: Option<String>,
     pub inscription_input: CreateInscriptionInput,
     pub update_authority: Pubkey,
+    pub description: Option<String>,
+    pub extension: MetadataExtension,
 }
 
-impl CreateOrdinalMetadataInput {
+impl CreateMetadataInscriptionInput {
     pub fn get_size(&self) -> usize {
         let size =
             4 + self.name.len()
@@ -32,18 +33,15 @@ impl CreateOrdinalMetadataInput {
             + 4
             + self.inscription_input.get_size() as usize
             + 2 + 32 // for ordinal asset type
-            + match &self.description {
-                None =>0,
-                Some(x) => 4 + x.len()
-            };
+            + self.extension.get_size();
 
         return size;
     }
 }
 
 #[derive(Accounts)]
-#[instruction(metadata_input: CreateOrdinalMetadataInput)]
-pub struct CreateOrdinalMetadata<'info> {
+#[instruction(metadata_input: CreateMetadataInscriptionInput)]
+pub struct CreateInscriptionMetadata<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -69,7 +67,7 @@ pub struct CreateOrdinalMetadata<'info> {
 
 }
 
-pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdinalMetadataInput) -> Result<()> {
+pub fn handler(ctx: Context<CreateInscriptionMetadata>, metadata_input: CreateMetadataInscriptionInput) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let ordinal = &mut ctx.accounts.ordinal;
 
@@ -109,10 +107,12 @@ pub fn handler(ctx: Context<CreateOrdinalMetadata>, metadata_input: CreateOrdina
     metadata.symbol = metadata_input.symbol.clone();
     metadata.name = metadata_input.name.clone();
     metadata.update_authority = metadata_input.update_authority;
-    metadata.description = metadata_input.description;
     metadata.asset = Asset::Inscription {
-            account_id: ctx.accounts.ordinal.key()
+            account_id: ctx.accounts.ordinal.key(),
+            description: metadata_input.description
     };
+    metadata.creator = signer.key();
+    metadata.extension = metadata_input.extension;
 
     msg!(
         "metadata created for mint with pubkey {}",

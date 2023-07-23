@@ -386,6 +386,12 @@ export type LibreplexCreator = {
               {
                 "name": "url",
                 "type": "string"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -394,6 +400,16 @@ export type LibreplexCreator = {
             "fields": [
               {
                 "name": "program_id",
+                "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
+              },
+              {
+                "name": "output_address",
                 "type": "publicKey"
               }
             ]
@@ -893,6 +909,12 @@ export const IDL: LibreplexCreator = {
               {
                 "name": "url",
                 "type": "string"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -901,6 +923,16 @@ export const IDL: LibreplexCreator = {
             "fields": [
               {
                 "name": "program_id",
+                "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
+              },
+              {
+                "name": "output_address",
                 "type": "publicKey"
               }
             ]

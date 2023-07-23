@@ -105,7 +105,9 @@ pub enum ErrorCode {
 
     #[msg("Metadata is not mutable")]
     MetadataIsNotMutable, //0x1791
-    Reserved34, //0x1792
+
+    #[msg("Inscription metadata is deleted via a separate method")]
+    InvokeDeleteInscriptionMetadata, //0x1792
     Reserved35, //0x1793
     Reserved36, //0x1794
     Reserved37, //0x1795

@@ -19,6 +19,11 @@ struct RoyaltyAmount {
     recipient: Pubkey,
 }
 
+#[event]
+pub struct ExecuteEvent {
+    pub id: Pubkey,
+}
+
 #[derive(Accounts)]
 pub struct Execute<'info> {
     /// CHECK: checked against listing.lister in macro
@@ -276,22 +281,11 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
         &[auth_seeds],
     )?;
 
-    // check token account is kosher - a sanity check for mint + owner
-    // let acc_data = &escrow_token_account.try_borrow_mut_data().unwrap()[..][..];
-    // let escrow_token_account_obj = spl_token_2022::state::Account::unpack_from_slice(acc_data).unwrap();
-    // drop(acc_data);
+    
+    emit!(ExecuteEvent {
+        id: listing.key(),
+    });
 
-    // if escrow_token_account_obj.mint != listing.mint.key() {
-    //     return Err(SharedError::BadMint.into());
-    // }
-
-    // msg!("owner: {}", escrow_token_account_obj.owner.key());
-
-    // msg!("listing: {}", listing.key());
-
-    // if !escrow_token_account_obj.owner.eq(&listing.key()) {
-    //     return Err(SharedError::BadOwner.into());
-    // }
 
     Ok(())
 }

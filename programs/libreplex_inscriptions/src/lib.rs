@@ -29,6 +29,14 @@ pub mod libreplex_inscriptions {
         )
     }
 
+    pub fn delete_inscription(
+        ctx: Context<DeleteInscription>
+    ) -> Result<()> {
+        instructions::delete_inscription::handler(
+            ctx
+        )
+    }
+
     pub fn resize_inscription(
         ctx: Context<ResizeInscription>,
         input: ResizeInscriptionInput,

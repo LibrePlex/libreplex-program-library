@@ -125,21 +125,28 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, 
 
     
     let mint_accounts = libreplex_creator::cpi::accounts::Mint {
-        buyer: accounts.buyer,
+        buyer: accounts.buyer.to_account_info(),
         mint_authority: controller.to_account_info(),
-        mint: accounts.mint,
-        creator: accounts.creator,
-        metadata: accounts.metadata,
-        group: accounts.group,
-        group_permissions: accounts.group_permissions,
-        minter_numbers: accounts.minter_numbers,
-        system_program: accounts.system_program,
-        libreplex_metadata_program: accounts.libreplex_metadata_program,
-        recent_slothashes: accounts.recent_slothashes,
-        attribute_config: accounts.attribute_config,
+        mint: accounts.mint.to_account_info(),
+        creator: accounts.creator.to_account_info(),
+        metadata: accounts.metadata.to_account_info(),
+        group: accounts.group.to_account_info(),
+        metadata_extension: accounts.metadata_extension.to_account_info(),
+        group_permissions: accounts.group_permissions.to_account_info(),
+        minter_numbers: accounts.minter_numbers.as_ref().map(|a| {a.to_account_info()}),
+        system_program: accounts.system_program.to_account_info(),
+        libreplex_metadata_program: accounts.libreplex_metadata_program.to_account_info(),
+        recent_slothashes: accounts.recent_slothashes.to_account_info(),
+        attribute_config: accounts.attribute_config.as_ref().map(|a| {a.to_account_info()}),
     };
 
     let mint_ctx = CpiContext::new_with_signer(ctx.accounts.libreplex_creator_program.to_account_info(), mint_accounts, &signer_seeds);
 
-    libreplex_creator::cpi::mint(mint_ctx)
+    libreplex_creator::cpi::mint(mint_ctx)?;
+
+    for control in &active_phase.controls {
+        control.after_mint(&mut accounts, &mut arg_ctx)?;
+    }
+
+    Ok(())
 }

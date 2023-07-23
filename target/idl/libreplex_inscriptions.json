@@ -1,5 +1,5 @@
 {
-  "version": "0.1.7",
+  "version": "0.1.9",
   "name": "libreplex_inscriptions",
   "instructions": [
     {
@@ -34,6 +34,27 @@
           }
         }
       ]
+    },
+    {
+      "name": "deleteInscription",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ordinal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "resizeInscription",
@@ -216,6 +237,16 @@
     }
   ],
   "events": [
+    {
+      "name": "InscriptionEventDelete",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "InscriptionEvent",
       "fields": [

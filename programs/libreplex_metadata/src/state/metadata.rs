@@ -44,9 +44,13 @@ pub enum Asset {
     None,
     Json { url: String },
     JsonTemplate { url_parameter: String },
-    Image { url: String },
-    ChainRenderer { program_id: Pubkey },
-    Inscription { account_id: Pubkey },
+    Image { url: String, description: Option<String> },
+    ChainRenderer { 
+        // This is where the renderer program will write the output of a render call to
+        render_output_address: Pubkey,
+        program_id: Pubkey, 
+        description: Option<String> },
+    Inscription { account_id: Pubkey, description: Option<String> },
 }
 
 impl Asset {
@@ -57,9 +61,9 @@ impl Asset {
                 Asset::None => 0,
                 Asset::Json { url } => 4 + url.len(),
                 Asset::JsonTemplate { url_parameter } => 4 + url_parameter.len(),
-                Asset::Image { url } => 4 + url.len(),
-                Asset::ChainRenderer { program_id: _ } => 32,
-                Asset::Inscription { account_id: _ } => 32,
+                Asset::Image { url , description} => 4 + url.len() + 1 + match &description {Some(x) => 4 + x.len(), None => 0},
+                Asset::ChainRenderer { render_output_address: _, program_id: _, description } => 32 + 32 + 1  + match &description {Some(x) => 4 + x.len(), None => 0},
+                Asset::Inscription { account_id: _, description } => 32 + 1  + match &description {Some(x) => 4 + x.len(), None => 0},
             };
     }
 }
@@ -83,8 +87,6 @@ pub struct Metadata {
     pub symbol: String,
 
     pub asset: Asset,
-
-    pub description: Option<String>,
 
     pub extension: MetadataExtension,
 }
@@ -111,11 +113,6 @@ impl Metadata {
             + 4
             + self.asset.get_size()
             + 1
-            + match &self.description {
-                None => 0,
-                Some(x) => 4 + x.len(),
-            }
-            
             + self.extension.get_size();
 
         return size;
@@ -194,7 +191,6 @@ pub struct CreateMetadataInput {
     pub name: String,
     pub symbol: String,
     pub asset: Asset,
-    pub description: Option<String>,
     pub update_authority: Pubkey,
     pub extension: MetadataExtension,
 }
@@ -207,10 +203,7 @@ impl CreateMetadataInput {
             + self.symbol.len()
             + 4
             + self.asset.get_size()
-            + 1 + match &self.description {
-                None => 0,
-                Some(x) => 4 + x.len(),
-            } + self.extension.get_size();
+            + self.extension.get_size();
 
         return size;
     }
@@ -221,7 +214,6 @@ pub struct UpdateMetadataInput {
     pub name: String,
     pub symbol: String,
     pub asset: Asset,
-    pub description: Option<String>,
 }
 
 impl UpdateMetadataInput {
@@ -232,10 +224,7 @@ impl UpdateMetadataInput {
             + self.symbol.len()
             + 4
             + self.asset.get_size()
-            + match &self.description {
-                None => 0,
-                Some(x) => x.len(),
-            };
+;
 
         return size;
     }

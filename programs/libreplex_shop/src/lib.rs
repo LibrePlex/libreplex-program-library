@@ -32,30 +32,30 @@ pub mod libreplex_shop {
         instructions::execute::handler(ctx)
     }
 
-    pub fn create_listing_group<'info>(
-        ctx: Context<'_, '_, '_, 'info, CreateListingGroup<'info>>,
-        input: CreateListingGroupInput
-    ) -> Result<()> {
-        instructions::create_listing_group::handler(ctx, input)
-    }
+    // pub fn create_listing_group<'info>(
+    //     ctx: Context<'_, '_, '_, 'info, CreateListingGroup<'info>>,
+    //     input: CreateListingGroupInput
+    // ) -> Result<()> {
+    //     instructions::create_listing_group::handler(ctx, input)
+    // }
 
-    pub fn delete_listing_group<'info>(
-        ctx: Context<'_, '_, '_, 'info, DeleteListingGroup<'info>>
-    ) -> Result<()> {
-        instructions::delete_listing_group::handler(ctx)
-    }
+    // pub fn delete_listing_group<'info>(
+    //     ctx: Context<'_, '_, '_, 'info, DeleteListingGroup<'info>>
+    // ) -> Result<()> {
+    //     instructions::delete_listing_group::handler(ctx)
+    // }
 
-    pub fn create_listing_filter<'info>(
-        ctx: Context<'_, '_, '_, 'info, CreateListingFilter<'info>>,
-        input: CreateListingFilterInput
-    ) -> Result<()> {
-        instructions::create_listing_filter::handler(ctx, input)
-    }
+    // pub fn create_listing_filter<'info>(
+    //     ctx: Context<'_, '_, '_, 'info, CreateListingFilter<'info>>,
+    //     input: CreateListingFilterInput
+    // ) -> Result<()> {
+    //     instructions::create_listing_filter::handler(ctx, input)
+    // }
 
 
-    pub fn delete_listing_filter<'info>(
-        ctx: Context<'_, '_, '_, 'info, DeleteListingFilter<'info>>
-    ) -> Result<()> {
-        instructions::delete_listing_filter::handler(ctx)
-    }
+    // pub fn delete_listing_filter<'info>(
+    //     ctx: Context<'_, '_, '_, 'info, DeleteListingFilter<'info>>
+    // ) -> Result<()> {
+    //     instructions::delete_listing_filter::handler(ctx)
+    // }
 }

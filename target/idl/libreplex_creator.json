@@ -386,6 +386,12 @@
               {
                 "name": "url",
                 "type": "string"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
               }
             ]
           },
@@ -394,6 +400,16 @@
             "fields": [
               {
                 "name": "program_id",
+                "type": "publicKey"
+              },
+              {
+                "name": "description",
+                "type": {
+                  "option": "string"
+                }
+              },
+              {
+                "name": "output_address",
                 "type": "publicKey"
               }
             ]

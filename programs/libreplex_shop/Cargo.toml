@@ -1,6 +1,6 @@
 [package]
 name = "libreplex_shop"
-version = "0.3.0"
+version = "0.3.1"
 description = "Created with Anchor"
 edition = "2021"
 
@@ -19,7 +19,7 @@ default = []
 anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
 anchor-spl = {version = "0.28.0"}
 libreplex_shared = {version = "*", path="../libreplex_shared"}
-libreplex_metadata = {version = "0.6.0", features =["cpi", "no-entrypoint"]}
+libreplex_metadata = {version = "*", path="../libreplex_metadata",  features =["cpi", "no-entrypoint"]}
 spl-token-2022 = "0.6.1"
 solana-program = ">1.14"
 
