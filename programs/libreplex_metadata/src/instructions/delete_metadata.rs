@@ -42,6 +42,7 @@ pub fn handler(ctx: Context<DeleteMetadata>
     match &metadata.asset {
         Asset::Inscription {
             account_id: _,
+            data_type: _,
             description: _
         } =>  {
             return Err(ErrorCode::InvokeDeleteInscriptionMetadata.into())    

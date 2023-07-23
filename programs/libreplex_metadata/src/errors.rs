@@ -112,7 +112,8 @@ pub enum ErrorCode {
     #[msg("Only used for inscription metadata")]
     OnlyUsedForInscriptionMetadata,
 
-    Reserved35, //0x1793
+    #[msg("Wrong asset type")]
+    WrongAssetType, //0x1793
     Reserved36, //0x1794
     Reserved37, //0x1795
     Reserved38, //0x1796

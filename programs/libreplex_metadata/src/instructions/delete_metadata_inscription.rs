@@ -49,6 +49,7 @@ pub fn handler(ctx: Context<DeleteMetadataInscription>
     match &metadata.asset {
         Asset::Inscription {
             account_id: _,
+            data_type: _,
             description: _
         } =>  {
             

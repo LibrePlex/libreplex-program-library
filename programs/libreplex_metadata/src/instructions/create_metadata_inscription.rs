@@ -1,8 +1,8 @@
-use crate::state::{Metadata};
-use crate::{MetadataEvent, MetadataEventType, Asset, MetadataExtension};
-use anchor_lang::{prelude::*};
+use crate::state::Metadata;
+use crate::{Asset, MetadataEvent, MetadataEventType, MetadataExtension};
+use anchor_lang::prelude::*;
 
-use libreplex_inscriptions::cpi::accounts::{CreateInscription};
+use libreplex_inscriptions::cpi::accounts::CreateInscription;
 
 use libreplex_inscriptions::program::LibreplexInscriptions;
 
@@ -14,27 +14,26 @@ use libreplex_inscriptions::program::LibreplexInscriptions;
 
     (two-way link ensures that the mapping is 1-1)
 */
+
+#[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateMetadataInscriptionInput {
     pub name: String,
     pub symbol: String,
     pub update_authority: Pubkey,
-    pub description: Option<String>,
     pub extension: MetadataExtension,
+    pub description: Option<String>,
+    pub data_type: String,
 }
 
 impl CreateMetadataInscriptionInput {
     pub fn get_size(&self) -> usize {
         let size =
-            // name
-            4 + self.name.len()
-            // symbol
-            + 4 + self.symbol.len()
-            // asset (inscription)
-            + 2 + 32 + 1 + match &self.description {
-                Some(x)=>4 + x.len(),
-                None => 0
-            } + self.extension.get_size();
+            32 + 
+            1 + match &self.description {
+                Some(x) => 4 + x.len(),
+                None => 0,
+            } + 4 + self.data_type.len();
 
         return size;
     }
@@ -60,17 +59,19 @@ pub struct CreateInscriptionMetadata<'info> {
     pub mint: Signer<'info>,
 
     // ordinal must sign otherwise
-    pub ordinal: Signer<'info>,
+    pub inscription: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 
-    pub inscriptions_program: Program<'info, LibreplexInscriptions>
-
+    pub inscriptions_program: Program<'info, LibreplexInscriptions>,
 }
 
-pub fn handler(ctx: Context<CreateInscriptionMetadata>, metadata_input: CreateMetadataInscriptionInput) -> Result<()> {
+pub fn handler(
+    ctx: Context<CreateInscriptionMetadata>,
+    metadata_input: CreateMetadataInscriptionInput
+) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
-    let ordinal = &mut ctx.accounts.ordinal;
+    let inscription = &mut ctx.accounts.inscription;
 
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let system_program = &ctx.accounts.system_program;
@@ -78,11 +79,7 @@ pub fn handler(ctx: Context<CreateInscriptionMetadata>, metadata_input: CreateMe
 
     let mint_key = &ctx.accounts.mint.key();
 
-    let metadata_seeds: &[&[u8]] = &[
-        b"metadata",
-        mint_key.as_ref(),
-        &[ctx.bumps["metadata"]],
-    ];
+    let metadata_seeds: &[&[u8]] = &[b"metadata", mint_key.as_ref(), &[ctx.bumps["metadata"]]];
 
     libreplex_inscriptions::cpi::create_inscription(
         CpiContext::new_with_signer(
@@ -90,16 +87,16 @@ pub fn handler(ctx: Context<CreateInscriptionMetadata>, metadata_input: CreateMe
             CreateInscription {
                 // raffle is the owner of the pod
                 root: metadata.to_account_info(),
-                ordinal: ordinal.to_account_info(),
+                ordinal: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),
-                payer: signer.to_account_info()
+                payer: signer.to_account_info(),
             },
-            &[&metadata_seeds]
+            &[&metadata_seeds],
         ),
         libreplex_inscriptions::instructions::CreateInscriptionInput {
             authority: Some(signer.key()),
             max_data_length: 0,
-        }
+        },
     )?;
 
     // Update the metadata state account
@@ -109,8 +106,9 @@ pub fn handler(ctx: Context<CreateInscriptionMetadata>, metadata_input: CreateMe
     metadata.name = metadata_input.name.clone();
     metadata.update_authority = metadata_input.update_authority;
     metadata.asset = Asset::Inscription {
-            account_id: ctx.accounts.ordinal.key(),
-            description: metadata_input.description
+        account_id: ctx.accounts.inscription.key(),
+        data_type: metadata_input.data_type,
+        description: metadata_input.description,
     };
     metadata.creator = signer.key();
     metadata.extension = metadata_input.extension;
