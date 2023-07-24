@@ -29,11 +29,16 @@ pub struct CreateMetadataInscriptionInput {
 impl CreateMetadataInscriptionInput {
     pub fn get_size(&self) -> usize {
         let size =
-            32 + 
+            4 + self.name.len() +
+            4 + self.symbol.len() +
+            // inscription asset
+            Asset::BASE_SIZE + 
+            32 +
+            4 + self.data_type.len() +
             1 + match &self.description {
                 Some(x) => 4 + x.len(),
                 None => 0,
-            } + 4 + self.data_type.len();
+            } + self.extension.get_size();
 
         return size;
     }
