@@ -13,6 +13,7 @@ pub trait Control {
     }
 
     fn after_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+        msg!("Default Post Mint");
         Ok(())
     }
 }
@@ -22,10 +23,11 @@ pub enum ControlType {
     AllowList(AllowList),
     Payment(Payment),
     SplPayment(SplPayment),
-    MintLimit(MintLimit)
+    MintLimit(MintLimit),
+    CustomProgram(CustomProgram),
 }
 
-pub const MAX_CONTROL_TYPE_SIZE: usize = 100;
+pub const MAX_CONTROL_TYPE_SIZE: usize = 150;
 
 impl Control for ControlType {
     fn before_mint<'a, 'b, 'info>(&self, accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
@@ -34,6 +36,17 @@ impl Control for ControlType {
             ControlType::Payment(payment) => payment.before_mint(accounts, arg_ctx),
             ControlType::SplPayment(spl_payment) => spl_payment.before_mint(accounts, arg_ctx),
             ControlType::MintLimit(mint_limit) => mint_limit.before_mint(accounts, arg_ctx),
+            ControlType::CustomProgram(custom_program) => custom_program.before_mint(accounts, arg_ctx)
+        }
+    }
+
+    fn after_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+        match self {
+            ControlType::AllowList(allow_list) => allow_list.after_mint(accounts, arg_ctx),
+            ControlType::Payment(payment) => payment.after_mint(accounts, arg_ctx),
+            ControlType::SplPayment(spl_payment) => spl_payment.after_mint(accounts, arg_ctx),
+            ControlType::MintLimit(mint_limit) => mint_limit.after_mint(accounts, arg_ctx),
+            ControlType::CustomProgram(custom_program) => custom_program.after_mint(accounts, arg_ctx)
         }
     }
 }
@@ -216,17 +229,27 @@ pub struct CustomProgram {
 
 
 impl Control for CustomProgram {
-  
+
+    
     fn after_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
-        let current_remaining_accounts_pointer = accounts.remaining_accounts.current as usize;
+        msg!("CustomProgram control");
         let remaining_accounts = accounts.remaining_accounts.accounts;
 
-        let target_remaining_accounts = &remaining_accounts[current_remaining_accounts_pointer..self.remaining_accounts_to_use as usize];
+        let custom_program_account = remaining_accounts.get(accounts.remaining_accounts.current as usize).unwrap();
+        accounts.remaining_accounts.current += 1;
+        let current_remaining_accounts_pointer = accounts.remaining_accounts.current as usize;
 
-        let mut account_metas = vec![accounts.buyer.to_account_metas(None).pop().unwrap(), 
+
+
+        let target_remaining_accounts = &remaining_accounts[current_remaining_accounts_pointer..current_remaining_accounts_pointer + self.remaining_accounts_to_use as usize];
+
+    
+        let mut account_metas = vec![
+            accounts.buyer.to_account_metas(None).pop().unwrap(), 
             accounts.mint.to_account_metas(None).pop().unwrap(), 
             accounts.metadata.to_account_metas(None).pop().unwrap(), 
-            accounts.group.to_account_metas(None).pop().unwrap()];
+            accounts.group.to_account_metas(None).pop().unwrap(), 
+            accounts.system_program.to_account_metas(None).pop().unwrap()];
 
 
 
@@ -241,10 +264,12 @@ impl Control for CustomProgram {
             data: self.instruction_data.clone(),
             program_id: self.program_id,
         };
-
-        let mut infos = vec![accounts.mint.to_account_info(), 
-        accounts.metadata.to_account_info(), 
-        accounts.group.to_account_info()];
+        
+        let mut infos = vec![ 
+            accounts.buyer.to_account_info(), 
+            accounts.mint.to_account_info(), 
+            accounts.metadata.to_account_info(),
+        accounts.group.to_account_info(), accounts.system_program.to_account_info(), custom_program_account.to_account_info()];
 
         infos.extend(target_remaining_accounts.iter().map(|acc| acc.to_account_info()));
 

@@ -131,7 +131,6 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, 
         creator: accounts.creator.to_account_info(),
         metadata: accounts.metadata.to_account_info(),
         group: accounts.group.to_account_info(),
-        metadata_extension: accounts.metadata_extension.to_account_info(),
         group_permissions: accounts.group_permissions.to_account_info(),
         minter_numbers: accounts.minter_numbers.as_ref().map(|a| {a.to_account_info()}),
         system_program: accounts.system_program.to_account_info(),
@@ -144,6 +143,7 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, 
 
     libreplex_creator::cpi::mint(mint_ctx)?;
 
+    msg!("Post Mint {}", active_phase.controls.len());
     for control in &active_phase.controls {
         control.after_mint(&mut accounts, &mut arg_ctx)?;
     }

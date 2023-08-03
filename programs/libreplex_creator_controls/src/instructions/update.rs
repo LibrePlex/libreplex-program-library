@@ -27,5 +27,6 @@ pub fn handler(ctx: Context<Update>, input: UpdateInput) -> Result<()> {
 
     controller.phases = input.phases;
 
+    msg!("Update controller");
     Ok(())
 }
