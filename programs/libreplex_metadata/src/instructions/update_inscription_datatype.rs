@@ -29,7 +29,15 @@ pub struct UpdateInscriptionDataType<'info> {
     #[account(mut)]
     pub editor: Signer<'info>,
 
-    #[account(mut)]
+    #[account(mut,
+        realloc = metadata.get_size() + metadata_input.data_type.len() - match &metadata.asset {
+            Asset::Inscription {
+                data_type, ..
+            } => data_type.len(),
+            _ => 0
+        },
+        realloc::payer = editor,
+        realloc::zero = false)]
     pub metadata: Box<Account<'info, Metadata>>,
 
     // Derived from the editor, the metadata's update auth and the the metadata itself
