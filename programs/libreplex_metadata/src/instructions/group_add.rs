@@ -16,7 +16,10 @@ pub struct GroupAdd<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account(mut)]
+    #[account(mut,
+        realloc = metadata.get_size() + 32, // add group size. TODO: Remove the group size on base metadata
+        realloc::payer = group_authority,
+        realloc::zero = false)]
     pub metadata: Box<Account<'info, Metadata>>,
 
     // Derived from the editor, the metadata's update auth and the the metadata itself
