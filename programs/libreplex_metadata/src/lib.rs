@@ -94,25 +94,25 @@ pub mod libreplex_metadata {
         )
     }
 
-    pub fn create_ordinal_metadata(
+    pub fn create_inscription_metadata(
         ctx: Context<CreateInscriptionMetadata>,
-        metadata_input: CreateMetadataInscriptionInput,
+        metadata_input: CreateMetadataInscriptionInput
     ) -> Result<()> {
         msg!("creating metadata");
         instructions::create_metadata_inscription::handler(
             ctx,
-            metadata_input
+            metadata_input,
         )
     }
 
-    pub fn create_inscription_metadata(
-        ctx: Context<CreateInscriptionMetadata>,
-        metadata_input: CreateMetadataInscriptionInput,
+    pub fn update_inscription_datatype(
+        ctx: Context<UpdateInscriptionDataType>,
+        inscription_input: UpdateInscriptionDataTypeInput
     ) -> Result<()> {
-        msg!("creating metadata");
-        instructions::create_metadata_inscription::handler(
+        msg!("update inscription datatype");
+        instructions::update_inscription_datatype::handler(
             ctx,
-            metadata_input
+            inscription_input,
         )
     }
 
@@ -124,31 +124,11 @@ pub mod libreplex_metadata {
         )
     }
 
-
-    // pub fn extend_metadata(
-    //     ctx: Context<ExtendMetadata>,
-    //     metadata_input: MetadataExtensionInput,
-    // ) -> Result<()> {
-    //     msg!("extending metadata");
-    //     instructions::extend_metadata::handler(
-    //         ctx,
-    //         metadata_input
-    //     )
-    // }
-
-    // pub fn delete_metadata_extension(
-    //     ctx: Context<DeleteMetadataExtension>,
-    // ) -> Result<()> {
-    //     msg!("deleting metadata");
-    //     instructions::delete_metadataextension::handler(ctx)
-    // }
-
     pub fn delete_permissions(
         ctx: Context<DeletePermissions>,
     ) -> Result<()> {
         msg!("deleting collection permissions");
         instructions::delete_permissions::handler(ctx)
     }
-
 
 }

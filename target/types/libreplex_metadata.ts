@@ -1,5 +1,5 @@
 export type LibreplexMetadata = {
-  "version": "0.9.0",
+  "version": "0.10.0",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -539,63 +539,6 @@ export type LibreplexMetadata = {
       "args": []
     },
     {
-      "name": "createOrdinalMetadata",
-      "accounts": [
-        {
-          "name": "signer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "metadata",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "ordinal",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "metadataInput",
-          "type": {
-            "defined": "CreateMetadataInscriptionInput"
-          }
-        }
-      ]
-    },
-    {
       "name": "createInscriptionMetadata",
       "accounts": [
         {
@@ -628,7 +571,7 @@ export type LibreplexMetadata = {
           "isSigner": true
         },
         {
-          "name": "ordinal",
+          "name": "inscription",
           "isMut": false,
           "isSigner": true
         },
@@ -648,6 +591,98 @@ export type LibreplexMetadata = {
           "name": "metadataInput",
           "type": {
             "defined": "CreateMetadataInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateInscriptionDatatype",
+      "accounts": [
+        {
+          "name": "editor",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "editor"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "delegatedGroupWidePermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "editor"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
+        },
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "UpdateInscriptionDataTypeInput"
           }
         }
       ]
@@ -912,14 +947,14 @@ export type LibreplexMetadata = {
             "type": "string"
           },
           {
-            "name": "inscriptionInput",
-            "type": {
-              "defined": "CreateInscriptionInput"
-            }
-          },
-          {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
+            }
           },
           {
             "name": "description",
@@ -928,10 +963,20 @@ export type LibreplexMetadata = {
             }
           },
           {
-            "name": "extension",
-            "type": {
-              "defined": "MetadataExtension"
-            }
+            "name": "dataType",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateInscriptionDataTypeInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dataType",
+            "type": "string"
           }
         ]
       }
@@ -1445,6 +1490,10 @@ export type LibreplexMetadata = {
                 "type": "publicKey"
               },
               {
+                "name": "data_type",
+                "type": "string"
+              },
+              {
                 "name": "description",
                 "type": {
                   "option": "string"
@@ -1505,6 +1554,16 @@ export type LibreplexMetadata = {
     }
   ],
   "events": [
+    {
+      "name": "DeleteEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "EditCollectionEvent",
       "fields": [
@@ -1800,189 +1859,195 @@ export type LibreplexMetadata = {
     },
     {
       "code": 6035,
-      "name": "Reserved35"
+      "name": "OnlyUsedForInscriptionMetadata",
+      "msg": "Only used for inscription metadata"
     },
     {
       "code": 6036,
-      "name": "Reserved36"
+      "name": "WrongAssetType",
+      "msg": "Wrong asset type"
     },
     {
       "code": 6037,
-      "name": "Reserved37"
+      "name": "Reserved36"
     },
     {
       "code": 6038,
-      "name": "Reserved38"
+      "name": "Reserved37"
     },
     {
       "code": 6039,
-      "name": "Reserved39"
+      "name": "Reserved38"
     },
     {
       "code": 6040,
-      "name": "Reserved40"
+      "name": "Reserved39"
     },
     {
       "code": 6041,
-      "name": "Reserved41"
+      "name": "Reserved40"
     },
     {
       "code": 6042,
-      "name": "Reserved42"
+      "name": "Reserved41"
     },
     {
       "code": 6043,
-      "name": "Reserved43"
+      "name": "Reserved42"
     },
     {
       "code": 6044,
-      "name": "Reserved44"
+      "name": "Reserved43"
     },
     {
       "code": 6045,
-      "name": "Reserved45"
+      "name": "Reserved44"
     },
     {
       "code": 6046,
-      "name": "Reserved46"
+      "name": "Reserved45"
     },
     {
       "code": 6047,
-      "name": "Reserved47"
+      "name": "Reserved46"
     },
     {
       "code": 6048,
-      "name": "Reserved48"
+      "name": "Reserved47"
     },
     {
       "code": 6049,
-      "name": "Reserved49"
+      "name": "Reserved48"
     },
     {
       "code": 6050,
-      "name": "Reserved50"
+      "name": "Reserved49"
     },
     {
       "code": 6051,
-      "name": "Reserved51"
+      "name": "Reserved50"
     },
     {
       "code": 6052,
-      "name": "Reserved52"
+      "name": "Reserved51"
     },
     {
       "code": 6053,
-      "name": "Reserved53"
+      "name": "Reserved52"
     },
     {
       "code": 6054,
-      "name": "Reserved54"
+      "name": "Reserved53"
     },
     {
       "code": 6055,
-      "name": "Reserved55"
+      "name": "Reserved54"
     },
     {
       "code": 6056,
-      "name": "Reserved56"
+      "name": "Reserved55"
     },
     {
       "code": 6057,
-      "name": "Reserved57"
+      "name": "Reserved56"
     },
     {
       "code": 6058,
-      "name": "Reserved58"
+      "name": "Reserved57"
     },
     {
       "code": 6059,
-      "name": "Reserved59"
+      "name": "Reserved58"
     },
     {
       "code": 6060,
-      "name": "Reserved60"
+      "name": "Reserved59"
     },
     {
       "code": 6061,
-      "name": "Reserved61"
+      "name": "Reserved60"
     },
     {
       "code": 6062,
-      "name": "Reserved62"
+      "name": "Reserved61"
     },
     {
       "code": 6063,
-      "name": "Reserved63"
+      "name": "Reserved62"
     },
     {
       "code": 6064,
-      "name": "Reserved64"
+      "name": "Reserved63"
     },
     {
       "code": 6065,
-      "name": "Reserved65"
+      "name": "Reserved64"
     },
     {
       "code": 6066,
-      "name": "Reserved66"
+      "name": "Reserved65"
     },
     {
       "code": 6067,
-      "name": "Reserved67"
+      "name": "Reserved66"
     },
     {
       "code": 6068,
-      "name": "Reserved68"
+      "name": "Reserved67"
     },
     {
       "code": 6069,
-      "name": "Reserved69"
+      "name": "Reserved68"
     },
     {
       "code": 6070,
-      "name": "Reserved70"
+      "name": "Reserved69"
     },
     {
       "code": 6071,
-      "name": "Reserved71"
+      "name": "Reserved70"
     },
     {
       "code": 6072,
-      "name": "Reserved72"
+      "name": "Reserved71"
     },
     {
       "code": 6073,
-      "name": "Reserved73"
+      "name": "Reserved72"
     },
     {
       "code": 6074,
-      "name": "Reserved74"
+      "name": "Reserved73"
     },
     {
       "code": 6075,
-      "name": "Reserved75"
+      "name": "Reserved74"
     },
     {
       "code": 6076,
-      "name": "Reserved76"
+      "name": "Reserved75"
     },
     {
       "code": 6077,
-      "name": "Reserved77"
+      "name": "Reserved76"
     },
     {
       "code": 6078,
-      "name": "Reserved78"
+      "name": "Reserved77"
     },
     {
       "code": 6079,
+      "name": "Reserved78"
+    },
+    {
+      "code": 6080,
       "name": "Reserved79"
     }
   ]
 };
 
 export const IDL: LibreplexMetadata = {
-  "version": "0.9.0",
+  "version": "0.10.0",
   "name": "libreplex_metadata",
   "instructions": [
     {
@@ -2522,63 +2587,6 @@ export const IDL: LibreplexMetadata = {
       "args": []
     },
     {
-      "name": "createOrdinalMetadata",
-      "accounts": [
-        {
-          "name": "signer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "metadata",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "metadata"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "ordinal",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "metadataInput",
-          "type": {
-            "defined": "CreateMetadataInscriptionInput"
-          }
-        }
-      ]
-    },
-    {
       "name": "createInscriptionMetadata",
       "accounts": [
         {
@@ -2611,7 +2619,7 @@ export const IDL: LibreplexMetadata = {
           "isSigner": true
         },
         {
-          "name": "ordinal",
+          "name": "inscription",
           "isMut": false,
           "isSigner": true
         },
@@ -2631,6 +2639,98 @@ export const IDL: LibreplexMetadata = {
           "name": "metadataInput",
           "type": {
             "defined": "CreateMetadataInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateInscriptionDatatype",
+      "accounts": [
+        {
+          "name": "editor",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegatedMetadataSpecificPermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "editor"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata.update_authority"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Metadata",
+                "path": "metadata"
+              }
+            ]
+          }
+        },
+        {
+          "name": "delegatedGroupWidePermissions",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "permissions"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "editor"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Group",
+                "path": "group"
+              }
+            ]
+          }
+        },
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "UpdateInscriptionDataTypeInput"
           }
         }
       ]
@@ -2895,14 +2995,14 @@ export const IDL: LibreplexMetadata = {
             "type": "string"
           },
           {
-            "name": "inscriptionInput",
-            "type": {
-              "defined": "CreateInscriptionInput"
-            }
-          },
-          {
             "name": "updateAuthority",
             "type": "publicKey"
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "MetadataExtension"
+            }
           },
           {
             "name": "description",
@@ -2911,10 +3011,20 @@ export const IDL: LibreplexMetadata = {
             }
           },
           {
-            "name": "extension",
-            "type": {
-              "defined": "MetadataExtension"
-            }
+            "name": "dataType",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateInscriptionDataTypeInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dataType",
+            "type": "string"
           }
         ]
       }
@@ -3428,6 +3538,10 @@ export const IDL: LibreplexMetadata = {
                 "type": "publicKey"
               },
               {
+                "name": "data_type",
+                "type": "string"
+              },
+              {
                 "name": "description",
                 "type": {
                   "option": "string"
@@ -3488,6 +3602,16 @@ export const IDL: LibreplexMetadata = {
     }
   ],
   "events": [
+    {
+      "name": "DeleteEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "EditCollectionEvent",
       "fields": [
@@ -3783,182 +3907,188 @@ export const IDL: LibreplexMetadata = {
     },
     {
       "code": 6035,
-      "name": "Reserved35"
+      "name": "OnlyUsedForInscriptionMetadata",
+      "msg": "Only used for inscription metadata"
     },
     {
       "code": 6036,
-      "name": "Reserved36"
+      "name": "WrongAssetType",
+      "msg": "Wrong asset type"
     },
     {
       "code": 6037,
-      "name": "Reserved37"
+      "name": "Reserved36"
     },
     {
       "code": 6038,
-      "name": "Reserved38"
+      "name": "Reserved37"
     },
     {
       "code": 6039,
-      "name": "Reserved39"
+      "name": "Reserved38"
     },
     {
       "code": 6040,
-      "name": "Reserved40"
+      "name": "Reserved39"
     },
     {
       "code": 6041,
-      "name": "Reserved41"
+      "name": "Reserved40"
     },
     {
       "code": 6042,
-      "name": "Reserved42"
+      "name": "Reserved41"
     },
     {
       "code": 6043,
-      "name": "Reserved43"
+      "name": "Reserved42"
     },
     {
       "code": 6044,
-      "name": "Reserved44"
+      "name": "Reserved43"
     },
     {
       "code": 6045,
-      "name": "Reserved45"
+      "name": "Reserved44"
     },
     {
       "code": 6046,
-      "name": "Reserved46"
+      "name": "Reserved45"
     },
     {
       "code": 6047,
-      "name": "Reserved47"
+      "name": "Reserved46"
     },
     {
       "code": 6048,
-      "name": "Reserved48"
+      "name": "Reserved47"
     },
     {
       "code": 6049,
-      "name": "Reserved49"
+      "name": "Reserved48"
     },
     {
       "code": 6050,
-      "name": "Reserved50"
+      "name": "Reserved49"
     },
     {
       "code": 6051,
-      "name": "Reserved51"
+      "name": "Reserved50"
     },
     {
       "code": 6052,
-      "name": "Reserved52"
+      "name": "Reserved51"
     },
     {
       "code": 6053,
-      "name": "Reserved53"
+      "name": "Reserved52"
     },
     {
       "code": 6054,
-      "name": "Reserved54"
+      "name": "Reserved53"
     },
     {
       "code": 6055,
-      "name": "Reserved55"
+      "name": "Reserved54"
     },
     {
       "code": 6056,
-      "name": "Reserved56"
+      "name": "Reserved55"
     },
     {
       "code": 6057,
-      "name": "Reserved57"
+      "name": "Reserved56"
     },
     {
       "code": 6058,
-      "name": "Reserved58"
+      "name": "Reserved57"
     },
     {
       "code": 6059,
-      "name": "Reserved59"
+      "name": "Reserved58"
     },
     {
       "code": 6060,
-      "name": "Reserved60"
+      "name": "Reserved59"
     },
     {
       "code": 6061,
-      "name": "Reserved61"
+      "name": "Reserved60"
     },
     {
       "code": 6062,
-      "name": "Reserved62"
+      "name": "Reserved61"
     },
     {
       "code": 6063,
-      "name": "Reserved63"
+      "name": "Reserved62"
     },
     {
       "code": 6064,
-      "name": "Reserved64"
+      "name": "Reserved63"
     },
     {
       "code": 6065,
-      "name": "Reserved65"
+      "name": "Reserved64"
     },
     {
       "code": 6066,
-      "name": "Reserved66"
+      "name": "Reserved65"
     },
     {
       "code": 6067,
-      "name": "Reserved67"
+      "name": "Reserved66"
     },
     {
       "code": 6068,
-      "name": "Reserved68"
+      "name": "Reserved67"
     },
     {
       "code": 6069,
-      "name": "Reserved69"
+      "name": "Reserved68"
     },
     {
       "code": 6070,
-      "name": "Reserved70"
+      "name": "Reserved69"
     },
     {
       "code": 6071,
-      "name": "Reserved71"
+      "name": "Reserved70"
     },
     {
       "code": 6072,
-      "name": "Reserved72"
+      "name": "Reserved71"
     },
     {
       "code": 6073,
-      "name": "Reserved73"
+      "name": "Reserved72"
     },
     {
       "code": 6074,
-      "name": "Reserved74"
+      "name": "Reserved73"
     },
     {
       "code": 6075,
-      "name": "Reserved75"
+      "name": "Reserved74"
     },
     {
       "code": 6076,
-      "name": "Reserved76"
+      "name": "Reserved75"
     },
     {
       "code": 6077,
-      "name": "Reserved77"
+      "name": "Reserved76"
     },
     {
       "code": 6078,
-      "name": "Reserved78"
+      "name": "Reserved77"
     },
     {
       "code": 6079,
+      "name": "Reserved78"
+    },
+    {
+      "code": 6080,
       "name": "Reserved79"
     }
   ]

@@ -11,6 +11,7 @@ pub mod group_remove;
 pub mod create_metadata_inscription;
 pub mod delete_metadata;
 pub mod delete_metadata_inscription;
+pub mod update_inscription_datatype;
 
 pub use delete_metadata::*;
 pub use delete_metadata_inscription::*;
@@ -25,4 +26,5 @@ pub use update_group::*;
 pub use group_add::*;
 pub use delegate_group_permissions::*;
 pub use delegate_metadata_permissions::*;
+pub use update_inscription_datatype::*;
 

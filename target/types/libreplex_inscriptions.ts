@@ -1,5 +1,5 @@
 export type LibreplexInscriptions = {
-  "version": "0.1.9",
+  "version": "0.1.10",
   "name": "libreplex_inscriptions",
   "instructions": [
     {
@@ -239,6 +239,46 @@ export type LibreplexInscriptions = {
   "events": [
     {
       "name": "InscriptionEventDelete",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeFinal",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionWriteEvent",
       "fields": [
         {
           "name": "id",
@@ -280,7 +320,7 @@ export type LibreplexInscriptions = {
 };
 
 export const IDL: LibreplexInscriptions = {
-  "version": "0.1.9",
+  "version": "0.1.10",
   "name": "libreplex_inscriptions",
   "instructions": [
     {
@@ -520,6 +560,46 @@ export const IDL: LibreplexInscriptions = {
   "events": [
     {
       "name": "InscriptionEventDelete",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeFinal",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionWriteEvent",
       "fields": [
         {
           "name": "id",

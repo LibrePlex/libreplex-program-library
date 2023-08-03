@@ -36,6 +36,11 @@
           "isSigner": false
         },
         {
+          "name": "metadataExtension",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "groupPermissions",
           "isMut": true,
           "isSigner": false
@@ -135,42 +140,6 @@
           }
         }
       ]
-    },
-    {
-      "name": "update",
-      "accounts": [
-        {
-          "name": "updateAuthority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "creatorController",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "update_authority"
-          ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "UpdateInput"
-          }
-        }
-      ]
     }
   ],
   "accounts": [
@@ -252,9 +221,7 @@
           },
           {
             "name": "accountKey",
-            "type": {
-              "vec": "publicKey"
-            }
+            "type": "string"
           },
           {
             "name": "scopedToBuyer",
@@ -273,12 +240,28 @@
             "type": "u64"
           },
           {
-            "name": "mint",
+            "name": "recepient",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CustomProgram",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "programId",
             "type": "publicKey"
           },
           {
-            "name": "recepient",
-            "type": "publicKey"
+            "name": "instructionData",
+            "type": "bytes"
+          },
+          {
+            "name": "remainingAccountsToUse",
+            "type": "u32"
           }
         ]
       }
@@ -318,22 +301,6 @@
             "name": "chosenPhase",
             "type": {
               "option": "string"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "phases",
-            "type": {
-              "vec": {
-                "defined": "Phase"
-              }
             }
           }
         ]
@@ -456,8 +423,5 @@
       "name": "PhaseNotSpecified",
       "msg": "Phase not specified"
     }
-  ],
-  "metadata": {
-    "address": "G9whLiLT9nSkxwWzWvbiKKrTL6yWxvzh2UXqNht5VXqV"
-  }
+  ]
 }

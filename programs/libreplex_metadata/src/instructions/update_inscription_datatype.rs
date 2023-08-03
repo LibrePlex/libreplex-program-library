@@ -1,14 +1,14 @@
 use anchor_lang::prelude::*;
 
-use crate::{Metadata, DelegatePermissions, PermissionType, UpdateMetadataInput, Group};
+use crate::instructions::EditMetadataEvent;
+use crate::{Metadata, DelegatePermissions, PermissionType, UpdateMetadataInput, Group, Asset};
 
 
 use crate::{errors::ErrorCode};
 
-#[event]
-pub struct EditMetadataEvent {
-    pub id: Pubkey,
-    pub name: String,
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct UpdateInscriptionDataTypeInput {
+    data_type: String,
 }
 
 
@@ -24,11 +24,20 @@ pub struct EditMetadataEvent {
 // The editor with delegated group wide permissions
 
 #[derive(Accounts)]
-#[instruction(metadata_input: UpdateMetadataInput)]
-pub struct UpdateMetadata<'info> {
+#[instruction(metadata_input: UpdateInscriptionDataTypeInput)]
+pub struct UpdateInscriptionDataType<'info> {
     #[account(mut)]
     pub editor: Signer<'info>,
 
+    #[account(mut,
+        realloc = metadata.get_size() + metadata_input.data_type.len() - match &metadata.asset {
+            Asset::Inscription {
+                data_type, ..
+            } => data_type.len(),
+            _ => 0
+        },
+        realloc::payer = editor,
+        realloc::zero = false)]
     pub metadata: Box<Account<'info, Metadata>>,
 
     // Derived from the editor, the metadata's update auth and the the metadata itself
@@ -51,16 +60,10 @@ pub struct UpdateMetadata<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<UpdateMetadata>,
-    update_metadata_input: UpdateMetadataInput,
+pub fn handler(ctx: Context<UpdateInscriptionDataType>,
+    update_metadata_input: UpdateInscriptionDataTypeInput,
 ) -> Result<()> {
     let editor = &ctx.accounts.editor;
-
-
-    let UpdateMetadataInput {name, 
-            symbol,
-            asset,
-        } = update_metadata_input;
 
     
     let metadata = &mut ctx.accounts.metadata;
@@ -89,14 +92,36 @@ pub fn handler(ctx: Context<UpdateMetadata>,
         return Err(ErrorCode::InvalidPermissions.into())
     }
 
-    // Update the metadata state account
-    metadata.name = name.clone();
-    metadata.asset = asset.clone();
-    metadata.symbol= symbol;
-    
+    // match &metadata.asset {
+    //     Asset::Inscription {
+    //         data_type:_,
+    //         account_id,
+    //         description,
+    //     } => {
+    //         msg!("Updating asset datatype: {}", update_metadata_input.data_type);
+    //         metadata.asset= Asset::Inscription { account_id: *account_id, data_type: "asdasd".to_owned(), //update_metadata_input.data_type.clone(), 
+    //             description:  match description {
+    //                 Some(x)=>Some(x.clone()),
+    //                 None => None
+    //             } }
+    //     },
+    //     _ => {
+    //         return Err(ErrorCode::WrongAssetType.into())
+    //     }
+    // }
+
+    let old_val = metadata.asset.clone();
+    metadata.asset = match old_val {
+        Asset::Inscription { account_id, data_type:_, description } => Asset::Inscription { account_id, data_type: update_metadata_input.data_type,
+             description },
+        _ => {
+            return Err(ErrorCode::WrongAssetType.into())
+        }
+    };
+
     emit!(EditMetadataEvent{
         id: metadata.key(),
-        name
+        name: metadata.name.clone()
     });
 
     Ok(())

@@ -108,7 +108,12 @@ pub enum ErrorCode {
 
     #[msg("Inscription metadata is deleted via a separate method")]
     InvokeDeleteInscriptionMetadata, //0x1792
-    Reserved35, //0x1793
+
+    #[msg("Only used for inscription metadata")]
+    OnlyUsedForInscriptionMetadata,
+
+    #[msg("Wrong asset type")]
+    WrongAssetType, //0x1793
     Reserved36, //0x1794
     Reserved37, //0x1795
     Reserved38, //0x1796
