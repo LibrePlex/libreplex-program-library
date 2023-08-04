@@ -61,9 +61,11 @@ pub struct CreateInscriptionMetadata<'info> {
         Currently this signer does not need to be a mint,
         but you can tag metadata onto anything.A
     */
+    #[account(mut)]
     pub mint: Signer<'info>,
 
     // ordinal must sign otherwise
+    #[account(mut)]
     pub inscription: Signer<'info>,
 
     pub system_program: Program<'info, System>,

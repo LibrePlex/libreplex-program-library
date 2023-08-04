@@ -1,17 +1,19 @@
 use solana_program_test::*;
-use anchor_spl::token::{ID, self};
+use spl_token_2022::ID;
 use anchor_spl::token::Mint as SplMint;
 
+const METADATA_NAME: &str = "MD1";
+
 mod permissions {
-    use anchor_lang::{system_program, ToAccountMetas, InstructionData, Key};
+    use anchor_lang::{system_program, ToAccountMetas, InstructionData, Key, prelude::Account};
     use anchor_spl::token::spl_token;
-    use libreplex_metadata::{GroupInput, CreateMetadataInput, Asset, accounts::CreateMetadata};
-    use solana_program::{pubkey::Pubkey, instruction::Instruction, program::invoke_signed, system_instruction, rent::Rent, sysvar::Sysvar};
+    use libreplex_metadata::{GroupInput, CreateMetadataInput, Asset, accounts::CreateMetadata, Metadata};
+    use solana_program::{pubkey::Pubkey, instruction::Instruction, program::invoke_signed, system_instruction, rent::Rent, sysvar::Sysvar, account_info::AccountInfo};
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 
     use super::*;
     #[tokio::test]
-    async fn create_metadata_delegated() {
+    async fn create_metadata() {
         let program = ProgramTest::new("libreplex_metadata", libreplex_metadata::ID, 
         processor!(libreplex_metadata::entry));
 
@@ -32,8 +34,8 @@ mod permissions {
             &ID,
         );
 
-        let initialize_ix = spl_token::instruction::initialize_mint2(
-            &spl_token::id(),
+        let initialize_ix = spl_token_2022::instruction::initialize_mint2(
+            &ID,
             &mint.pubkey(),
             &context.payer.pubkey(),
             Some(&context.payer.pubkey()),
@@ -61,7 +63,6 @@ mod permissions {
       
 
         let create_metadata_accounts = CreateMetadata {
-            signer: collection_authority,
             payer: collection_authority,
             authority: collection_authority,
             metadata:  metadata.key(),
@@ -74,13 +75,12 @@ mod permissions {
         let create_metadata = libreplex_metadata::instruction::CreateMetadata {
             metadata_input: CreateMetadataInput {
                 // collection_url: "COOLIO.COM".to_string(),
-                name: "COOLIO COLLECTION".to_string(),
+                name: METADATA_NAME.to_string(),
                 asset: Asset::Json {
                     url: "https://collection-url.com".to_owned()
                 },
                 update_authority: collection_authority,
                 symbol: "COOL".to_string(),
-                description: Some("coolio description".to_string()),
                 extension: libreplex_metadata::MetadataExtension::None
             },
         };
@@ -101,12 +101,37 @@ mod permissions {
             context.last_blockhash,
         );
 
+        
         context
             .banks_client
             .process_transaction(transaction)
             .await
             .unwrap();
 
+            
+            let mut metadata_account = context.banks_client.get_account(
+                metadata
+            ).await.unwrap().unwrap();
+    
+            let metadata_account_info = AccountInfo::new(
+                &metadata,
+                false,
+                false,
+                &mut metadata_account.lamports,
+                &mut metadata_account.data,
+                &metadata_account.owner,
+                metadata_account.executable,
+                metadata_account.rent_epoch,
+            );
+    
+    
+            
+            let metadata_obj: Account<Metadata> = Account::try_from(&metadata_account_info).unwrap();
+    
+            assert_eq!(
+                metadata_obj.name,
+                METADATA_NAME
+            );
 
 
     }
