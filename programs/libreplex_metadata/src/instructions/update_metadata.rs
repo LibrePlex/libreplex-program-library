@@ -26,9 +26,10 @@ pub struct EditMetadataEvent {
 #[derive(Accounts)]
 #[instruction(metadata_input: UpdateMetadataInput)]
 pub struct UpdateMetadata<'info> {
-    #[account(mut)]
     pub editor: Signer<'info>,
 
+    // TODO realloc
+    #[account(mut)]
     pub metadata: Box<Account<'info, Metadata>>,
 
     // Derived from the editor, the metadata's update auth and the the metadata itself
@@ -92,7 +93,7 @@ pub fn handler(ctx: Context<UpdateMetadata>,
     // Update the metadata state account
     metadata.name = name.clone();
     metadata.asset = asset.clone();
-    metadata.symbol= symbol;
+    metadata.symbol = symbol; 
     
     emit!(EditMetadataEvent{
         id: metadata.key(),
