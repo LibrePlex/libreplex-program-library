@@ -567,12 +567,12 @@ export type LibreplexMetadata = {
         },
         {
           "name": "mint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "inscription",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
@@ -993,6 +993,18 @@ export type LibreplexMetadata = {
                 "defined": "PermissionType"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hoo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "t",
+            "type": "string"
           }
         ]
       }
@@ -2615,12 +2627,12 @@ export const IDL: LibreplexMetadata = {
         },
         {
           "name": "mint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "inscription",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
@@ -3041,6 +3053,18 @@ export const IDL: LibreplexMetadata = {
                 "defined": "PermissionType"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hoo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "t",
+            "type": "string"
           }
         ]
       }

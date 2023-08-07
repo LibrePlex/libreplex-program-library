@@ -21,13 +21,14 @@ mod defaultrenderer_test {
         let authority = context.payer.pubkey();
 
         let metadata = Keypair::new();
+        let metadata = Keypair::new();
         let metadata_extension = Keypair::new();
         let group = Keypair::new();
 
         let render_canonical = RenderContext {
             metadata: metadata.pubkey(),
-            metadata_extension: metadata_extension.pubkey(),
             group: group.pubkey(),
+            mint: 
         };
 
         let render_input = Canonical {

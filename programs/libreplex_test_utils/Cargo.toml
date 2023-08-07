@@ -1,5 +1,5 @@
 [package]
-name = "libreplex_metadata"
+name = "libreplex_test_utils"
 version = "0.10.0"
 description = "Created with Anchor"
 edition = "2021"
@@ -8,7 +8,7 @@ repository = "https://github.com/LibrePlex/metadata"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "libreplex_metadata"
+name = "libreplex_test_utils"
 
 [features]
 no-entrypoint = []
@@ -20,13 +20,13 @@ default = []
 [dependencies]
 anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
 anchor-spl = "0.28.0"
-libreplex_inscriptions = {version = '0.1.10', features=["cpi", "no-entrypoint"]}
-spl-token-2022 = "0.6.1"
+libreplex_inscriptions = {path="../libreplex_inscriptions", features=["cpi", "no-entrypoint"]}
+libreplex_metadata = {path="../libreplex_metadata", features=["cpi", "no-entrypoint"]}
 
-[dev-dependencies]
+spl-token-2022 = "0.6.1"
 mocha = "0.1.1"
 assert_matches = "1.5.0"
 solana-program-test = ">1.14"
 solana-sdk = ">1.14"
 solana-program = ">1.14"
-libreplex_test_utils = {path="../libreplex_test_utils"}
+

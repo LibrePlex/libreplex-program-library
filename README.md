@@ -17,3 +17,13 @@ The fee-free nature of the protocol ensures that even though applications built 
  4) Open source
 
 The source of the protocol will be made available on github or similar. After initial launch, any changes will be subject to 30-day vetting and a community vote.
+
+INSTRUCTIONS:
+
+To run unit tests (cargo):
+
+`cargo test`
+
+To run unit tests (cargo, for a single program):
+
+`cargo test libreplex_metadata`

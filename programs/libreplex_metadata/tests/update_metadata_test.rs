@@ -8,17 +8,19 @@ const METADATA_NAME_NEW: &str = "MD2";
 const METADATA_SYMBOL_NEW: &str = "SYMBOL2";
 
 mod create_metadata_test {
-    use std::borrow::BorrowMut;
 
+    use std::borrow::BorrowMut;
+   
     use anchor_lang::prelude::Account;
     use libreplex_metadata::{ Asset, Metadata};
     use libreplex_test_utils::{create_metadata_util, update_metadata_util};
     use solana_program::account_info::AccountInfo;
     use solana_sdk::signer::Signer;
-
+   
     use super::*;
+
     #[tokio::test]
-    async fn create_metadata() {
+    async fn update_metadata() {
         let program = ProgramTest::new(
             "libreplex_metadata",
             libreplex_metadata::ID,
@@ -37,6 +39,17 @@ mod create_metadata_test {
             "COOL".to_string(),
         )
         .await;
+
+        // update metadata
+
+        update_metadata_util(
+            context.borrow_mut(),
+            metadata,
+            METADATA_NAME_NEW.to_string(),
+            Asset::Image { url: "bla".to_string(), description: Some("zugululu".to_string()) },
+            METADATA_SYMBOL_NEW.to_string()
+        ).await;
+
 
         let mut metadata_account = context
             .banks_client
@@ -58,7 +71,6 @@ mod create_metadata_test {
 
         let metadata_obj: Account<Metadata> = Account::try_from(&metadata_account_info).unwrap();
 
-        assert_eq!(metadata_obj.name, METADATA_NAME);
+        assert_eq!(metadata_obj.name, METADATA_NAME_NEW);
     }
-
 }

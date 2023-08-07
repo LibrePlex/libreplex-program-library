@@ -94,6 +94,7 @@ pub mod libreplex_metadata {
         )
     }
 
+ 
     pub fn create_inscription_metadata(
         ctx: Context<CreateInscriptionMetadata>,
         metadata_input: CreateMetadataInscriptionInput

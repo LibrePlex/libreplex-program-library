@@ -28,7 +28,6 @@ pub struct EditMetadataEvent {
 pub struct UpdateMetadata<'info> {
     pub editor: Signer<'info>,
 
-    // TODO realloc
     #[account(mut)]
     pub metadata: Box<Account<'info, Metadata>>,
 

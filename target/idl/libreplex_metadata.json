@@ -567,12 +567,12 @@
         },
         {
           "name": "mint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "inscription",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
@@ -993,6 +993,18 @@
                 "defined": "PermissionType"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hoo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "t",
+            "type": "string"
           }
         ]
       }
