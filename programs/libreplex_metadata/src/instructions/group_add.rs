@@ -18,7 +18,7 @@ pub struct GroupAdd<'info> {
 
     #[account(mut,
         realloc = metadata.get_size() + 32, // add group size. TODO: Remove the group size on base metadata
-        realloc::payer = group_authority,
+        realloc::payer = payer,
         realloc::zero = false)]
     pub metadata: Box<Account<'info, Metadata>>,
 

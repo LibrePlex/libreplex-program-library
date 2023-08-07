@@ -44,7 +44,6 @@ pub struct Accounts<'b, 'info> {
     pub mint: AccountInfo<'info>,
     pub metadata: AccountInfo<'info>,
     pub group: AccountInfo<'info>,
-    pub metadata_extension: AccountInfo<'info>,
     pub group_permissions: AccountInfo<'info>,
     pub minter_numbers: Option<AccountInfo<'info>>,
     pub system_program:  AccountInfo<'info>,

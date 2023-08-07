@@ -120,11 +120,6 @@ export type LibreplexCreator = {
           "isSigner": false
         },
         {
-          "name": "metadataExtension",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "groupPermissions",
           "isMut": true,
           "isSigner": false
@@ -459,6 +454,31 @@ export type LibreplexCreator = {
     }
   ],
   "events": [
+    {
+      "name": "MintEvent",
+      "fields": [
+        {
+          "name": "group",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "number",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "authority",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "holder",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "AccountEvent",
       "fields": [
@@ -623,11 +643,6 @@ export const IDL: LibreplexCreator = {
           "isSigner": false
         },
         {
-          "name": "metadataExtension",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "groupPermissions",
           "isMut": true,
           "isSigner": false
@@ -962,6 +977,31 @@ export const IDL: LibreplexCreator = {
     }
   ],
   "events": [
+    {
+      "name": "MintEvent",
+      "fields": [
+        {
+          "name": "group",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "number",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "authority",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "holder",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "AccountEvent",
       "fields": [

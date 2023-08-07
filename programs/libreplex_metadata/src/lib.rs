@@ -45,6 +45,12 @@ pub mod libreplex_metadata {
         )
     }
 
+    pub fn update_metadata(ctx: Context<UpdateMetadata>, input: UpdateMetadataInput) -> Result<()> {
+        msg!("Update metadata");
+
+        instructions::update_metadata::handler(ctx, input)
+    }
+
     pub fn group_add(ctx: Context<GroupAdd>) -> Result<()> {
         instructions::group_add::handler(ctx)
     }
