@@ -2089,17 +2089,6 @@ dependencies = [
 
 [[package]]
 name = "libreplex_inscriptions"
-version = "0.1.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf74aa0cd48fcf9e56e67d27060ec78ba92ba218cb721254eb2236570ba076bd"
-dependencies = [
- "anchor-attribute-event",
- "anchor-derive-accounts",
- "anchor-lang",
-]
-
-[[package]]
-name = "libreplex_inscriptions"
 version = "0.1.10"
 dependencies = [
  "anchor-attribute-event",
@@ -2113,13 +2102,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "libreplex_inscriptions"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2de14de2ab31442b8bea93bcd1c1afedee4b26b9a2160109736c67107d559639"
+dependencies = [
+ "anchor-attribute-event",
+ "anchor-derive-accounts",
+ "anchor-lang",
+]
+
+[[package]]
 name = "libreplex_metadata"
 version = "0.10.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "assert_matches",
- "libreplex_inscriptions 0.1.9",
+ "libreplex_inscriptions 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "mocha",
  "solana-program",
  "solana-program-test",

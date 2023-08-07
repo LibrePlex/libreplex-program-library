@@ -142,6 +142,17 @@ impl AttributeValue {
     }
 }
 
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct Hoo {
+    pub t: String
+}
+
+impl Hoo {
+    pub fn t(&self) {
+
+    }
+}
+
 /*
     #0 BACKGROUND - "blue", "red", ...., "green"
     #1 FACE - "angry", "sad",
@@ -166,6 +177,7 @@ pub struct AttributeType {
 }
 
 impl AttributeType {
+
     pub fn get_size(&self) -> usize {
         let total_size: usize = self.permitted_values.iter().map(|x| 4 + x.get_size()).sum();
 
@@ -180,7 +192,7 @@ impl AttributeType {
             + match self.continued_from_index { // continued_at_index
                 Some(_)=>4,
                 None => 0
-            }
+            };
     }
 }
 
