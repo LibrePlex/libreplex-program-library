@@ -92,8 +92,6 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         },
     };
 
-    msg!("{}", mint_number);
-
     let signer_seeds = [creator_seeds.as_slice()];
 
     let create_ctx = CpiContext::new_with_signer(ctx.accounts.libreplex_metadata_program.to_account_info(), 

@@ -63,8 +63,6 @@ pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result
             let bytes = i.to_le_bytes();
             let offset = base_offset + (i as usize) * 4;
 
-            msg!("{} {} {:?} {}", i , offset, bytes, bytes.len());
-    
             mint_numbers_data[offset..offset + 4].copy_from_slice(&bytes);
         }
     }
