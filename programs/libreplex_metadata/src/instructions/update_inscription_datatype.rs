@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::instructions::EditMetadataEvent;
-use crate::{Metadata, DelegatePermissions, PermissionType, UpdateMetadataInput, Group, Asset};
+use crate::{Metadata, DelegatePermissions, PermissionType, Group, Asset};
 
 
 use crate::{errors::ErrorCode};

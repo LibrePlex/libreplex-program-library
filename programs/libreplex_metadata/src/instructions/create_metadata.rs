@@ -1,9 +1,10 @@
 use crate::state::{Metadata};
 use crate::{ CreateMetadataInput, MetadataEvent, MetadataEventType, assert_pda_derivation::assert_pda_derivation};
 use anchor_lang::prelude::*;
+use solana_program::program_option::COption;
+use spl_token_2022::extension::StateWithExtensions;
 use crate::{errors::ErrorCode};
 use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
-use anchor_spl::token_interface::Mint;
 
 // whitelisted signer programs
 
@@ -52,7 +53,7 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     let authority = &ctx.accounts.authority;
     let invoked_migrator_program = &ctx.accounts.invoked_migrator_program;
 
-    assert_is_valid_signer(&authority.key(), &mint.key(), invoked_migrator_program)?;
+    assert_is_valid_signer(&authority.key(), &mint, invoked_migrator_program)?;
 
     // Update the metadata state account
     metadata.mint = ctx.accounts.mint.key();
@@ -80,7 +81,7 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     Ok(())
 }
 
-fn assert_is_valid_signer<'info> (signer: &Pubkey, mint: &Pubkey, invoked_migrator_program: &Option<UncheckedAccount<'info>>) -> Result<()> {
+fn assert_is_valid_signer<'info> (signer: &Pubkey, mint: &AccountInfo<'info>, invoked_migrator_program: &Option<UncheckedAccount<'info>>) -> Result<()> {
     match invoked_migrator_program {
         Some(x) => {
 
@@ -91,7 +92,7 @@ fn assert_is_valid_signer<'info> (signer: &Pubkey, mint: &Pubkey, invoked_migrat
 
             let seeds = [
                 b"metadata_signer",
-                mint.as_ref()
+                mint.key.as_ref()
             ];
 
             msg!("{} {}", x.key(), signer.key());
@@ -100,7 +101,18 @@ fn assert_is_valid_signer<'info> (signer: &Pubkey, mint: &Pubkey, invoked_migrat
         },
         None => {
             // no migrator invoked. Hence mint must be the signer
+                   
+            let mint_data = mint.try_borrow_data()?;
+            let mint = StateWithExtensions::<spl_token_2022::state::Mint>::unpack(&mint_data)?;
 
+            if let COption::Some(mint_authority) = mint.base.mint_authority.as_ref() {
+                if mint_authority != signer {
+                    return err!(ErrorCode::BadAuthority);
+                }
+            }
+            else {
+                return err!(ErrorCode::BadAuthority);
+            };
         }
     }
 
