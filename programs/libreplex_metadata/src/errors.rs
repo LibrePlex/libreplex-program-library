@@ -114,7 +114,9 @@ pub enum ErrorCode {
 
     #[msg("Wrong asset type")]
     WrongAssetType, //0x1793
-    Reserved36, //0x1794
+
+    #[msg("Invalid metadata pointer")]
+    InvalidMetadataPointer, //0x1794
     Reserved37, //0x1795
     Reserved38, //0x1796
     Reserved39, //0x1797

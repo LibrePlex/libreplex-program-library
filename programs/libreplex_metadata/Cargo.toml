@@ -21,7 +21,7 @@ default = []
 anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
 anchor-spl = "0.28.0"
 libreplex_inscriptions = {version = '0.1.10', features=["cpi", "no-entrypoint"]}
-spl-token-2022 = "0.6.1"
+spl-token-2022 = {version = "0.7.0", features = ["no-entrypoint"]}
 solana-program = ">1.14"
 
 [dev-dependencies]

@@ -3,6 +3,8 @@ members = [
     "programs/*",
 ]
 
+exclude = ["programs/libreplex_test_utils"]
+
 [profile.release]
 overflow-checks = true
 lto = "fat"
