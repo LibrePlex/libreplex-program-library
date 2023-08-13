@@ -26,7 +26,7 @@ libreplex_metadata = {path="../libreplex_metadata", features=["cpi", "no-entrypo
 spl-token-2022 = "0.6.1"
 mocha = "0.1.1"
 assert_matches = "1.5.0"
-solana-program-test = ">1.14"
-solana-sdk = ">1.14"
-solana-program = ">1.14"
+solana-program-test = "~1.16"
+solana-sdk = "~1.16"
+solana-program = "~1.16"
 
