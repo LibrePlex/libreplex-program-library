@@ -3,7 +3,7 @@ members = [
     "programs/*",
 ]
 
-exclude = ["programs/libreplex_test_utils"]
+exclude = ["programs/libreplex_test_utils", "programs/libreplex_shared"]
 
 [profile.release]
 overflow-checks = true
