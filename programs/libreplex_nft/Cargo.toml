@@ -1,0 +1,28 @@
+[package]
+name = "libreplex_nft"
+version = "0.10.0"
+description = "Created with Anchor"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/LibrePlex/metadata"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "libreplex_nft"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
+anchor-spl = "0.28.0"
+spl-token-2022 = {version = "0.7.0", features = ["no-entrypoint"]}
+solana-program = ">1.14"
+
+[dev-dependencies]
+mocha = "0.1.1"
+assert_matches = "1.5.0"

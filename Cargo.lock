@@ -2129,6 +2129,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "libreplex_nft"
+version = "0.10.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "assert_matches",
+ "mocha",
+ "solana-program",
+ "spl-token-2022 0.7.0",
+]
+
+[[package]]
 name = "libreplex_shared"
 version = "0.1.0"
 dependencies = [
