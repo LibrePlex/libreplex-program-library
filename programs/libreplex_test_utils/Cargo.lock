@@ -636,15 +636,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
-name = "bmp"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69985ff4f58085ac696454692d0b646a66ad1f9cc9be294c91dc51bb5df511ae"
-dependencies = [
- "byteorder",
-]
-
-[[package]]
 name = "borsh"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2037,67 +2028,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4668fb0ea861c1df094127ac5f1da3409a82116a4ba74fca2e58ef927159bb3"
 
 [[package]]
-name = "libreplex_creator"
-version = "0.9.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "arrayref",
- "assert_matches",
- "bincode",
- "libreplex_metadata",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token 3.5.0",
- "winnow 0.4.1",
-]
-
-[[package]]
-name = "libreplex_creator_controls"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "arrayref",
- "assert_matches",
- "bincode",
- "libreplex_creator",
- "libreplex_metadata",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token 3.5.0",
- "winnow 0.4.1",
-]
-
-[[package]]
-name = "libreplex_default_renderer"
-version = "0.1.2"
-dependencies = [
- "anchor-lang",
- "assert_matches",
- "bmp",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
-]
-
-[[package]]
 name = "libreplex_inscriptions"
 version = "0.1.10"
 dependencies = [
  "anchor-attribute-event",
  "anchor-derive-accounts",
  "anchor-lang",
- "assert_matches",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
+]
+
+[[package]]
+name = "libreplex_inscriptions"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2de14de2ab31442b8bea93bcd1c1afedee4b26b9a2160109736c67107d559639"
+dependencies = [
+ "anchor-attribute-event",
+ "anchor-derive-accounts",
+ "anchor-lang",
 ]
 
 [[package]]
@@ -2106,39 +2053,8 @@ version = "0.10.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "assert_matches",
- "libreplex_inscriptions",
- "libreplex_test_utils",
- "mocha",
+ "libreplex_inscriptions 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token-2022 0.7.0",
-]
-
-[[package]]
-name = "libreplex_shared"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "solana-program",
- "spl-token-2022 0.7.0",
-]
-
-[[package]]
-name = "libreplex_shop"
-version = "0.3.1"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "libreplex_metadata",
- "libreplex_shared",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
  "spl-token-2022 0.7.0",
 ]
 
@@ -2149,13 +2065,13 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "assert_matches",
- "libreplex_inscriptions",
+ "libreplex_inscriptions 0.1.10",
  "libreplex_metadata",
  "mocha",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
- "spl-token-2022 0.7.0",
+ "spl-token-2022 0.6.1",
 ]
 
 [[package]]
@@ -5200,7 +5116,7 @@ checksum = "f8123f27e969974a3dfba720fdb560be359f57b44302d280ba72e76a74480e8a"
 dependencies = [
  "indexmap 2.0.0",
  "toml_datetime",
- "winnow 0.5.10",
+ "winnow",
 ]
 
 [[package]]
@@ -5740,15 +5656,6 @@ name = "windows_x86_64_msvc"
 version = "0.48.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1a515f5799fe4961cb532f983ce2b23082366b898e52ffbce459c86f67c8378a"
-
-[[package]]
-name = "winnow"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae8970b36c66498d8ff1d66685dc86b91b29db0c7739899012f63a63814b4b28"
-dependencies = [
- "memchr",
-]
 
 [[package]]
 name = "winnow"
