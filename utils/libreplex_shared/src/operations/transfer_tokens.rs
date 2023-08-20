@@ -37,10 +37,7 @@ pub fn transfer_tokens<'info>(
     }
     msg!("{}", amount);
 
-
-    let acc_data = &mint.try_borrow_data().unwrap()[..][..];
-    let mint_obj = spl_token_2022::state::Mint::unpack_from_slice(acc_data).unwrap();
-    drop(acc_data);
+    let mint_obj = spl_token_2022::state::Mint::unpack_from_slice(&mint.try_borrow_data()?).unwrap();
 
     if target_token_account.data_is_empty() {
         // msg!("{}",payer.key() );

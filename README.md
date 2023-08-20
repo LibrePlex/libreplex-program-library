@@ -20,6 +20,18 @@ The source of the protocol will be made available on github or similar. After in
 
 INSTRUCTIONS:
 
+Install dependencies
+
+```
+yarn
+```
+
+Build
+
+```
+anchor build
+```
+
 To run unit tests (cargo):
 
 `cargo test`

@@ -36,7 +36,7 @@ mod permissions {
         .0;
 
      
-        let aa = vec![1,2,3];
+        let _aa = vec![1,2,3];
 
         let permitted_values = vec![
             AttributeValue::Word {

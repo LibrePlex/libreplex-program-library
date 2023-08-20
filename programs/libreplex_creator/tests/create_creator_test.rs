@@ -2,8 +2,8 @@
 use solana_program_test::*;
 
 mod permissions {
-    use anchor_lang::{InstructionData, system_program, ToAccountMetas, Key};
-    use libreplex_creator::{accounts, instruction, instructions::CreateCreatorInput};
+    use anchor_lang::{InstructionData, system_program, ToAccountMetas};
+    
     use libreplex_metadata::{accounts as libreaccounts, instruction as libreinstruction, GroupInput, TemplateConfiguration};
     use libreplex_metadata::GROUP;
     use solana_program::{instruction::Instruction, pubkey::Pubkey};
@@ -25,7 +25,7 @@ mod permissions {
             = Pubkey::find_program_address(&[GROUP.as_ref(), group_seed.pubkey().as_ref()], &libreplex_metadata::ID).0;
 
 
-        let group_permissions = Pubkey::find_program_address(&[b"permissions", group.as_ref(), authority.as_ref()], &libreplex_metadata::ID).0;
+        let _group_permissions = Pubkey::find_program_address(&[b"permissions", group.as_ref(), authority.as_ref()], &libreplex_metadata::ID).0;
 
         let create_group_accounts = libreaccounts::CreateGroup {
             authority,

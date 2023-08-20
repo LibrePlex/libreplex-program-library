@@ -15,7 +15,7 @@ impl CreatorController {
     pub const MAX_LABEL_SIZE: usize = 25;
 
     pub fn size_for_input(phases: &Vec<Phase>) -> usize {
-        return 8 + 32 + 1 + 32 + 32 + 4 + phases.len() * (8 + 9 + CreatorController::MAX_LABEL_SIZE + MAX_CONTROL_TYPE_SIZE)
+        8 + 32 + 1 + 32 + 32 + 4 + phases.len() * (8 + 9 + CreatorController::MAX_LABEL_SIZE + MAX_CONTROL_TYPE_SIZE)
     }
 }
 

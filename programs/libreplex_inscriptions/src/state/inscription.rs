@@ -85,7 +85,7 @@ impl Inscription {
         // msg!("current_index: {:?}", current_index);
         let data_slice: &mut [u8] = &mut current_data[current_index..current_index 
         + data_to_add.len()];
-        data_slice.copy_from_slice(&data_to_add);
+        data_slice.copy_from_slice(data_to_add);
 
         Ok(())
     }

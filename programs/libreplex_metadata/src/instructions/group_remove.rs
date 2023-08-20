@@ -36,7 +36,7 @@ pub fn handler(ctx: Context<GroupRemove>
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
 
-    if !metadata.group.is_some() {
+    if metadata.group.is_none() {
         return Err(ErrorCode::MetadataDoesNotHaveAGroup.into())
     }
 

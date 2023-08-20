@@ -93,8 +93,8 @@ mod permissions {
         let initialise_inscription_tx = system_instruction::create_account(
             &context.payer.pubkey(),
             &inscription.pubkey(),
-            rent.minimum_balance(Inscription::BASE_SIZE + 1024 as usize),
-            Inscription::BASE_SIZE as u64 + 1024 as u64,
+            rent.minimum_balance(Inscription::BASE_SIZE + 1024_usize),
+            Inscription::BASE_SIZE as u64 + 1024_u64,
             &libreplex_inscriptions::id(),
         );
 

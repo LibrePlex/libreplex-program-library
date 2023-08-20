@@ -1,0 +1,21 @@
+name: pull-request
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Lint
+      run: cargo clippy -- --allow clippy::result_large_err --allow ambiguous_glob_reexports --allow clippy::too_many_arguments -Dwarnings
+

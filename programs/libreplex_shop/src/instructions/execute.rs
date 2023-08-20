@@ -104,7 +104,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
     let mint_key = &mint.key();
     let auth_seeds = &[
         LISTING.as_bytes(),
-        &mint_key.as_ref(),
+        (mint_key.as_ref()),
         &[listing.listing_bump],
     ];
 
@@ -139,11 +139,11 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
         &recipient_token_account.to_account_info(),
         &listing.to_account_info(),
         &mint.to_account_info(),
-        &buyer_account_info,
+        buyer_account_info,
         &associated_token_program.to_account_info(),
         &system_program.to_account_info(),
         Some(&[auth_seeds]),
-        &buyer_account_info,
+        buyer_account_info,
        listing.amount,
     )?;
 
@@ -156,11 +156,11 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
                     shares.push(share.clone());
                 }
 
-                royalties.bps as u16
+                royalties.bps
             }
-            None => 0 as u16,
+            None => 0_u16,
         },
-        None => 0 as u16,
+        None => 0_u16,
     };
 
     let buyer_account_info = &buyer_account_info.clone();
@@ -194,7 +194,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
                 &anchor_lang::solana_program::system_instruction::transfer(
                     &buyer_account_info.key(),
                     &seller.key(),
-                    lamports - total_royalty_amount as u64,
+                    lamports - total_royalty_amount,
                 ),
                 &[buyer_account_info.clone(), seller_account_info.clone()],
             )?;
@@ -242,7 +242,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
                             associated_token_program,
                             system_program,
                             None,
-                            &buyer_account_info,
+                            buyer_account_info,
                             royalty_amount.amount,
                         )?;
                     }
@@ -257,7 +257,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
                         associated_token_program,
                         system_program,
                         None,
-                        &buyer_account_info,
+                        buyer_account_info,
                         amount - total_royalty_amount,
                     )?;
                 }
@@ -302,8 +302,8 @@ fn calculate_royalty_amounts(
             let current_royalty_amount = total_royalty_amount
                 .checked_mul(share.share as u64)
                 .unwrap()
-                .checked_div(10000 as u64)
-                .unwrap() as u64;
+                .checked_div(10000_u64)
+                .unwrap();
 
             royalty_amounts.push(RoyaltyAmount {
                 amount: current_royalty_amount,

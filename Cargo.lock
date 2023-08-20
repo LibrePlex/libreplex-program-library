@@ -2110,7 +2110,6 @@ dependencies = [
  "anchor-spl",
  "assert_matches",
  "libreplex_inscriptions",
- "libreplex_test_utils",
  "mocha",
  "solana-program",
  "solana-program-test",
@@ -2149,22 +2148,6 @@ dependencies = [
  "assert_matches",
  "libreplex_metadata",
  "libreplex_shared",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token-2022 0.7.0",
-]
-
-[[package]]
-name = "libreplex_test_utils"
-version = "0.10.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "libreplex_inscriptions",
- "libreplex_metadata",
  "mocha",
  "solana-program",
  "solana-program-test",

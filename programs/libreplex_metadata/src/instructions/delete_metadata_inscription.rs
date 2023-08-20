@@ -43,7 +43,9 @@ pub fn handler(ctx: Context<DeleteMetadataInscription>
     
 
     let metadata = &mut ctx.accounts.metadata;
+    let _inscriptions_program = &mut ctx.accounts.inscriptions_program;
 
+    let  _inscription_authority = &ctx.accounts.inscription_authority;
     match &metadata.asset {
         Asset::Inscription {
             account_id: _,

@@ -82,7 +82,7 @@ pub struct MintCtx<'info> {
     pub token_program: AccountInfo<'info>,
 }                 
 
-pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, MintCtx<'info>>, input: MintInput) -> Result<()> {
+pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>, input: MintInput) -> Result<()> {
     let controller = &mut ctx.accounts.creator_controller;
 
     let mut accounts = Accounts {
@@ -112,7 +112,7 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, MintCtx<'info>
         clock.unix_timestamp > p.start && (p.end.is_none() || clock.unix_timestamp < p.end.unwrap()) 
     }).collect();
 
-    if active_phases.len() == 0 {
+    if active_phases.is_empty() {
         return Err(ErrorCode::NoActivePhases.into())
     }
 
