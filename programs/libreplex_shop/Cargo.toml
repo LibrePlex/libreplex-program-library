@@ -18,7 +18,7 @@ default = []
 [dependencies]
 anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
 anchor-spl = {version = "0.28.0"}
-libreplex_shared = {version = "*", path="../libreplex_shared"}
+libreplex_shared = {version = "*", path="../../utils/libreplex_shared"}
 libreplex_metadata = {version = "*", path="../libreplex_metadata",  features =["cpi", "no-entrypoint"]}
 spl-token-2022 = {version = "0.7.0", features = ["no-entrypoint"]}
 solana-program = "~1.16"

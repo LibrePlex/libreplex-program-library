@@ -1,17 +1,18 @@
-use anchor_lang::{system_program, Key, ToAccountMetas, InstructionData};
+use anchor_lang::{system_program, InstructionData, Key, ToAccountMetas};
 use anchor_spl::token::Mint as SplMint;
-use solana_program::{pubkey::Pubkey, system_instruction, instruction::Instruction};
+use solana_program::{instruction::Instruction, pubkey::Pubkey, system_instruction};
 use solana_program_test::*;
 use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 use spl_token_2022::ID;
 
-use libreplex_metadata::{ Asset, CreateMetadataInput};
+use libreplex_metadata::{Asset, CreateMetadataInput};
 
 pub async fn create_metadata_util(
-    context: &mut ProgramTestContext, 
+    context: &mut ProgramTestContext,
     name: String,
     asset: Asset,
-    symbol: String) -> Pubkey {
+    symbol: String,
+) -> Pubkey {
     let collection_authority = context.payer.pubkey();
 
     let mint = Keypair::new();
@@ -56,6 +57,15 @@ pub async fn create_metadata_util(
     )
     .0;
 
+    let initialize_extension = spl_token_2022::extension::metadata_pointer::instruction::initialize(
+        &ID,
+        &mint.pubkey(),
+        Some(collection_authority),
+        Some(metadata.key()),
+    ).unwrap();
+
+    
+
     let create_metadata_accounts = libreplex_metadata::accounts::CreateMetadata {
         payer: collection_authority,
         authority: collection_authority,
@@ -83,7 +93,7 @@ pub async fn create_metadata_util(
     };
 
     let transaction = Transaction::new_signed_with_payer(
-        &[create_metadata],
+        &[initialize_extension, create_metadata],
         Some(&collection_authority),
         &[&context.payer],
         context.last_blockhash,
