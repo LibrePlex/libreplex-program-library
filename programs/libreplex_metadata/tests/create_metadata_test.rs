@@ -1,4 +1,4 @@
-use solana_program_test::*;
+use solana_program_test::{processor, tokio, ProgramTest};
 
 const METADATA_NAME: &str = "MD1";
 
@@ -16,15 +16,23 @@ mod create_metadata_test {
     use libreplex_metadata::{ Asset, Metadata};
     use solana_program::account_info::AccountInfo;
     use solana_sdk::signer::Signer;
+    use spl_token_2022::ID;
 
     use super::*;
     #[tokio::test]
     async fn create_metadata() {
-        let program = ProgramTest::new(
+        let mut program = ProgramTest::new(
             "libreplex_metadata",
             libreplex_metadata::ID,
             processor!(libreplex_metadata::entry),
         );
+
+  
+        program.add_program(
+            "spl_token_2022", 
+            ID, 
+            processor!(spl_token_2022::processor::Processor::process));
+       
 
         let mut context = program.start_with_context().await;
         let _collection_authority = context.payer.pubkey();

@@ -40,7 +40,7 @@ pub async fn create_metadata_util(
     )
     .unwrap();
 
-      let metadata = Pubkey::find_program_address(
+    let metadata = Pubkey::find_program_address(
         &[b"metadata", mint.pubkey().as_ref()],
         &libreplex_metadata::ID,
     )
@@ -50,7 +50,7 @@ pub async fn create_metadata_util(
     let initialize_extension = spl_token_2022::extension::metadata_pointer::instruction::initialize(
         &ID,
         &mint.pubkey(),
-        Some(context.payer.pubkey()),
+        None,
         Some(metadata.key()),
     ).unwrap();
 
