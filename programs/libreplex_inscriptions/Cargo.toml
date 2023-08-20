@@ -7,9 +7,6 @@ edition = "2021"
 repository = "https://github.com/LibrePlex/metadata"
 rust-version = "1.68"
 
-[profile.release]
-lto = false
-
 [lib]
 crate-type = ["cdylib", "lib"]
 name = "libreplex_inscriptions"

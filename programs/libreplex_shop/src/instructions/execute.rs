@@ -292,7 +292,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
 
 fn calculate_royalty_amounts(
     total_royalty_amount: u64,
-    lamports: u64,
+    _lamports: u64,
     shares: Vec<RoyaltyShare>,
 ) -> Result<Vec<RoyaltyAmount>> {
     let mut royalty_amounts: Vec<RoyaltyAmount> = Vec::new();

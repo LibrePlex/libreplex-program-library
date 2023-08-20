@@ -8,7 +8,7 @@ mod metadata_tests {
         accounts::CreateInscription,
         instructions::{WriteToInscriptionInput, create_inscription::CreateInscriptionInput}, Inscription,
     };
-    use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program, system_instruction, program::invoke, rent::Rent};
+    use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program, system_instruction};
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 
     use super::*;
@@ -95,7 +95,7 @@ mod metadata_tests {
         
         println!("Creating ordinal");
         
-        let result = context
+        let _result = context
             .banks_client
             .process_transaction(create_ordinal_tx)
             .await
@@ -186,7 +186,7 @@ mod metadata_tests {
         let metadata =
             Pubkey::find_program_address(&[b"metadata", mint.pubkey().as_ref()], &libreplex_inscriptions::ID).0;
 
-        let permissions = Pubkey::find_program_address(
+        let _permissions = Pubkey::find_program_address(
             &[b"permissions", metadata.as_ref(), authority.as_ref()],
             &libreplex_inscriptions::ID,
         )

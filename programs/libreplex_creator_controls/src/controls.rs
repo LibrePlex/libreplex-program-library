@@ -8,11 +8,11 @@ use crate::state::{Accounts, ArgCtx};
 
 
 pub trait Control {
-    fn before_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn before_mint<'a, 'b, 'info>(&self,  _accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
         Ok(())
     }
 
-    fn after_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn after_mint<'a, 'b, 'info>(&self,  _accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
         msg!("Default Post Mint");
         Ok(())
     }
@@ -77,7 +77,7 @@ impl AllowList {
 }
 
 impl Control for AllowList {
-    fn before_mint<'a, 'b, 'info>(&self, accounts: &mut Accounts<'b, 'info>, mut arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn before_mint<'a, 'b, 'info>(&self, accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
         let current_arg 
             = arg_ctx.args.get(arg_ctx.current as usize).ok_or(ErrorCode::MissingArgument)?;
 
