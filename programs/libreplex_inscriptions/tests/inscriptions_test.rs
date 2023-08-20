@@ -95,7 +95,7 @@ mod metadata_tests {
         
         println!("Creating ordinal");
         
-        let _result = context
+        context
             .banks_client
             .process_transaction(create_ordinal_tx)
             .await

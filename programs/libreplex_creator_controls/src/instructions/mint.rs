@@ -61,7 +61,7 @@ pub struct Mint<'info> {
     pub libreplex_creator_program: AccountInfo<'info>,
 }                 
 
-pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, input: MintInput) -> Result<()> {
+pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Mint<'info>>, input: MintInput) -> Result<()> {
     let controller = &mut ctx.accounts.creator_controller;
 
     let mut accounts = Accounts {
@@ -85,7 +85,7 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, 
         clock.unix_timestamp > p.start && (p.end.is_none() || clock.unix_timestamp < p.end.unwrap()) 
     }).collect();
 
-    if active_phases.len() == 0 {
+    if active_phases.is_empty() {
         return Err(ErrorCode::NoActivePhases.into())
     }
 

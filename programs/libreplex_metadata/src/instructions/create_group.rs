@@ -62,7 +62,7 @@ pub fn handler(ctx: Context<CreateGroup>,
     Ok(())
 }
 
-pub fn update_collection_from_input<'a>(group_input: GroupInput, 
+pub fn update_collection_from_input(group_input: GroupInput, 
     group: &mut Box<Account<Group>>) 
     -> Result<(), AnchorError> {
     let GroupInput {name, symbol, 

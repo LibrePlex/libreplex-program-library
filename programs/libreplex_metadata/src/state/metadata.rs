@@ -56,7 +56,7 @@ pub enum Asset {
 impl Asset {
     pub const BASE_SIZE: usize = 2;
     pub fn get_size(&self) -> usize {
-        return Asset::BASE_SIZE
+        Asset::BASE_SIZE
             + match self {
                 Asset::None => 0,
                 Asset::Json { url } => 4 + url.len(),
@@ -68,7 +68,7 @@ impl Asset {
                 + 4 + data_type.len()
                 + 1 + match &description {Some(x) => 4 + x.len(), None => 0}
                 
-            };
+            }
     }
 }
 
@@ -109,7 +109,9 @@ impl Metadata {
         + 1 + 32;
 
     pub fn get_size(&self) -> usize {
-        let size = Metadata::BASE_SIZE
+        
+
+        Metadata::BASE_SIZE
             + 4
             + self.name.len()
             + 4
@@ -117,9 +119,7 @@ impl Metadata {
             + 4
             + self.asset.get_size()
             + 1
-            + self.extension.get_size();
-
-        return size;
+            + self.extension.get_size()
     }
 }
 
@@ -136,9 +136,9 @@ pub struct AttributesInput {
 
 impl AttributesInput {
     pub fn get_size(&self) -> usize {
-        let size = 4 + self.attributes.len();
+        
 
-        return size;
+        4 + self.attributes.len()
     }
 }
 
@@ -201,15 +201,15 @@ pub struct CreateMetadataInput {
 
 impl CreateMetadataInput {
     pub fn get_size(&self) -> usize {
-        let size = 4
+        
+
+        4
             + self.name.len()
             + 4
             + self.symbol.len()
             + 4
             + self.asset.get_size()
-            + self.extension.get_size();
-
-        return size;
+            + self.extension.get_size()
     }
 }
 
@@ -222,14 +222,14 @@ pub struct UpdateMetadataInput {
 
 impl UpdateMetadataInput {
     pub fn get_size(&self) -> usize {
-        let size = 4
+        
+
+        4
             + self.name.len()
             + 4
             + self.symbol.len()
             + 4
-            + self.asset.get_size();
-
-        return size;
+            + self.asset.get_size()
     }
 }
 

@@ -140,7 +140,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         symbol: creator.symbol.clone(),
         asset,
         update_authority: creator.key(),
-        extension: libreplex_metadata::MetadataExtension::Nft { attributes: attributes, signers: vec![], royalties: None, license: None },
+        extension: libreplex_metadata::MetadataExtension::Nft { attributes, signers: vec![], royalties: None, license: None },
     })?;
     
 
@@ -182,7 +182,7 @@ pub fn select_mint_number(
     mints_left: usize) -> u32 {
         let recent_slothash_data = recent_slothashes.data.borrow();
         let chosen_index 
-            = (4 * (u64::from_le_bytes( array_ref![recent_slothash_data, 12, 8].clone()) % (mints_left as u64)) + (MINT_NUMBERS_START as u64)) as usize;
+            = (4 * (u64::from_le_bytes( *array_ref![recent_slothash_data, 12, 8]) % (mints_left as u64)) + (MINT_NUMBERS_START as u64)) as usize;
         let end: usize = MINT_NUMBERS_START + 4 * (mints_left - 1);
 
         msg!("{}", chosen_index);

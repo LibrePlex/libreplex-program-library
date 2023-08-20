@@ -181,7 +181,7 @@ impl AttributeType {
     pub fn get_size(&self) -> usize {
         let total_size: usize = self.permitted_values.iter().map(|x| 4 + x.get_size()).sum();
 
-        return 4 + 32  // name
+        4 + 32  // name
             +  4 + total_size 
             + 1 // deleted
             + 1 
@@ -192,7 +192,7 @@ impl AttributeType {
             + match self.continued_from_index { // continued_at_index
                 Some(_)=>4,
                 None => 0
-            };
+            }
     }
 }
 
@@ -206,7 +206,7 @@ pub struct BaseUrlConfiguration {
 
 impl BaseUrlConfiguration {
     pub fn get_size(&self) -> usize {
-        return 4 + self.prefix.len() + 4 + self.suffix.len();
+        4 + self.prefix.len() + 4 + self.suffix.len()
     }
 }
 
@@ -241,7 +241,7 @@ impl GroupInput {
             + 4 + self.attribute_types.iter().map(|x|x.get_size()).sum::<usize>()
             + 4 + self.permitted_signers.len() * 32;
 
-        return size;
+        size
     }
 }
 

@@ -9,7 +9,7 @@ pub struct CreateInscriptionInput {
 
 impl CreateInscriptionInput {
     pub fn get_size(&self) -> u32 {
-        return self.max_data_length + 1 + match self.authority {
+        self.max_data_length + 1 + match self.authority {
             Some(_)=>32,
             None=>0
         }

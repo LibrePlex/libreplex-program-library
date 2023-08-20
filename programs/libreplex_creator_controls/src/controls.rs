@@ -8,11 +8,11 @@ use crate::state::{Accounts, ArgCtx};
 
 
 pub trait Control {
-    fn before_mint<'a, 'b, 'info>(&self,  _accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn before_mint(&self,  _accounts: &mut Accounts, _arg_ctx: &mut ArgCtx) -> Result<()> {
         Ok(())
     }
 
-    fn after_mint<'a, 'b, 'info>(&self,  _accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn after_mint(&self,  _accounts: &mut Accounts, _arg_ctx: &mut ArgCtx) -> Result<()> {
         msg!("Default Post Mint");
         Ok(())
     }
@@ -30,7 +30,7 @@ pub enum ControlType {
 pub const MAX_CONTROL_TYPE_SIZE: usize = 150;
 
 impl Control for ControlType {
-    fn before_mint<'a, 'b, 'info>(&self, accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn before_mint(&self, accounts: &mut Accounts, arg_ctx: &mut ArgCtx) -> Result<()> {
         match self {
             ControlType::AllowList(allow_list) => allow_list.before_mint(accounts, arg_ctx),
             ControlType::Payment(payment) => payment.before_mint(accounts, arg_ctx),
@@ -40,7 +40,7 @@ impl Control for ControlType {
         }
     }
 
-    fn after_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn after_mint(&self,  accounts: &mut Accounts, arg_ctx: &mut ArgCtx) -> Result<()> {
         match self {
             ControlType::AllowList(allow_list) => allow_list.after_mint(accounts, arg_ctx),
             ControlType::Payment(payment) => payment.after_mint(accounts, arg_ctx),
@@ -64,7 +64,7 @@ impl AllowList {
         }
 
 
-        let hash = proof.chunks(32).into_iter().fold(leaf, |hash, proof_element| {
+        let hash = proof.chunks(32).fold(leaf, |hash, proof_element| {
             if &hash[..] <= proof_element {
                 keccak::hashv(&[&hash, proof_element]).0
             } else {
@@ -77,7 +77,7 @@ impl AllowList {
 }
 
 impl Control for AllowList {
-    fn before_mint<'a, 'b, 'info>(&self, accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn before_mint(&self, accounts: &mut Accounts, arg_ctx: &mut ArgCtx) -> Result<()> {
         let current_arg 
             = arg_ctx.args.get(arg_ctx.current as usize).ok_or(ErrorCode::MissingArgument)?;
 
@@ -98,7 +98,7 @@ pub struct Payment {
 }
 
 impl Control for Payment {
-    fn before_mint<'a, 'b, 'info>(&self, accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn before_mint(&self, accounts: &mut Accounts, _arg_ctx: &mut ArgCtx) -> Result<()> {
         let mint_funds_recepient = accounts.remaining_accounts.accounts
                                                             .get(accounts.remaining_accounts.current as usize)
                                                             .ok_or(ErrorCode::MissingAccount)?;
@@ -129,7 +129,7 @@ impl MintLimit {
 
 
 impl Control for MintLimit {
-    fn before_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn before_mint(&self,  accounts: &mut Accounts, _arg_ctx: &mut ArgCtx) -> Result<()> {
         let total_mints_account = accounts.remaining_accounts.accounts
             .get(accounts.remaining_accounts.current as usize)
             .ok_or(ErrorCode::MissingAccount)?;
@@ -188,7 +188,7 @@ pub struct SplPayment {
 }
 
 impl Control for SplPayment {
-    fn before_mint<'a, 'b, 'info>(&self, accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn before_mint(&self, accounts: &mut Accounts, _arg_ctx: &mut ArgCtx) -> Result<()> {
         let token_recepient = accounts.remaining_accounts.accounts
             .get(accounts.remaining_accounts.current as usize)
             .ok_or(ErrorCode::MissingAccount)?;
@@ -231,7 +231,7 @@ pub struct CustomProgram {
 impl Control for CustomProgram {
 
     
-    fn after_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn after_mint(&self,  accounts: &mut Accounts, _arg_ctx: &mut ArgCtx) -> Result<()> {
         msg!("CustomProgram control");
         let remaining_accounts = accounts.remaining_accounts.accounts;
 
