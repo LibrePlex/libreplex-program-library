@@ -1,6 +1,6 @@
 use anchor_lang::{system_program, InstructionData, Key, ToAccountMetas};
 
-use solana_program::{instruction::Instruction, pubkey::Pubkey, system_instruction};
+use solana_program::{instruction::Instruction, pubkey::Pubkey};
 use solana_program_test::*;
 use solana_sdk::{ signer::Signer, transaction::Transaction};
 

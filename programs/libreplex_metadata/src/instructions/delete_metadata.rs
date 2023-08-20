@@ -39,16 +39,14 @@ pub fn handler(ctx: Context<DeleteMetadata>
 
     let metadata = &mut ctx.accounts.metadata;
 
-    match &metadata.asset {
-        Asset::Inscription {
-            account_id: _,
-            data_type: _,
-            description: _
-        } =>  {
-            return Err(ErrorCode::InvokeDeleteInscriptionMetadata.into())    
-        },
-        _ => {}
+    if let Asset::Inscription {
+                    account_id: _,
+                    data_type: _,
+                    description: _
+                 } = &metadata.asset {
+                 return Err(ErrorCode::InvokeDeleteInscriptionMetadata.into())    
     };
+    
 
     if metadata.group.is_some() {
         return Err(ErrorCode::MetadataBelongsToGroup.into())

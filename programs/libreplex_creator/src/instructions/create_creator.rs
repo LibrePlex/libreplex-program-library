@@ -1,4 +1,4 @@
-use std::mem::size_of;
+
 
 use anchor_lang::prelude::*;
 
@@ -21,7 +21,7 @@ pub struct CreateCreatorInput {
 
 impl CreateCreatorInput {
     pub fn get_size (&self) -> usize {
-        return 8 + 8 + 32 + 4;
+        8 + 8 + 32 + 4
     }
 }
 

@@ -24,6 +24,6 @@ pub struct Royalties {
 impl Royalties {
     pub const BASE_SIZE: usize = 2 + 4;
     pub fn get_size(&self) -> usize {
-        return Royalties::BASE_SIZE + self.shares.len() * RoyaltyShare::SIZE;
+        Royalties::BASE_SIZE + self.shares.len() * RoyaltyShare::SIZE
     }
 }

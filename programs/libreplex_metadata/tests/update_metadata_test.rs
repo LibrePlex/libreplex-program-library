@@ -1,6 +1,6 @@
-use anchor_spl::token::Mint as SplMint;
+
 use solana_program_test::*;
-use spl_token_2022::ID;
+
 const METADATA_NAME: &str = "MD1";
 
 const METADATA_NAME_NEW: &str = "MD2";
@@ -38,7 +38,7 @@ mod create_metadata_test {
         );
 
         let mut context = program.start_with_context().await;
-        let collection_authority = context.payer.pubkey();
+        let _collection_authority = context.payer.pubkey();
 
         let metadata = create_metadata_util(
             context.borrow_mut(),

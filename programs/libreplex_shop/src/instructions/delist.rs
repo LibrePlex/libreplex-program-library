@@ -72,7 +72,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Delist<'info>>) -> Result<
 
     let auth_seeds = &[
         LISTING.as_bytes(),
-        &mint_key.as_ref(),
+        (mint_key.as_ref()),
         &[listing.listing_bump],
     ];
 
@@ -89,7 +89,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Delist<'info>>) -> Result<
         &associated_token_program.to_account_info(),
         &system_program.to_account_info(),
         Some(&[auth_seeds]),
-        &lister_account_info,
+        lister_account_info,
         listing.amount,
     )?;
 

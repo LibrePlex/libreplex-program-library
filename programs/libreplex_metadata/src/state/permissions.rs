@@ -45,7 +45,7 @@ pub fn assert_valid_permissions(permissions: &Account<DelegatePermissions>,
     } 
 
 
-    if permissions.permissions.clone().into_iter().find(|x|(x.eq(permission_type))).is_none() {
+    if !permissions.permissions.clone().into_iter().any(|x|(x.eq(permission_type))) {
         return Err(ErrorCode::InvalidPermissions.into());
     }
 
@@ -74,6 +74,6 @@ impl DelegatePermissions {
     pub const BASE_SIZE: usize = 8 + 1 + 32 + 32 + 4 + 32;
 
     pub fn get_size(&self) -> usize {
-        return DelegatePermissions::BASE_SIZE + self.permissions.len();
+        DelegatePermissions::BASE_SIZE + self.permissions.len()
     }
 }

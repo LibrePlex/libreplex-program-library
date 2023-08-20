@@ -66,7 +66,7 @@ impl Creator {
     + 1 + 32;
 
     pub fn get_size (&self) -> usize {
-        return Creator::BASE_SIZE
+        Creator::BASE_SIZE
     }
 }
 

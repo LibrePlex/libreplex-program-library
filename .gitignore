@@ -1,13 +1,6 @@
 .anchor
 .DS_Store
-**/target/deploy
-**/target/debug
-**/target/CACHEDIR.TAG
-**/target/release
-**/target/package
-**/target/bpfel-unknown-unknown
-**/target/sbf-solana-solana/
-**/target/.rustc_info.json
+**/target/**
 **/src/**/*.js
 tests*/**/*.js
 **/src/**/*.d.ts

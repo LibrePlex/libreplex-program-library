@@ -101,7 +101,7 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     Ok(())
 }
 
-fn assert_is_valid_signer<'info> (signer: &Pubkey, mint_key: &Pubkey, mint: &spl_token_2022::state::Mint, invoked_migrator_program: &Option<UncheckedAccount<'info>>) -> Result<()> {
+fn assert_is_valid_signer (signer: &Pubkey, mint_key: &Pubkey, mint: &spl_token_2022::state::Mint, invoked_migrator_program: &Option<UncheckedAccount<'_>>) -> Result<()> {
     match invoked_migrator_program {
         Some(x) => {
 
@@ -134,5 +134,5 @@ fn assert_is_valid_signer<'info> (signer: &Pubkey, mint_key: &Pubkey, mint: &spl
         }
     }
 
-    return Ok(())
+    Ok(())
 }

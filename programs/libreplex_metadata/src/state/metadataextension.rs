@@ -16,7 +16,7 @@ pub enum License {
 
 impl License {
     pub fn get_size(&self)-> usize {
-        return 2 + match &self {
+        2 + match &self {
             License::NoLicense => 0,
             License::Custom { license_url } => 4 + license_url.len()
         }

@@ -28,8 +28,9 @@ pub struct CreateMetadataInscriptionInput {
 
 impl CreateMetadataInscriptionInput {
     pub fn get_size(&self) -> usize {
-        let size =
-            4 + self.name.len() +
+        
+
+        4 + self.name.len() +
             4 + self.symbol.len() +
             // inscription asset
             Asset::BASE_SIZE + 
@@ -38,9 +39,7 @@ impl CreateMetadataInscriptionInput {
             1 + match &self.description {
                 Some(x) => 4 + x.len(),
                 None => 0,
-            } + self.extension.get_size();
-
-        return size;
+            } + self.extension.get_size()
     }
 }
 
@@ -98,7 +97,7 @@ pub fn handler(
                 system_program: system_program.to_account_info(),
                 payer: signer.to_account_info(),
             },
-            &[&metadata_seeds],
+            &[metadata_seeds],
         ),
         libreplex_inscriptions::instructions::CreateInscriptionInput {
             authority: Some(signer.key()),
