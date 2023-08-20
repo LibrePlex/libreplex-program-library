@@ -7,13 +7,23 @@ const METADATA_NAME_NEW: &str = "MD2";
 
 const METADATA_SYMBOL_NEW: &str = "SYMBOL2";
 
+
+use anchor_lang::{system_program, InstructionData, Key, ToAccountMetas};
+use solana_program::{instruction::Instruction, pubkey::Pubkey, system_instruction};
+use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
+
+use libreplex_metadata::{Asset, CreateMetadataInput, UpdateMetadataInput};
+pub mod create_metadata_util;
+use create_metadata_util::*;
+pub mod update_metadata_util;
+use update_metadata_util::*;
+
 mod create_metadata_test {
 
     use std::borrow::BorrowMut;
    
     use anchor_lang::prelude::Account;
     use libreplex_metadata::{ Asset, Metadata};
-    use libreplex_test_utils::{create_metadata_util, update_metadata_util};
     use solana_program::account_info::AccountInfo;
     use solana_sdk::signer::Signer;
    
