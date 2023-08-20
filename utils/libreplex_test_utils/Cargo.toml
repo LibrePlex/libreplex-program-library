@@ -20,8 +20,8 @@ default = []
 [dependencies]
 anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
 anchor-spl = "0.28.0"
-libreplex_inscriptions = {path="../libreplex_inscriptions", features=["cpi", "no-entrypoint"]}
-libreplex_metadata = {path="../libreplex_metadata", features=["cpi", "no-entrypoint"]}
+libreplex_inscriptions = {path="../../programs/libreplex_inscriptions", features=["cpi", "no-entrypoint"]}
+libreplex_metadata = {path="../../programs/libreplex_metadata", features=["cpi", "no-entrypoint"]}
 
 spl-token-2022 = {version = "0.7.0", features = ["no-entrypoint"]}
 mocha = "0.1.1"
