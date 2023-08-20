@@ -5,10 +5,6 @@ description = "Inscriptions from LibrePlex"
 license = "MIT"
 edition = "2021"
 repository = "https://github.com/LibrePlex/metadata"
-rust-version = "1.68"
-
-[profile.release]
-lto = false
 
 [lib]
 crate-type = ["cdylib", "lib"]
@@ -35,9 +31,9 @@ anchor-attribute-event = { version = "0.28.0" }
 [dev-dependencies]
 mocha = "0.1.1"
 assert_matches = "1.5.0"
-solana-program-test = "~1.16"
-solana-sdk = ">1.14"
-solana-program = "~1.16"
+solana-program-test = "1.16.3"
+solana-sdk = "1.16.3"
+solana-program = "=1.16.3"
 
 
 

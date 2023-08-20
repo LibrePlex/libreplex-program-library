@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-use crate::{License, MetadataExtension, Royalties};
+use crate::{MetadataExtension, Royalties};
 
 /*
     Asset replaces URL and provides both backwards compatibility and flexibility

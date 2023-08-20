@@ -1,5 +1,5 @@
 
-use anchor_lang::{prelude::*};
+use anchor_lang::prelude::*;
 
 pub mod errors;
 pub mod instructions;
@@ -15,7 +15,7 @@ declare_id!("G9whLiLT9nSkxwWzWvbiKKrTL6yWxvzh2UXqNht5VXqV");
 pub mod libreplex_creator_controls {
     use super::*;
 
-    pub fn mint<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, input: MintInput) -> Result<()> {
+    pub fn mint<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, MintCtx<'info>>, input: MintInput) -> Result<()> {
         mint::handler(ctx, input)
     }
 

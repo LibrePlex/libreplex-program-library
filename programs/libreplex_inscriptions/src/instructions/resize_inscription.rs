@@ -1,6 +1,6 @@
-use std::cmp::{Ordering, self};
+use std::cmp::{self};
 
-use crate::{Inscription};
+use crate::Inscription;
 use anchor_lang::prelude::*;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]

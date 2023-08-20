@@ -13,4 +13,7 @@ pub enum ErrorCode {
 
     #[msg("Sold out")]
     SoldOut,
+
+    #[msg("Provided token account is not valid")]
+    InvalidTokenAccout,
 }

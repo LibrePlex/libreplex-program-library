@@ -6,7 +6,7 @@ pub mod instructions;
 pub mod errors;
 pub mod state;
 
-declare_id!("LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p");
+declare_id!("LibrAsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p");
 
 #[program]
 pub mod libreplex_metadata {

@@ -1,4 +1,4 @@
-use anchor_lang::{prelude::*};
+use anchor_lang::prelude::*;
 
 use crate::state::{Phase, CreatorController, Accounts, RemainingAccountsCtx, ArgCtx};
 use crate::controls::Control;
@@ -12,14 +12,28 @@ pub struct MintInput {
 
 #[derive(Accounts)]
 #[instruction(input: MintInput)]
-pub struct Mint<'info> {
+pub struct MintCtx<'info> {
     #[account(mut)]
     pub creator_controller: Account<'info, CreatorController>,
 
     #[account(mut)]
-    pub buyer: Signer<'info>,
+    pub receiver: Signer<'info>,
 
+    /// CHECK: checked in cpi
+    #[account(mut)]
+    pub receiver_token_account: AccountInfo<'info>,
+
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account(mut)]
     pub mint: Signer<'info>,
+
+    /// CHECK: Created in cpi
+    #[account(mut, seeds = [mint.key.as_ref()], seeds::program = libreplex_nft::id(), bump)]
+    pub mint_wrapper: AccountInfo<'info>,
+
+    pub mint_authority: Signer<'info>,
 
     /// CHECK: checked in cpi
     #[account(mut)]
@@ -37,19 +51,22 @@ pub struct Mint<'info> {
     #[account(mut)]
     pub group_permissions: AccountInfo<'info>,
 
-  /// CHECK: checked in cpi
+    /// CHECK: checked in cpi
     #[account(mut)]
     pub minter_numbers: Option<AccountInfo<'info>,>,
 
     pub system_program: Program<'info, System>,
 
 
-    /// CHECK: checked in cpi
+    /// CHECK: Just checking address
     #[account(address = libreplex_metadata::id())]
     pub libreplex_metadata_program: AccountInfo<'info>,
 
+    /// CHECK: Just checking address
+    #[account(address = libreplex_nft::id())]
+    pub libreplex_nft_program: AccountInfo<'info>,
     
-    /// CHECK: checked in cpi
+    /// CHECK: Just checking address
     #[account(address = solana_program::sysvar::slot_hashes::id())]
     recent_slothashes: AccountInfo<'info>,
 
@@ -57,16 +74,26 @@ pub struct Mint<'info> {
     pub attribute_config: Option<AccountInfo<'info>,>,
 
     /// CHECK: Only check address
-    #[account(address = libreplex_creator::id())]
+    #[account(address = libreplex_nft::id())]
     pub libreplex_creator_program: AccountInfo<'info>,
+
+    /// CHECK: Only check address
+    #[account(address = anchor_spl::token_2022::ID)]
+    pub token_program: AccountInfo<'info>,
 }                 
 
-pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, input: MintInput) -> Result<()> {
+pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, MintCtx<'info>>, input: MintInput) -> Result<()> {
     let controller = &mut ctx.accounts.creator_controller;
 
     let mut accounts = Accounts {
+        payer: ctx.accounts.payer.to_account_info(),
+        token_program: ctx.accounts.token_program.to_account_info(),
+        receiver_token_account: ctx.accounts.receiver_token_account.to_account_info(),
+        mint_wrapper: ctx.accounts.mint_wrapper.to_account_info(),
+        mint_authority: ctx.accounts.mint_authority.to_account_info(),
+        libreplex_nft_program: ctx.accounts.libreplex_nft_program.to_account_info(),
         creator: ctx.accounts.creator.to_account_info(),
-        buyer: ctx.accounts.buyer.to_account_info(),
+        receiver: ctx.accounts.receiver.to_account_info(),
         mint: ctx.accounts.mint.to_account_info(),
         metadata: ctx.accounts.metadata.to_account_info(),
         group: ctx.accounts.group.to_account_info(),
@@ -125,8 +152,14 @@ pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Mint<'info>>, 
 
     
     let mint_accounts = libreplex_creator::cpi::accounts::Mint {
-        buyer: accounts.buyer.to_account_info(),
-        mint_authority: controller.to_account_info(),
+        mint_wrapper: accounts.mint_wrapper.to_account_info(),
+        libreplex_nft_program: accounts.libreplex_nft_program.to_account_info(),
+        mint_authority: accounts.mint_authority.to_account_info(),
+        payer: accounts.payer.to_account_info(),
+        receiver_token_account: accounts.receiver_token_account.to_account_info(),
+        token_program: accounts.token_program.to_account_info(),
+        receiver: accounts.receiver.to_account_info(),
+        creator_authority: controller.to_account_info(),
         mint: accounts.mint.to_account_info(),
         creator: accounts.creator.to_account_info(),
         metadata: accounts.metadata.to_account_info(),

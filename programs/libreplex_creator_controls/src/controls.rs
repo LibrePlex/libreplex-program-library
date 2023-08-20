@@ -2,17 +2,17 @@ use anchor_lang::{prelude::*, system_program};
 use arrayref::array_ref;
 use solana_program::instruction::Instruction;
 use solana_program::program::invoke;
-use solana_program::{keccak};
+use solana_program::keccak;
 use crate::errors::ErrorCode;
 use crate::state::{Accounts, ArgCtx};
 
 
 pub trait Control {
-    fn before_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn before_mint<'a, 'b, 'info>(&self,  _accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
         Ok(())
     }
 
-    fn after_mint<'a, 'b, 'info>(&self,  accounts: &mut Accounts<'b, 'info>, arg_ctx: &mut ArgCtx) -> Result<()> {
+    fn after_mint<'a, 'b, 'info>(&self,  _accounts: &mut Accounts<'b, 'info>, _arg_ctx: &mut ArgCtx) -> Result<()> {
         msg!("Default Post Mint");
         Ok(())
     }
@@ -84,7 +84,7 @@ impl Control for AllowList {
         arg_ctx.current += 1;
 
         let proof = current_arg.as_slice();
-        let leaf = keccak::hash(&accounts.buyer.key.to_bytes()).to_bytes();
+        let leaf = keccak::hash(&accounts.receiver.key.to_bytes()).to_bytes();
         let root = self.root;
 
         Self::verify(proof, root, leaf)
@@ -110,7 +110,7 @@ impl Control for Payment {
         }
 
         system_program::transfer(CpiContext::new(accounts.system_program.to_account_info(), system_program::Transfer {
-            from: accounts.buyer.to_account_info(),
+            from: accounts.payer.to_account_info(),
             to: mint_funds_recepient.to_account_info()
         }), self.amount)
     }
@@ -139,7 +139,7 @@ impl Control for MintLimit {
         let mut account_key_bytes: Vec<&[u8]> = self.account_key.iter().map(|c| {c.as_ref()}).collect();
 
         let mut expected_seeds = if self.scoped_to_buyer {
-            vec!["mint_limit".as_bytes(), accounts.buyer.key.as_ref()]
+            vec!["mint_limit".as_bytes(), accounts.receiver.key.as_ref()]
         } else {
             vec!["mint_limit".as_bytes()]
         };
@@ -161,7 +161,7 @@ impl Control for MintLimit {
             let total_mints_signer_seeds = expected_seeds.as_slice();
 
             anchor_lang::system_program::create_account(CpiContext::new_with_signer(accounts.system_program.to_account_info(), anchor_lang::system_program::CreateAccount {
-                from: accounts.buyer.to_account_info(),
+                from: accounts.payer.to_account_info(),
                 to: total_mints_account.to_account_info(),
             }, &[total_mints_signer_seeds]), rent.minimum_balance(4), 4, &crate::id())?;
         }
@@ -215,7 +215,7 @@ impl Control for SplPayment {
         anchor_spl::token::transfer(CpiContext::new(token_program.to_account_info(), anchor_spl::token::Transfer{
             from: buyer_token_wallet.to_account_info(),
             to: token_recepient.to_account_info(),
-            authority: accounts.buyer.to_account_info(),
+            authority: accounts.payer.to_account_info(),
         }), self.amount)
     }
 }
@@ -245,7 +245,7 @@ impl Control for CustomProgram {
 
     
         let mut account_metas = vec![
-            accounts.buyer.to_account_metas(None).pop().unwrap(), 
+            accounts.receiver.to_account_metas(None).pop().unwrap(), 
             accounts.mint.to_account_metas(None).pop().unwrap(), 
             accounts.metadata.to_account_metas(None).pop().unwrap(), 
             accounts.group.to_account_metas(None).pop().unwrap(), 
@@ -266,7 +266,7 @@ impl Control for CustomProgram {
         };
         
         let mut infos = vec![ 
-            accounts.buyer.to_account_info(), 
+            accounts.receiver.to_account_info(), 
             accounts.mint.to_account_info(), 
             accounts.metadata.to_account_info(),
         accounts.group.to_account_info(), accounts.system_program.to_account_info(), custom_program_account.to_account_info()];

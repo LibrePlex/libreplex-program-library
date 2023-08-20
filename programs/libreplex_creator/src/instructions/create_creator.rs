@@ -1,5 +1,3 @@
-use std::mem::size_of;
-
 use anchor_lang::prelude::*;
 
 
@@ -73,7 +71,7 @@ pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result
     creator.description = input.description;
     creator.attribute_mappings = input.attribute_mappings;
 
-    creator.mint_authority = input.mint_authority;
+    creator.creator_authority = input.mint_authority;
     creator.is_ordered = input.is_ordered;
 
     emit!(AccountEvent {

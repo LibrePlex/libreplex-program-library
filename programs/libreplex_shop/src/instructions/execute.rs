@@ -1,11 +1,11 @@
 use crate::{
-    constants::{LISTING},
+    constants::LISTING,
     state::{Listing, Price},
 };
-use anchor_lang::{prelude::*};
+use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{Token},
+    token::Token,
 };
 use libreplex_metadata::{Group, Metadata, RoyaltyShare};
 use libreplex_shared::{transfer_tokens, SharedError};
@@ -292,7 +292,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
 
 fn calculate_royalty_amounts(
     total_royalty_amount: u64,
-    lamports: u64,
+    _lamports: u64,
     shares: Vec<RoyaltyShare>,
 ) -> Result<Vec<RoyaltyAmount>> {
     let mut royalty_amounts: Vec<RoyaltyAmount> = Vec::new();

@@ -5,7 +5,7 @@ use libreplex_inscriptions::program::LibreplexInscriptions;
 use crate::instructions::DeleteEvent;
 use crate::{Metadata, DelegatePermissions, PermissionType, Asset};
 
-use crate::{errors::ErrorCode};
+use crate::errors::ErrorCode;
 
 
 // Adds a metadata to a group
@@ -43,9 +43,7 @@ pub fn handler(ctx: Context<DeleteMetadataInscription>
     
 
     let metadata = &mut ctx.accounts.metadata;
-    let inscriptions_program = &mut ctx.accounts.inscriptions_program;
 
-    let  inscription_authority = &ctx.accounts.inscription_authority;
     match &metadata.asset {
         Asset::Inscription {
             account_id: _,

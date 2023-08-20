@@ -22,11 +22,11 @@ anchor-lang = {version = "~0.28", features = ["init-if-needed"]}
 anchor-spl = {version = "~0.28"}
 libreplex_inscriptions = {version = "*", path="../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
 spl-token-2022 = {version = "0.7.0", features = ["no-entrypoint"]}
-solana-program = {version = "~1.16"}
+solana-program = {version = "1.16.3"}
 
 [dev-dependencies]
 mocha = "0.1.1"
 assert_matches = "1.5.0"
-solana-program-test = "1.16"
-solana-sdk = "~1.16"
+solana-program-test = "1.16.3"
+solana-sdk = "1.16.3"
 libreplex_test_utils = {path="../libreplex_test_utils", features =["cpi", "no-entrypoint"]}
