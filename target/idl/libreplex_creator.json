@@ -476,6 +476,16 @@
           "name": "holder",
           "type": "publicKey",
           "index": false
+        },
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "totalMinted",
+          "type": "u32",
+          "index": false
         }
       ]
     },
@@ -518,8 +528,5 @@
       "name": "SoldOut",
       "msg": "Sold out"
     }
-  ],
-  "metadata": {
-    "address": "78deTr7qycJ6498vSd3pNMhdCKKWxMipniitVHQcM8RM"
-  }
+  ]
 }

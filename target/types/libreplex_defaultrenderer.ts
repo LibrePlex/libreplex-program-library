@@ -11,12 +11,31 @@ export type LibreplexDefaultrenderer = {
           "isSigner": false
         },
         {
-          "name": "metadataExtension",
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "group",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "renderState",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "outputAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -56,12 +75,31 @@ export const IDL: LibreplexDefaultrenderer = {
           "isSigner": false
         },
         {
-          "name": "metadataExtension",
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "group",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "renderState",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "outputAccount",
           "isMut": false,
           "isSigner": false
         }

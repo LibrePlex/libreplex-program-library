@@ -425,6 +425,14 @@ export type LibreplexCreatorControls = {
                 "defined": "MintLimit"
               }
             ]
+          },
+          {
+            "name": "CustomProgram",
+            "fields": [
+              {
+                "defined": "CustomProgram"
+              }
+            ]
           }
         ]
       }
@@ -904,6 +912,14 @@ export const IDL: LibreplexCreatorControls = {
             "fields": [
               {
                 "defined": "MintLimit"
+              }
+            ]
+          },
+          {
+            "name": "CustomProgram",
+            "fields": [
+              {
+                "defined": "CustomProgram"
               }
             ]
           }

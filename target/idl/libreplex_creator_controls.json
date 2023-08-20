@@ -36,11 +36,6 @@
           "isSigner": false
         },
         {
-          "name": "metadataExtension",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "groupPermissions",
           "isMut": true,
           "isSigner": false
@@ -140,6 +135,42 @@
           }
         }
       ]
+    },
+    {
+      "name": "update",
+      "accounts": [
+        {
+          "name": "updateAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creatorController",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "update_authority"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "UpdateInput"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -221,7 +252,9 @@
           },
           {
             "name": "accountKey",
-            "type": "string"
+            "type": {
+              "vec": "publicKey"
+            }
           },
           {
             "name": "scopedToBuyer",
@@ -238,6 +271,10 @@
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
           },
           {
             "name": "recepient",
@@ -301,6 +338,22 @@
             "name": "chosenPhase",
             "type": {
               "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "phases",
+            "type": {
+              "vec": {
+                "defined": "Phase"
+              }
             }
           }
         ]
@@ -372,6 +425,14 @@
                 "defined": "MintLimit"
               }
             ]
+          },
+          {
+            "name": "CustomProgram",
+            "fields": [
+              {
+                "defined": "CustomProgram"
+              }
+            ]
           }
         ]
       }
@@ -423,8 +484,5 @@
       "name": "PhaseNotSpecified",
       "msg": "Phase not specified"
     }
-  ],
-  "metadata": {
-    "address": "7eb3CjBh8HWFVkWPRNj5LYyM3KpfLPvRrLFY21yyC3cs"
-  }
+  ]
 }

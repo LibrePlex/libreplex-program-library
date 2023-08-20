@@ -476,6 +476,16 @@ export type LibreplexCreator = {
           "name": "holder",
           "type": "publicKey",
           "index": false
+        },
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "totalMinted",
+          "type": "u32",
+          "index": false
         }
       ]
     },
@@ -998,6 +1008,16 @@ export const IDL: LibreplexCreator = {
         {
           "name": "holder",
           "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "totalMinted",
+          "type": "u32",
           "index": false
         }
       ]
