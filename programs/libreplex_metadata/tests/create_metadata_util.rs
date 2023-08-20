@@ -3,7 +3,7 @@ use anchor_spl::token::Mint as SplMint;
 use solana_program::{instruction::Instruction, pubkey::Pubkey, system_instruction};
 use solana_program_test::*;
 use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
-use spl_token_2022::ID;
+use spl_token_2022::{ID, extension::ExtensionType, state::Mint};
 
 use libreplex_metadata::{Asset, CreateMetadataInput};
 
@@ -21,11 +21,13 @@ pub async fn create_metadata_util(
 
     let rent = context.banks_client.get_rent().await.unwrap();
 
+    let space = ExtensionType::get_account_len::<Mint>(&[ExtensionType::MetadataPointer]);
+
     let allocate_ix = system_instruction::create_account(
         &context.payer.pubkey(),
         &mint.pubkey(),
-        rent.minimum_balance(SplMint::LEN),
-        SplMint::LEN as u64,
+        rent.minimum_balance(space),
+        space as u64,
         &ID,
     );
 
@@ -38,8 +40,26 @@ pub async fn create_metadata_util(
     )
     .unwrap();
 
+      let metadata = Pubkey::find_program_address(
+        &[b"metadata", mint.pubkey().as_ref()],
+        &libreplex_metadata::ID,
+    )
+    .0;
+
+
+    let initialize_extension = spl_token_2022::extension::metadata_pointer::instruction::initialize(
+        &ID,
+        &mint.pubkey(),
+        Some(context.payer.pubkey()),
+        Some(metadata.key()),
+    ).unwrap();
+
+    
+
     let create_account_tx = Transaction::new_signed_with_payer(
-        &[allocate_ix, initialize_ix],
+        &[allocate_ix, 
+        initialize_extension, 
+        initialize_ix],
         Some(&context.payer.pubkey()),
         &[&context.payer, &mint],
         context.last_blockhash,
@@ -51,20 +71,7 @@ pub async fn create_metadata_util(
         .await
         .unwrap();
 
-    let metadata = Pubkey::find_program_address(
-        &[b"metadata", mint.pubkey().as_ref()],
-        &libreplex_metadata::ID,
-    )
-    .0;
-
-    let initialize_extension = spl_token_2022::extension::metadata_pointer::instruction::initialize(
-        &ID,
-        &mint.pubkey(),
-        Some(collection_authority),
-        Some(metadata.key()),
-    ).unwrap();
-
-    
+  
 
     let create_metadata_accounts = libreplex_metadata::accounts::CreateMetadata {
         payer: collection_authority,
@@ -93,7 +100,7 @@ pub async fn create_metadata_util(
     };
 
     let transaction = Transaction::new_signed_with_payer(
-        &[initialize_extension, create_metadata],
+        &[create_metadata],
         Some(&collection_authority),
         &[&context.payer],
         context.last_blockhash,

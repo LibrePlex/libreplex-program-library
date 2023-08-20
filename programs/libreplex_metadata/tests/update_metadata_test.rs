@@ -7,13 +7,71 @@ const METADATA_NAME_NEW: &str = "MD2";
 
 const METADATA_SYMBOL_NEW: &str = "SYMBOL2";
 
+
+use anchor_lang::{system_program, InstructionData, Key, ToAccountMetas};
+use solana_program::{instruction::Instruction, pubkey::Pubkey, system_instruction};
+use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
+
+use libreplex_metadata::{Asset, CreateMetadataInput, UpdateMetadataInput};
+pub mod create_metadata_util;
+use create_metadata_util::*;
+
+pub async fn update_metadata_util(
+    context: &mut ProgramTestContext,
+    metadata: Pubkey,
+    name: String,
+    asset: Asset,
+    symbol: String,
+) -> Pubkey {
+    let collection_authority = context.payer.pubkey();
+
+    let create_metadata_accounts = libreplex_metadata::accounts::UpdateMetadata {
+        editor: context.payer.pubkey(),
+        metadata: metadata.key(),
+        system_program: system_program::ID,
+        delegated_metadata_specific_permissions: None,
+        delegated_group_wide_permissions: None,
+        group: None
+    }
+    .to_account_metas(None);
+
+    let update_metadata_input = libreplex_metadata::instruction::UpdateMetadata {
+        input: UpdateMetadataInput {
+            name,
+            asset,
+            symbol,
+        },
+    };
+
+    let update_metadata_ix = Instruction {
+        data: update_metadata_input.data(),
+        program_id: libreplex_metadata::ID,
+        accounts: create_metadata_accounts,
+    };
+
+    let transaction = Transaction::new_signed_with_payer(
+        &[update_metadata_ix],
+        Some(&collection_authority),
+        &[&context.payer],
+        context.last_blockhash,
+    );
+
+    context
+        .banks_client
+        .process_transaction(transaction)
+        .await
+        .unwrap();
+
+    metadata
+}
+
+
 mod create_metadata_test {
 
     use std::borrow::BorrowMut;
    
     use anchor_lang::prelude::Account;
     use libreplex_metadata::{ Asset, Metadata};
-    use libreplex_test_utils::{create_metadata_util, update_metadata_util};
     use solana_program::account_info::AccountInfo;
     use solana_sdk::signer::Signer;
    
