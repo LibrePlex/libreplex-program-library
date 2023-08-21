@@ -30,7 +30,7 @@ pub struct MintCtx<'info> {
     pub mint: Signer<'info>,
 
     /// CHECK: Created in cpi
-    #[account(mut, seeds = [mint.key.as_ref()], seeds::program = libreplex_nft::id(), bump)]
+    #[account(mut)]
     pub mint_wrapper: AccountInfo<'info>,
 
     pub mint_authority: Signer<'info>,
