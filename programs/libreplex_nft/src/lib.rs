@@ -9,7 +9,7 @@ pub mod state;
 declare_id!("LibrAsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p");
 
 #[program]
-pub mod libreplex_metadata {
+pub mod libreplex_nft {
     
     use super::*;
 
