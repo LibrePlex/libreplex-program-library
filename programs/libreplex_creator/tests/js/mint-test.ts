@@ -2,18 +2,27 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { LibreplexCreator } from "../../../../target/types/libreplex_creator";
 import { LibreplexMetadata } from "../../../../target/types/libreplex_metadata";
-import { Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY, SystemProgram } from "@solana/web3.js";
+import { LibreplexNft } from "../../../../target/types/libreplex_nft";
+import { ConfirmOptions, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY, Signer, SystemProgram, TransactionInstruction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { expect } from 'chai';
 import exp from "constants";
-
-import {createMint, TOKEN_2022_PROGRAM_ID} from "@solana/spl-token"
+import {struct, u8} from "@solana/buffer-layout";
+import {publicKey} from "@solana/buffer-layout-utils";
+import {MINT_SIZE, TOKEN_2022_PROGRAM_ID, createInitializeMint2Instruction, getMinimumBalanceForRentExemptMint} from "@solana/spl-token"
 import { Transaction } from "@solana/web3.js";
+
+type GroupDescriptor = {
+  name: string,
+  symbol: string,
+  description: string,
+}
 
 describe("libreplex creator", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
   const program = anchor.workspace.LibreplexCreator as Program<LibreplexCreator>;
   const metadataProgram = anchor.workspace.LibreplexMetadata as Program<LibreplexMetadata>;
+  const nftProgram = anchor.workspace.LibreplexNft as Program<LibreplexNft>
 
   console.log(Object.keys(anchor.workspace))
 
@@ -45,7 +54,7 @@ describe("libreplex creator", () => {
       royalties: {
         bps: 100,
         shares: [{
-          recipient: program.provider.publicKey,
+          recipient: program.provider.publicKey as PublicKey,
           share: 100,
         }],
       }
@@ -75,13 +84,12 @@ describe("libreplex creator", () => {
     console.log("Group permissions delegated")
 
     await program.methods.createCreator({
-
       attributeMappings: null,
       collection: group,
       description: "The coolest metadatas",
       isOrdered: true,
       maxMints: 2000,
-      mintAuthority: program.provider.publicKey,
+      mintAuthority: program.provider.publicKey as PublicKey,
       name: "COOL #",
       seed: creatorSeed.publicKey,
       symbol: "COOL",
@@ -100,8 +108,8 @@ describe("libreplex creator", () => {
     console.log("Creator initialised")
 
     const payer = Keypair.generate()
-    await program.provider.sendAndConfirm(new Transaction().add(SystemProgram.createAccount({
-      fromPubkey: program.provider.publicKey,
+    await program.provider.sendAndConfirm?.(new Transaction().add(SystemProgram.createAccount({
+      fromPubkey: program.provider.publicKey as PublicKey,
       lamports: LAMPORTS_PER_SOL,
       newAccountPubkey: payer.publicKey,
       programId: SystemProgram.programId,
@@ -109,28 +117,34 @@ describe("libreplex creator", () => {
     })), [payer])
   
     const mint = Keypair.generate()
-
-    await createMint(program.provider.connection, payer, program.provider.publicKey,  program.provider.publicKey, 0, mint, undefined, TOKEN_2022_PROGRAM_ID)
-
-
     const metadata = PublicKey.findProgramAddressSync([Buffer.from("metadata"), 
       mint.publicKey.toBuffer()], metadataProgram.programId)[0]
+
+    await createMint(program.provider.connection, payer, program.provider.publicKey as PublicKey,  program.provider.publicKey as PublicKey, 0, mint, metadata, undefined, TOKEN_2022_PROGRAM_ID)
+
+
     const metadataExtension = PublicKey.findProgramAddressSync([Buffer.from("metadata_extension"), metadata.toBuffer()], metadataProgram.programId)[0]
 
     await program.methods.mint().accounts({
+      libreplexNftProgram: nftProgram.programId,
+
       attributeConfig: null,
-      buyer: program.provider.publicKey,
+  
       creator,
       group,
       groupPermissions: creatorGroupPermissions,
       libreplexMetadataProgram: metadataProgram.programId,
       mint: mint.publicKey,
+      creatorAuthority: program.provider.publicKey,
+      payer: program.provider.publicKey,
+      tokenProgram: TOKEN_2022_PROGRAM_ID,
       mintAuthority: program.provider.publicKey,
+      receiver: program.provider.publicKey,
+
       minterNumbers: null,
       metadata,
       recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
       systemProgram: SystemProgram.programId,
-      metadataExtension,
     }).signers([mint]).rpc({
       skipPreflight: true,
     })
@@ -138,3 +152,75 @@ describe("libreplex creator", () => {
 
 
 });
+
+const MetadataPointerMintSize = 234;
+
+interface InitializeMetadataPointerIx {
+  instruction: 39
+  metadataPointerInitIx: 0,
+  authority: PublicKey,
+  metadataAddress: PublicKey,
+}
+
+const initializeMetadataPointerInstructionData = struct<InitializeMetadataPointerIx>([
+  u8('instruction') as any,
+  u8('metadataPointerInitIx'),
+  publicKey("authority"),
+  publicKey("metadataAddress")
+]);
+
+
+async function createMint(
+  connection: Connection,
+  payer: Signer,
+  mintAuthority: PublicKey,
+  freezeAuthority: PublicKey | null,
+  decimals: number,
+  keypair = Keypair.generate(),
+  metadata: PublicKey,
+  confirmOptions?: ConfirmOptions,
+  programId = TOKEN_2022_PROGRAM_ID
+): Promise<PublicKey> {
+  const lamports = await connection.getMinimumBalanceForRentExemption(MetadataPointerMintSize);
+
+  const initMetadataPointerExtensionIx = (() => {
+    const initMetadataPointerIxSpan = Buffer.alloc(initializeMetadataPointerInstructionData.span)
+
+    initializeMetadataPointerInstructionData.encode({
+      instruction: 39,
+      authority: PublicKey.default,
+      metadataPointerInitIx: 0,
+      metadataAddress: metadata,
+    }, initMetadataPointerIxSpan)
+
+    return new TransactionInstruction(
+      {
+        keys: [
+          {
+            isSigner: false,
+            isWritable: true,
+            pubkey: keypair.publicKey
+          }
+        ],
+        programId,
+        data: initMetadataPointerIxSpan,
+      }
+    )
+  })();
+
+  const transaction = new Transaction().add(
+      SystemProgram.createAccount({
+          fromPubkey: payer.publicKey,
+          newAccountPubkey: keypair.publicKey,
+          space: MetadataPointerMintSize,
+          lamports,
+          programId,
+      }),
+      initMetadataPointerExtensionIx,
+      createInitializeMint2Instruction(keypair.publicKey, decimals, mintAuthority, freezeAuthority, programId)
+  );
+
+  await sendAndConfirmTransaction(connection, transaction, [payer, keypair], confirmOptions);
+
+  return keypair.publicKey;
+}
