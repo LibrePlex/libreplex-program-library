@@ -7,11 +7,6 @@
               "target": "es6",
               "esModuleInterop": true
             },
-  "include": [],
-  "exclude": ["node_modules"],
-  "references": [
-    {
-      "path": "./packages/libreplex-idls"
-    },
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }
