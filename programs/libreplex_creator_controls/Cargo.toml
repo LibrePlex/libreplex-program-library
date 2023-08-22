@@ -21,16 +21,16 @@ anchor-lang = {version = "0.28.0", features = ["init-if-needed"]}
 libreplex_creator = {path='../libreplex_creator', features = ["cpi"]}
 anchor-spl = "0.28.0"
 spl-token = { version = "3.5.0",  features = ["no-entrypoint"] }
-solana-program = "~1.16"
+solana-program = "1.16.3"
 winnow="=0.4.1"
 libreplex_metadata = {path='../libreplex_metadata',  features = ["cpi"]}
 arrayref = "0.3.7"
 mocha = "0.1.1"
-
+libreplex_nft = {path='../libreplex_nft',  features = ["cpi"]}
 
 [dev-dependencies]
 mocha = "0.1.1"
 bincode = "1.3.3"
 assert_matches = "1.5.0"
-solana-program-test = "~1.16"
-solana-sdk= "~1.16"
+solana-program-test = "1.16.3"
+solana-sdk= "1.16.3"

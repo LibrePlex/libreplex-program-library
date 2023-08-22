@@ -16,3 +16,4 @@ yarn-error.log
 .amman/
 .env
 dist
+**/packages/*/lib

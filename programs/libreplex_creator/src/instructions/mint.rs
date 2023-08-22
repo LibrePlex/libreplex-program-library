@@ -1,4 +1,7 @@
-
+/*
+    Creates a metadata for a pre existing mint, 
+    wraps and ensures it as an NFT and adds it to the required Group.
+*/
 
 use anchor_lang::prelude::*;
 use arrayref::array_ref;
@@ -7,6 +10,9 @@ use libreplex_metadata::{Group, CreateMetadataInput};
 use crate::{Creator, AssetUrl, MintNumbers, errors::ErrorCode, MINT_NUMBERS_START, AttributeConfig};
 
 use super::attributes::ATTRIBUTE_DATA_START;
+
+use anchor_spl::{token_2022::ID as TOKEN_2022_PROGRAM_ID, token_interface::TokenAccount};
+use libreplex_nft::ID as LIBREPLEX_NFT_PROGRAM_ID;
 
 #[event]
 pub struct MintEvent {
@@ -19,18 +25,29 @@ pub struct MintEvent {
 }
 
 
+
 #[derive(Accounts)]
 pub struct Mint<'info> {
+    pub receiver: Signer<'info>,
+
+    pub receiver_token_account: InterfaceAccount<'info, TokenAccount>,
+
     #[account(mut)]
-    pub buyer: Signer<'info>,
+    pub payer: Signer<'info>,
+
+    pub creator_authority: Signer<'info>,
+
+    #[account(mut)]
+    pub mint: Signer<'info>,
+
+    /// CHECK: address checked
+    #[account(mut)]
+    pub mint_wrapper: AccountInfo<'info>,
 
     pub mint_authority: Signer<'info>,
 
-    pub mint: Signer<'info>,
-
-    #[account(mut, has_one = mint_authority)]
+    #[account(mut, has_one = creator_authority)]
     pub creator: Box<Account<'info, Creator>>,
-
 
     /// CHECK: checked in cpi
     #[account(mut)]
@@ -45,25 +62,43 @@ pub struct Mint<'info> {
 
     #[account(mut)]
     pub minter_numbers: Option<Account<'info, MintNumbers>>,
+    pub attribute_config: Option<Account<'info, AttributeConfig>>,
+
 
     pub system_program: Program<'info, System>,
 
 
-    /// CHECK: checked in cpi
+    /// CHECK: address checked
     #[account(address = libreplex_metadata::id())]
     pub libreplex_metadata_program: AccountInfo<'info>,
 
     
-    /// CHECK: checked in cpi
+      /// CHECK: address checked
     #[account(address = solana_program::sysvar::slot_hashes::id())]
-    recent_slothashes: AccountInfo<'info>,
+    pub recent_slothashes: AccountInfo<'info>,
 
-    pub attribute_config: Option<Account<'info, AttributeConfig>>,
+    /// CHECK: address checked
+    #[account(address = LIBREPLEX_NFT_PROGRAM_ID)]
+    pub libreplex_nft_program: AccountInfo<'info>,
+
+     /// CHECK: address checked
+     #[account(address = TOKEN_2022_PROGRAM_ID)]
+    pub token_program: AccountInfo<'info>,
 }
 
 pub fn handler(ctx: Context<Mint>) -> Result<()> {
     let creator = &mut ctx.accounts.creator;
     let creator_seeds = ["creator".as_bytes(), creator.seed.as_ref(), &[creator.bump]];
+
+    let receiver_token_account = &ctx.accounts.receiver_token_account;
+    let mint = &ctx.accounts.mint;
+
+    let receiver = &ctx.accounts.receiver;
+
+    if &receiver_token_account.owner != receiver.key || 
+        &receiver_token_account.mint != mint.key {
+        return Err(ErrorCode::InvalidTokenAccout.into())
+    }
 
     if creator.minted >= creator.supply {
         return Err(ErrorCode::SoldOut.into())
@@ -71,10 +106,10 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
 
     let create_ix_accounts = libreplex_metadata::cpi::accounts::CreateMetadata {
         metadata: ctx.accounts.metadata.to_account_info(),
-        payer: ctx.accounts.buyer.to_account_info(),
+        payer: ctx.accounts.payer.to_account_info(),
         mint: ctx.accounts.mint.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
-        authority: ctx.accounts.buyer.to_account_info(),
+        authority: ctx.accounts.mint_authority.to_account_info(),
         invoked_migrator_program: None,
     };
 
@@ -102,10 +137,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         AssetUrl::JsonPrefix { url } => {
             libreplex_metadata::Asset::Json { url: format!("{}{}.json", url, mint_number) }
         },
-        AssetUrl::ImagePrefix { url , description} => libreplex_metadata::Asset::Image { description: description.clone(), url: format!("{}{}.json", url, mint_number) },
         AssetUrl::ChainRenderer { output_address, program_id, description } => libreplex_metadata::Asset::ChainRenderer { render_output_address: *output_address, description: description.clone(), program_id: *program_id },
-        AssetUrl::Json { url_config: _ } => todo!(),
-        AssetUrl::Image { image_config: _ } => todo!(),
     };
 
     let name = format!("{}{}", creator.name, mint_number);   
@@ -145,7 +177,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
     
 
     let group_add_accounts = libreplex_metadata::cpi::accounts::GroupAdd {
-        payer: ctx.accounts.buyer.to_account_info(),
+        payer: ctx.accounts.payer.to_account_info(),
         metadata_authority: creator.to_account_info(),
         group_authority: creator.to_account_info(),
         metadata: ctx.accounts.metadata.to_account_info(),
@@ -166,11 +198,23 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
     emit!(MintEvent {
         group: creator.collection,
         authority: creator.update_authority,
-        holder: ctx.accounts.buyer.key(),
+        holder: receiver.key(), 
         number: mint_number,
         mint: ctx.accounts.mint.key(),
         total_minted: creator.minted,
     });
+
+
+    let wrap_ctx = CpiContext::new(ctx.accounts.libreplex_nft_program.to_account_info(), libreplex_nft::cpi::accounts::WrapCtx {
+        payer: ctx.accounts.payer.to_account_info(),
+        authority: ctx.accounts.mint_authority.to_account_info(),
+        mint: ctx.accounts.mint.to_account_info(),
+        wrapped_mint: ctx.accounts.mint_wrapper.to_account_info(),
+        system_program: ctx.accounts.system_program.to_account_info(),
+        token_program: ctx.accounts.token_program.to_account_info(),
+    });
+
+    libreplex_nft::cpi::wrap(wrap_ctx)?;
 
     Ok(())
 }

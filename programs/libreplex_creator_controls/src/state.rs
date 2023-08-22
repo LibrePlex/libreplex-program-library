@@ -1,4 +1,4 @@
-use anchor_lang::{prelude::*};
+use anchor_lang::prelude::*;
 
 use crate::controls::{MAX_CONTROL_TYPE_SIZE, ControlType};
 
@@ -40,15 +40,29 @@ pub struct RemainingAccountsCtx<'b, 'info> {
 
 pub struct Accounts<'b, 'info> {
     pub creator: AccountInfo<'info>,
-    pub buyer: AccountInfo<'info>,
+
+    pub receiver: AccountInfo<'info>,
+    pub receiver_token_account: AccountInfo<'info>,
+
+    pub payer: AccountInfo<'info>,
+
     pub mint: AccountInfo<'info>,
+    pub mint_authority: AccountInfo<'info>,
+    
+    pub mint_wrapper: AccountInfo<'info>,
+
     pub metadata: AccountInfo<'info>,
     pub group: AccountInfo<'info>,
     pub group_permissions: AccountInfo<'info>,
+
+    pub attribute_config: Option<AccountInfo<'info>>,
     pub minter_numbers: Option<AccountInfo<'info>>,
+
     pub system_program:  AccountInfo<'info>,
+    pub libreplex_nft_program: AccountInfo<'info>,
     pub libreplex_metadata_program: AccountInfo<'info>,
     pub recent_slothashes: AccountInfo<'info>,
-    pub attribute_config: Option<AccountInfo<'info>>,
+    pub token_program: AccountInfo<'info>,
+
     pub remaining_accounts: RemainingAccountsCtx<'b, 'info>,
 }

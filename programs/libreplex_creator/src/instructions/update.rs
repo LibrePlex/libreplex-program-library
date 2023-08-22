@@ -24,7 +24,7 @@ pub struct UpdateCreator<'info> {
 pub fn handler(ctx: Context<UpdateCreator>, input: UpdateInput) -> Result<()> {
     let creator = &mut ctx.accounts.creator;
 
-    creator.mint_authority = input.mint_authority;
+    creator.creator_authority = input.mint_authority;
 
     Ok(())
 }

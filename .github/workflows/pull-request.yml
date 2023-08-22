@@ -10,12 +10,15 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  lint:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Lint
       run: cargo clippy -- --allow clippy::result_large_err --allow ambiguous_glob_reexports --allow clippy::too_many_arguments -Dwarnings
-
+  test-cargo:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Test
+      run: cargo test

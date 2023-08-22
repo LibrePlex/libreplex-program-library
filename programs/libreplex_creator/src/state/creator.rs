@@ -8,20 +8,10 @@ pub enum AssetUrl {
     JsonPrefix {
         url: String,
     },
-    ImagePrefix {
-        url: String,
-        description: Option<String>
-    },
     ChainRenderer {
         program_id: Pubkey,
         description: Option<String>,
         output_address: Pubkey,
-    },
-    Json {
-        url_config: Pubkey,
-    },
-    Image {
-        image_config: Pubkey,
     },
 }
 
@@ -34,7 +24,7 @@ pub enum AssetUrl {
 pub struct Creator {
     pub update_authority: Pubkey,
     // Only this key can mint
-    pub mint_authority: Pubkey,
+    pub creator_authority: Pubkey,
     pub seed: Pubkey,
     pub supply: u32,
     pub symbol: String,
