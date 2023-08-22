@@ -33,6 +33,7 @@ pub struct WrapCtx<'info> {
 
     /// CHECK: Account state checked in instruction
     #[account(
+        mut,
         constraint = mint.owner.eq(&TOKEN_2022_PROGRAM_ID)
     )]
     pub mint: UncheckedAccount<'info>,
@@ -54,19 +55,26 @@ pub fn handler(ctx: Context<WrapCtx>) -> Result<()> {
     let mint_info = &ctx.accounts.mint;
     let authority_info = &ctx.accounts.authority;
 
-    let mint_data = mint_info.try_borrow_data()?;
+    let (maybe_close_authority_extension, mint) = {
+        let mint_data = mint_info.try_borrow_data()?;
 
-    let mint = StateWithExtensions::<Mint>::unpack(&mint_data)?;
+        let mint: StateWithExtensions<'_, Mint> = StateWithExtensions::<Mint>::unpack(&mint_data)?;
+
+        let maybe_close_authority_extension 
+            = mint.get_extension::<MintCloseAuthority>().map(|m|{*m});
+
+        (maybe_close_authority_extension, mint.base)
+    };
 
     let wrapped_mint_info = &ctx.accounts.wrapped_mint;
 
     let token_program = &ctx.accounts.token_program;
 
-    if mint.base.supply != 1 || mint.base.decimals != 0 {
+    if mint.supply != 1 || mint.decimals != 0 {
         return Err(ErrorCode::MintCannotRepresentNFT.into());
     }
 
-    if let COption::Some(actual_mint_authority) = mint.base.mint_authority.as_ref() {
+    if let COption::Some(actual_mint_authority) = mint.mint_authority.as_ref() {
         if actual_mint_authority != authority_info.key {
             return Err(ErrorCode::InvalidMintAuthority.into());
         }
@@ -86,7 +94,7 @@ pub fn handler(ctx: Context<WrapCtx>) -> Result<()> {
         return Err(ErrorCode::InvalidMintAuthority.into());
     };
 
-    if let COption::Some(actual_freeze_authority) = mint.base.freeze_authority.as_ref() {
+    if let COption::Some(actual_freeze_authority) = mint.freeze_authority.as_ref() {
         if actual_freeze_authority != authority_info.key {
             return Err(ErrorCode::InvalidMintAuthority.into());
         }
@@ -104,7 +112,6 @@ pub fn handler(ctx: Context<WrapCtx>) -> Result<()> {
         )?;
     }
 
-    let maybe_close_authority_extension = mint.get_extension::<MintCloseAuthority>();
 
     if let Ok(close_authority_extension) = maybe_close_authority_extension {
         let maybe_close_authority: Option<Pubkey> =

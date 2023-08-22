@@ -37,6 +37,7 @@ pub struct Mint<'info> {
 
     pub creator_authority: Signer<'info>,
 
+    #[account(mut)]
     pub mint: Signer<'info>,
 
     /// CHECK: address checked
