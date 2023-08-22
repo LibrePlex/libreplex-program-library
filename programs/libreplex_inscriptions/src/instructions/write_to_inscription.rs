@@ -1,7 +1,7 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*};
 use crate::errors::ErrorCode;
 
-use crate::Inscription;
+use crate::{Inscription};
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct WriteToInscriptionInput {

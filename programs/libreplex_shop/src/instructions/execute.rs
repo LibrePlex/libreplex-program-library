@@ -1,11 +1,11 @@
 use crate::{
-    constants::LISTING,
+    constants::{LISTING},
     state::{Listing, Price},
 };
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::Token,
+    token::{Token},
 };
 use libreplex_metadata::{Group, Metadata, RoyaltyShare};
 use libreplex_shared::{transfer_tokens, SharedError};

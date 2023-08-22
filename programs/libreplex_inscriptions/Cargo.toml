@@ -5,6 +5,7 @@ description = "Inscriptions from LibrePlex"
 license = "MIT"
 edition = "2021"
 repository = "https://github.com/LibrePlex/metadata"
+rust-version = "1.68"
 
 [lib]
 crate-type = ["cdylib", "lib"]

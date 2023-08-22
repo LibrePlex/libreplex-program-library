@@ -1,4 +1,4 @@
-use crate::Inscription;
+use crate::{Inscription};
 use anchor_lang::prelude::*;
 
 
