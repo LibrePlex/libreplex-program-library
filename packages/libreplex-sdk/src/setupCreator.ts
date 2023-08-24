@@ -15,7 +15,14 @@ export type SetupCreatorData = {
     ordered: boolean,
     supply: number,
     symbol: string,
-    baseUrl: string,
+    baseUrl: {
+        type: "json-prefix",
+        url: string,
+    } | {
+        type: "chain-renderer",
+        programId: PublicKey,
+        description?: string,
+    },
 }
 
 export type SetupCreatorInput = {
@@ -138,11 +145,16 @@ export async function setupCreator(input: SetupCreatorInput, checkGroupIsValid =
         name: baseName,
         seed: creatorSeed.publicKey,
         symbol: symbol,
-        assetUrl: {
-          jsonPrefix: {
-            url: baseUrl,
+        assetUrl: baseUrl.type === "json-prefix" ? {
+            jsonPrefix: {
+              url: baseUrl.url,
+            }
+          } : {
+            chainRenderer: {
+                description: baseUrl.description || null,
+                programId: baseUrl.programId
+            }
           }
-        }
       }).accounts({
         creator,
         minterNumbers,
