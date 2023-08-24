@@ -3,6 +3,7 @@ import { BN, Program } from "@coral-xyz/anchor";
 import { LibreplexCreator } from "../../../../target/types/libreplex_creator";
 import { LibreplexMetadata } from "../../../../target/types/libreplex_metadata";
 import { LibreplexNft } from "../../../../target/types/libreplex_nft";
+import { LibreplexCreatorControls } from "../../../../target/types/libreplex_creator_controls";
 import { ConfirmOptions, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY, Signer, SystemProgram, TransactionInstruction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { expect } from 'chai';
 import exp from "constants";
@@ -13,94 +14,57 @@ import {
   getMinimumBalanceForRentExemptMint, getAssociatedTokenAddressSync, createAssociatedTokenAccountInstruction, createMintToInstruction
 } from "@solana/spl-token"
 import { Transaction } from "@solana/web3.js";
+import {LIBREPLEX_METADATA_PROGRAM_ID, setupGroup, 
+  setUserPermissionsForGroup, 
+  UserPermission, setupCreator, setupCreatorWithCustomSalePhases, mintFromCreatorController} from "@libreplex/sdk"
 
-type GroupDescriptor = {
+
+
+
+
+type SetupCreatorInput = {
   name: string,
-  symbol: string,
-  description: string,
-}
-
-type RoyaltyConfig = {
-  bps: number,
-  shares: {
-    recipient: PublicKey,
-    share: number,
-  }[]
-}
-
-type SetupGroupInput = {
-  name: string,
-  symbol: string,
-  url: string,
-  royalties: RoyaltyConfig
   description: string,
 
-  /**
-  * The set of possible attributes for metadatas in your collection.
- */
-  onChainAttributes?: AttributeType[]
-
-  /**
-   * The set of all addresses that are allowed to sign your collection.
-   */
-  permittedSigners?: PublicKey[]
 }
 
-enum TemplateConfig {
-  None,
-}
+// async function setupCreator({
+//   creatorProgram,
+//   group,
+//   creatorSeed = Keypair.generate(),
+//   mintAuthority
+// }: {
+//   creatorProgram: Program<LibreplexCreator>,
+//   group: PublicKey,
+//   creatorSeed?: Keypair,
+//   mintAuthority: PublicKey,
+// }) {
+//   await creatorProgram.methods.createCreator({
+//     attributeMappings: null,
+//     collection: group,
+//     description: "The coolest metadatas",
+//     isOrdered: true,
+//     maxMints: 2000,
+//     mintAuthority,
+//     name: "COOL #",
+//     seed: creatorSeed.publicKey,
+//     symbol: "COOL",
+//     assetUrl: {
+//       jsonPrefix: {
+//         url: "COOL.com/",
+//       }
+//     }
+//   }).accounts({
+//     creator,
+//     minterNumbers: null,
+//     signer: program.provider.publicKey,
+//     systemProgram: SystemProgram.programId,
+//   }).rpc()
+// }
 
-const LIBREPLEX_METADATA_PROGRAM_ID = new PublicKey("LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p")
 
-function getGroupAddress(groupSeed: PublicKey, program = LIBREPLEX_METADATA_PROGRAM_ID) {
-  return PublicKey.findProgramAddressSync([Buffer.from("group"), groupSeed.toBuffer()], LIBREPLEX_METADATA_PROGRAM_ID)[0]
 
-}
 
-type AttributeType = {
-  name: string,
-  possibleValues: (string | BN | number)[]
-}
-
-async function setupGroup(
-  {
-    metadataProgram,
-    input,
-    groupAuthority,
-    groupSeedKp = Keypair.generate()
-  }: {
-    metadataProgram: Program<LibreplexMetadata>,
-    input: SetupGroupInput,
-    groupAuthority: PublicKey,
-    groupSeedKp?: Keypair
-  }
-) {
-  return metadataProgram.methods.createGroup({
-    permittedSigners: input.permittedSigners || [],
-    attributeTypes: input.onChainAttributes?.map(v => {
-      return {
-        permittedValues: v.possibleValues,
-        continuedFromIndex: null,
-        continuedAtIndex: null,
-        deleted: false,
-        name: v.name,
-      }
-    }) || [],
-    description: input.description,
-    templateConfiguration: {
-      none: {},
-    },
-    name: input.name,
-    symbol: input.symbol,
-    url: input.url,
-    royalties: input.royalties
-  }).accounts({
-    authority: groupAuthority,
-    seed: groupSeedKp.publicKey,
-    systemProgram: SystemProgram.programId,
-    group: getGroupAddress(groupSeedKp.publicKey),
-  });
-}
 
 
 
@@ -110,6 +74,7 @@ describe("libreplex creator", () => {
   const program = anchor.workspace.LibreplexCreator as Program<LibreplexCreator>;
   const metadataProgram = anchor.workspace.LibreplexMetadata as Program<LibreplexMetadata>;
   const nftProgram = anchor.workspace.LibreplexNft as Program<LibreplexNft>
+  const controllerProgram = anchor.workspace.LibreplexCreatorControls as Program<LibreplexCreatorControls>
 
   console.log(Object.keys(anchor.workspace))
 
@@ -117,15 +82,8 @@ describe("libreplex creator", () => {
 
   it("has minted", async () => {
     const groupSeed = Keypair.generate();
-    const group = PublicKey.findProgramAddressSync([Buffer.from("group"), groupSeed.publicKey.toBuffer()], metadataProgram.programId)[0]
 
-    const creatorSeed = Keypair.generate()
-    const creator = PublicKey.findProgramAddressSync([Buffer.from("creator"), creatorSeed.publicKey.toBuffer()], program.programId)[0]
-    const creatorGroupPermissions = PublicKey.findProgramAddressSync([Buffer.from("permissions"), creator.toBuffer(), group.toBuffer()], metadataProgram.programId)[0]
-
-    console.log("Creating group")
-
-    const grpSetupMethod = await setupGroup({
+    const grpSetupCtx = await setupGroup({
       metadataProgram,
       groupSeedKp: groupSeed,
       groupAuthority: program.provider.publicKey as PublicKey,
@@ -143,84 +101,55 @@ describe("libreplex creator", () => {
         }
       }
     })
-    await grpSetupMethod.rpc({
+
+    const group = grpSetupCtx.group;
+    await grpSetupCtx.method.rpc({
       skipPreflight: false,
     });
 
-    console.log("Group created")
+    const startTime = new Date();
+    startTime.setDate(startTime.getDate() - 1)
 
-    await metadataProgram.methods.delegateGroupPermissions({
-      permissions: [{
-        addToGroup: {}
-      }],
-    }).accounts({
+    const creatorControllerCtx =  await setupCreatorWithCustomSalePhases({
       group,
-      delegatedUser: creator,
-      systemProgram: SystemProgram.programId,
-      updateAuthority: program.provider.publicKey,
-      userPermissions: creatorGroupPermissions,
-    }).rpc()
-
-    console.log("Group permissions delegated")
-
-    await program.methods.createCreator({
-      attributeMappings: null,
-      collection: group,
-      description: "The coolest metadatas",
-      isOrdered: true,
-      maxMints: 2000,
+      metadataProgram,
       mintAuthority: program.provider.publicKey as PublicKey,
-      name: "COOL #",
-      seed: creatorSeed.publicKey,
-      symbol: "COOL",
-      assetUrl: {
-        jsonPrefix: {
-          url: "COOL.com/",
-        }
+      program,
+      creatorData: {
+        baseName: "COOL #",
+        baseUrl: "COOL.com/",
+        description: "The coolest metadatas",
+        ordered: true,
+        symbol: "COOL",
+        supply: 2000
       }
-    }).accounts({
-      creator,
-      minterNumbers: null,
-      signer: program.provider.publicKey,
-      systemProgram: SystemProgram.programId,
-    }).rpc()
+    }, controllerProgram, [{
+      end: null,
+      start: startTime,
+      label: "Public",
+      /* No controls anyone can mint and it's free*/
+      control: []
+    }])
+
+    await creatorControllerCtx.method.rpc()
+
+
+    const {creator, minterNumbers, creatorController} = creatorControllerCtx;
+
 
     console.log("Creator initialised")
 
+    const mintMethod = await mintFromCreatorController({
+      creatorController: creatorControllerCtx.creatorController,
+      creatorControllerProgram: controllerProgram,
+      creatorProgram: program,
+    })
 
-    const mint = Keypair.generate()
-    const metadata = PublicKey.findProgramAddressSync([Buffer.from("metadata"),
-    mint.publicKey.toBuffer()], metadataProgram.programId)[0]
-
-    console.log("Creating mint");
-    const { transaction, keypair } = await setupMint(program.provider.connection, program.provider.publicKey as PublicKey, program.provider.publicKey as PublicKey, program.provider.publicKey as PublicKey, program.provider.publicKey as PublicKey, 0, mint, metadata, TOKEN_2022_PROGRAM_ID)
-
-    await program.provider.sendAndConfirm?.(transaction, [keypair])
-
-    console.log("Mint created");
-    await program.methods.mint().accounts({
-      libreplexNftProgram: nftProgram.programId,
-      mintWrapper: PublicKey.findProgramAddressSync([mint.publicKey.toBuffer()], nftProgram.programId)[0],
-      attributeConfig: null,
-      receiverTokenAccount: getAssociatedTokenAddressSync(mint.publicKey, program.provider.publicKey as PublicKey, undefined, TOKEN_2022_PROGRAM_ID),
-      creator,
-      group,
-      groupPermissions: creatorGroupPermissions,
-      libreplexMetadataProgram: metadataProgram.programId,
-      mint: mint.publicKey,
-      creatorAuthority: program.provider.publicKey,
-      payer: program.provider.publicKey,
-      tokenProgram: TOKEN_2022_PROGRAM_ID,
-      mintAuthority: program.provider.publicKey,
-      receiver: program.provider.publicKey,
-
-      minterNumbers: null,
-      metadata,
-      recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
-      systemProgram: SystemProgram.programId,
-    }).signers([mint]).rpc({
+    await mintMethod.rpc({
       skipPreflight: true,
     })
+
+
   });
 
 
@@ -243,7 +172,7 @@ const initializeMetadataPointerInstructionData = struct<InitializeMetadataPointe
 ]);
 
 
-async function setupMint(
+async function setupLibreplexReadyMint(
   connection: Connection,
   payer: PublicKey,
   receiver: PublicKey,

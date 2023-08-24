@@ -53,6 +53,7 @@ impl Control for ControlType {
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct AllowList {
+    pub label: String,
     pub root: [u8; 32],
 }
 
@@ -185,6 +186,7 @@ pub struct SplPayment {
     pub amount: u64,
     pub mint: Pubkey,
     pub recepient: Pubkey,
+    pub token_program: Pubkey,
 }
 
 impl Control for SplPayment {
@@ -207,6 +209,10 @@ impl Control for SplPayment {
 
         accounts.remaining_accounts.current += 1;
 
+        if token_program.key != &self.token_program {
+            return Err(ErrorCode::InvalidTokenProgram.into());
+        }
+
         if &self.recepient != token_recepient.key {
             return Err(ErrorCode::InvalidMintFundsRecepient.into());
         }
@@ -222,6 +228,7 @@ impl Control for SplPayment {
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct CustomProgram {
+    pub label: String,
     pub program_id: Pubkey,
     pub instruction_data: Vec<u8>,
     pub remaining_accounts_to_use: u32,

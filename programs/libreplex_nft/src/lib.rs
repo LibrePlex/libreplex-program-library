@@ -1,3 +1,4 @@
+
 use anchor_lang::prelude::*;
 
 use instructions::*;
@@ -6,7 +7,7 @@ pub mod instructions;
 pub mod errors;
 pub mod state;
 
-declare_id!("LibrAsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p");
+declare_id!("9SXDHUdtfvBGT3H2uPCNEkxmWREoqdeS1qdBudLDD6KX");
 
 #[program]
 pub mod libreplex_nft {

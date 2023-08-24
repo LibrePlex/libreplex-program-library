@@ -74,7 +74,7 @@ pub struct MintCtx<'info> {
     pub attribute_config: Option<AccountInfo<'info>,>,
 
     /// CHECK: Only check address
-    #[account(address = libreplex_nft::id())]
+    #[account(address = libreplex_creator::id())]
     pub libreplex_creator_program: AccountInfo<'info>,
 
     /// CHECK: Only check address

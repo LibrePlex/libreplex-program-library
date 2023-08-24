@@ -1,0 +1,29 @@
+{
+  "name": "@libreplex/sdk",
+  "version": "0.0.2",
+  "description": "",
+  "main": "./lib/cjs/src/index.js",
+  "module": "./lib/esm/src/index.js",
+  "types": "./lib/types/src/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "@libreplex/idls": "0.0.2"
+  },
+  "exports": {
+    "import": "./lib/esm/src/index.js",
+    "require": "./lib/cjs/src/index.js",
+    "types": "./lib/types/src/index.d.ts"
+  },
+  "scripts": {
+    "clean": "npx shx mkdir -p lib && npx shx rm -rf lib",
+    "package": "npx shx mkdir -p lib/cjs lib/esm",
+    "prebuild": "npm run clean && npm run package",
+    "build": "tsc --build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
