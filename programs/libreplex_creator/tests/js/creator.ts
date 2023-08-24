@@ -14,57 +14,11 @@ import {
   getMinimumBalanceForRentExemptMint, getAssociatedTokenAddressSync, createAssociatedTokenAccountInstruction, createMintToInstruction
 } from "@solana/spl-token"
 import { Transaction } from "@solana/web3.js";
-import {LIBREPLEX_METADATA_PROGRAM_ID, setupGroup, 
-  setUserPermissionsForGroup, 
-  UserPermission, setupCreator, setupCreatorWithCustomSalePhases, mintFromCreatorController} from "@libreplex/sdk"
-
-
-
-
-
-type SetupCreatorInput = {
-  name: string,
-  description: string,
-
-}
-
-// async function setupCreator({
-//   creatorProgram,
-//   group,
-//   creatorSeed = Keypair.generate(),
-//   mintAuthority
-// }: {
-//   creatorProgram: Program<LibreplexCreator>,
-//   group: PublicKey,
-//   creatorSeed?: Keypair,
-//   mintAuthority: PublicKey,
-// }) {
-//   await creatorProgram.methods.createCreator({
-//     attributeMappings: null,
-//     collection: group,
-//     description: "The coolest metadatas",
-//     isOrdered: true,
-//     maxMints: 2000,
-//     mintAuthority,
-//     name: "COOL #",
-//     seed: creatorSeed.publicKey,
-//     symbol: "COOL",
-//     assetUrl: {
-//       jsonPrefix: {
-//         url: "COOL.com/",
-//       }
-//     }
-//   }).accounts({
-//     creator,
-//     minterNumbers: null,
-//     signer: program.provider.publicKey,
-//     systemProgram: SystemProgram.programId,
-//   }).rpc()
-// }
-
-
-
-
+import {
+  LIBREPLEX_METADATA_PROGRAM_ID, setupGroup,
+  setUserPermissionsForGroup,
+  UserPermission, setupCreator, setupCreatorWithCustomSalePhases, mintFromCreatorController
+} from "@libreplex/sdk"
 
 
 
@@ -110,7 +64,7 @@ describe("libreplex creator", () => {
     const startTime = new Date();
     startTime.setDate(startTime.getDate() - 1)
 
-    const creatorControllerCtx =  await setupCreatorWithCustomSalePhases({
+    const creatorControllerCtx = await setupCreatorWithCustomSalePhases({
       group,
       metadataProgram,
       mintAuthority: program.provider.publicKey as PublicKey,
@@ -134,7 +88,7 @@ describe("libreplex creator", () => {
     await creatorControllerCtx.method.rpc()
 
 
-    const {creator, minterNumbers, creatorController} = creatorControllerCtx;
+    const { creator, minterNumbers, creatorController } = creatorControllerCtx;
 
 
     console.log("Creator initialised")
@@ -149,85 +103,7 @@ describe("libreplex creator", () => {
       skipPreflight: true,
     })
 
-
   });
 
 
 });
-
-const MetadataPointerMintSize = 234;
-
-interface InitializeMetadataPointerIx {
-  instruction: 39
-  metadataPointerInitIx: 0,
-  authority: PublicKey,
-  metadataAddress: PublicKey,
-}
-
-const initializeMetadataPointerInstructionData = struct<InitializeMetadataPointerIx>([
-  u8('instruction') as any,
-  u8('metadataPointerInitIx'),
-  publicKey("authority"),
-  publicKey("metadataAddress")
-]);
-
-
-async function setupLibreplexReadyMint(
-  connection: Connection,
-  payer: PublicKey,
-  receiver: PublicKey,
-  mintAuthority: PublicKey,
-  freezeAuthority: PublicKey | null,
-  decimals: number,
-  mintKeypair = Keypair.generate(),
-  metadata: PublicKey,
-  programId = TOKEN_2022_PROGRAM_ID
-) {
-  const lamports = await connection.getMinimumBalanceForRentExemption(MetadataPointerMintSize);
-
-  const initMetadataPointerExtensionIx = (() => {
-    const initMetadataPointerIxSpan = Buffer.alloc(initializeMetadataPointerInstructionData.span)
-
-    initializeMetadataPointerInstructionData.encode({
-      instruction: 39,
-      authority: PublicKey.default,
-      metadataPointerInitIx: 0,
-      metadataAddress: metadata,
-    }, initMetadataPointerIxSpan)
-
-    return new TransactionInstruction(
-      {
-        keys: [
-          {
-            isSigner: false,
-            isWritable: true,
-            pubkey: mintKeypair.publicKey
-          }
-        ],
-        programId,
-        data: initMetadataPointerIxSpan,
-      }
-    )
-  })();
-
-  const assocTokenAccount = getAssociatedTokenAddressSync(mintKeypair.publicKey, receiver, undefined, TOKEN_2022_PROGRAM_ID);
-  const transaction = new Transaction().add(
-    SystemProgram.createAccount({
-      fromPubkey: payer,
-      newAccountPubkey: mintKeypair.publicKey,
-      space: MetadataPointerMintSize,
-      lamports,
-      programId,
-    }),
-    initMetadataPointerExtensionIx,
-    createInitializeMint2Instruction(mintKeypair.publicKey, decimals, mintAuthority, freezeAuthority, programId),
-    createAssociatedTokenAccountInstruction(payer,
-      assocTokenAccount, receiver, mintKeypair.publicKey, TOKEN_2022_PROGRAM_ID),
-    createMintToInstruction(mintKeypair.publicKey, assocTokenAccount, mintAuthority, 1, undefined, TOKEN_2022_PROGRAM_ID),
-  );
-
-  return {
-    transaction,
-    keypair: mintKeypair,
-  };
-}
