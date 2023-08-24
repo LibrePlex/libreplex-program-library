@@ -46,8 +46,6 @@ pub enum Asset {
     JsonTemplate { url_parameter: String },
     Image { url: String, description: Option<String> },
     ChainRenderer { 
-        // This is where the renderer program will write the output of a render call to
-        render_output_address: Pubkey,
         program_id: Pubkey, 
         description: Option<String> },
     Inscription { account_id: Pubkey, data_type: String, description: Option<String> },
@@ -62,7 +60,7 @@ impl Asset {
                 Asset::Json { url } => 4 + url.len(),
                 Asset::JsonTemplate { url_parameter } => 4 + url_parameter.len(),
                 Asset::Image { url , description} => 4 + url.len() + 1 + match &description {Some(x) => 4 + x.len(), None => 0},
-                Asset::ChainRenderer { render_output_address: _, program_id: _, description } => 32 + 32 + 1  + match &description {Some(x) => 4 + x.len(), None => 0},
+                Asset::ChainRenderer { program_id: _, description } => 32 + 32 + 1  + match &description {Some(x) => 4 + x.len(), None => 0},
                 // Asset::Inscription { account_id: _, description } => 32 + 1  + match &description {Some(x) => 4 + x.len(), None => 0},
                 Asset::Inscription { account_id: _, data_type, description } => 32 
                 + 4 + data_type.len()

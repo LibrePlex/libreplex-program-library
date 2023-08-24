@@ -1,0 +1,28 @@
+{
+  "include": [],
+  "compilerOptions": {
+    "lib": ["ES2021.String"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "stripInternal": true,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "allowSyntheticDefaultImports": true,
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "./tsconfig.cjs.json"
+    },
+    {
+      "path": "./tsconfig.esm.json"
+    },
+  ]
+}

@@ -29,4 +29,7 @@ pub enum ErrorCode {
 
     #[msg("Phase not specified")]
     PhaseNotSpecified,
+
+    #[msg("Invalid token program")]
+    InvalidTokenProgram,
 }

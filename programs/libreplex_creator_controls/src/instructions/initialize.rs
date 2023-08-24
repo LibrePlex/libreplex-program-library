@@ -32,15 +32,17 @@ pub struct Initialize<'info> {
 
 pub fn handler(ctx: Context<Initialize>, input: InitializeInput) -> Result<()> {
     let controller = &mut ctx.accounts.creator_controller;
+    let creator = &ctx.accounts.creator;
 
     controller.phases = input.phases;
     controller.update_authority = ctx.accounts.update_authority.key();
     controller.seed = input.seed;
     controller.bump = *ctx.bumps.get("creator_controller").unwrap();
+    controller.creator = creator.key();
 
 
     let cpi_ctx = CpiContext::new(ctx.accounts.libreplex_creator_program.to_account_info(), libreplex_creator::cpi::accounts::UpdateCreator {
-        creator: ctx.accounts.creator.to_account_info(),
+        creator: creator.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
         update_authority: ctx.accounts.update_authority.to_account_info(),
     });
