@@ -106,7 +106,7 @@ export async function setupCreator(input: SetupCreatorInput, checkGroupIsValid =
 
     const preIx: TransactionInstruction[] = []
     const signers: Keypair[] = []
-    let minterNumbers: PublicKey | undefined
+    let minterNumbers: PublicKey | null = null
 
     if (!ordered) {
         const minterNumbersKp = Keypair.generate()
@@ -145,7 +145,7 @@ export async function setupCreator(input: SetupCreatorInput, checkGroupIsValid =
         }
       }).accounts({
         creator,
-        minterNumbers: null,
+        minterNumbers,
         signer: program.provider.publicKey,
         systemProgram: SystemProgram.programId,
       }).preInstructions(preIx).signers(signers)

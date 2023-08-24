@@ -37,6 +37,7 @@ describe("libreplex creator", () => {
   it("has minted", async () => {
     const groupSeed = Keypair.generate();
 
+    console.log("Setting up group")
     const grpSetupCtx = await setupGroup({
       metadataProgram,
       groupSeedKp: groupSeed,
@@ -64,6 +65,7 @@ describe("libreplex creator", () => {
     const startTime = new Date();
     startTime.setDate(startTime.getDate() - 1)
 
+    console.log("Setting up controller")
     const creatorControllerCtx = await setupCreatorWithCustomSalePhases({
       group,
       metadataProgram,
@@ -73,7 +75,7 @@ describe("libreplex creator", () => {
         baseName: "COOL #",
         baseUrl: "COOL.com/",
         description: "The coolest metadatas",
-        ordered: true,
+        ordered: false,
         symbol: "COOL",
         supply: 2000
       }
