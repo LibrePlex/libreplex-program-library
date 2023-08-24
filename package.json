@@ -17,18 +17,19 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@solana/spl-token": "^0.3.8",
     "@coral-xyz/anchor": "0.28.0",
+    "@libreplex/sdk": "^0.0.2",
+    "@solana/spl-token": "^0.3.8",
     "@solana/web3.js": "^1.73.0"
   },
   "devDependencies": {
-    "lerna": "^7.1.5",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^9.0.0",
     "@types/node": "20.2.3",
     "@types/react": "18.2.7",
     "chai": "^4.3.7",
     "lefthook": "^1.4.9",
+    "lerna": "^7.1.5",
     "mocha": "^9.0.3",
     "ts-mocha": "^10.0.0",
     "typescript": "5.0.4"
