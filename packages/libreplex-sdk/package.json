@@ -10,7 +10,8 @@
     "lib"
   ],
   "dependencies": {
-    "@libreplex/idls": "0.1.0"
+    "@libreplex/idls": "0.1.0",
+    "shx": "^0.3.4"
   },
   "exports": {
     "import": "./lib/esm/src/index.js",
