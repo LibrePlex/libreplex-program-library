@@ -2,7 +2,7 @@ import { AccountMeta, Connection, Keypair, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY,
 import {LibreplexCreator} from "@libreplex/idls/lib/types/libreplex_creator"
 import {LibreplexMetadata} from "@libreplex/idls/lib/types/libreplex_metadata"
 import {LibreplexCreatorControls} from "@libreplex/idls/lib/types/libreplex_creator_controls"
-import { Program } from "@coral-xyz/anchor"
+import { Program, AccountClient , IdlAccounts} from "@coral-xyz/anchor"
 import { LIBREPLEX_CREATOR_CONTROLS_PROGRAM_ID, LIBREPLEX_CREATOR_PROGRAM_ID, LIBREPLEX_METADATA_PROGRAM_ID, LIBREPLEX_NFT_PROGRAM_ID } from "./constants"
 import {
     MINT_SIZE, TOKEN_2022_PROGRAM_ID, createInitializeMint2Instruction,
@@ -46,19 +46,32 @@ export type MintFromCreatorControllerInput = {
         label: string,
         accounts: CustomProgramAccountMeta[]
     }[]
+
+
+    addTransferHookToMint?: {
+        programId: PublicKey,
+        authority: PublicKey,
+    },
 }
 
-export async function mintFromCreatorController({
-    creatorControllerProgram,
-    creatorController,
-    phaseToMintIn,
-    creatorProgram,
-    merkleProofsForAllowLists,
-    accountsForCustomProgram
-}: MintFromCreatorControllerInput) {
-    const controller = await creatorControllerProgram.account.creatorController.fetch(creatorController);
 
-    const creator = await creatorProgram.account.creator.fetch(controller.creator);
+type MintFromCreatorControllerStateInput = {
+    controller: IdlAccounts<LibreplexCreatorControls>["creatorController"],
+    creator: IdlAccounts<LibreplexCreator>["creator"],
+} & MintFromCreatorControllerInput
+
+export async function mintFromCreatorControllerState(input: MintFromCreatorControllerStateInput) {
+    const {
+        creatorControllerProgram,
+        creatorController,
+        phaseToMintIn,
+        creatorProgram,
+        merkleProofsForAllowLists,
+        accountsForCustomProgram,
+        controller,
+        creator,
+        addTransferHookToMint,
+    } = input;
 
 
     const availablePhases = controller.phases;
@@ -205,7 +218,7 @@ export async function mintFromCreatorController({
   
     const mintKp = Keypair.generate()
     const metadata = getMetadataAddress(mintKp.publicKey)
-    const setupMintCtx = await setupLibreplexReadyMint(connection, me, me, me, me, 0, mintKp, metadata);
+    const setupMintCtx = await setupLibreplexReadyMint(connection, me, me, me, me, 0, mintKp, metadata, addTransferHookToMint);
 
     return creatorControllerProgram.methods.mint({
         chosenPhase: targetPhase.label,
@@ -231,6 +244,33 @@ export async function mintFromCreatorController({
         tokenProgram: TOKEN_2022_PROGRAM_ID,
         groupPermissions: getGroupWiderUserPermissionsAddress(creator.collection, controller.creator),
     }).preInstructions([...setupMintCtx.transaction.instructions]).signers([mintKp]).remainingAccounts(remainingAccounts);
+}
+
+export async function mintFromCreatorController(input: MintFromCreatorControllerInput) {
+    const {
+        creatorControllerProgram,
+        creatorController,
+        creatorProgram,
+    } = input;
+
+    const controller = await creatorControllerProgram.account.creatorController.fetchNullable(creatorController);
+
+    if (!controller) {
+        throw new Error(`Creator controller at address: ${creatorController.toString()} not found`)
+    }
+
+    const creator = await creatorProgram.account.creator.fetchNullable(controller.creator);
+
+
+    if (!creator) {
+        throw new Error(`Creator at address ${controller.creator?.toString()} not found`)
+    }
+
+    return mintFromCreatorControllerState({
+        ...input,
+        creator,
+        controller
+    });
 }
 
 

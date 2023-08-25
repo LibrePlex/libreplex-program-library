@@ -73,7 +73,10 @@ describe("libreplex creator", () => {
       program,
       creatorData: {
         baseName: "COOL #",
-        baseUrl: "COOL.com/",
+        baseUrl: {
+          type: "json-prefix",
+          url: "COOL.com/",
+        },
         description: "The coolest metadatas",
         ordered: false,
         symbol: "COOL",
@@ -89,8 +92,11 @@ describe("libreplex creator", () => {
 
     await creatorControllerCtx.method.rpc()
 
-
     const { creator, minterNumbers, creatorController } = creatorControllerCtx;
+
+
+    const controllerData = await controllerProgram.account.creatorController.fetch(creatorController)
+
 
 
     console.log("Creator initialised")
