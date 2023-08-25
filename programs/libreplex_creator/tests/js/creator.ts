@@ -101,15 +101,36 @@ describe("libreplex creator", () => {
 
     console.log("Creator initialised")
 
-    const mintMethod = await mintFromCreatorController({
-      creatorController: creatorControllerCtx.creatorController,
-      creatorControllerProgram: controllerProgram,
-      creatorProgram: program,
-    })
+    {
+      // Set some dummy values for transfer hook.
+      const mintMethod = await mintFromCreatorController({
+        addTransferHookToMint: {
+          authority: program.provider.publicKey as PublicKey,
+          programId: program.provider.publicKey as PublicKey,
+        },
+        creatorController: creatorControllerCtx.creatorController,
+        creatorControllerProgram: controllerProgram,
+        creatorProgram: program,
+      })
 
-    await mintMethod.rpc({
-      skipPreflight: true,
-    })
+      await mintMethod.method.rpc({
+        skipPreflight: true,
+      })
+    }
+
+    {
+      // Mint without transfer hook
+      const mintMethod = await mintFromCreatorController({
+        creatorController: creatorControllerCtx.creatorController,
+        creatorControllerProgram: controllerProgram,
+        creatorProgram: program,
+      })
+
+      
+      await mintMethod.method.rpc({
+        skipPreflight: true,
+      })
+    }
 
   });
 

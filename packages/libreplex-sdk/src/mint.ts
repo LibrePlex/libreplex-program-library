@@ -220,30 +220,34 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
     const metadata = getMetadataAddress(mintKp.publicKey)
     const setupMintCtx = await setupLibreplexReadyMint(connection, me, me, me, me, 0, mintKp, metadata, addTransferHookToMint);
 
-    return creatorControllerProgram.methods.mint({
-        chosenPhase: targetPhase.label,
-        args,
-    }).accounts({
-        attributeConfig: null,
-        creator: controller.creator,
-        creatorController,
-        group: creator.collection,
-        libreplexCreatorProgram: LIBREPLEX_CREATOR_PROGRAM_ID,
-        libreplexMetadataProgram: LIBREPLEX_METADATA_PROGRAM_ID,
-        libreplexNftProgram: LIBREPLEX_NFT_PROGRAM_ID,
-        mint: mintKp.publicKey,
-        metadata,
-        mintAuthority: me,
-        minterNumbers: creator.minterNumbers,
-        mintWrapper: getMintWrapperAddress(mintKp.publicKey),
-        payer: me,
-        receiver: me,
-        receiverTokenAccount: getAssociatedTokenAddressSync(mintKp.publicKey, me, undefined, TOKEN_2022_PROGRAM_ID),
-        recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_2022_PROGRAM_ID,
-        groupPermissions: getGroupWiderUserPermissionsAddress(creator.collection, controller.creator),
-    }).preInstructions([...setupMintCtx.transaction.instructions]).signers([mintKp]).remainingAccounts(remainingAccounts);
+    return {
+        method: await creatorControllerProgram.methods.mint({
+            chosenPhase: targetPhase.label,
+            args,
+        }).accounts({
+            attributeConfig: null,
+            creator: controller.creator,
+            creatorController,
+            group: creator.collection,
+            libreplexCreatorProgram: LIBREPLEX_CREATOR_PROGRAM_ID,
+            libreplexMetadataProgram: LIBREPLEX_METADATA_PROGRAM_ID,
+            libreplexNftProgram: LIBREPLEX_NFT_PROGRAM_ID,
+            mint: mintKp.publicKey,
+            metadata,
+            mintAuthority: me,
+            minterNumbers: creator.minterNumbers,
+            mintWrapper: getMintWrapperAddress(mintKp.publicKey),
+            payer: me,
+            receiver: me,
+            receiverTokenAccount: getAssociatedTokenAddressSync(mintKp.publicKey, me, undefined, TOKEN_2022_PROGRAM_ID),
+            recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
+            systemProgram: SystemProgram.programId,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
+            groupPermissions: getGroupWiderUserPermissionsAddress(creator.collection, controller.creator),
+        }).preInstructions([...setupMintCtx.transaction.instructions]).signers([mintKp]).remainingAccounts(remainingAccounts),
+
+        mint: mintKp
+    };
 }
 
 export async function mintFromCreatorController(input: MintFromCreatorControllerInput) {
@@ -275,6 +279,7 @@ export async function mintFromCreatorController(input: MintFromCreatorController
 
 
 const MetadataPointerMintSize = 234;
+const MintSizeForTranserHookAndPointer = 302;
 
 interface InitializeMetadataPointerIx {
   instruction: 39
@@ -320,7 +325,9 @@ async function setupLibreplexReadyMint(
     },
     programId = TOKEN_2022_PROGRAM_ID
   ) {
-    const lamports = await connection.getMinimumBalanceForRentExemption(MetadataPointerMintSize);
+
+    const mintSize = transferHook ? MintSizeForTranserHookAndPointer : MetadataPointerMintSize
+    const lamports = await connection.getMinimumBalanceForRentExemption(mintSize);
   
     const initMetadataPointerExtensionIx = (() => {
       const initMetadataPointerIxSpan = Buffer.alloc(initializeMetadataPointerInstructionData.span)
@@ -371,7 +378,7 @@ async function setupLibreplexReadyMint(
       SystemProgram.createAccount({
         fromPubkey: payer,
         newAccountPubkey: mintKeypair.publicKey,
-        space: MetadataPointerMintSize,
+        space: mintSize,
         lamports,
         programId,
       }),
