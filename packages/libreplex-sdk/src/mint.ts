@@ -34,6 +34,9 @@ export type MintFromCreatorControllerInput = {
     creatorProgram: Program<LibreplexCreator>,
     creatorController: PublicKey,
 
+    // If you do not provide one will generate
+    mintKeyPair?: Keypair,
+
     // If there are multiple active sale phases, specify the one to mint in.
     phaseToMintIn?: string,
 
@@ -74,10 +77,10 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
         minterNumbers,
         availableSalePhases,
         group,
-        creator
+        creator,
     } = input;
 
-    
+    const mintKeyPair = input.mintKeyPair || Keypair.generate()
 
     const now = Date.now() / 1000;
 
@@ -194,7 +197,7 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
                     const seeds = a.key.seeds
 
                     if (a.key.deriveFromMint) {
-                        seeds.push(mintKp.publicKey.toBuffer())
+                        seeds.push(mintKeyPair.publicKey.toBuffer())
                     }
 
                     if (a.key.deriveFromBuyer) {
@@ -219,9 +222,8 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
 
    
   
-    const mintKp = Keypair.generate()
-    const metadata = getMetadataAddress(mintKp.publicKey)
-    const setupMintCtx = await setupLibreplexReadyMint(connection, me, me, me, me, 0, mintKp, metadata, addTransferHookToMint);
+    const metadata = getMetadataAddress(mintKeyPair.publicKey)
+    const setupMintCtx = await setupLibreplexReadyMint(connection, me, me, me, me, 0, mintKeyPair, metadata, addTransferHookToMint);
 
     return {
         method: await creatorControllerProgram.methods.mint({
@@ -235,21 +237,21 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
             libreplexCreatorProgram: LIBREPLEX_CREATOR_PROGRAM_ID,
             libreplexMetadataProgram: LIBREPLEX_METADATA_PROGRAM_ID,
             libreplexNftProgram: LIBREPLEX_NFT_PROGRAM_ID,
-            mint: mintKp.publicKey,
+            mint: mintKeyPair.publicKey,
             metadata,
             mintAuthority: me,
             minterNumbers,
-            mintWrapper: getMintWrapperAddress(mintKp.publicKey),
+            mintWrapper: getMintWrapperAddress(mintKeyPair.publicKey),
             payer: me,
             receiver: me,
-            receiverTokenAccount: getAssociatedTokenAddressSync(mintKp.publicKey, me, undefined, TOKEN_2022_PROGRAM_ID),
+            receiverTokenAccount: getAssociatedTokenAddressSync(mintKeyPair.publicKey, me, undefined, TOKEN_2022_PROGRAM_ID),
             recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
             groupPermissions: getGroupWiderUserPermissionsAddress(group, creator),
-        }).preInstructions([...setupMintCtx.transaction.instructions]).signers([mintKp]).remainingAccounts(remainingAccounts),
+        }).preInstructions([...setupMintCtx.transaction.instructions]).signers([mintKeyPair]).remainingAccounts(remainingAccounts),
 
-        mint: mintKp
+        mint: mintKeyPair
     };
 }
 
