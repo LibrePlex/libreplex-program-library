@@ -56,8 +56,10 @@ export type MintFromCreatorControllerInput = {
 
 
 type MintFromCreatorControllerStateInput = {
-    controller: IdlAccounts<LibreplexCreatorControls>["creatorController"],
-    creator: IdlAccounts<LibreplexCreator>["creator"],
+    creator: PublicKey,
+    availableSalePhases: IdlAccounts<LibreplexCreatorControls>["creatorController"]["phases"]
+    minterNumbers: PublicKey | null,
+    group: PublicKey,
 } & MintFromCreatorControllerInput
 
 export async function mintFromCreatorControllerState(input: MintFromCreatorControllerStateInput) {
@@ -68,17 +70,18 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
         creatorProgram,
         merkleProofsForAllowLists,
         accountsForCustomProgram,
-        controller,
-        creator,
         addTransferHookToMint,
+        minterNumbers,
+        availableSalePhases,
+        group,
+        creator
     } = input;
 
-
-    const availablePhases = controller.phases;
+    
 
     const now = Date.now() / 1000;
 
-    const activePhases = availablePhases.filter(ph => now > ph.start && (ph.end === null || now < ph.end))
+    const activePhases = availableSalePhases.filter(ph => now > ph.start && (ph.end === null || now < ph.end))
 
     if  (activePhases.length === 0 ) {
         throw new Error("No currently active phases to mint from");
@@ -226,16 +229,16 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
             args,
         }).accounts({
             attributeConfig: null,
-            creator: controller.creator,
+            creator,
             creatorController,
-            group: creator.collection,
+            group,
             libreplexCreatorProgram: LIBREPLEX_CREATOR_PROGRAM_ID,
             libreplexMetadataProgram: LIBREPLEX_METADATA_PROGRAM_ID,
             libreplexNftProgram: LIBREPLEX_NFT_PROGRAM_ID,
             mint: mintKp.publicKey,
             metadata,
             mintAuthority: me,
-            minterNumbers: creator.minterNumbers,
+            minterNumbers,
             mintWrapper: getMintWrapperAddress(mintKp.publicKey),
             payer: me,
             receiver: me,
@@ -243,7 +246,7 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
             recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-            groupPermissions: getGroupWiderUserPermissionsAddress(creator.collection, controller.creator),
+            groupPermissions: getGroupWiderUserPermissionsAddress(group, creator),
         }).preInstructions([...setupMintCtx.transaction.instructions]).signers([mintKp]).remainingAccounts(remainingAccounts),
 
         mint: mintKp
@@ -272,8 +275,10 @@ export async function mintFromCreatorController(input: MintFromCreatorController
 
     return mintFromCreatorControllerState({
         ...input,
-        creator,
-        controller
+        availableSalePhases: controller.phases,
+        creator: controller.creator,
+        minterNumbers: creator.minterNumbers,
+        group: creator.collection
     });
 }
 
