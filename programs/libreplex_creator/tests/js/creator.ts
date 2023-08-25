@@ -73,7 +73,10 @@ describe("libreplex creator", () => {
       program,
       creatorData: {
         baseName: "COOL #",
-        baseUrl: "COOL.com/",
+        baseUrl: {
+          type: "json-prefix",
+          url: "COOL.com/",
+        },
         description: "The coolest metadatas",
         ordered: false,
         symbol: "COOL",
@@ -89,21 +92,45 @@ describe("libreplex creator", () => {
 
     await creatorControllerCtx.method.rpc()
 
-
     const { creator, minterNumbers, creatorController } = creatorControllerCtx;
+
+
+    const controllerData = await controllerProgram.account.creatorController.fetch(creatorController)
+
 
 
     console.log("Creator initialised")
 
-    const mintMethod = await mintFromCreatorController({
-      creatorController: creatorControllerCtx.creatorController,
-      creatorControllerProgram: controllerProgram,
-      creatorProgram: program,
-    })
+    {
+      // Set some dummy values for transfer hook.
+      const mintMethod = await mintFromCreatorController({
+        addTransferHookToMint: {
+          authority: program.provider.publicKey as PublicKey,
+          programId: program.provider.publicKey as PublicKey,
+        },
+        creatorController: creatorControllerCtx.creatorController,
+        creatorControllerProgram: controllerProgram,
+        creatorProgram: program,
+      })
 
-    await mintMethod.rpc({
-      skipPreflight: true,
-    })
+      await mintMethod.method.rpc({
+        skipPreflight: true,
+      })
+    }
+
+    {
+      // Mint without transfer hook
+      const mintMethod = await mintFromCreatorController({
+        creatorController: creatorControllerCtx.creatorController,
+        creatorControllerProgram: controllerProgram,
+        creatorProgram: program,
+      })
+
+      
+      await mintMethod.method.rpc({
+        skipPreflight: true,
+      })
+    }
 
   });
 

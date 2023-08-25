@@ -7,7 +7,7 @@
     "declarationDir": "lib/types",
     "target": "ESNext",
     "module": "ESNext",
-    "sourceMap": true,
+    "sourceMap": false,
     "declaration": true,
     "declarationMap": true,
     "composite": true

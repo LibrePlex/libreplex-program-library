@@ -15,7 +15,6 @@
     "skipLibCheck": true,
     "noEmit": false,
     "allowSyntheticDefaultImports": true,
-    "composite": true
   },
   "references": [
     {

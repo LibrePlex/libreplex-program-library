@@ -1,18 +1,18 @@
 {
   "name": "@libreplex/idls",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Idls for libreplex programs",
   "sideEffects": false,
   "files": [
     "lib"
   ],
   "exports": {
-    "./*": "./*"
+    "./lib/esm/*": "./lib/esm/*",
+    "./lib/cjs/*": "./lib/cjs/*.js",
+    "./lib/types/*": "./lib/types/*"
   },
   "scripts": {
     "clean": "npx shx mkdir -p lib && npx shx rm -rf lib",
-    "package": "npx shx mkdir -p lib/cjs lib/esm",
-
     "build": "tsc --build"
   },
   "keywords": [],
