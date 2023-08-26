@@ -17,9 +17,9 @@ import { Transaction } from "@solana/web3.js";
 import {
   LIBREPLEX_METADATA_PROGRAM_ID, setupGroup,
   setUserPermissionsForGroup,
-  UserPermission, setupCreator, setupCreatorWithCustomSalePhases, mintFromCreatorController
+  UserPermission, setupCreator, setupCreatorWithCustomSalePhases, mintFromCreatorController, LIBREPLEX_CREATOR_CONTROLS_PROGRAM_ID
 } from "@libreplex/sdk"
-
+import {sha256} from "js-sha256"
 
 
 describe("libreplex creator", () => {
@@ -65,6 +65,8 @@ describe("libreplex creator", () => {
     const startTime = new Date();
     startTime.setDate(startTime.getDate() - 1)
 
+    const pingDiscrim = Buffer.from(sha256.digest("global:ping")).slice(0, 8)
+
     console.log("Setting up controller")
     const creatorControllerCtx = await setupCreatorWithCustomSalePhases({
       group,
@@ -87,7 +89,13 @@ describe("libreplex creator", () => {
       start: startTime,
       label: "Public",
       /* No controls anyone can mint and it's free*/
-      control: []
+      control: [{
+        name: "CustomProgram",
+        instructionData: pingDiscrim,
+        label: "Ping",
+        programId: LIBREPLEX_CREATOR_CONTROLS_PROGRAM_ID,
+        remainingAccountsMetas: [],
+      }]
     }])
 
     await creatorControllerCtx.method.rpc()
@@ -113,9 +121,11 @@ describe("libreplex creator", () => {
         creatorProgram: program,
       })
 
-      await mintMethod.method.rpc({
+      const txId = await mintMethod.method.rpc({
         skipPreflight: true,
       })
+
+      console.log(txId)
     }
 
     {

@@ -32,4 +32,10 @@ pub enum ErrorCode {
 
     #[msg("Invalid token program")]
     InvalidTokenProgram,
+
+    #[msg("Invalid remaining accounts for custom program control.")]
+    InvalidRemainingAccountsForCustomProgramControl,
+
+    #[msg("InvalidCustomProgram")]
+    InvalidCustomProgram
 }
