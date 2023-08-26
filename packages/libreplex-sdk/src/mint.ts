@@ -2,7 +2,7 @@ import { AccountMeta, Connection, Keypair, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY,
 import {LibreplexCreator} from "@libreplex/idls/lib/types/libreplex_creator"
 import {LibreplexMetadata} from "@libreplex/idls/lib/types/libreplex_metadata"
 import {LibreplexCreatorControls} from "@libreplex/idls/lib/types/libreplex_creator_controls"
-import { Program, AccountClient , IdlAccounts} from "@coral-xyz/anchor"
+import { Program, AccountClient , IdlAccounts, IdlTypes} from "@coral-xyz/anchor"
 import { LIBREPLEX_CREATOR_CONTROLS_PROGRAM_ID, LIBREPLEX_CREATOR_PROGRAM_ID, LIBREPLEX_METADATA_PROGRAM_ID, LIBREPLEX_NFT_PROGRAM_ID } from "./constants"
 import {
     MINT_SIZE, TOKEN_2022_PROGRAM_ID, createInitializeMint2Instruction,
@@ -34,6 +34,8 @@ export type MintFromCreatorControllerInput = {
     creatorProgram: Program<LibreplexCreator>,
     creatorController: PublicKey,
 
+    mintKeyPair?: Keypair,
+
     // If there are multiple active sale phases, specify the one to mint in.
     phaseToMintIn?: string,
 
@@ -41,12 +43,6 @@ export type MintFromCreatorControllerInput = {
         label: string,
         proof: Buffer[],
     }[],
-
-    accountsForCustomProgram?: {
-        label: string,
-        accounts: CustomProgramAccountMeta[]
-    }[]
-
 
     addTransferHookToMint?: {
         programId: PublicKey,
@@ -57,60 +53,31 @@ export type MintFromCreatorControllerInput = {
 
 type MintFromCreatorControllerStateInput = {
     creator: PublicKey,
-    availableSalePhases: IdlAccounts<LibreplexCreatorControls>["creatorController"]["phases"]
+    targetPhase: IdlAccounts<LibreplexCreatorControls>["creatorController"]["phases"][0]
     minterNumbers: PublicKey | null,
     group: PublicKey,
-} & MintFromCreatorControllerInput
+} & Omit<MintFromCreatorControllerInput, "phaseToMintIn" | "creatorProgram">
 
 export async function mintFromCreatorControllerState(input: MintFromCreatorControllerStateInput) {
     const {
         creatorControllerProgram,
         creatorController,
-        phaseToMintIn,
-        creatorProgram,
         merkleProofsForAllowLists,
-        accountsForCustomProgram,
         addTransferHookToMint,
         minterNumbers,
-        availableSalePhases,
+        targetPhase,
         group,
         creator
     } = input;
 
-    
+    let mintKeyPair = input.mintKeyPair || Keypair.generate()
 
-    const now = Date.now() / 1000;
-
-    const activePhases = availableSalePhases.filter(ph => now > ph.start && (ph.end === null || now < ph.end))
-
-    if  (activePhases.length === 0 ) {
-        throw new Error("No currently active phases to mint from");
-    }
-
-    let targetPhase = activePhases[0]
-    
-    if (activePhases.length > 1) {
-        if (!phaseToMintIn) {
-            throw new Error("Must provide a target phase to mint in when multiple are active");
-        }
-
-        const maybeTargetPhase = activePhases.find(ph => ph.label === phaseToMintIn);
-
-        if (!maybeTargetPhase) {
-            throw new Error(`Specified phase to mint in ${phaseToMintIn} is not active`)
-        }
-
-        targetPhase = maybeTargetPhase;
-    }
-
-    const connection = creatorProgram.provider.connection;
-    const me = creatorProgram.provider.publicKey;
+    const connection = creatorControllerProgram.provider.connection;
+    const me = creatorControllerProgram.provider.publicKey;
 
     if (!me) {
         throw new Error("Provider not setup. Perhaps your wallet is not connected");
     }
-
-
 
     const args: Buffer[] =  []
     const remainingAccounts: AccountMeta[] = []
@@ -178,40 +145,51 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
             args.push(Buffer.concat(proofEntry.proof))
         }
         else if (control.customProgram) {
-            if (!accountsForCustomProgram) {
-                throw new Error("Must provide account list for custom program control.")
+            const remainingAccountMetas: AccountMeta[] = [{
+                isSigner: false,
+                isWritable: false,
+                pubkey: control.customProgram[0].programId,
+            }]
+
+            for (const meta of control.customProgram[0].remainingAccountMetas)  {
+                const key: IdlTypes<LibreplexCreatorControls>["CustomProgramAcountMetaKey"] = meta.key as any
+
+                if (key.pubkey) {
+                    remainingAccountMetas.push({
+                        ...meta,
+                        pubkey: key.pubkey[0]
+                    })
+                }
+                else if (key.derivedFromSeeds) {
+                    const programId = key.derivedFromSeeds[0].programId;
+
+                    const seeds: Buffer[] = []
+                    for (const seed of key.derivedFromSeeds[0].seeds) {
+                        if (seed.bytes) {
+                            seeds.push(seed.bytes[0])
+                        }
+                        else if (seed.mintPlaceHolder) {
+                            seeds.push(mintKeyPair.publicKey.toBuffer())
+                        }
+                        else if (seed.payerPlaceHolder || seed.receiverPlaceHolder) {
+                            seeds.push(me.toBuffer())
+                        }
+                        else {
+                            throw new Error("Invalid seed derivation")
+                        }
+                    }
+
+                    remainingAccountMetas.push({
+                        ...meta,
+                        pubkey: PublicKey.findProgramAddressSync(seeds, programId)[0]
+                    })
+                }
+                else {
+                    throw new Error("Invalid CustomProgramAcountMetaKey")
+                }
             }
 
-            const expectedLabel = control.customProgram[0].label;
-            const accountEntry = accountsForCustomProgram.find(entry => entry.label === expectedLabel)
-
-            if (!accountEntry) {
-                throw new Error(`Account entry not found for custom program entry: ${control.customProgram[0].label}`)
-            }
-
-            const remainingAccountMetas: AccountMeta[] = accountEntry.accounts.map(a => {
-                if (a.key.keyType === "PDA") {
-                    const seeds = a.key.seeds
-
-                    if (a.key.deriveFromMint) {
-                        seeds.push(mintKp.publicKey.toBuffer())
-                    }
-
-                    if (a.key.deriveFromBuyer) {
-                        seeds.push(me.toBuffer())
-                    }
-
-                    return {
-                        ...a,
-                        pubkey: PublicKey.findProgramAddressSync(seeds, a.key.programIdToDeriveFrom)[0]
-                    }
-                }
-                
-                return {
-                    ...a,
-                    pubkey: a.key.value
-                }
-            })
+           
 
             remainingAccounts.push(...remainingAccountMetas)
         }
@@ -258,6 +236,7 @@ export async function mintFromCreatorController(input: MintFromCreatorController
         creatorControllerProgram,
         creatorController,
         creatorProgram,
+        phaseToMintIn
     } = input;
 
     const controller = await creatorControllerProgram.account.creatorController.fetchNullable(creatorController);
@@ -273,9 +252,36 @@ export async function mintFromCreatorController(input: MintFromCreatorController
         throw new Error(`Creator at address ${controller.creator?.toString()} not found`)
     }
 
+    const now = Date.now() / 1000;
+
+    const availableSalePhases = controller.phases;
+
+    const activePhases = availableSalePhases.filter(ph => now > ph.start && (ph.end === null || now < ph.end))
+
+    if  (activePhases.length === 0 ) {
+        throw new Error("No currently active phases to mint from");
+    }
+
+    let targetPhase = activePhases[0]
+    
+    if (activePhases.length > 1) {
+        if (!phaseToMintIn) {
+            throw new Error("Must provide a target phase to mint in when multiple are active");
+        }
+
+        const maybeTargetPhase = activePhases.find(ph => ph.label === phaseToMintIn);
+
+        if (!maybeTargetPhase) {
+            throw new Error(`Specified phase to mint in ${phaseToMintIn} is not active`)
+        }
+
+        targetPhase = maybeTargetPhase;
+    }
+
+
     return mintFromCreatorControllerState({
         ...input,
-        availableSalePhases: controller.phases,
+        targetPhase,
         creator: controller.creator,
         minterNumbers: creator.minterNumbers,
         group: creator.collection

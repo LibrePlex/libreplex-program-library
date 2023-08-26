@@ -27,7 +27,7 @@ pub enum ControlType {
     CustomProgram(CustomProgram),
 }
 
-pub const MAX_CONTROL_TYPE_SIZE: usize = 150;
+pub const MAX_CONTROL_TYPE_SIZE: usize = 200;
 
 impl Control for ControlType {
     fn before_mint(&self, accounts: &mut Accounts, arg_ctx: &mut ArgCtx) -> Result<()> {
@@ -231,7 +231,35 @@ pub struct CustomProgram {
     pub label: String,
     pub program_id: Pubkey,
     pub instruction_data: Vec<u8>,
-    pub remaining_accounts_to_use: u32,
+    pub remaining_account_metas: Vec<CustomProgramAccountMeta>,
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+pub enum Seed {
+    Bytes(Vec<u8>),
+    MintPlaceHolder,
+    ReceiverPlaceHolder,
+    PayerPlaceHolder,
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct KeySeedDerivation {
+    program_id: Pubkey,
+    seeds: Vec<Seed>,
+
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+pub enum CustomProgramAcountMetaKey {
+    Pubkey(Pubkey),
+    DerivedFromSeeds(KeySeedDerivation),
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct CustomProgramAccountMeta {
+    pub key: CustomProgramAcountMetaKey,
+    pub is_signer: bool,
+    pub is_writable: bool,
 }
 
 
@@ -242,15 +270,51 @@ impl Control for CustomProgram {
         msg!("CustomProgram control");
         let remaining_accounts = accounts.remaining_accounts.accounts;
 
-        let custom_program_account = remaining_accounts.get(accounts.remaining_accounts.current as usize).unwrap();
+        let maybe_custom_program_account = remaining_accounts.get(accounts.remaining_accounts.current as usize);
+
         accounts.remaining_accounts.current += 1;
         let current_remaining_accounts_pointer = accounts.remaining_accounts.current as usize;
 
+        if maybe_custom_program_account.is_none() {
+            return Err(ErrorCode::InvalidCustomProgram.into());
+        };
 
+        let custom_program_account = maybe_custom_program_account.unwrap();
 
-        let target_remaining_accounts = &remaining_accounts[current_remaining_accounts_pointer..current_remaining_accounts_pointer + self.remaining_accounts_to_use as usize];
+        if custom_program_account.key != &self.program_id {
+            return Err(ErrorCode::InvalidCustomProgram.into());
+        }
 
-    
+        let target_remaining_accounts = &remaining_accounts[current_remaining_accounts_pointer..current_remaining_accounts_pointer + self.remaining_account_metas.len()];
+
+        let remaining_accounts_are_invalid = self.remaining_account_metas.iter().enumerate().any(|(index, expected_meta)| {
+            let actual_remaining_account = &target_remaining_accounts[index];
+
+            let keys_match = match &expected_meta.key {
+                CustomProgramAcountMetaKey::Pubkey(key) => key == actual_remaining_account.key,
+                CustomProgramAcountMetaKey::DerivedFromSeeds(seeds) => {
+                    let pda_seeds: Vec<&[u8]> = seeds.seeds.iter().map(|seed| {
+                        match seed {
+                            Seed::Bytes(bytes) => bytes.as_slice(),
+                            Seed::MintPlaceHolder => accounts.mint.key.as_ref(),
+                            Seed::ReceiverPlaceHolder => accounts.receiver.key.as_ref(),
+                            Seed::PayerPlaceHolder => accounts.payer.key.as_ref(),
+                        }
+                    }).collect();
+
+                    let expected_key = Pubkey::find_program_address(pda_seeds.as_slice(), &seeds.program_id);
+
+                    &expected_key.0 == actual_remaining_account.key
+                },
+            };
+
+            !(expected_meta.is_signer == actual_remaining_account.is_signer && expected_meta.is_writable == actual_remaining_account.is_writable && keys_match)
+        });
+
+        if remaining_accounts_are_invalid {
+            return Err(ErrorCode::InvalidRemainingAccountsForCustomProgramControl.into())
+        }
+
         let mut account_metas = vec![
             accounts.receiver.to_account_metas(None).pop().unwrap(), 
             accounts.mint.to_account_metas(None).pop().unwrap(), 
@@ -284,7 +348,7 @@ impl Control for CustomProgram {
         invoke(&ix, 
             infos.as_slice())?;
 
-        accounts.remaining_accounts.current += self.remaining_accounts_to_use;
+        accounts.remaining_accounts.current += self.remaining_account_metas.len() as u32;
 
         Ok(())
     }

@@ -28,6 +28,14 @@ pub mod libreplex_creator_controls {
         instructions::update::handler(ctx, input)
     }
 
+    /* For testing */
+    pub fn ping(_ctx: Context<Ping>) -> Result<()> {
+        Ok(())
+    }
 }
+
+/* For testing */
+#[derive(Accounts)]
+pub struct Ping {}
 
 
