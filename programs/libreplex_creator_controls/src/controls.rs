@@ -27,6 +27,28 @@ pub enum ControlType {
     CustomProgram(CustomProgram),
 }
 
+impl ControlType {
+    pub fn get_size(&self) -> usize {
+        1 + match &self {
+            ControlType::AllowList(al) => {
+                4 + al.label.len() + 32
+            },
+            ControlType::Payment(_) => {
+                32 + 8
+            },
+            ControlType::SplPayment(_) => {
+                8 + 32 + 32 + 32
+            },
+            ControlType::MintLimit(limit) => {
+                4 + 4 + limit.account_key.len() * 32 + 1
+            },
+            ControlType::CustomProgram(custom_program) => {
+                custom_program.get_size()
+            },
+        }
+    }
+}
+
 pub const MAX_CONTROL_TYPE_SIZE: usize = 200;
 
 impl Control for ControlType {
@@ -234,7 +256,18 @@ pub struct CustomProgram {
     pub remaining_account_metas: Vec<CustomProgramAccountMeta>,
 }
 
-#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+impl CustomProgram {
+    fn get_size(&self) -> usize {
+        4 + self.label.len() + 
+        32 + 
+        4 + self.instruction_data.len() + 
+        4 + self.remaining_account_metas.iter().fold(0, |current, meta| {
+            current + meta.get_size()
+        })
+    }
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, Debug)]
 pub enum Seed {
     Bytes(Vec<u8>),
     MintPlaceHolder,
@@ -242,24 +275,55 @@ pub enum Seed {
     PayerPlaceHolder,
 }
 
-#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+impl Seed {
+    fn get_size(&self) -> usize {
+        1 + match &self {
+            Seed::Bytes(bytes) => 4 + bytes.len(),
+            _ => 0,
+        }
+    }
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, Debug)]
 pub struct KeySeedDerivation {
     program_id: Pubkey,
     seeds: Vec<Seed>,
-
 }
 
-#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+impl KeySeedDerivation {
+    fn get_size(&self) -> usize {
+        32 + 4 + self.seeds.iter().fold(0, |total, seed|{
+            total + seed.get_size()
+        })
+    }
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, Debug)]
 pub enum CustomProgramAcountMetaKey {
     Pubkey(Pubkey),
     DerivedFromSeeds(KeySeedDerivation),
 }
 
-#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+impl CustomProgramAcountMetaKey {
+    fn get_size(&self) -> usize {
+        1 + match &self {
+            CustomProgramAcountMetaKey::Pubkey(_) => 32,
+            CustomProgramAcountMetaKey::DerivedFromSeeds(seed_derivation) => seed_derivation.get_size(),
+        }
+    }
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, Debug)]
 pub struct CustomProgramAccountMeta {
     pub key: CustomProgramAcountMetaKey,
     pub is_signer: bool,
     pub is_writable: bool,
+}
+
+impl CustomProgramAccountMeta {
+    fn get_size(&self) -> usize {
+        &self.key.get_size() + 1 + 1
+    }
 }
 
 
@@ -340,7 +404,9 @@ impl Control for CustomProgram {
             accounts.receiver.to_account_info(), 
             accounts.mint.to_account_info(), 
             accounts.metadata.to_account_info(),
-        accounts.group.to_account_info(), accounts.system_program.to_account_info(), custom_program_account.to_account_info()];
+            accounts.group.to_account_info(), 
+            accounts.system_program.to_account_info(), 
+            custom_program_account.to_account_info()];
 
         infos.extend(target_remaining_accounts.iter().map(|acc| acc.to_account_info()));
 

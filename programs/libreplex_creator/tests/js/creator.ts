@@ -4,7 +4,7 @@ import { LibreplexCreator } from "../../../../target/types/libreplex_creator";
 import { LibreplexMetadata } from "../../../../target/types/libreplex_metadata";
 import { LibreplexNft } from "../../../../target/types/libreplex_nft";
 import { LibreplexCreatorControls } from "../../../../target/types/libreplex_creator_controls";
-import { ConfirmOptions, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY, Signer, SystemProgram, TransactionInstruction, sendAndConfirmTransaction } from "@solana/web3.js";
+import { ConfirmOptions, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_EPOCH_SCHEDULE_PUBKEY, SYSVAR_SLOT_HASHES_PUBKEY, Signer, SystemProgram, TransactionInstruction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { expect } from 'chai';
 import exp from "constants";
 import { struct, u8 } from "@solana/buffer-layout";
@@ -94,7 +94,24 @@ describe("libreplex creator", () => {
         instructionData: pingDiscrim,
         label: "Ping",
         programId: LIBREPLEX_CREATOR_CONTROLS_PROGRAM_ID,
-        remainingAccountsMetas: [],
+        remainingAccountsMetas: [{
+          isSigner: false,
+          isWritable: true,
+          key: {
+            type: "key",
+            value: Keypair.generate().publicKey,
+          }
+        }, {
+          isSigner: false,
+          isWritable: true,
+          key: {
+            type: "seedDerivation",
+            programId: SYSVAR_EPOCH_SCHEDULE_PUBKEY,
+            seeds: [{
+              type: "mintPlaceHolder",
+            }],
+          }
+        }],
       }]
     }])
 
