@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::controls::{MAX_CONTROL_TYPE_SIZE, ControlType};
+use crate::controls::ControlType;
 
 #[account]
 pub struct CreatorController {
@@ -14,8 +14,15 @@ pub struct CreatorController {
 impl CreatorController {
     pub const MAX_LABEL_SIZE: usize = 25;
 
-    pub fn size_for_input(phases: &Vec<Phase>) -> usize {
-        8 + 32 + 1 + 32 + 32 + 4 + phases.len() * (8 + 9 + CreatorController::MAX_LABEL_SIZE + MAX_CONTROL_TYPE_SIZE)
+    pub fn size_for_input(phases: &[Phase]) -> usize {
+        return 8 + 
+        32 + 
+        1 + 
+        32 + 
+        32 + 
+        4 + phases.iter().fold(0, |total, phase| {
+            total + phase.get_size()
+        });
     }
 }
 
@@ -25,6 +32,17 @@ pub struct Phase {
     pub end: Option<i64>,
     pub label: String,
     pub controls: Vec<ControlType>,
+}
+
+impl Phase {
+    fn get_size(&self) -> usize {
+        8 + 
+        9 + 
+        4 + self.label.len() + 
+        4 + self.controls.iter().fold(0, |current, control| {
+            current + control.get_size()
+        })
+    }
 }
 
 pub struct ArgCtx {
