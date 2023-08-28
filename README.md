@@ -1,4 +1,10 @@
-# metadata
+<div align="center">
+  <img src="https://avatars.githubusercontent.com/u/134429862?s=200&v=4" width="150" />
+
+  <h1>Libreplex</h1>
+</div>
+
+
 
 The mission of Libreplex is to provide a community-driven, open license protocol to the Solana SPL Token and NFT community.   The protocol must meet the following criteria:
 
