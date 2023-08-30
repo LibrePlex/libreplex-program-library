@@ -12,7 +12,9 @@ pub mod create_metadata_inscription;
 pub mod delete_metadata;
 pub mod delete_metadata_inscription;
 pub mod update_inscription_datatype;
+pub mod update_group_authority;
 
+pub use update_group_authority::*;
 pub use delete_metadata::*;
 pub use delete_metadata_inscription::*;
 pub use create_group::*;

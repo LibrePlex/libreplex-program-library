@@ -3,6 +3,8 @@ import { PublicKey, SystemProgram } from "@solana/web3.js"
 import {LibreplexMetadata} from "@libreplex/idls/lib/types/libreplex_metadata";
 
 import { LIBREPLEX_METADATA_PROGRAM_ID } from "./constants";
+import { Connector } from "./createGroup";
+import { loadMetadataProgram } from "./programs";
 
 export enum UserPermission {
     Update,
@@ -40,13 +42,13 @@ export enum UserPermission {
 
 export async function setUserPermissionsForGroup(
     {
-      metadataProgram,
+      connector,
       group,
       user,
       permissions,
       groupUpdateAuthority,
     }: {
-      metadataProgram: Program<LibreplexMetadata>,
+      connector: Connector,
       group: PublicKey,
       user: PublicKey,
       permissions: UserPermission[],
@@ -54,6 +56,9 @@ export async function setUserPermissionsForGroup(
     }
   ) {
     const permissionsAccountAddress = getGroupWiderUserPermissionsAddress(group, user)  
+
+    const metadataProgram = connector.type === "program" ? connector.metadataProgram : await loadMetadataProgram(connector.provider)
+
   
     const existingPermissionsInfo = await metadataProgram.provider.connection.getAccountInfo(permissionsAccountAddress)
   

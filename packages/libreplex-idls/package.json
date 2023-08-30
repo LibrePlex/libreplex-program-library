@@ -6,6 +6,7 @@
   "files": [
     "lib"
   ],
+  "types": "./lib/types/index.d.ts",
   "exports": {
     "./lib/esm/*": "./lib/esm/*",
     "./lib/cjs/*": "./lib/cjs/*.js",
@@ -13,6 +14,7 @@
   },
   "scripts": {
     "clean": "npx shx mkdir -p lib && npx shx rm -rf lib",
+    "package": "npx shx mkdir  -p lib/cjs lib/esm lib/types",
     "build": "tsc --build"
   },
   "keywords": [],

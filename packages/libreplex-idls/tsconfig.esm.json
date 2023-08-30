@@ -9,7 +9,6 @@
     "module": "ESNext",
     "sourceMap": false,
     "declaration": true,
-    "declarationMap": true,
     "composite": true
   }
 }
