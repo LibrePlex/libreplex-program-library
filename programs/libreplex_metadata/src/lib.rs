@@ -47,6 +47,13 @@ pub mod libreplex_metadata {
         )
     }
 
+    pub fn update_group_authority(ctx: Context<UpdateGroupAuthority>, new_update_authority: Pubkey) -> Result<()>  {
+        instructions::update_group_authority::handler(
+            ctx,
+            new_update_authority
+        )
+    }
+
     pub fn update_metadata(ctx: Context<UpdateMetadata>, input: UpdateMetadataInput) -> Result<()> {
         msg!("Update metadata");
 

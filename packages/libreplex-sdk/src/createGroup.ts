@@ -1,14 +1,15 @@
-import { Program, BN } from "@coral-xyz/anchor";
+import { Program, BN, Provider } from "@coral-xyz/anchor";
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import {LibreplexMetadata} from "@libreplex/idls/lib/types/libreplex_metadata"
 import { getGroupAddress } from "./pda";
+import { loadMetadataProgram } from "./programs";
 
 type AttributeType = {
   name: string,
   possibleValues: (string | BN | number)[]
 }
 
-type RoyaltyConfig = {
+export type RoyaltyConfig = {
   bps: number,
   shares: {
     recipient: PublicKey,
@@ -35,24 +36,35 @@ type SetupGroupInput = {
 }
 
 
+export type Connector = {
+  type: "provider",
+  provider: Provider,
+} | {
+  type: "program",
+  metadataProgram: Program<LibreplexMetadata>,
+}
+
 
 export async function setupGroup(
-    {
-      metadataProgram,
-      input,
-      groupAuthority,
-      groupSeedKp = Keypair.generate()
-    }: {
-      metadataProgram: Program<LibreplexMetadata>,
+    groupInfo: {
+      connector: Connector,
       input: SetupGroupInput,
       groupAuthority: PublicKey,
       groupSeedKp?: Keypair
     }
   ) {
+    const {
+      connector,
+      input,
+      groupAuthority,
+      groupSeedKp = Keypair.generate()
+    } = groupInfo
     const group = getGroupAddress(groupSeedKp.publicKey)
 
+    const metadataProgram = connector.type === "program" ? connector.metadataProgram : await loadMetadataProgram(connector.provider)
+
     return {
-      method: await metadataProgram.methods.createGroup({
+      method: metadataProgram.methods.createGroup({
         permittedSigners: input.permittedSigners || [],
         attributeTypes: input.onChainAttributes?.map(v => {
           return {

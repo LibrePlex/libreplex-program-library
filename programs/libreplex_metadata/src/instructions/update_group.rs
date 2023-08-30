@@ -1,9 +1,7 @@
-use crate::instructions::{update_collection_from_input};
+use crate::instructions::update_collection_from_input;
 use crate::state::{Group, GroupInput};
-use crate::{
-    GROUP, DelegatePermissions, PermissionType, GroupEvent, GroupEventType
-};
-use crate::{errors::ErrorCode};
+use crate::{DelegatePermissions, PermissionType, GroupEvent, GroupEventType};
+use crate::errors::ErrorCode;
 
 use anchor_lang::prelude::*;
 
@@ -26,20 +24,13 @@ pub struct UpdateGroup<'info> {
     #[account(mut, 
         realloc =  Group::BASE_SIZE + collection_input.get_size(),
         realloc::payer = authority,
-        realloc::zero = false,
-        seeds = [GROUP.as_ref(), seed.key().as_ref()],
-      bump)]
+        realloc::zero = false)]
     pub group: Box<Account<'info, Group>>,
-
-    /// CHECK: The seed address used for initialization of the collection PDA
-    pub seed: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
 }
 
 pub fn handler(ctx: Context<UpdateGroup>, collection_input: GroupInput) -> Result<()> {
-
-
     let group =&mut ctx.accounts.group;
     let authority = &mut ctx.accounts.authority;
 

@@ -166,7 +166,10 @@ export async function setupCreator(input: SetupCreatorInput, checkGroupIsValid =
         group,
         groupUpdateAuthority: me as PublicKey,
         user: creator,
-        metadataProgram,
+        connector: {
+            type: "program",
+            metadataProgram,
+        },
         permissions: [UserPermission.AddToGroup]
       })).prepare()
       

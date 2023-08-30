@@ -14,7 +14,7 @@ declare_id!("rndbQFmFfiQ4tTG9QPhfJeq1J9fLCSBMAPj3EbLQ7Co");
 
 
 #[program]
-pub mod libreplex_defaultrenderer {
+pub mod libreplex_default_renderer {
 
 
 

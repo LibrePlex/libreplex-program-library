@@ -1,9 +1,9 @@
 import * as anchor from "@coral-xyz/anchor";
 import { BN, Program } from "@coral-xyz/anchor";
-import { LibreplexCreator } from "../../../../target/types/libreplex_creator";
-import { LibreplexMetadata } from "../../../../target/types/libreplex_metadata";
-import { LibreplexNft } from "../../../../target/types/libreplex_nft";
-import { LibreplexCreatorControls } from "../../../../target/types/libreplex_creator_controls";
+import { LibreplexCreator } from "../target/types/libreplex_creator";
+import { LibreplexMetadata } from "../target/types/libreplex_metadata";
+import { LibreplexNft } from "../target/types/libreplex_nft";
+import { LibreplexCreatorControls } from "../target/types/libreplex_creator_controls";
 import { ConfirmOptions, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_EPOCH_SCHEDULE_PUBKEY, SYSVAR_SLOT_HASHES_PUBKEY, Signer, SystemProgram, TransactionInstruction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { expect } from 'chai';
 import exp from "constants";
@@ -23,7 +23,8 @@ import {sha256} from "js-sha256"
 
 
 describe("libreplex creator", () => {
-  anchor.setProvider(anchor.AnchorProvider.env());
+  const provider = anchor.AnchorProvider.env()
+  anchor.setProvider(provider);
 
   const program = anchor.workspace.LibreplexCreator as Program<LibreplexCreator>;
   const metadataProgram = anchor.workspace.LibreplexMetadata as Program<LibreplexMetadata>;
@@ -39,7 +40,10 @@ describe("libreplex creator", () => {
 
     console.log("Setting up group")
     const grpSetupCtx = await setupGroup({
-      metadataProgram,
+      connector: {
+        type: "provider",
+        provider,
+      },
       groupSeedKp: groupSeed,
       groupAuthority: program.provider.publicKey as PublicKey,
       input: {

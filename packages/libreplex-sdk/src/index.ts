@@ -14,4 +14,10 @@ export type {CreatorControl, AllowListControl, CustomProgramControl,
 export {anchorToControl, controlToAnchor} from "./creatorControls"
 
 export {updateCreator} from "./updateCreator"
+
+
 export type {UpdateCreatorInput} from "./updateCreator"
+
+export {mintSingle} from "./mint"
+
+export {updateGroupAuthority} from "./updateGroup"
