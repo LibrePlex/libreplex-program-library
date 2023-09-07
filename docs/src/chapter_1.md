@@ -1,5 +1,9 @@
 # Quickstart
 
+
+Install the [SDK](https://www.npmjs.com/package/@libreplex/sdk)
+
+
 ```
 import {mintSingle} from "@libreplex/sdk"
 import * as anchor from "@coral-xyz/anchor";
