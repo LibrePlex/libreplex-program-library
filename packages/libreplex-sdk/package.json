@@ -22,7 +22,7 @@
     "types": "./lib/types/src/index.d.ts"
   },
   "scripts": {
-    "clean": "npx shx mkdir -p lib && npx shx rm -rf lib",
+    "clean": "npx shx mkdir -p lib",
     "build": "tsc --build"
   },
   "keywords": [],

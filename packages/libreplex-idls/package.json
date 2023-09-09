@@ -13,9 +13,9 @@
     "./lib/types/*": "./lib/types/*"
   },
   "scripts": {
-    "clean": "npx shx mkdir -p lib && npx shx rm -rf lib",
+    "clean": "npx shx mkdir -p lib",
     "package": "npx shx mkdir  -p lib/cjs lib/esm lib/types",
-    "build": "tsc --build"
+    "build": "cp -r ../../target/types lib/ && tsc --build"
   },
   "keywords": [],
   "author": "",
