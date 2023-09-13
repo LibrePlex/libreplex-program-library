@@ -3,28 +3,7 @@ use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
 use crate::Royalties;
 
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum TemplateConfiguration {
-    None,
-    Template {
-        name: String,
-        image_url: String,
-        description: String
-    },
-}
 
-impl TemplateConfiguration {
-    pub fn get_size(&self) -> usize {
-        2 + match self {
-            TemplateConfiguration::None => 1,
-            TemplateConfiguration::Template {
-                name,
-                image_url,
-                description
-            } => name.len() + image_url.len() + description.len(),
-        }
-    }
-}
 
 #[account]
 pub struct Group {
@@ -50,8 +29,6 @@ pub struct Group {
 
     pub description: String,
 
-    pub template_configuration: TemplateConfiguration,
-
     pub royalties: Option<Royalties>,
     
     pub permitted_signers: Vec<Pubkey>,
@@ -73,7 +50,6 @@ impl Group {
         + 4 + self.url.len() // symbol
         + 4 + self.description.len() // symbol
         // + self.collection_render_mode.get_size()
-        + self.template_configuration.get_size()
         + 1 + match &self.royalties {
             Some(x)=>x.get_size(),
             None=>0
@@ -216,7 +192,6 @@ pub struct GroupInput {
     pub symbol: String,
     pub url: String,
     pub description: String,
-    pub template_configuration: TemplateConfiguration,
     pub royalties: Option<Royalties>,
     pub attribute_types: Vec<AttributeType>,
     pub permitted_signers: Vec<Pubkey>
@@ -233,7 +208,6 @@ impl GroupInput {
             + 4 + self.url.len()
             + 4 + self.description.len()
             // + self.collection_render_mode.get_size()
-            + self.template_configuration.get_size()
             + 1 + match self.royalties.as_ref() {
                 Some(data) => data.get_size(),
                 None => 0,

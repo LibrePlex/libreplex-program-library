@@ -62,7 +62,6 @@ mod permissions {
                 name: GROUP_NAME.to_string(),
                 url: GROUP_URL.to_owned(),
                 symbol: GROUP_SYMBOL.to_string(),
-                template_configuration: libreplex_metadata::TemplateConfiguration::None,
                 attribute_types,
                 royalties: None,
                 permitted_signers: vec![],

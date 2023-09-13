@@ -66,7 +66,6 @@ pub fn update_collection_from_input(group_input: GroupInput,
     group: &mut Box<Account<Group>>) 
     -> Result<(), AnchorError> {
     let GroupInput {name, symbol, 
-        template_configuration, 
         // collection_render_mode, 
         royalties,
         permitted_signers,
@@ -96,7 +95,6 @@ pub fn update_collection_from_input(group_input: GroupInput,
     // instruction input size limit
     group.description = description;
     // collection.collection_render_mode = collection_render_mode;
-    group.template_configuration = template_configuration;
     group.royalties = royalties;
     group.attribute_types = attribute_types;
     group.permitted_signers = permitted_signers;
