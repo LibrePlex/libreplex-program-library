@@ -10,7 +10,6 @@ pub enum AssetUrl {
     },
     ChainRenderer {
         program_id: Pubkey,
-        description: Option<String>,
     },
 }
 
