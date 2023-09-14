@@ -30,24 +30,19 @@ use crate::{MetadataExtension, Royalties};
     3) Dynamic applications (gaming etc) could be configured in many different ways such
         1) Asset::Json{ url: String} with
                 url = https://metadata.libreplex.io/api/offchaindata/<mintId> (or any similar API)
-        2) Asset::JsonTemplate{ url_parameter: String} with
-                url_parameter = <mintId>
-                (on group) url_template = https://metadata.libreplex.io/api/offchaindata/{{mintId}}
-        3) Asset::Image{ url: String} with
+        2) Asset::Image{ url: String} with
                 url = <custom renderer image API>
-        4) Asset::ChainRenderer {program_id: Pubkey} with
+        3) Asset::ChainRenderer {program_id: Pubkey} with
                 program_id = <address of on-chain rendering program that generates image content>
-
+        4) Asset::Inscriptions - fully on-chain image
 */
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum Asset {
     None,
     Json { url: String },
-    JsonTemplate { url_parameter: String },
     Image { url: String, description: Option<String> },
     ChainRenderer { 
-        program_id: Pubkey, 
-        description: Option<String> },
+        program_id: Pubkey },
     Inscription { account_id: Pubkey, data_type: String, description: Option<String> },
 }
 
@@ -58,9 +53,8 @@ impl Asset {
             + match self {
                 Asset::None => 0,
                 Asset::Json { url } => 4 + url.len(),
-                Asset::JsonTemplate { url_parameter } => 4 + url_parameter.len(),
                 Asset::Image { url , description} => 4 + url.len() + 1 + match &description {Some(x) => 4 + x.len(), None => 0},
-                Asset::ChainRenderer { program_id: _, description } => 32 + 32 + 1  + match &description {Some(x) => 4 + x.len(), None => 0},
+                Asset::ChainRenderer { program_id: _} => 32 + 32,
                 // Asset::Inscription { account_id: _, description } => 32 + 1  + match &description {Some(x) => 4 + x.len(), None => 0},
                 Asset::Inscription { account_id: _, data_type, description } => 32 
                 + 4 + data_type.len()
@@ -169,23 +163,10 @@ pub fn validate_extend_metadata_input(metadata_input: &MetadataExtensionInput) -
         }
         None => {}
     }
-
-    /*
-        ensure that the initial render mode of the metadata matches the
-        currently active render mode of the collection.
-
-        NB: It is possible to change the active render mode of the collection.
-        If that happens, it is the responsibility of the update auth holder
-        to add the appropriate render mode data to each metadata.
-
-    */
-
-    // render_mode_data.is_compatible_with(&collection.collection_render_mode);
-
-    // Ensure that the lengths of strings do not exceed the maximum allowed length
-
     Ok(())
 }
+
+
 
 #[repr(C)]
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -197,11 +178,11 @@ pub struct CreateMetadataInput {
     pub extension: MetadataExtension,
 }
 
+
+
 impl CreateMetadataInput {
     pub fn get_size(&self) -> usize {
-        
-
-        4
+       4
             + self.name.len()
             + 4
             + self.symbol.len()

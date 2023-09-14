@@ -137,7 +137,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         AssetUrl::JsonPrefix { url } => {
             libreplex_metadata::Asset::Json { url: format!("{}{}.json", url, mint_number) }
         },
-        AssetUrl::ChainRenderer { program_id, description } => libreplex_metadata::Asset::ChainRenderer { description: description.clone(), program_id: *program_id },
+        AssetUrl::ChainRenderer { program_id} => libreplex_metadata::Asset::ChainRenderer { program_id: *program_id },
     };
 
     let name = format!("{}{}", creator.name, mint_number);   
