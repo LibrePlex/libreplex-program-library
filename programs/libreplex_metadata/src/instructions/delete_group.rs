@@ -1,6 +1,8 @@
 use anchor_lang::prelude::*;
 use crate::state::Group;
 
+use crate::{errors::ErrorCode};
+
 
 #[event]
 pub struct GroupEventDelete {
@@ -27,6 +29,10 @@ pub fn handler(ctx: Context<DeleteGroup>
 ) -> anchor_lang::Result<()> {
 
     let group = &ctx.accounts.group;
+
+    if group.item_count > 0 {
+        return Err(ErrorCode::GroupHasItems.into());
+    }
     emit!(GroupEventDelete{
         authority: ctx.accounts.authority.key(),
         name: group.name.clone(),
