@@ -117,7 +117,9 @@ pub enum ErrorCode {
 
     #[msg("Invalid metadata pointer")]
     InvalidMetadataPointer, //0x1794
-    Reserved37, //0x1795
+
+    #[msg("Group has items")]
+    GroupHasItems, //0x1794
     Reserved38, //0x1796
     Reserved39, //0x1797
 
