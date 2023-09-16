@@ -1,6 +1,6 @@
 [package]
 name = "libreplex_metadata"
-version = "0.11.0"
+version = "0.12.0"
 description = "Created with Anchor"
 edition = "2021"
 license = "MIT"
@@ -29,4 +29,3 @@ mocha = "0.1.1"
 assert_matches = "1.5.0"
 solana-program-test = "~1.16"
 solana-sdk = "~1.16"
-

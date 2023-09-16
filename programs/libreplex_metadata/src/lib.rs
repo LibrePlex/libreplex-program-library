@@ -103,6 +103,15 @@ pub mod libreplex_metadata {
         )
     }
 
+    pub fn delete_group(
+        ctx: Context<DeleteGroup>
+    ) -> Result<()> {
+        msg!("delete group");
+        instructions::delete_group::handler(
+            ctx
+        )
+    }
+
  
     pub fn create_inscription_metadata(
         ctx: Context<CreateInscriptionMetadata>,
