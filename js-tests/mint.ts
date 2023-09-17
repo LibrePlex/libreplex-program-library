@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { BN, Program } from "@coral-xyz/anchor";
 import { AnchorProvider, getProvider } from "@coral-xyz/anchor";
-import {mintSingle, setupCollection, setUserPermissionsForGroup, UserPermission, updateGroupAuthority} from "@libreplex/sdk"
+import {mintSingle, setupCollection, setUserPermissionsForGroup, UserPermission, updateCollectionAuthority} from "@libreplex/sdk"
 import { Keypair } from "@solana/web3.js";
 
 
@@ -112,7 +112,7 @@ describe("mint", () => {
             permissions: [UserPermission.AddToGroup]
         })).rpc()
 
-        await (await updateGroupAuthority({
+        await (await updateCollectionAuthority({
             collection,
             new_authority: Keypair.generate().publicKey,
             connector: {

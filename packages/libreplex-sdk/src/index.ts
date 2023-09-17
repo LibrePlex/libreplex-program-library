@@ -20,4 +20,4 @@ export type {UpdateCreatorInput} from "./updateCreator"
 
 export {mintSingle} from "./mint"
 
-export {updateGroupAuthority} from "./updateCollection"
+export {updateCollectionAuthority} from "./updateCollection"

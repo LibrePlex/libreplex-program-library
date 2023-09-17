@@ -4,7 +4,7 @@ import { loadMetadataProgram } from "./programs";
 
 
 
-export async function updateGroupAuthority(
+export async function updateCollectionAuthority(
     {
       connector,
       collection,
