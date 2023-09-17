@@ -5,6 +5,7 @@
     "packages/*"
   ],
   "scripts": {
+    "build-interfaces": "cd packages/libreplex-idls && yarn package && yarn build && cd .. && cd libreplex-sdk && yarn build && cd ../..",
     "build": "lerna run clean && lerna run build",
 
     "libre-cli": "ts-node src/cli/index.ts",

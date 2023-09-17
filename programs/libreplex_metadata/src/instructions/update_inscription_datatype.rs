@@ -1,10 +1,10 @@
 use anchor_lang::prelude::*;
 
 use crate::instructions::EditMetadataEvent;
-use crate::{Metadata, DelegatePermissions, PermissionType, Group, Asset};
+use crate::{Metadata, DelegatePermissions, PermissionType, Collection, Asset};
 
 
-use crate::{errors::ErrorCode};
+use crate::errors::ErrorCode;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct UpdateInscriptionDataTypeInput {
@@ -55,7 +55,7 @@ pub struct UpdateInscriptionDataType<'info> {
     pub delegated_group_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(constraint = metadata.group.expect("Metadata must have a group if you provided a group.") == group.key())]
-    pub group: Option<Box<Account<'info, Group>>>,
+    pub group: Option<Box<Account<'info, Collection>>>,
 
     pub system_program: Program<'info, System>,
 }

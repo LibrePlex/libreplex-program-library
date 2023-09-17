@@ -3,23 +3,8 @@ use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
 use crate::Royalties;
 
-
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum TemplateConfiguration {
-    None,
-    
-}
-
-impl TemplateConfiguration {
-        pub fn get_size(&self) -> usize {
-            2 + match self {
-                TemplateConfiguration::None => 1,
-            }
-        }
-    }
-
 #[account]
-pub struct Group {
+pub struct Collection {
     // Seed address used to generate unique account PDA address
     pub seed: Pubkey,
 
@@ -42,24 +27,22 @@ pub struct Group {
 
     pub description: String,
 
-    pub template_configuration: TemplateConfiguration,
-
     pub royalties: Option<Royalties>,
     
     pub permitted_signers: Vec<Pubkey>,
 
-    attribute_types: Vec<AttributeType>,
+    pub attribute_types: Vec<AttributeType>,
     
 }
 
 
 
-impl Group {
+impl Collection {
 
     pub const BASE_SIZE: usize  = 8 + 32 + 32 + 32 + 4; // anchor + seed + creator + item count
 
     pub fn get_size(&self) -> usize {
-        Group::BASE_SIZE
+        Collection::BASE_SIZE
         + 4 + self.name.len() // name
         + 4 + self.symbol.len() // symbol
         + 4 + self.url.len() // symbol
@@ -101,7 +84,7 @@ impl Group {
 */
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-enum AttributeValue {
+pub enum AttributeValue {
     None,
     Word {value: String},
     U8 {value: u8},
@@ -152,7 +135,7 @@ impl Hoo {
 */
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-struct AttributeType {
+pub struct AttributeType {
     // royalty address and their share in basis points (0-10,000)
     pub name: String,
 
@@ -201,18 +184,36 @@ impl BaseUrlConfiguration {
     }
 }
 
-
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum GroupEventType {
-    Create,
-    Update,
-    Delete
+pub struct CollectionInput {
+    pub name: String,
+    pub symbol: String,
+    pub url: String,
+    pub description: String,
+    pub royalties: Option<Royalties>,
+    pub attribute_types: Vec<AttributeType>,
+    pub permitted_signers: Vec<Pubkey>
+
 }
 
-#[event]
-pub struct GroupEvent {
-    pub event_type: GroupEventType,
-    pub authority: Pubkey,
-    pub name: String,
-    pub id: Pubkey,    
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+impl CollectionInput {
+    pub fn get_size(&self) -> usize {
+        let size 
+            = 4 + self.name.len()
+            + 4 + self.symbol.len()
+            + 4 + self.url.len()
+            + 4 + self.description.len()
+            // + self.collection_render_mode.get_size()
+            + 1 + match self.royalties.as_ref() {
+                Some(data) => data.get_size(),
+                None => 0,
+            }
+            + 4 + self.attribute_types.iter().map(|x|x.get_size()).sum::<usize>()
+            + 4 + self.permitted_signers.len() * 32;
+
+        size
+    }
 }
+

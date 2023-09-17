@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
 
-use crate::{Metadata, DelegatePermissions, PermissionType, Group};
+use crate::{Metadata, DelegatePermissions, PermissionType, Collection};
 
-use crate::{errors::ErrorCode};
+use crate::errors::ErrorCode;
 
 
 // Adds a metadata to a group
@@ -27,7 +27,7 @@ pub struct GroupRemove<'info> {
     pub delegated_group_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(mut)]
-    pub group: Box<Account<'info, Group>>,
+    pub group: Box<Account<'info, Collection>>,
 
     pub system_program: Program<'info, System>,
 }

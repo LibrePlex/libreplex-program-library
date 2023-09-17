@@ -3,8 +3,8 @@ import { LIBREPLEX_METADATA_PROGRAM_ID, LIBREPLEX_CREATOR_PROGRAM_ID, LIBREPLEX_
 
 
 
-export function getGroupAddress(groupSeed: PublicKey, program = LIBREPLEX_METADATA_PROGRAM_ID) {
-    return PublicKey.findProgramAddressSync([Buffer.from("group"), groupSeed.toBuffer()], LIBREPLEX_METADATA_PROGRAM_ID)[0]
+export function getCollectionAddress(collectionSeed: PublicKey, program = LIBREPLEX_METADATA_PROGRAM_ID) {
+    return PublicKey.findProgramAddressSync([Buffer.from("collection"), collectionSeed.toBuffer()], LIBREPLEX_METADATA_PROGRAM_ID)[0]
   
   }
   

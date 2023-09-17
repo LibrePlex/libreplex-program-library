@@ -1,7 +1,7 @@
 import { Program, BN, Provider } from "@coral-xyz/anchor";
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import {LibreplexMetadata} from "@libreplex/idls/lib/types/libreplex_metadata"
-import { getGroupAddress } from "./pda";
+import { getCollectionAddress } from "./pda";
 import { loadMetadataProgram } from "./programs";
 
 type AttributeType = {
@@ -17,7 +17,7 @@ export type RoyaltyConfig = {
   }[]
 }
 
-type SetupGroupInput = {
+type SetupCollectionInput = {
   name: string,
   symbol: string,
   url: string,
@@ -45,10 +45,10 @@ export type Connector = {
 }
 
 
-export async function setupGroup(
+export async function setupCollection(
     groupInfo: {
       connector: Connector,
-      input: SetupGroupInput,
+      input: SetupCollectionInput,
       groupAuthority: PublicKey,
       groupSeedKp?: Keypair
     }
@@ -59,12 +59,12 @@ export async function setupGroup(
       groupAuthority,
       groupSeedKp = Keypair.generate()
     } = groupInfo
-    const group = getGroupAddress(groupSeedKp.publicKey)
+    const collection = getCollectionAddress(groupSeedKp.publicKey)
 
     const metadataProgram = connector.type === "program" ? connector.metadataProgram : await loadMetadataProgram(connector.provider)
 
     return {
-      method: metadataProgram.methods.createGroup({
+      method: metadataProgram.methods.createCollection({
         permittedSigners: input.permittedSigners || [],
         attributeTypes: input.onChainAttributes?.map(v => {
           return {
@@ -76,9 +76,6 @@ export async function setupGroup(
           }
         }) || [],
         description: input.description,
-        templateConfiguration: {
-          none: {},
-        },
         name: input.name,
         symbol: input.symbol,
         url: input.url,
@@ -87,10 +84,10 @@ export async function setupGroup(
         authority: groupAuthority,
         seed: groupSeedKp.publicKey,
         systemProgram: SystemProgram.programId,
-        group,
+        collection,
       }),
 
-      group,
+      collection,
     }
   }
   

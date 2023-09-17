@@ -53,7 +53,7 @@ describe("mint", () => {
         
         await grpCtx.method.rpc()
 
-        const group = grpCtx.group
+        const collection = grpCtx.collection
 
         const mintCtx =  (await mintSingle({
             provider,
@@ -66,7 +66,7 @@ describe("mint", () => {
                 symbol: "COOL",
             },
             mintToGroup: {
-                group,
+                collection,
                 checkValidGroup: true,
             }
         }))
@@ -99,21 +99,21 @@ describe("mint", () => {
 
         await grpCtx.method.rpc();
 
-        const group = grpCtx.group;
+        const collection = grpCtx.collection;
 
         await (await setUserPermissionsForGroup({
             connector: {
                 type: "provider",
                 provider,
             },
-            group,
+            collection,
             user: me,
             groupUpdateAuthority: me,
             permissions: [UserPermission.AddToGroup]
         })).rpc()
 
         await (await updateGroupAuthority({
-            group,
+            collection,
             new_authority: Keypair.generate().publicKey,
             connector: {
                 type: "provider",
@@ -132,7 +132,7 @@ describe("mint", () => {
                 symbol: "COOL",
             },
             mintToGroup: {
-                group,
+                collection,
                 checkValidGroup: true,
             }
         }))

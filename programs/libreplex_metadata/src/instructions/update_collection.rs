@@ -1,6 +1,6 @@
 use crate::instructions::update_collection_from_input;
-use crate::state::{Group, GroupInput};
-use crate::{DelegatePermissions, PermissionType, GroupEvent, GroupEventType};
+use crate::state::{Collection, CollectionInput};
+use crate::{DelegatePermissions, PermissionType};
 use crate::errors::ErrorCode;
 
 use anchor_lang::prelude::*;
@@ -12,8 +12,17 @@ struct EditCollectionEvent {
     name: String,
 }
 
+#[event]
+pub struct CollectionEventUpdate {
+    pub authority: Pubkey,
+    pub name: String,
+    pub id: Pubkey,    
+}
+
+
+
 #[derive(Accounts)]
-#[instruction(collection_input: GroupInput)]
+#[instruction(collection_input: CollectionInput)]
 pub struct UpdateGroup<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -22,15 +31,15 @@ pub struct UpdateGroup<'info> {
     pub delegated_group_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(mut, 
-        realloc =  Group::BASE_SIZE + collection_input.get_size(),
+        realloc =  Collection::BASE_SIZE + collection_input.get_size(),
         realloc::payer = authority,
         realloc::zero = false)]
-    pub group: Box<Account<'info, Group>>,
+    pub group: Box<Account<'info, Collection>>,
 
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<UpdateGroup>, collection_input: GroupInput) -> Result<()> {
+pub fn handler(ctx: Context<UpdateGroup>, collection_input: CollectionInput) -> Result<()> {
     let group =&mut ctx.accounts.group;
     let authority = &mut ctx.accounts.authority;
 
@@ -50,11 +59,10 @@ pub fn handler(ctx: Context<UpdateGroup>, collection_input: GroupInput) -> Resul
 
     update_collection_from_input(collection_input, group)?;
 
-    emit!(GroupEvent{
+    emit!(CollectionEventUpdate{
         authority: ctx.accounts.authority.key(),
         name: group.name.clone(),
-        id: group.key(),
-        event_type: GroupEventType::Update
+        id: group.key()
     });
 
 

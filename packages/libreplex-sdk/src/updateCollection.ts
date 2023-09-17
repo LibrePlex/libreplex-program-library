@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { Connector } from "./createGroup";
+import { Connector } from "./createCollection";
 import { loadMetadataProgram } from "./programs";
 
 
@@ -7,11 +7,11 @@ import { loadMetadataProgram } from "./programs";
 export async function updateGroupAuthority(
     {
       connector,
-      group,
+      collection,
       new_authority
     }: {
       connector: Connector,
-      group: PublicKey,
+      collection: PublicKey,
       new_authority: PublicKey,
     }
   ) {
@@ -23,8 +23,8 @@ export async function updateGroupAuthority(
         throw new Error("Provider not setup. Perhaps your wallet is not connected");
     }
 
-    return metadataProgram.methods.updateGroupAuthority(new_authority).accounts({
-        group,
+    return metadataProgram.methods.updateCollectionAuthority(new_authority).accounts({
+       collection,
         updateAuthority: me,
     })
   }

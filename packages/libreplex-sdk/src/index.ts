@@ -1,4 +1,4 @@
-export {setupGroup} from "./createGroup"
+export {setupCollection as setupGroup} from "./createCollection"
 export * from "./constants"
 export * from "./pda"
 export {setUserPermissionsForGroup, UserPermission} from "./groupPermissions"
@@ -20,4 +20,4 @@ export type {UpdateCreatorInput} from "./updateCreator"
 
 export {mintSingle} from "./mint"
 
-export {updateGroupAuthority} from "./updateGroup"
+export {updateGroupAuthority} from "./updateCollection"

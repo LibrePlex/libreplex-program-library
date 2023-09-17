@@ -1,17 +1,17 @@
 use anchor_lang::prelude::*;
 
-use crate::{Metadata, DelegatePermissions, PermissionType, Group};
+use crate::{Metadata, DelegatePermissions, PermissionType, Collection};
 
 use crate::{errors::ErrorCode};
 
 
 // Adds a metadata to a group
 #[derive(Accounts)]
-pub struct GroupAdd<'info> {
+pub struct AddMetadataToCollection<'info> {
     pub metadata_authority: Signer<'info>,
 
     #[account(mut)]
-    pub group_authority: Signer<'info>,
+    pub collection_authority: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -31,17 +31,17 @@ pub struct GroupAdd<'info> {
     pub delegated_metadata_specific_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(seeds = ["permissions".as_ref(),
-                        group_authority.key().as_ref(), 
+                        collection_authority.key().as_ref(), 
                         group.key().as_ref()], bump)]
     pub delegated_group_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(mut)]
-    pub group: Box<Account<'info, Group>>,
+    pub group: Box<Account<'info, Collection>>,
 
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<GroupAdd>
+pub fn handler(ctx: Context<AddMetadataToCollection>
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
 
@@ -52,7 +52,7 @@ pub fn handler(ctx: Context<GroupAdd>
     let group = &ctx.accounts.group;
 
     let metadata_authority = &ctx.accounts.metadata_authority;
-    let group_authority = &ctx.accounts.group_authority;
+    let collection_authority = &ctx.accounts.collection_authority;
 
     let mut can_edit_metadata = &metadata.update_authority == metadata_authority.key;
     
@@ -61,7 +61,7 @@ pub fn handler(ctx: Context<GroupAdd>
             can_edit_metadata = can_edit_metadata || delegated_metadata_specific_permissions_account.permissions.contains(&PermissionType::AddToGroup)
     }
 
-    let mut can_edit_group = &group.update_authority == group_authority.key;
+    let mut can_edit_group = &group.update_authority == collection_authority.key;
 
     if let Some(delegated_group_wide_permissions) = &ctx.accounts.delegated_group_wide_permissions {
         can_edit_group = can_edit_group || delegated_group_wide_permissions.permissions.contains(&PermissionType::AddToGroup)
