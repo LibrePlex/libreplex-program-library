@@ -41,7 +41,7 @@ pub struct Execute<'info> {
     pub metadata: Box<Account<'info, Metadata>>,
 
     #[account()]
-    pub group: Option<Box<Account<'info, Collection>>>,
+    pub collection: Option<Box<Account<'info, Collection>>>,
 
     #[account(mut,
         close=seller,
@@ -93,7 +93,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
     let token_program_2022 = &ctx.accounts.token_program_2022;
-    let group = &ctx.accounts.group;
+    let collection = &ctx.accounts.collection;
     let payment_mint = &ctx.accounts.payment_mint;
     let metadata = &ctx.accounts.metadata;
     let buyer_account_info = &ctx.accounts.buyer.to_account_info().clone();
@@ -110,15 +110,15 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
 
 
 
-    match &metadata.group {
-        Some(g) => match group {
+    match &metadata.collection {
+        Some(g) => match collection {
             Some(g2) => {
                 if !g.eq(&g2.key()) {
-                    return Err(SharedError::GroupMismatch.into());
+                    return Err(SharedError::CollectionMismatch.into());
                 }
             }
             None => {
-                return Err(SharedError::GroupAccountMissing.into());
+                return Err(SharedError::CollectionAccountMissing.into());
             }
         },
         None => {
@@ -149,7 +149,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, Execute<'info>>) -> Result
 
     let mut shares: Vec<RoyaltyShare> = vec![];
 
-    let royalty_bps = match group {
+    let royalty_bps = match collection {
         Some(x) => match &x.royalties {
             Some(royalties) => {
                 for share in &royalties.shares {

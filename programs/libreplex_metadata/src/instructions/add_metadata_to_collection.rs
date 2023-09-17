@@ -32,11 +32,11 @@ pub struct AddMetadataToCollection<'info> {
 
     #[account(seeds = ["permissions".as_ref(),
                         collection_authority.key().as_ref(), 
-                        group.key().as_ref()], bump)]
-    pub delegated_group_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
+                        collection.key().as_ref()], bump)]
+    pub delegated_collection_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(mut)]
-    pub group: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, Collection>>,
 
     pub system_program: Program<'info, System>,
 }
@@ -45,11 +45,11 @@ pub fn handler(ctx: Context<AddMetadataToCollection>
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
 
-    if metadata.group.is_some() {
-        return Err(ErrorCode::MetadataBelongsToGroup.into())
+    if metadata.collection.is_some() {
+        return Err(ErrorCode::MetadataBelongsToCollection.into())
     }
 
-    let group = &ctx.accounts.group;
+    let collection = &ctx.accounts.collection;
 
     let metadata_authority = &ctx.accounts.metadata_authority;
     let collection_authority = &ctx.accounts.collection_authority;
@@ -61,9 +61,9 @@ pub fn handler(ctx: Context<AddMetadataToCollection>
             can_edit_metadata = can_edit_metadata || delegated_metadata_specific_permissions_account.permissions.contains(&PermissionType::AddToGroup)
     }
 
-    let mut can_edit_group = &group.update_authority == collection_authority.key;
+    let mut can_edit_group = &collection.update_authority == collection_authority.key;
 
-    if let Some(delegated_group_wide_permissions) = &ctx.accounts.delegated_group_wide_permissions {
+    if let Some(delegated_group_wide_permissions) = &ctx.accounts.delegated_collection_wide_permissions {
         can_edit_group = can_edit_group || delegated_group_wide_permissions.permissions.contains(&PermissionType::AddToGroup)
     }
 
@@ -71,11 +71,11 @@ pub fn handler(ctx: Context<AddMetadataToCollection>
         return Err(ErrorCode::InvalidPermissions.into());
     }
 
-    msg!("Setting group to {}", group.key());
+    msg!("Setting group to {}", collection.key());
     
 
-    metadata.group = Some(group.key());
-    metadata.update_authority = group.key();
+    metadata.collection = Some(collection.key());
+    metadata.update_authority = collection.key();
     
     Ok(())
 }

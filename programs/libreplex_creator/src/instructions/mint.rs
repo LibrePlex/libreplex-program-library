@@ -16,7 +16,7 @@ use libreplex_nft::ID as LIBREPLEX_NFT_PROGRAM_ID;
 
 #[event]
 pub struct MintEvent {
-    pub group: Pubkey,
+    pub collection: Pubkey,
     pub number: u32,
     pub authority: Pubkey,
     pub holder: Pubkey,
@@ -54,11 +54,11 @@ pub struct Mint<'info> {
     pub metadata: AccountInfo<'info>,
 
     #[account(mut)]
-    pub group: Box<Account<'info, Collection>>,
+    pub collection: Box<Account<'info, Collection>>,
 
     /// CHECK: checked in cpi
     #[account(mut)]
-    pub group_permissions: AccountInfo<'info>,
+    pub collection_permissions: AccountInfo<'info>,
 
     #[account(mut)]
     pub minter_numbers: Option<Account<'info, MintNumbers>>,
@@ -182,8 +182,8 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         collection_authority: creator.to_account_info(),
         metadata: ctx.accounts.metadata.to_account_info(),
         delegated_metadata_specific_permissions: None,
-        delegated_group_wide_permissions: Some(ctx.accounts.group_permissions.to_account_info()),
-        group: ctx.accounts.group.to_account_info(),
+        delegated_collection_wide_permissions: Some(ctx.accounts.collection_permissions.to_account_info()),
+        collection: ctx.accounts.collection.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
     };
 
@@ -196,7 +196,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
     creator.minted += 1;
 
     emit!(MintEvent {
-        group: creator.collection,
+        collection: creator.collection,
         authority: creator.update_authority,
         holder: receiver.key(), 
         number: mint_number,

@@ -24,7 +24,7 @@ pub fn handler(ctx: Context<DeleteGroup>
     let group = &ctx.accounts.group;
 
     if group.item_count > 0 {
-        return Err(ErrorCode::GroupHasItems.into());
+        return Err(ErrorCode::CollectionHasItems.into());
     }
 
     Ok(())

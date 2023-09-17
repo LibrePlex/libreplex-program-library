@@ -19,8 +19,8 @@ pub struct Listing {
     pub lister: Pubkey,
     pub amount: u64,
     pub listing_bump: u8,
-    pub group: Option<Pubkey>,// set to the group of the mint for indexing
     pub price: Price,
+    pub collection: Option<Pubkey>,// set to the group of the mint for indexing
 }
 
 impl Listing{
@@ -55,14 +55,14 @@ pub enum ListingFilterType {
         pubkey: Pubkey
     },
     // to allow listings of items belonging to a group
-    Group {
+    Collection {
         pubkey: Pubkey
     }
 }
 
 #[account]
 pub struct ListingFilter {
-    pub listing_group: Pubkey,
+    pub listing_collection: Pubkey,
     pub seed: Pubkey,
     pub filter_type: ListingFilterType,
     pub listings_active: u32,

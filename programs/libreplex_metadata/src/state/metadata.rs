@@ -76,7 +76,7 @@ pub struct Metadata {
 
     pub is_mutable: bool,
 
-    pub group: Option<Pubkey>,
+    pub collection: Option<Pubkey>,
 
     pub name: String,
 

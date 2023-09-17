@@ -45,11 +45,11 @@ pub struct MintCtx<'info> {
 
     /// CHECK: checked in cpi
     #[account(mut)]
-    pub group: AccountInfo<'info>,
+    pub collection: AccountInfo<'info>,
 
     /// CHECK: checked in cpi
     #[account(mut)]
-    pub group_permissions: AccountInfo<'info>,
+    pub collection_permissions: AccountInfo<'info>,
 
     /// CHECK: checked in cpi
     #[account(mut)]
@@ -96,8 +96,8 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>, input: Mi
         receiver: ctx.accounts.receiver.to_account_info(),
         mint: ctx.accounts.mint.to_account_info(),
         metadata: ctx.accounts.metadata.to_account_info(),
-        group: ctx.accounts.group.to_account_info(),
-        group_permissions: ctx.accounts.group_permissions.to_account_info(),
+        collection: ctx.accounts.collection.to_account_info(),
+        collection_permissions: ctx.accounts.collection_permissions.to_account_info(),
         minter_numbers: ctx.accounts.minter_numbers.as_ref().map(|c| c.to_account_info()),
         system_program: ctx.accounts.system_program.to_account_info(),
         libreplex_metadata_program: ctx.accounts.libreplex_metadata_program.to_account_info(),
@@ -163,8 +163,8 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>, input: Mi
         mint: accounts.mint.to_account_info(),
         creator: accounts.creator.to_account_info(),
         metadata: accounts.metadata.to_account_info(),
-        group: accounts.group.to_account_info(),
-        group_permissions: accounts.group_permissions.to_account_info(),
+        collection: accounts.collection.to_account_info(),
+        collection_permissions: accounts.collection_permissions.to_account_info(),
         minter_numbers: accounts.minter_numbers.as_ref().map(|a| {a.to_account_info()}),
         system_program: accounts.system_program.to_account_info(),
         libreplex_metadata_program: accounts.libreplex_metadata_program.to_account_info(),

@@ -12,7 +12,7 @@ export enum UserPermission {
     AddToGroup,
   }
   
-  export function getGroupWideUserPermissionsAddress(collection: PublicKey, user: PublicKey, program = LIBREPLEX_METADATA_PROGRAM_ID) {
+  export function getCollectionWideUserPermissionsAddress(collection: PublicKey, user: PublicKey, program = LIBREPLEX_METADATA_PROGRAM_ID) {
     return  PublicKey.findProgramAddressSync([Buffer.from("permissions"), user.toBuffer(), collection.toBuffer()], program)[0]
 
   }
@@ -55,7 +55,7 @@ export async function setUserPermissionsForGroup(
       groupUpdateAuthority: PublicKey,
     }
   ) {
-    const permissionsAccountAddress = getGroupWideUserPermissionsAddress(collection, user)  
+    const permissionsAccountAddress = getCollectionWideUserPermissionsAddress(collection, user)  
 
     const metadataProgram = connector.type === "program" ? connector.metadataProgram : await loadMetadataProgram(connector.provider)
 

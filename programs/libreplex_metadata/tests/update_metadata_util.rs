@@ -21,7 +21,7 @@ pub async fn update_metadata_util(
         system_program: system_program::ID,
         delegated_metadata_specific_permissions: None,
         delegated_group_wide_permissions: None,
-        group: None
+        collection: None
     }
     .to_account_metas(None);
 

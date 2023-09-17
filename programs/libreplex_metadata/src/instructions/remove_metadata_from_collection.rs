@@ -12,7 +12,7 @@ pub struct GroupRemove<'info> {
     pub group_authority: Signer<'info>,
 
     #[account(mut,
-        realloc = metadata.get_size() - match &metadata.group {
+        realloc = metadata.get_size() - match &metadata.collection {
             Some(_) => 32, // reduce the size as we no longer need the group
             None => 0
         },
@@ -36,8 +36,8 @@ pub fn handler(ctx: Context<GroupRemove>
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
 
-    if metadata.group.is_none() {
-        return Err(ErrorCode::MetadataDoesNotHaveAGroup.into())
+    if metadata.collection.is_none() {
+        return Err(ErrorCode::MetadataDoesNotBelongToACollection.into())
     }
 
     let group = &ctx.accounts.group;
@@ -55,7 +55,7 @@ pub fn handler(ctx: Context<GroupRemove>
         return Err(ErrorCode::InvalidPermissions.into());
     }
 
-    metadata.group = None;
+    metadata.collection = None;
     // reassign authority to the authority instead of the group itself
     metadata.update_authority = group_authority.key();
     

@@ -31,7 +31,7 @@ pub fn handler(ctx: Context<DeleteCollection>
     let group = &ctx.accounts.group;
 
     if group.item_count > 0 {
-        return Err(ErrorCode::GroupHasItems.into());
+        return Err(ErrorCode::CollectionHasItems.into());
     }
     emit!(CollectionEventDelete{
         authority: ctx.accounts.authority.key(),

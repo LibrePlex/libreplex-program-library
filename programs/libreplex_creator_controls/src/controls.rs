@@ -383,7 +383,7 @@ impl Control for CustomProgram {
             accounts.receiver.to_account_metas(None).pop().unwrap(), 
             accounts.mint.to_account_metas(None).pop().unwrap(), 
             accounts.metadata.to_account_metas(None).pop().unwrap(), 
-            accounts.group.to_account_metas(None).pop().unwrap(), 
+            accounts.collection.to_account_metas(None).pop().unwrap(), 
             accounts.system_program.to_account_metas(None).pop().unwrap()];
 
 
@@ -404,7 +404,7 @@ impl Control for CustomProgram {
             accounts.receiver.to_account_info(), 
             accounts.mint.to_account_info(), 
             accounts.metadata.to_account_info(),
-            accounts.group.to_account_info(), 
+            accounts.collection.to_account_info(), 
             accounts.system_program.to_account_info(), 
             custom_program_account.to_account_info()];
 

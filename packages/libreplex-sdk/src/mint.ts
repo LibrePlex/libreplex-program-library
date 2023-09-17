@@ -12,8 +12,8 @@ import {
   import { struct, u8 } from "@solana/buffer-layout";
   import { publicKey } from "@solana/buffer-layout-utils";
 import { getMetadataAddress, getMintWrapperAddress } from "./pda"
-import { getGroupWideUserPermissionsAddress } from "./groupPermissions"
-import { group } from "console"
+import { getCollectionWideUserPermissionsAddress } from "./groupPermissions"
+
 import { RoyaltyConfig } from "./createCollection"
 import { loadMetadataProgram, loadNftProgram } from "./programs"
 
@@ -58,7 +58,7 @@ type MintFromCreatorControllerStateInput = {
     creator: PublicKey,
     targetPhase: IdlAccounts<LibreplexCreatorControls>["creatorController"]["phases"][0]
     minterNumbers: PublicKey | null,
-    group: PublicKey,
+    collection: PublicKey,
 } & Omit<MintFromCreatorControllerInput, "phaseToMintIn" | "creatorProgram">
 
 export async function mintFromCreatorControllerState(input: MintFromCreatorControllerStateInput) {
@@ -69,7 +69,7 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
         addTransferHookToMint,
         minterNumbers,
         targetPhase,
-        group,
+        collection,
         creator
     } = input;
 
@@ -212,7 +212,7 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
             attributeConfig: null,
             creator,
             creatorController,
-            group,
+            collection,
             libreplexCreatorProgram: LIBREPLEX_CREATOR_PROGRAM_ID,
             libreplexMetadataProgram: LIBREPLEX_METADATA_PROGRAM_ID,
             libreplexNftProgram: LIBREPLEX_NFT_PROGRAM_ID,
@@ -227,7 +227,7 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
             recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-            groupPermissions: getGroupWideUserPermissionsAddress(group, creator),
+            collectionPermissions: getCollectionWideUserPermissionsAddress(collection, creator),
         }).preInstructions([...setupMintCtx.transaction.instructions]).signers([mintKeyPair])
         .remainingAccounts(remainingAccounts)),
 
@@ -288,7 +288,7 @@ export async function mintFromCreatorController(input: MintFromCreatorController
         targetPhase,
         creator: controller.creator,
         minterNumbers: creator.minterNumbers,
-        group: creator.collection
+        collection: creator.collection
     });
 }
 
@@ -340,7 +340,7 @@ export type MintSingleInput = {
     
     mintData: MetadataData,
 
-    mintToGroup?: {
+    mintToCollection?: {
         collection: PublicKey,
         checkValidGroup: boolean,
 
@@ -372,7 +372,7 @@ export async function mintSingle(input: MintSingleInput) {
     const {provider, 
         metadataProgram = await loadMetadataProgram(provider), 
         nftProgram = await loadNftProgram(provider), 
-        mintToGroup, 
+        mintToCollection, 
         receiver = provider.publicKey, 
         mintKp = Keypair.generate(), 
         transferHook, 
@@ -386,16 +386,16 @@ export async function mintSingle(input: MintSingleInput) {
     }
 
 
-    if (mintToGroup) {
-        if (mintToGroup.checkValidGroup) {
-            const groupData = await metadataProgram.account.collection.fetchNullable(mintToGroup.collection)
+    if (mintToCollection) {
+        if (mintToCollection.checkValidGroup) {
+            const groupData = await metadataProgram.account.collection.fetchNullable(mintToCollection.collection)
 
             if (!groupData) {
                 throw new Error("Group does not exist")
             }
 
             if (groupData.updateAuthority.toString() != me.toString()) {
-                const groupWideAddress = getGroupWideUserPermissionsAddress(mintToGroup.collection, me)
+                const groupWideAddress = getCollectionWideUserPermissionsAddress(mintToCollection.collection, me)
 
                 const permissionsData = await metadataProgram.account.delegatePermissions.fetchNullable(groupWideAddress);
 
@@ -405,7 +405,7 @@ export async function mintSingle(input: MintSingleInput) {
                     throw new Error("You do not have permission to add metadata to this group.")
                 }
 
-                mintToGroup.groupDelegate = true;
+                mintToCollection.groupDelegate = true;
             }
         }
     }   
@@ -497,16 +497,16 @@ export async function mintSingle(input: MintSingleInput) {
         }).instruction()
     ]
 
-    if (mintToGroup) {
+    if (mintToCollection) {
         const ix = await metadataProgram.methods.addMetadataToCollection().accounts({
-            delegatedGroupWidePermissions: mintToGroup.groupDelegate ? getGroupWideUserPermissionsAddress(mintToGroup.collection, me) : null,
+            delegatedCollectionWidePermissions: mintToCollection.groupDelegate ? getCollectionWideUserPermissionsAddress(mintToCollection.collection, me) : null,
             systemProgram: SystemProgram.programId,
             payer: me,
             metadata,
             metadataAuthority: me,
             collectionAuthority: me,
             delegatedMetadataSpecificPermissions: null,
-            group: mintToGroup.collection
+            collection: mintToCollection.collection
 
         }).instruction()
 

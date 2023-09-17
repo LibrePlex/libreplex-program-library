@@ -76,9 +76,9 @@ pub enum SharedError {
      #[msg("Instruction builder failed")]
      InstructionBuilderFailed,
 
-     #[msg("Group account missing")]
-     GroupAccountMissing,
+     #[msg("Collection account missing")]
+     CollectionAccountMissing,
 
-     #[msg("Group mismatch")]
-     GroupMismatch
+     #[msg("Collection mismatch")]
+     CollectionMismatch
 }

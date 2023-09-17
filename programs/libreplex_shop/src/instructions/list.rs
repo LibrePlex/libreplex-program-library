@@ -109,7 +109,7 @@ pub fn handler(ctx: Context<List>, list_input: ListInput) -> AnchorResult<()> {
     listing.price = list_input.price;
     listing.listing_bump = list_input.listing_bump;
     listing.amount = list_input.amount;
-    listing.group = metadata.group;
+    listing.collection = metadata.collection;
 
     // validate_filters(listing_filter, lister, metadata)?;
 
@@ -143,9 +143,9 @@ pub fn validate_filters<'info>(
                 return Err(ShopError::ListerNotAllowed.into())
             }
         },
-        ListingFilterType::Group { pubkey } => {
-            if !metadata.group.unwrap().key().eq(&pubkey) && !pubkey.eq(&empty_account_placeholder::ID) {
-                return Err(ShopError::GroupNotAllowed.into())
+        ListingFilterType::Collection { pubkey } => {
+            if !metadata.collection.unwrap().key().eq(&pubkey) && !pubkey.eq(&empty_account_placeholder::ID) {
+                return Err(ShopError::CollectionNotAllowed.into())
             }
         }
         _ => {

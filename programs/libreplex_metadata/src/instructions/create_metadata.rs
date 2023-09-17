@@ -85,7 +85,7 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     metadata.update_authority = metadata_input.update_authority;
     metadata.extension = metadata_input.extension;
 
-    metadata.group = None;
+    metadata.collection = None;
 
     msg!(
         "metadata created for mint with pubkey {}",

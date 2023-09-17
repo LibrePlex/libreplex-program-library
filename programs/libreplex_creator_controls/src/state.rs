@@ -70,8 +70,8 @@ pub struct Accounts<'b, 'info> {
     pub mint_wrapper: AccountInfo<'info>,
 
     pub metadata: AccountInfo<'info>,
-    pub group: AccountInfo<'info>,
-    pub group_permissions: AccountInfo<'info>,
+    pub collection: AccountInfo<'info>,
+    pub collection_permissions: AccountInfo<'info>,
 
     pub attribute_config: Option<AccountInfo<'info>>,
     pub minter_numbers: Option<AccountInfo<'info>>,

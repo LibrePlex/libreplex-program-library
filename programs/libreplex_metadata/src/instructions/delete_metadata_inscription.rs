@@ -59,8 +59,8 @@ pub fn handler(ctx: Context<DeleteMetadataInscription>
         }
     };
 
-    if metadata.group.is_some() {
-        return Err(ErrorCode::MetadataBelongsToGroup.into())
+    if metadata.collection.is_some() {
+        return Err(ErrorCode::MetadataBelongsToCollection.into())
     }
 
     if !metadata.is_mutable {

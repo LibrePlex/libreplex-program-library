@@ -51,11 +51,11 @@ pub struct UpdateInscriptionDataType<'info> {
     pub delegated_metadata_specific_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
     #[account(seeds = ["permissions".as_ref(), editor.key().as_ref(), 
-                        group.as_ref().expect("Group must be provided with group wide permissions").key().as_ref()], bump)]
+                        collection.as_ref().expect("Group must be provided with group wide permissions").key().as_ref()], bump)]
     pub delegated_group_wide_permissions: Option<Box<Account<'info, DelegatePermissions>>>,
 
-    #[account(constraint = metadata.group.expect("Metadata must have a group if you provided a group.") == group.key())]
-    pub group: Option<Box<Account<'info, Collection>>>,
+    #[account(constraint = metadata.collection.expect("Metadata must have a collection if you provided a collection.") == collection.key())]
+    pub collection: Option<Box<Account<'info, Collection>>>,
 
     pub system_program: Program<'info, System>,
 }
@@ -71,7 +71,7 @@ pub fn handler(ctx: Context<UpdateInscriptionDataType>,
     let mut can_edit = editor.key == &metadata.update_authority;
 
 
-    if let Some(group) = ctx.accounts.group.as_ref() {
+    if let Some(group) = ctx.accounts.collection.as_ref() {
         can_edit = can_edit || &group.update_authority == editor.key;
 
         if let Some(delegated_group_wide_permissions_account) 

@@ -92,7 +92,7 @@ pub enum ErrorCode {
     BadAuthority, //0x178C
 
     #[msg("Metadata belongs to a group")]
-    MetadataBelongsToGroup, //0x178D
+    MetadataBelongsToCollection, //0x178D
 
     #[msg("Derived key invalid")]
     DerivedKeyInvalid, //0x178E
@@ -101,7 +101,7 @@ pub enum ErrorCode {
     InvalidSignedProgram, //0x178F
 
     #[msg("Metadata does not have a group")]
-    MetadataDoesNotHaveAGroup, //0x1790
+    MetadataDoesNotBelongToACollection, //0x1790
 
     #[msg("Metadata is not mutable")]
     MetadataIsNotMutable, //0x1791
@@ -118,8 +118,7 @@ pub enum ErrorCode {
     #[msg("Invalid metadata pointer")]
     InvalidMetadataPointer, //0x1794
 
-    #[msg("Group has items")]
-    GroupHasItems, //0x1794
+    Reserved37, //0x1796
     Reserved38, //0x1796
     Reserved39, //0x1797
 

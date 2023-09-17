@@ -65,7 +65,7 @@ describe("mint", () => {
                 name: "COOL",
                 symbol: "COOL",
             },
-            mintToGroup: {
+            mintToCollection: {
                 collection,
                 checkValidGroup: true,
             }
@@ -131,7 +131,7 @@ describe("mint", () => {
                 name: "COOL",
                 symbol: "COOL",
             },
-            mintToGroup: {
+            mintToCollection: {
                 collection,
                 checkValidGroup: true,
             }

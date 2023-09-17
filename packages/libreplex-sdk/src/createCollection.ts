@@ -49,14 +49,14 @@ export async function setupCollection(
     groupInfo: {
       connector: Connector,
       input: SetupCollectionInput,
-      groupAuthority: PublicKey,
+      collectionAuthority: PublicKey,
       groupSeedKp?: Keypair
     }
   ) {
     const {
       connector,
       input,
-      groupAuthority,
+      collectionAuthority,
       groupSeedKp = Keypair.generate()
     } = groupInfo
     const collection = getCollectionAddress(groupSeedKp.publicKey)
@@ -81,7 +81,7 @@ export async function setupCollection(
         url: input.url,
         royalties: input.royalties
       }).accounts({
-        authority: groupAuthority,
+        authority: collectionAuthority,
         seed: groupSeedKp.publicKey,
         systemProgram: SystemProgram.programId,
         collection,

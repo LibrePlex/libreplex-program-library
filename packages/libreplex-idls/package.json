@@ -1,6 +1,6 @@
 {
   "name": "@libreplex/idls",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Idls for libreplex programs",
   "sideEffects": false,
   "files": [
