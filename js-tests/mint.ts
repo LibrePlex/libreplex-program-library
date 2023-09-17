@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { BN, Program } from "@coral-xyz/anchor";
 import { AnchorProvider, getProvider } from "@coral-xyz/anchor";
-import {mintSingle, setupGroup, setUserPermissionsForGroup, UserPermission, updateGroupAuthority} from "@libreplex/sdk"
+import {mintSingle, setupCollection, setUserPermissionsForGroup, UserPermission, updateGroupAuthority} from "@libreplex/sdk"
 import { Keypair } from "@solana/web3.js";
 
 
@@ -25,10 +25,10 @@ describe("mint", () => {
         await mintCtx.method.rpc()        
     })
 
-    it ("has minted to a group", async () => {
+    it ("has minted to a collection", async () => {
         const me = provider.publicKey
 
-        const grpCtx = await setupGroup({
+        const grpCtx = await setupCollection({
             connector: {
                 type: "provider",
                 provider,
@@ -74,10 +74,10 @@ describe("mint", () => {
         await mintCtx.method.rpc()     
     })
 
-    it ("has minted to a group where I am not the authority", async () => {
+    it ("has minted to a collection where I am not the authority", async () => {
         const me = provider.publicKey
 
-        const grpCtx = await setupGroup({
+        const grpCtx = await setupCollection({
             connector: {
                 type: "provider",
                 provider,

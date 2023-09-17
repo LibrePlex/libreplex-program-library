@@ -1,4 +1,4 @@
-export {setupCollection as setupGroup} from "./createCollection"
+export {setupCollection} from "./createCollection"
 export * from "./constants"
 export * from "./pda"
 export {setUserPermissionsForGroup, UserPermission} from "./groupPermissions"
