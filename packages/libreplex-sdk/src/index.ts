@@ -18,6 +18,6 @@ export {updateCreator} from "./updateCreator"
 
 export type {UpdateCreatorInput} from "./updateCreator"
 
-export {mintSingle} from "./mint"
+export {mintSingle, setupLibreplexReadyMint} from "./mint"
 
 export {updateCollectionAuthority} from "./updateCollection"

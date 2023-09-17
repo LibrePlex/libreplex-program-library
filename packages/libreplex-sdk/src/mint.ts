@@ -558,7 +558,7 @@ type TransferHookConfig = {
 }
 
 
-async function setupLibreplexReadyMint(
+export async function setupLibreplexReadyMint(
     connection: Connection,
     payer: PublicKey,
     receiver: PublicKey,
