@@ -12,9 +12,9 @@ import {
   import { struct, u8 } from "@solana/buffer-layout";
   import { publicKey } from "@solana/buffer-layout-utils";
 import { getMetadataAddress, getMintWrapperAddress } from "./pda"
-import { getGroupWiderUserPermissionsAddress } from "./groupPermissions"
+import { getGroupWideUserPermissionsAddress } from "./groupPermissions"
 import { group } from "console"
-import { RoyaltyConfig } from "./createGroup"
+import { RoyaltyConfig } from "./createCollection"
 import { loadMetadataProgram, loadNftProgram } from "./programs"
 
 
@@ -227,7 +227,7 @@ export async function mintFromCreatorControllerState(input: MintFromCreatorContr
             recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-            groupPermissions: getGroupWiderUserPermissionsAddress(group, creator),
+            groupPermissions: getGroupWideUserPermissionsAddress(group, creator),
         }).preInstructions([...setupMintCtx.transaction.instructions]).signers([mintKeyPair])
         .remainingAccounts(remainingAccounts)),
 
@@ -341,7 +341,7 @@ export type MintSingleInput = {
     mintData: MetadataData,
 
     mintToGroup?: {
-        group: PublicKey,
+        collection: PublicKey,
         checkValidGroup: boolean,
 
         /**
@@ -388,14 +388,14 @@ export async function mintSingle(input: MintSingleInput) {
 
     if (mintToGroup) {
         if (mintToGroup.checkValidGroup) {
-            const groupData = await metadataProgram.account.group.fetchNullable(mintToGroup.group)
+            const groupData = await metadataProgram.account.collection.fetchNullable(mintToGroup.collection)
 
             if (!groupData) {
                 throw new Error("Group does not exist")
             }
 
             if (groupData.updateAuthority.toString() != me.toString()) {
-                const groupWideAddress = getGroupWiderUserPermissionsAddress(mintToGroup.group, me)
+                const groupWideAddress = getGroupWideUserPermissionsAddress(mintToGroup.collection, me)
 
                 const permissionsData = await metadataProgram.account.delegatePermissions.fetchNullable(groupWideAddress);
 
@@ -442,7 +442,6 @@ export async function mintSingle(input: MintSingleInput) {
             anchorAssetUrl = {
                 chainRenderer: {
                     programId: assetUrl.programId,
-                    description: assetUrl.description,
                 }
             }
             break;
@@ -499,15 +498,15 @@ export async function mintSingle(input: MintSingleInput) {
     ]
 
     if (mintToGroup) {
-        const ix = await metadataProgram.methods.groupAdd().accounts({
-            delegatedGroupWidePermissions: mintToGroup.groupDelegate ? getGroupWiderUserPermissionsAddress(mintToGroup.group, me) : null,
+        const ix = await metadataProgram.methods.addMetadataToCollection().accounts({
+            delegatedGroupWidePermissions: mintToGroup.groupDelegate ? getGroupWideUserPermissionsAddress(mintToGroup.collection, me) : null,
             systemProgram: SystemProgram.programId,
             payer: me,
             metadata,
             metadataAuthority: me,
-            groupAuthority: me,
+            collectionAuthority: me,
             delegatedMetadataSpecificPermissions: null,
-            group: mintToGroup.group
+            group: mintToGroup.collection
 
         }).instruction()
 

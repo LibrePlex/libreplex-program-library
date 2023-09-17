@@ -5,7 +5,7 @@
 
 use anchor_lang::prelude::*;
 use arrayref::array_ref;
-use libreplex_metadata::{Group, CreateMetadataInput};
+use libreplex_metadata::{Collection, CreateMetadataInput};
 
 use crate::{Creator, AssetUrl, MintNumbers, errors::ErrorCode, MINT_NUMBERS_START, AttributeConfig};
 
@@ -54,7 +54,7 @@ pub struct Mint<'info> {
     pub metadata: AccountInfo<'info>,
 
     #[account(mut)]
-    pub group: Box<Account<'info, Group>>,
+    pub group: Box<Account<'info, Collection>>,
 
     /// CHECK: checked in cpi
     #[account(mut)]
@@ -176,10 +176,10 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
     })?;
     
 
-    let group_add_accounts = libreplex_metadata::cpi::accounts::GroupAdd {
+    let group_add_accounts = libreplex_metadata::cpi::accounts::AddMetadataToCollection {
         payer: ctx.accounts.payer.to_account_info(),
         metadata_authority: creator.to_account_info(),
-        group_authority: creator.to_account_info(),
+        collection_authority: creator.to_account_info(),
         metadata: ctx.accounts.metadata.to_account_info(),
         delegated_metadata_specific_permissions: None,
         delegated_group_wide_permissions: Some(ctx.accounts.group_permissions.to_account_info()),
@@ -191,7 +191,7 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
     = CpiContext::new_with_signer(ctx.accounts.libreplex_metadata_program.to_account_info(), group_add_accounts, signer_seeds.as_slice());
 
     // Transfers update authority to the group.
-    libreplex_metadata::cpi::group_add(group_add_ctx)?;
+    libreplex_metadata::cpi::add_metadata_to_collection(group_add_ctx)?;
 
     creator.minted += 1;
 

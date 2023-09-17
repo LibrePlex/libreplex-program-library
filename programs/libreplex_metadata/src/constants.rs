@@ -3,6 +3,7 @@ pub const METADATA_EXTENSION: &str = "metadata_extension";
 pub const NFT_OVERRIDE: &str = "nft_override";
 pub const SPL_AUTHORITY: &str = "spl_authority";
 pub const VERIFICATION: &str = "verification";
+pub const COLLECTION: &str = "collection";
 pub const GROUP: &str = "group";
 pub const PERMISSIONS: &str ="permissions";
 pub const OVERRIDE: &str = "override";

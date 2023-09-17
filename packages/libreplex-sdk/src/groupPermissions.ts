@@ -3,7 +3,7 @@ import { PublicKey, SystemProgram } from "@solana/web3.js"
 import {LibreplexMetadata} from "@libreplex/idls/lib/types/libreplex_metadata";
 
 import { LIBREPLEX_METADATA_PROGRAM_ID } from "./constants";
-import { Connector } from "./createGroup";
+import { Connector } from "./createCollection";
 import { loadMetadataProgram } from "./programs";
 
 export enum UserPermission {
@@ -12,8 +12,8 @@ export enum UserPermission {
     AddToGroup,
   }
   
-  export function getGroupWiderUserPermissionsAddress(group: PublicKey, user: PublicKey, program = LIBREPLEX_METADATA_PROGRAM_ID) {
-    return  PublicKey.findProgramAddressSync([Buffer.from("permissions"), user.toBuffer(), group.toBuffer()], program)[0]
+  export function getGroupWideUserPermissionsAddress(collection: PublicKey, user: PublicKey, program = LIBREPLEX_METADATA_PROGRAM_ID) {
+    return  PublicKey.findProgramAddressSync([Buffer.from("permissions"), user.toBuffer(), collection.toBuffer()], program)[0]
 
   }
   
@@ -43,19 +43,19 @@ export enum UserPermission {
 export async function setUserPermissionsForGroup(
     {
       connector,
-      group,
+      collection,
       user,
       permissions,
       groupUpdateAuthority,
     }: {
       connector: Connector,
-      group: PublicKey,
+      collection: PublicKey,
       user: PublicKey,
       permissions: UserPermission[],
       groupUpdateAuthority: PublicKey,
     }
   ) {
-    const permissionsAccountAddress = getGroupWiderUserPermissionsAddress(group, user)  
+    const permissionsAccountAddress = getGroupWideUserPermissionsAddress(collection, user)  
 
     const metadataProgram = connector.type === "program" ? connector.metadataProgram : await loadMetadataProgram(connector.provider)
 
@@ -65,10 +65,10 @@ export async function setUserPermissionsForGroup(
     const anchorPermissions = permissions.map(convertPermission);
   
     if (!existingPermissionsInfo) {
-      return metadataProgram.methods.delegateGroupPermissions({
+      return metadataProgram.methods.delegateCollectionPermissions({
         permissions: anchorPermissions,
       }).accounts({
-        group,
+        collection,
         delegatedUser: user,
         systemProgram: SystemProgram.programId,
         updateAuthority: groupUpdateAuthority,

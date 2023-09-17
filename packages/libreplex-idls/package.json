@@ -1,6 +1,6 @@
 {
   "name": "@libreplex/idls",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Idls for libreplex programs",
   "sideEffects": false,
   "files": [
@@ -15,7 +15,7 @@
   "scripts": {
     "clean": "npx shx mkdir -p lib && npx shx rm -rf lib",
     "package": "npx shx mkdir  -p lib/cjs lib/esm lib/types",
-    "build": "tsc --build"
+    "build": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json"
   },
   "keywords": [],
   "author": "",

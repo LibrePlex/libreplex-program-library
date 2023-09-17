@@ -7,7 +7,7 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Token},
 };
-use libreplex_metadata::{Group, Metadata, RoyaltyShare};
+use libreplex_metadata::{Collection, Metadata, RoyaltyShare};
 use libreplex_shared::{transfer_tokens, SharedError};
 
 
@@ -41,7 +41,7 @@ pub struct Execute<'info> {
     pub metadata: Box<Account<'info, Metadata>>,
 
     #[account()]
-    pub group: Option<Box<Account<'info, Group>>>,
+    pub group: Option<Box<Account<'info, Collection>>>,
 
     #[account(mut,
         close=seller,

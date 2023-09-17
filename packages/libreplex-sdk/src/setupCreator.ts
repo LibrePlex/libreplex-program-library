@@ -29,7 +29,7 @@ export type SetupCreatorInput = {
     mintAuthority: PublicKey,
     program: Program<LibreplexCreator>,
     metadataProgram: Program<LibreplexMetadata>,
-    group: PublicKey,
+    collection: PublicKey,
     creatorData: SetupCreatorData,
 }
 
@@ -89,13 +89,13 @@ export async function setupCreatorWithCustomSalePhases(
 
 
 export async function setupCreator(input: SetupCreatorInput, checkGroupIsValid = true) {
-    const {program, group, creatorData, mintAuthority, metadataProgram} = input;
+    const {program, collection, creatorData, mintAuthority, metadataProgram} = input;
     const {description, baseName, ordered, supply, symbol, baseUrl} = creatorData;
 
     const me = program.provider.publicKey
 
     if (checkGroupIsValid) {
-        const groupAccount = await metadataProgram.account.group.fetchNullable(group)
+        const groupAccount = await metadataProgram.account.collection.fetchNullable(collection)
 
         if (!groupAccount) {
             throw new Error("Provided group does not exist")
@@ -137,7 +137,7 @@ export async function setupCreator(input: SetupCreatorInput, checkGroupIsValid =
 
     let createCreatorMethod = await program.methods.createCreator({
         attributeMappings: null,
-        collection: group,
+        collection,
         description,
         isOrdered: ordered,
         maxMints: supply,
@@ -151,7 +151,6 @@ export async function setupCreator(input: SetupCreatorInput, checkGroupIsValid =
             }
           } : {
             chainRenderer: {
-                description: baseUrl.description || null,
                 programId: baseUrl.programId
             }
           }
@@ -163,7 +162,7 @@ export async function setupCreator(input: SetupCreatorInput, checkGroupIsValid =
       }).preInstructions(preIx).signers(signers)
 
       const delegateToGroupMethod = await (await setUserPermissionsForGroup({
-        group,
+        collection,
         groupUpdateAuthority: me as PublicKey,
         user: creator,
         connector: {

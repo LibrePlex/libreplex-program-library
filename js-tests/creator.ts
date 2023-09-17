@@ -7,17 +7,10 @@ import { LibreplexCreatorControls } from "../target/types/libreplex_creator_cont
 import { ConfirmOptions, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SYSVAR_EPOCH_SCHEDULE_PUBKEY, SYSVAR_SLOT_HASHES_PUBKEY, Signer, SystemProgram, TransactionInstruction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { expect } from 'chai';
 import exp from "constants";
-import { struct, u8 } from "@solana/buffer-layout";
-import { publicKey } from "@solana/buffer-layout-utils";
+
 import {
-  MINT_SIZE, TOKEN_2022_PROGRAM_ID, createInitializeMint2Instruction,
-  getMinimumBalanceForRentExemptMint, getAssociatedTokenAddressSync, createAssociatedTokenAccountInstruction, createMintToInstruction
-} from "@solana/spl-token"
-import { Transaction } from "@solana/web3.js";
-import {
-  LIBREPLEX_METADATA_PROGRAM_ID, setupGroup,
-  setUserPermissionsForGroup,
-  UserPermission, setupCreator, setupCreatorWithCustomSalePhases, mintFromCreatorController, LIBREPLEX_CREATOR_CONTROLS_PROGRAM_ID
+  setupGroup,
+   setupCreatorWithCustomSalePhases, mintFromCreatorController, LIBREPLEX_CREATOR_CONTROLS_PROGRAM_ID
 } from "@libreplex/sdk"
 import {sha256} from "js-sha256"
 
@@ -61,7 +54,7 @@ describe("libreplex creator", () => {
       }
     })
 
-    const group = grpSetupCtx.group;
+    const collection = grpSetupCtx.collection;
     await grpSetupCtx.method.rpc({
       skipPreflight: false,
     });
@@ -73,7 +66,7 @@ describe("libreplex creator", () => {
 
     console.log("Setting up controller")
     const creatorControllerCtx = await setupCreatorWithCustomSalePhases({
-      group,
+      collection,
       metadataProgram,
       mintAuthority: program.provider.publicKey as PublicKey,
       program,
@@ -124,7 +117,7 @@ describe("libreplex creator", () => {
     const { creator, minterNumbers, creatorController } = creatorControllerCtx;
 
 
-    const controllerData = await controllerProgram.account.creatorController.fetch(creatorController)
+    // const controllerData = await controllerProgram.account.creatorController.fetch(creatorController)
 
 
 
