@@ -26,7 +26,6 @@ pub fn handler(ctx: Context<DeleteGroup>
     if group.item_count > 0 {
         return Err(ErrorCode::GroupHasItems.into());
     }
-   
 
     Ok(())
 }
