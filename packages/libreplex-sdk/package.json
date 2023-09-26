@@ -1,6 +1,6 @@
 {
   "name": "@libreplex/sdk",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "",
   "main": "./lib/cjs/src/index.js",
   "module": "./lib/esm/src/index.js",
@@ -10,7 +10,7 @@
     "lib"
   ],
   "dependencies": {
-    "@libreplex/idls": "0.3.0",
+    "@libreplex/idls": "0.4.1",
     "@solana/spl-token": "0.3.8"
   },
   "devDependencies": {
