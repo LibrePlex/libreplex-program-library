@@ -10,7 +10,7 @@ use crate::{errors::ErrorCode};
 pub struct Inscription {
     
     // no option to keep data easier to write into
-    // set to 11111111.... or whatever to make this ordinal immutable
+    // set to 11111111.... or whatever to make this inscription immutable
     pub authority: Pubkey, 
     
     // root is the thing that the Inscription inscribes

@@ -21,11 +21,11 @@ pub mod libreplex_inscriptions {
 
     pub fn create_inscription(
         ctx: Context<CreateInscription>,
-        ordinal_input: CreateInscriptionInput,
+        inscription_input: CreateInscriptionInput,
     ) -> Result<()> {
         instructions::create_inscription::handler(
             ctx,
-            ordinal_input
+            inscription_input
         )
     }
 

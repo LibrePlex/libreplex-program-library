@@ -16,33 +16,17 @@ pub enum Price {
 #[account]
 pub struct Listing {
     pub mint: Pubkey,
-    pub lister: Pubkey,
-    pub amount: u64,
-    pub listing_bump: u8,
+    pub lister: Pubkey, 
+    pub amount: u64, 
+    pub listing_bump: u8, 
+    pub collection: Option<Pubkey>,// set to the group of the mint for indexing,
     pub price: Price,
-    pub collection: Option<Pubkey>,// set to the group of the mint for indexing
 }
 
 impl Listing{
     pub const BASE_SIZE: usize = 8 + 32 + 32 + 8 + 1 + 32; // price not included as this is added dynamically from list_input
    
 }
-
-// #[account]
-// pub struct ListingGroup {
-//     pub admin: Pubkey,
-//     pub seed: Pubkey,
-//     pub listings_active: u32,
-//     pub listings_created: u32,
-//     pub listings_sold: u32,
-//     pub filter_count: u32,
-//     pub name: String,
-// }
-
-// impl ListingGroup{
-//     pub const BASE_SIZE: usize = 8 + 32 + 32 + 36 + 4 + 4 + 4 + 4; // price not included as this is added dynamically from list_input
-// }
-
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum ListingFilterType {

@@ -8,9 +8,9 @@ use libreplex_inscriptions::program::LibreplexInscriptions;
 
 /*
     we need a separate method since we want to
-    1) create ordinal and the metadata together (this requires metadata to sign)
-    2) have metadata as the ordinal target
-    3) have metadata asset type = Ordinal with account_id pointing to the ordinal
+    1) create inscription and the metadata together (this requires metadata to sign)
+    2) have metadata as the inscription target
+    3) have metadata asset type = Inscription with account_id pointing to the inscription
 
     (two-way link ensures that the mapping is 1-1)
 */
@@ -63,7 +63,6 @@ pub struct CreateInscriptionMetadata<'info> {
     #[account(mut)]
     pub mint: Signer<'info>,
 
-    // ordinal must sign otherwise
     #[account(mut)]
     pub inscription: Signer<'info>,
 
@@ -93,7 +92,7 @@ pub fn handler(
             CreateInscription {
                 // raffle is the owner of the pod
                 root: metadata.to_account_info(),
-                ordinal: inscription.to_account_info(),
+                inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),
                 payer: signer.to_account_info(),
             },

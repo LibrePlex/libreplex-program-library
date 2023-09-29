@@ -42,18 +42,18 @@ mod metadata_tests {
      
         let inscription = Keypair::new();
 
-        let create_ordinal_input = libreplex_inscriptions::instruction::CreateInscription {
-            ordinal_input: CreateInscriptionInput {
+        let create_inscription_input = libreplex_inscriptions::instruction::CreateInscription {
+            inscription_input: CreateInscriptionInput {
                 max_data_length: (initial_data.len() + append_data.len()) as u32,
                 authority: Some(authority.key())
                 
             },
         };
 
-        let ordinal_account = CreateInscription {
+        let inscription_account = CreateInscription {
             payer: context.payer.pubkey(),
             root: root.pubkey(),
-            ordinal: inscription.pubkey(),
+            inscription: inscription.pubkey(),
             system_program: system_program::id(),
         };
 
@@ -67,9 +67,9 @@ mod metadata_tests {
             &[system_instruction::create_account(
                 &context.payer.pubkey(),
                 &inscription.pubkey(),
-                rent.minimum_balance(Inscription::BASE_SIZE + create_ordinal_input.ordinal_input.max_data_length as usize),
+                rent.minimum_balance(Inscription::BASE_SIZE + create_inscription_input.inscription_input.max_data_length as usize),
                 
-                Inscription::BASE_SIZE as u64 + create_ordinal_input.ordinal_input.max_data_length as u64,
+                Inscription::BASE_SIZE as u64 + create_inscription_input.inscription_input.max_data_length as u64,
                 &libreplex_inscriptions::id(),
             )],
             Some(&context.payer.pubkey()),
@@ -80,24 +80,24 @@ mod metadata_tests {
         
         context.banks_client.process_transaction(create_account_tx).await.unwrap();
      
-        let create_ordinal_ix = Instruction {
+        let create_inscription_ix = Instruction {
             program_id: libreplex_inscriptions::id(),
-            data: create_ordinal_input.data(),
-            accounts: ordinal_account.to_account_metas(None),
+            data: create_inscription_input.data(),
+            accounts: inscription_account.to_account_metas(None),
         };
 
-        let create_ordinal_tx = Transaction::new_signed_with_payer(
-            &[create_ordinal_ix],
+        let create_inscription_tx = Transaction::new_signed_with_payer(
+            &[create_inscription_ix],
             Some(&authority),
             &[&context.payer, &root],
             context.last_blockhash,
         );
         
-        println!("Creating ordinal");
+        println!("Creating inscription");
         
         context
             .banks_client
-            .process_transaction(create_ordinal_tx)
+            .process_transaction(create_inscription_tx)
             .await
             .unwrap();
 
@@ -117,27 +117,27 @@ mod metadata_tests {
 
         
         // WRITE SOME INITIAL DATA AT POS 0
-        let append_to_ordinal_accounts = WriteToInscription {
+        let append_to_inscription_accounts = WriteToInscription {
             signer: authority,
             inscription: inscription.pubkey(),
             system_program: system_program::id(),
         };
 
-        let append_to_ordinal_input: libreplex_inscriptions::instruction::WriteToInscription = libreplex_inscriptions::instruction::WriteToInscription {
+        let append_to_inscription_input: libreplex_inscriptions::instruction::WriteToInscription = libreplex_inscriptions::instruction::WriteToInscription {
             input: WriteToInscriptionInput {
                 data: initial_data.clone(),
                 start_pos: 0
             },
         };
 
-        let append_to_ordinal_ix = Instruction {
+        let append_to_inscription_ix = Instruction {
             program_id: libreplex_inscriptions::id(),
-            data: append_to_ordinal_input.data(),
-            accounts: append_to_ordinal_accounts.to_account_metas(None),
+            data: append_to_inscription_input.data(),
+            accounts: append_to_inscription_accounts.to_account_metas(None),
         };
 
-        let append_to_ordinal_tx = Transaction::new_signed_with_payer(
-            &[append_to_ordinal_ix],
+        let append_to_inscription_tx = Transaction::new_signed_with_payer(
+            &[append_to_inscription_ix],
             Some(&authority),
             &[&context.payer],
             context.last_blockhash,
@@ -145,32 +145,31 @@ mod metadata_tests {
 
         context
             .banks_client
-            .process_transaction(append_to_ordinal_tx)
+            .process_transaction(append_to_inscription_tx)
             .await
             .unwrap();
 
-        // APPEND SOME DATA
-        let append_to_ordinal_accounts = WriteToInscription {
+        let write_to_inscription_accounts = WriteToInscription {
             signer: authority,
             inscription: inscription.pubkey(),
             system_program: system_program::id(),
         };
 
-        let append_to_ordinal_input: libreplex_inscriptions::instruction::WriteToInscription = libreplex_inscriptions::instruction::WriteToInscription {
+        let write_to_inscription_input: libreplex_inscriptions::instruction::WriteToInscription = libreplex_inscriptions::instruction::WriteToInscription {
             input: WriteToInscriptionInput {
                 data: append_data.clone(),
                 start_pos: initial_data.len() as u32
             },
         };
 
-        let append_to_ordinal_ix = Instruction {
+        let write_to_inscription_ix = Instruction {
             program_id: libreplex_inscriptions::id(),
-            data: append_to_ordinal_input.data(),
-            accounts: append_to_ordinal_accounts.to_account_metas(None),
+            data: write_to_inscription_input.data(),
+            accounts: write_to_inscription_accounts.to_account_metas(None),
         };
 
-        let append_to_ordinal_tx = Transaction::new_signed_with_payer(
-            &[append_to_ordinal_ix],
+        let write_to_inscription_tx = Transaction::new_signed_with_payer(
+            &[write_to_inscription_ix],
             Some(&authority),
             &[&context.payer],
             context.last_blockhash,
@@ -178,7 +177,7 @@ mod metadata_tests {
 
         context
             .banks_client
-            .process_transaction(append_to_ordinal_tx)
+            .process_transaction(write_to_inscription_tx)
             .await
             .unwrap();
 

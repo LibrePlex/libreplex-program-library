@@ -28,7 +28,7 @@ pub struct CreateInscription<'info> {
 
     /// CHECK: validated in logic
     #[account(zero)]
-    pub ordinal: Account<'info, Inscription>,
+    pub inscription: Account<'info, Inscription>,
 
     pub system_program: Program<'info, System>,
 }
@@ -37,7 +37,7 @@ pub fn handler(
     ctx: Context<CreateInscription>,
     inscription_input: CreateInscriptionInput,
 ) -> Result<()> {
-    let inscription = &mut ctx.accounts.ordinal;
+    let inscription = &mut ctx.accounts.inscription;
 
     // let inscription_account_info = inscription.to_account_info();
     msg!("Writing authority");

@@ -10,12 +10,12 @@ pub struct InscriptionEventDelete {
 #[derive(Accounts)]
 pub struct DeleteInscription<'info> {
     #[account(mut,
-        constraint = ordinal.authority == payer.key())]
+        constraint = inscription.authority == payer.key())]
     pub payer: Signer<'info>,
 
     /// CHECK: validated in logic
     #[account(mut, close = payer)]
-    pub ordinal: Account<'info, Inscription>,
+    pub inscription: Account<'info, Inscription>,
 
     pub system_program: Program<'info, System>,
 }
@@ -23,7 +23,7 @@ pub struct DeleteInscription<'info> {
 pub fn handler(
     ctx: Context<DeleteInscription>
 ) -> Result<()> {
-    let inscription = &mut ctx.accounts.ordinal;
+    let inscription = &mut ctx.accounts.inscription;
 
     emit!(InscriptionEventDelete {
         id: inscription.key(),
