@@ -1,6 +1,7 @@
 pub mod create_collection;
 pub mod delete_group;
 pub mod create_metadata;
+pub mod create_metadata_update_summary;
 pub mod delegate_metadata_permissions;
 pub mod update_permissions;
 pub mod delete_permissions;
@@ -25,6 +26,7 @@ pub use delete_collection::*;
 pub use remove_metadata_from_collection::*;
 pub use create_metadata_inscription::*;
 pub use create_metadata::*;
+pub use create_metadata_update_summary::*;
 pub use delete_permissions::*;
 pub use update_permissions::*;
 pub use update_metadata::*;

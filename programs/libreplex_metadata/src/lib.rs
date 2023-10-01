@@ -23,6 +23,7 @@ pub use state::*;
 #[program]
 pub mod libreplex_metadata {
     
+    
     use super::*;
 
     pub fn create_collection(
@@ -86,6 +87,18 @@ pub mod libreplex_metadata {
     ) -> Result<()> {
         msg!("creating metadata");
         instructions::create_metadata::handler(
+            ctx,
+            metadata_input
+        )
+    }
+
+
+    pub fn create_metadata_update_summary(
+        ctx: Context<CreateMetadataUpdateSummary>,
+        metadata_input: CreateMetadataInput,
+    ) -> Result<()> {
+        msg!("creating metadata");
+        instructions::create_metadata_update_summary::handler(
             ctx,
             metadata_input
         )

@@ -7,12 +7,12 @@ use spl_token_2022::{ID, extension::ExtensionType, state::Mint};
 
 use libreplex_metadata::{Asset, CreateMetadataInput};
 
-pub async fn create_metadata_util(
+pub async fn create_metadata_update_summary_util(
     context: &mut ProgramTestContext,
     name: String,
     asset: Asset,
     symbol: String
-) -> Pubkey {
+) -> (Pubkey, Pubkey) {
     let collection_authority = context.payer.pubkey();
 
     let mint = Keypair::new();
@@ -71,19 +71,27 @@ pub async fn create_metadata_util(
         .await
         .unwrap();
 
+
+    let metadata_summary = Pubkey::find_program_address(
+        &[b"metadata_summary"],
+        &libreplex_metadata::ID,
+    )
+    .0;
+    
   
 
-    let create_metadata_accounts = libreplex_metadata::accounts::CreateMetadata {
+    let create_metadata_accounts = libreplex_metadata::accounts::CreateMetadataUpdateSummary {
         payer: collection_authority,
         authority: collection_authority,
         metadata: metadata.key(),
         mint: mint.pubkey(),
         invoked_migrator_program: None,
         system_program: system_program::ID,
+        metadata_summary,
     }
     .to_account_metas(None);
 
-    let create_metadata = libreplex_metadata::instruction::CreateMetadata {
+    let create_metadata = libreplex_metadata::instruction::CreateMetadataUpdateSummary {
         metadata_input: CreateMetadataInput {
             name,
             asset,
@@ -112,5 +120,5 @@ pub async fn create_metadata_util(
         .await
         .unwrap();
 
-    metadata
+    (metadata, mint.pubkey())
 }
