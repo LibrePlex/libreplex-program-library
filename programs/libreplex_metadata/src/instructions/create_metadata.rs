@@ -25,6 +25,7 @@ pub struct CreateMetadata<'info> {
               bump, payer = payer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
 
+
     /// CHECK: Checked against ID constraint
     #[account(
         constraint = mint.owner.eq(&TOKEN_2022_PROGRAM_ID)
@@ -54,16 +55,18 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     let authority = &ctx.accounts.authority;
     let invoked_migrator_program = &ctx.accounts.invoked_migrator_program;
 
+    handle_create_metadata(mint_info, authority, invoked_migrator_program, metadata, metadata_input)?;
+
+    Ok(())
+}
+
+pub fn handle_create_metadata(mint_info: &mut UncheckedAccount<'_>, authority: &Signer<'_>, invoked_migrator_program: &Option<UncheckedAccount<'_>>, metadata: &mut Box<Account<'_, Metadata>>, metadata_input: CreateMetadataInput) -> Result<()> {
     let mint_data = mint_info.try_borrow_data()?;
     let mint = StateWithExtensions::<spl_token_2022::state::Mint>::unpack(&mint_data)?;
-
     assert_is_valid_signer(&authority.key(), mint_info.key, &mint.base, invoked_migrator_program)?;
-    
     let metadata_pointer = mint.get_extension::<MetadataPointer>().unwrap();
-
     let metadata_pointer_authority: Option<Pubkey> = metadata_pointer.authority.into();
     let metadata_pointer_address: Option<Pubkey> = metadata_pointer.metadata_address.into();
-
     match (metadata_pointer_authority, metadata_pointer_address) {
         (None, Some(address)) => {
             if address != metadata.key() {
@@ -74,8 +77,6 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
             return err!(ErrorCode::InvalidMetadataPointer)
         }
     };
-
-    // Update the metadata state account
     metadata.mint = mint_info.key();
     metadata.is_mutable = true;
     metadata.symbol = metadata_input.symbol.clone();
@@ -84,20 +85,16 @@ pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput
     metadata.asset = metadata_input.asset;
     metadata.update_authority = metadata_input.update_authority;
     metadata.extension = metadata_input.extension;
-
     metadata.collection = None;
-
     msg!(
         "metadata created for mint with pubkey {}",
         mint_info.key()
     );
-
     emit!(MetadataEvent {
         id: metadata.key(),
         mint: mint_info.key(),
         event_type: MetadataEventType::Create
     });
-
     Ok(())
 }
 
