@@ -13,7 +13,7 @@ mod create_metadata_update_summary_test {
     use std::borrow::BorrowMut;
 
     use anchor_lang::prelude::Account;
-    use libreplex_metadata::{ Asset, Metadata, MetadataSummary};
+    use libreplex_metadata::{Asset, Metadata, MetadataSummary};
     use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
     use solana_sdk::signer::Signer;
     use spl_token_2022::ID;
@@ -27,12 +27,11 @@ mod create_metadata_update_summary_test {
             processor!(libreplex_metadata::entry),
         );
 
-  
         program.add_program(
-            "spl_token_2022", 
-            ID, 
-            processor!(spl_token_2022::processor::Processor::process));
-       
+            "spl_token_2022",
+            ID,
+            processor!(spl_token_2022::processor::Processor::process),
+        );
 
         let mut context = program.start_with_context().await;
         let _collection_authority = context.payer.pubkey();
@@ -69,19 +68,15 @@ mod create_metadata_update_summary_test {
 
         assert_eq!(metadata_obj.name, METADATA_NAME);
 
-        let metadata_summary = Pubkey::find_program_address(
-            &[b"metadata_summary"],
-            &libreplex_metadata::ID,
-        )
-        .0;
+        let metadata_summary =
+            Pubkey::find_program_address(&[b"metadata_summary"], &libreplex_metadata::ID).0;
 
         let mut metadata_summary_account = context
-        .banks_client
-        .get_account(metadata_summary)
-        .await
-        .unwrap()
-        .unwrap();
-
+            .banks_client
+            .get_account(metadata_summary)
+            .await
+            .unwrap()
+            .unwrap();
 
         let metadata_summary_account_info = AccountInfo::new(
             &metadata_summary,
@@ -94,16 +89,16 @@ mod create_metadata_update_summary_test {
             metadata_summary_account.rent_epoch,
         );
 
-        let metadata_summary: Account<MetadataSummary> = Account::try_from(&metadata_summary_account_info).unwrap();
+        let metadata_summary: Account<MetadataSummary> =
+            Account::try_from(&metadata_summary_account_info).unwrap();
 
-        assert_eq!(metadata_summary.mint_count_total, 1);
-        assert_eq!(metadata_summary.last_mint, mint);
-        
-        assert_eq!(metadata_summary.last_minter, context.payer.pubkey());
-        assert_ne!(metadata_summary.last_mint_time, 0);
+        assert_eq!(metadata_summary.metadata_count_total, 1);
+        assert_eq!(metadata_summary.last_metadata_mint, mint);
 
-
-        
+        assert_eq!(
+            metadata_summary.last_metadata_creator,
+            context.payer.pubkey()
+        );
+        assert_ne!(metadata_summary.last_metadata_create_time, 0);
     }
-
 }

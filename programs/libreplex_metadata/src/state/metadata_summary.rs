@@ -11,10 +11,10 @@ pub enum SummaryExtension {
 
 #[account]
 pub struct MetadataSummary {
-    pub mint_count_total: u64,
-    pub last_mint: Pubkey,
-    pub last_minter: Pubkey,
-    pub last_mint_time: i64,
+    pub metadata_count_total: u64,
+    pub last_metadata_mint: Pubkey,
+    pub last_metadata_creator: Pubkey,
+    pub last_metadata_create_time: i64,
     pub extension: SummaryExtension,
 }
 

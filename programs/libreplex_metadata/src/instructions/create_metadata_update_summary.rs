@@ -1,6 +1,6 @@
 use crate::state::Metadata;
-use crate::MetadataSummary;
 use crate::CreateMetadataInput;
+use crate::MetadataSummary;
 use anchor_lang::prelude::*;
 use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
 
@@ -63,10 +63,10 @@ pub fn handler(
     let metadata_summary = &mut ctx.accounts.metadata_summary;
 
     let clock = Clock::get()?;
-    metadata_summary.mint_count_total += 1;
-    metadata_summary.last_mint = mint_info.key();
-    metadata_summary.last_minter = payer.key();
-    metadata_summary.last_mint_time = clock.unix_timestamp;
+    metadata_summary.metadata_count_total += 1;
+    metadata_summary.last_metadata_mint = mint_info.key();
+    metadata_summary.last_metadata_creator = payer.key();
+    metadata_summary.last_metadata_create_time = clock.unix_timestamp;
 
     handle_create_metadata(
         mint_info,
