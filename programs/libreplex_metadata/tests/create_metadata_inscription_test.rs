@@ -117,7 +117,7 @@ mod permissions {
                 name: METADATA_NAME.to_string(),
                 update_authority: collection_authority,
                 symbol: "COOL".to_string(),
-                extension: libreplex_metadata::MetadataExtension::None,
+                extensions: vec![],
             },
         };
 

@@ -2038,7 +2038,7 @@ checksum = "b4668fb0ea861c1df094127ac5f1da3409a82116a4ba74fca2e58ef927159bb3"
 
 [[package]]
 name = "libreplex_creator"
-version = "0.12.0"
+version = "0.12.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -2057,7 +2057,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_creator_controls"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -2104,7 +2104,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_metadata"
-version = "0.15.3"
+version = "0.16.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -2141,7 +2141,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_shop"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

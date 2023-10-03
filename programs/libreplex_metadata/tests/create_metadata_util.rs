@@ -89,7 +89,7 @@ pub async fn create_metadata_util(
             asset,
             update_authority: collection_authority,
             symbol,
-            extension: libreplex_metadata::MetadataExtension::None,
+            extensions: vec![],
         },
     };
 
