@@ -11,6 +11,8 @@
     "libre-cli": "ts-node src/cli/index.ts",
     "libreplex_inscriptions:deploy:localnet": "anchor build -p libreplex_inscriptions && anchor deploy -p libreplex_inscriptions --provider.cluster http://localhost:8899 --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_metadata:deploy:localnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster http://localhost:8899 --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_creator:deploy:devnet": "anchor build -p libreplex_creator && anchor deploy -p libreplex_creator --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_creator_controls:deploy:devnet": "anchor build -p libreplex_creator_controls && anchor deploy -p libreplex_creator_controls --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_metadata:deploy:devnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_metadata:deploy:mainnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_inscriptions:deploy:devnet": "anchor build -p libreplex_inscriptions && anchor deploy -p libreplex_inscriptions --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",

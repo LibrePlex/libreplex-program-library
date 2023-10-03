@@ -97,7 +97,7 @@ impl Metadata {
         + 32 
         // is mutable
         + 1 
-        // group
+        // collection
         + 1 + 32;
 
     pub fn get_size(&self) -> usize {
@@ -182,13 +182,17 @@ pub struct CreateMetadataInput {
 
 impl CreateMetadataInput {
     pub fn get_size(&self) -> usize {
-       4
+            4
             + self.name.len()
             + 4
             + self.symbol.len()
             + 4
             + self.asset.get_size()
             + self.extensions.iter().map(|x|x.get_size()).sum::<usize>()
+            + 4 
+            // sum of sizes of extensions
+            + self.extensions.iter().map(|x|x.get_size())
+                .sum::<usize>()
     }
 }
 

@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 use solana_program::program_option::COption;
 use spl_token_2022::extension::metadata_pointer::MetadataPointer;
 use spl_token_2022::extension::{StateWithExtensions, BaseStateWithExtensions};
-use crate::{errors::ErrorCode};
+use crate::errors::ErrorCode;
 use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
 
 // whitelisted signer programs
@@ -84,7 +84,7 @@ pub fn handle_create_metadata(mint_info: &mut UncheckedAccount<'_>, authority: &
     metadata.creator = authority.key();
     metadata.asset = metadata_input.asset;
     metadata.update_authority = metadata_input.update_authority;
-    metadata.extensions = vec![];
+    metadata.extensions = metadata_input.extensions;
     metadata.collection = None;
     msg!(
         "metadata created for mint with pubkey {}",

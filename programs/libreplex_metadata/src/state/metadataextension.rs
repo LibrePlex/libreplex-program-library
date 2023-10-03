@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-use crate::{Royalties};
+use crate::Royalties;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum License {
@@ -49,49 +49,14 @@ pub enum MetadataExtension {
 
 impl MetadataExtension {
     
-    pub const BASE_SIZE: usize = 2;
-
     pub fn get_size(&self) -> usize {
-        1 
+        2
         + match self {
             MetadataExtension::Attributes {attributes} => 4 + attributes.len(),
             MetadataExtension::Signers {signers} => 4 + signers.len() * 32,
             MetadataExtension::Royalties {royalties} => royalties.get_size(),
             MetadataExtension::License {license} => license.get_size(),
-            // MetadataExtension::Nft {attributes, signers, royalties, license} =>  
-            //   4 + &attributes.len()
-            // + 4 + &signers.len() * 32
-            // + 1 + match &royalties {
-            //     Some(x)=>x.get_size(),
-            //     None=>0
-            // } 
-            // + 1 + match &license {
-            //     Some(x) => x.get_size(),
-            //     None => 0
-            // }
         }
     }
 }
 
-// impl MetadataExtension {
-    
-//     pub const BASE_SIZE: usize = 2;
-
-//     pub fn get_size(&self) -> usize {
-//         MetadataExtension::BASE_SIZE 
-//         + match self {
-//             MetadataExtension::None => 0,
-//             MetadataExtension::Nft {attributes, signers, royalties, license} =>  
-//               4 + &attributes.len()
-//             + 4 + &signers.len() * 32
-//             + 1 + match &royalties {
-//                 Some(x)=>x.get_size(),
-//                 None=>0
-//             } 
-//             + 1 + match &license {
-//                 Some(x) => x.get_size(),
-//                 None => 0
-//             }
-//         }
-//     }
-// }
