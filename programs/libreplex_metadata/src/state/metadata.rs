@@ -84,7 +84,7 @@ pub struct Metadata {
 
     pub asset: Asset,
 
-    pub extension: MetadataExtension,
+    pub extensions: Vec<MetadataExtension>,
 }
 
 impl Metadata {
@@ -110,8 +110,8 @@ impl Metadata {
             + self.symbol.len()
             + 4
             + self.asset.get_size()
-            + 1
-            + self.extension.get_size()
+            + 4
+            + self.extensions.iter().map(|x|x.get_size()).sum::<usize>()
     }
 }
 
@@ -175,7 +175,7 @@ pub struct CreateMetadataInput {
     pub symbol: String,
     pub asset: Asset,
     pub update_authority: Pubkey,
-    pub extension: MetadataExtension,
+    pub extensions: Vec<MetadataExtension>,
 }
 
 
@@ -188,7 +188,7 @@ impl CreateMetadataInput {
             + self.symbol.len()
             + 4
             + self.asset.get_size()
-            + self.extension.get_size()
+            + self.extensions.iter().map(|x|x.get_size()).sum::<usize>()
     }
 }
 
@@ -201,8 +201,6 @@ pub struct UpdateMetadataInput {
 
 impl UpdateMetadataInput {
     pub fn get_size(&self) -> usize {
-        
-
         4
             + self.name.len()
             + 4

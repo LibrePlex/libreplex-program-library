@@ -21,7 +21,7 @@ pub struct CreateMetadataInscriptionInput {
     pub name: String,
     pub symbol: String,
     pub update_authority: Pubkey,
-    pub extension: MetadataExtension,
+    pub extensions: Vec<MetadataExtension>,
     pub description: Option<String>,
     pub data_type: String,
 }
@@ -39,7 +39,7 @@ impl CreateMetadataInscriptionInput {
             1 + match &self.description {
                 Some(x) => 4 + x.len(),
                 None => 0,
-            } + self.extension.get_size()
+            } + self.extensions.iter().map(|x|x.get_size()).sum::<usize>()
     }
 }
 
@@ -116,7 +116,7 @@ pub fn handler(
         description: metadata_input.description,
     };
     metadata.creator = signer.key();
-    metadata.extension = metadata_input.extension;
+    metadata.extensions = metadata_input.extensions;
 
     msg!(
         "metadata created for mint with pubkey {}",

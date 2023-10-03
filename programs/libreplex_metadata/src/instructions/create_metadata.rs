@@ -84,7 +84,7 @@ pub fn handle_create_metadata(mint_info: &mut UncheckedAccount<'_>, authority: &
     metadata.creator = authority.key();
     metadata.asset = metadata_input.asset;
     metadata.update_authority = metadata_input.update_authority;
-    metadata.extension = metadata_input.extension;
+    metadata.extensions = vec![];
     metadata.collection = None;
     msg!(
         "metadata created for mint with pubkey {}",

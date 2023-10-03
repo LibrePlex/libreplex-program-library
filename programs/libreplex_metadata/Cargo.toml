@@ -1,6 +1,6 @@
 [package]
 name = "libreplex_metadata"
-version = "0.15.3"
+version = "0.16.0"
 description = "Created with Anchor"
 edition = "2021"
 license = "MIT"

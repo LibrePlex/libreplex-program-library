@@ -172,7 +172,10 @@ pub fn handler(ctx: Context<Mint>) -> Result<()> {
         symbol: creator.symbol.clone(),
         asset,
         update_authority: creator.key(),
-        extension: libreplex_metadata::MetadataExtension::Nft { attributes, signers: vec![], royalties: None, license: None },
+        extensions: match attributes.len() {
+            0 => vec![],
+            _ => vec![libreplex_metadata::MetadataExtension::Attributes { attributes }]
+        },
     })?;
     
 
