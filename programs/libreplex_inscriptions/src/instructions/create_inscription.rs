@@ -49,6 +49,7 @@ pub fn handler(
 
     inscription.authority = authority;
     inscription.size = inscription_input.max_data_length;
+    inscription.root = ctx.accounts.root.key();
    
 
     emit!(InscriptionEvent {

@@ -3,11 +3,13 @@ use solana_program_test::*;
 mod metadata_tests {
     use anchor_lang::{InstructionData,  ToAccountMetas, Key};
     
+    use anchor_lang::prelude::Account;
     use libreplex_inscriptions::{
         accounts::WriteToInscription,
         accounts::CreateInscription,
         instructions::{WriteToInscriptionInput, create_inscription::CreateInscriptionInput}, Inscription,
     };
+    use solana_program::account_info::AccountInfo;
     use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program, system_instruction};
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 
@@ -193,7 +195,7 @@ mod metadata_tests {
 
         
 
-        let final_account = context
+        let mut final_account = context
             .banks_client
             .get_account(inscription.pubkey())
             .await
@@ -201,7 +203,7 @@ mod metadata_tests {
 
         let expected_data: Vec<u8> = [&initial_data[..], &append_data[..]].concat();
 
-        match final_account {
+        match &mut final_account {
             Some(x) => {
                 let l = u32::from_le_bytes(x.data[72..76].try_into().unwrap());
 
@@ -217,6 +219,24 @@ mod metadata_tests {
                     // 4 - data length (max)
                     &x.data[76..endidx as usize]
                 );
+
+                let inscription_pubkey = inscription.pubkey();
+                let inscription_account_info = AccountInfo::new(
+                    &inscription_pubkey,
+                    false,
+                    false,
+                    &mut x.lamports,
+                    &mut x.data,
+                    &x.owner,
+                    x.executable,
+                    x.rent_epoch,
+                );
+
+                let inscription_obj: Account<Inscription> 
+                = Account::try_from(&inscription_account_info).unwrap();
+
+            
+                assert_eq!(inscription_obj.root, root.pubkey());
             }
             None => {
                 assert_eq!(true, false);
