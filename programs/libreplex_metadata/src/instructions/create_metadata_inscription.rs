@@ -90,7 +90,14 @@ pub fn handler(
         CpiContext::new_with_signer(
             inscriptions_program.to_account_info(),
             CreateInscription {
-                // raffle is the owner of the pod
+                /* the inscription root is set to metadata
+                 root is a pointer back from inscription to the 
+                 thing that is being inscribed. in this case
+                 it is the metadata object, but we could 
+                 inscribe anything that can act as a signer
+                 including, f ex a wallet, legacy 
+                 mint etc
+                */
                 root: metadata.to_account_info(),
                 inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),

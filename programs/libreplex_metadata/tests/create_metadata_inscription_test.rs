@@ -24,15 +24,6 @@ mod permissions {
             processor!(libreplex_metadata::entry),
         );
 
-        // let inscriptions_prog = ProgramTest::new("libreplex_inscriptions", libreplex_inscriptions::ID,
-        //     processor!(libreplex_inscriptions::entry));
-
-        // let mut inscriptions_context: ProgramTestContext = inscriptions_prog.start_with_context().await;
-
-        // let inscription_program_data = inscriptions_context.banks_client.get_account(
-        //     libreplex_inscriptions::ID
-        // ).await.unwrap().unwrap();
-
         program.add_program(
             "libreplex_inscriptions",
             libreplex_inscriptions::ID,
@@ -40,8 +31,6 @@ mod permissions {
         );
         let mut context: ProgramTestContext = program.start_with_context().await;
 
-        // context.set_account(&libreplex_inscriptions::ID,
-        //     &AccountSharedData::from(inscription_program_data));
         let collection_authority = context.payer.pubkey();
 
         let mint = Keypair::new();
