@@ -91,8 +91,6 @@ pub fn handler(
     let inscription = &mut ctx.accounts.inscription;
 
     let inscription_summary = &mut ctx.accounts.inscription_summary;
-    let inscription_ranks_current_page = ctx.accounts.inscription_ranks_current_page.to_account_info();
-    let inscription_ranks_next_page = ctx.accounts.inscription_ranks_next_page.to_account_info();
     
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let system_program = &ctx.accounts.system_program;
@@ -107,6 +105,8 @@ pub fn handler(
         CpiContext::new_with_signer(
             inscriptions_program.to_account_info(),
             CreateInscription {
+                inscription_summary: inscription_summary.to_account_info(),
+               
                 /* the inscription root is set to metadata
                  root is a pointer back from inscription to the 
                  thing that is being inscribed. in this case
@@ -115,9 +115,6 @@ pub fn handler(
                  including, f ex a wallet, legacy 
                  mint etc
                 */
-                inscription_ranks_current_page,
-                inscription_ranks_next_page,
-                inscription_summary: inscription_summary.to_account_info(),
                 root: metadata.to_account_info(),
                 inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),

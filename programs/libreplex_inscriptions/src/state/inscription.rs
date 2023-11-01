@@ -36,7 +36,12 @@ impl InscriptionRankPage {
     }
 
     pub fn get_inscriptions<'a>(current_data: &'a RefMut<'a, &mut [u8]>, start_pos: usize, end_pos: usize) -> impl Iterator<Item=Pubkey> + 'a {
-        let byte_slice = &current_data[(12 + start_pos*32)..(12 + end_pos*32)];
+
+        let effective_start_pos = std::cmp::min(12 + start_pos*32, current_data.len());
+        let effective_end_pos = std::cmp::min(12 + end_pos*32, current_data.len());
+
+        println!("start: {}, end: {}", effective_start_pos, effective_end_pos);
+        let byte_slice = &current_data[(effective_start_pos)..(effective_end_pos)];
         byte_slice.chunks(32).map(|x| Pubkey::try_from_slice(x).unwrap())
     }
 }
@@ -44,6 +49,7 @@ impl InscriptionRankPage {
 #[account]
 pub struct InscriptionSummary {
     pub inscription_count_total: u64,
+    pub inscription_count_immutables: u64,
     pub last_inscription: Pubkey,
     pub last_inscriber: Pubkey,
     pub last_inscription_create_time: i64,
@@ -51,7 +57,7 @@ pub struct InscriptionSummary {
 }
 
 impl InscriptionSummary {
-    pub const BASE_SIZE: usize = 8 + 8 + 32 + 32 + 8 + 2;
+    pub const BASE_SIZE: usize = 8 + 8 + 8 + 32 + 32 + 8 + 2;
 }
 
 #[account]
@@ -72,7 +78,11 @@ pub struct Inscription {
     // could also be called inscribee but that would
     // be weird
     pub root: Pubkey, // 8 + 32 = 40
-    pub counter: u64, // 8 + 32 + 32 = 72
+
+    // rank 0 - unranked. ranks 1,2,3,4,5,6 represent the rank of this inscription in the order they are made immutable
+    // only immutable inscriptions are ranked.
+
+    pub rank: u64, // 8 + 32 + 32 = 72
     pub size: u32,    // 8 + 32 + 32 + 8 = 80
                       // we do not mark the following field as being serialized at all. instead we
                       // write to it directly via append_data method

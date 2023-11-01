@@ -1,7 +1,7 @@
-use anchor_lang::{prelude::*};
+use anchor_lang::prelude::*;
 use crate::errors::ErrorCode;
 
-use crate::{Inscription};
+use crate::Inscription;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct WriteToInscriptionInput {
@@ -18,7 +18,7 @@ pub struct InscriptionWriteEvent {
 #[instruction(inscription_input: WriteToInscriptionInput)]
 pub struct WriteToInscription<'info> {
     #[account(mut)]
-    pub signer: Signer<'info>,
+    pub authority: Signer<'info>,
 
     /// CHECK: Authority checked in logic
     #[account(mut)]
@@ -33,14 +33,14 @@ pub fn handler(
 ) -> Result<()> {
     let inscription = &mut ctx.accounts.inscription;
 
-    let signer = &ctx.accounts.signer;
+    let authority = &ctx.accounts.authority;
 
     let inscription_account_info = inscription.to_account_info();
     // check that the authority matches
 
-    let authority = Inscription::get_authority(inscription_account_info.data.borrow())?;
+    let inscription_authority = Inscription::get_authority(inscription_account_info.data.borrow())?;
 
-    if authority != signer.key() {
+    if inscription_authority != authority.key() {
         return Err(ErrorCode::BadAuthority.into());
     }
 

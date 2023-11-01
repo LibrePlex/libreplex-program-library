@@ -29,6 +29,16 @@ pub mod libreplex_inscriptions {
         )
     }
 
+    pub fn make_inscription_immutable(
+        ctx: Context<MakeInscriptionImmutable>,
+        input: MakeInscriptionImmutableInput,
+    ) -> Result<()> {
+        instructions::make_inscription_immutable::handler(
+            ctx,
+            input
+        )
+    }
+
     pub fn create_inscription(
         ctx: Context<CreateInscription>,
         inscription_input: CreateInscriptionInput,
