@@ -16,4 +16,7 @@ pub enum ErrorCode {
 
     #[msg("Max size exceeded")]
     MaxSizeExceeded,
+
+    #[msg("Bad page")]
+    BadInscriptionRankPage
 }

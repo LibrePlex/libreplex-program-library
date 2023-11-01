@@ -19,6 +19,16 @@ pub mod libreplex_inscriptions {
 
     use super::*;
 
+    pub fn create_inscription_rank_page(
+        ctx: Context<CreateInscriptionRank>,
+        input: CreateInscriptionRankInput,
+    ) -> Result<()> {
+        instructions::create_inscription_rank_page::handler(
+            ctx,
+            input
+        )
+    }
+
     pub fn create_inscription(
         ctx: Context<CreateInscription>,
         inscription_input: CreateInscriptionInput,
