@@ -87,15 +87,21 @@ mod permissions {
         )
         .0;
 
-        let inscription = Keypair::new();
+        let inscription = Pubkey::find_program_address(
+            &["inscription".as_bytes(), mint.pubkey().as_ref()],
+            &libreplex_inscriptions::ID,
+        )
+        .0;
+
+        let inscription_data = Keypair::new();
 
         let rent = context.banks_client.get_rent().await.unwrap();
 
-        let initialise_inscription_tx = system_instruction::create_account(
+        let initialise_inscription_data_tx = system_instruction::create_account(
             &context.payer.pubkey(),
-            &inscription.pubkey(),
-            rent.minimum_balance(Inscription::BASE_SIZE + 1024_usize),
-            Inscription::BASE_SIZE as u64 + 1024_u64,
+            &inscription_data.pubkey(),
+            rent.minimum_balance(Inscription::SIZE + 1024_usize),
+            Inscription::SIZE as u64 + 1024_u64,
             &libreplex_inscriptions::id(),
         );
 
@@ -112,7 +118,8 @@ mod permissions {
             inscription_summary,
             inscription_ranks_current_page,
             inscription_ranks_next_page,
-            inscription: inscription.pubkey(),
+            inscription,
+            inscription_data: inscription_data.pubkey(),
             inscriptions_program: libreplex_inscriptions::ID,
             system_program: system_program::ID,
         }
@@ -136,9 +143,9 @@ mod permissions {
         };
 
         let transaction = Transaction::new_signed_with_payer(
-            &[initialise_inscription_tx, create_metadata],
+            &[initialise_inscription_data_tx, create_metadata],
             Some(&context.payer.pubkey()),
-            &[&context.payer, &mint, &inscription],
+            &[&context.payer, &mint, &inscription_data],
             context.last_blockhash,
         );
 
@@ -171,8 +178,9 @@ mod permissions {
         assert_eq!(metadata_obj.name, METADATA_NAME);
 
         match metadata_obj.asset {
-            Asset::Inscription { account_id, .. } => {
-                assert_eq!(account_id, inscription.pubkey());
+            Asset::Inscription { base_data_account_id, inscription_id, .. } => {
+                assert_eq!(base_data_account_id, inscription_data.pubkey());
+                assert_eq!(inscription_id, inscription);
             },
             _ => {
                 assert_eq!(true, false);

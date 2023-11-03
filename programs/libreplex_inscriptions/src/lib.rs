@@ -30,12 +30,10 @@ pub mod libreplex_inscriptions {
     }
 
     pub fn make_inscription_immutable(
-        ctx: Context<MakeInscriptionImmutable>,
-        input: MakeInscriptionImmutableInput,
+        ctx: Context<MakeInscriptionImmutable>
     ) -> Result<()> {
         instructions::make_inscription_immutable::handler(
-            ctx,
-            input
+            ctx
         )
     }
 

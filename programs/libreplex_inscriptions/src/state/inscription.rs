@@ -1,4 +1,4 @@
-use std::cell::{Ref, RefMut};
+use std::cell::RefMut;
 
 use anchor_lang::prelude::*;
 
@@ -69,6 +69,11 @@ pub struct InscriptionRank {
 }
 
 #[account]
+pub struct InscriptionData {
+    // no explicit fields. This contains the inscription data itself
+}
+
+#[account]
 pub struct Inscription {
     // no option to keep data easier to write into
     // set to 11111111.... or whatever to make this inscription immutable
@@ -78,6 +83,10 @@ pub struct Inscription {
     // could also be called inscribee but that would
     // be weird
     pub root: Pubkey, // 8 + 32 = 40
+
+    // pointer to inscription data object. This allows us to keep the data
+    // struct free of prefixes etc
+    pub inscription_data: Pubkey, 
 
     // rank 0 - unranked. ranks 1,2,3,4,5,6 represent the rank of this inscription in the order they are made immutable
     // only immutable inscriptions are ranked.
@@ -90,57 +99,57 @@ pub struct Inscription {
 }
 
 impl Inscription {
-    pub const BASE_SIZE: usize = 8 + 32 + 32 + 8 + 4; // no need for vector padding as we write bytes directly onto the account
+    pub const SIZE: usize = 8 + 32 + 32 + 32 + 8 + 4; // no need for vector padding as we write bytes directly onto the account
 
-    pub fn get_size(&self) -> usize {
-        Inscription::BASE_SIZE + self.size as usize
-    }
+    // pub fn get_size(&self) -> usize {
+    //     Inscription::BASE_SIZE + self.size as usize
+    // }
 
-    pub fn write_authority(mut current_data: RefMut<&mut [u8]>, authority: &Pubkey) -> Result<()> {
-        let current_position_slice: &mut [u8] = &mut current_data[8..40];
-        current_position_slice.copy_from_slice(authority.as_ref());
-        Ok(())
-    }
+    // pub fn write_authority(mut current_data: RefMut<&mut [u8]>, authority: &Pubkey) -> Result<()> {
+    //     let current_position_slice: &mut [u8] = &mut current_data[8..40];
+    //     current_position_slice.copy_from_slice(authority.as_ref());
+    //     Ok(())
+    // }
 
-    pub fn get_authority(current_data: Ref<&mut [u8]>) -> Result<Pubkey> {
-        Ok(Pubkey::try_from_slice(&current_data[8..40])?)
-    }
+    // pub fn get_authority(current_data: Ref<&mut [u8]>) -> Result<Pubkey> {
+    //     Ok(Pubkey::try_from_slice(&current_data[8..40])?)
+    // }
 
-    pub fn get_counter(current_data: Ref<&mut [u8]>) -> Result<u64> {
-        Ok(u64::try_from_slice(&current_data[72..76])?)
-    }
+    // pub fn get_counter(current_data: Ref<&mut [u8]>) -> Result<u64> {
+    //     Ok(u64::try_from_slice(&current_data[72..76])?)
+    // }
 
-    pub fn get_data_length(current_data: Ref<&mut [u8]>) -> Result<u32> {
-        Ok(u32::try_from_slice(&current_data[80..84])?)
-    }
+    // pub fn get_data_length(current_data: Ref<&mut [u8]>) -> Result<u32> {
+    //     Ok(u32::try_from_slice(&current_data[80..84])?)
+    // }
 
-    pub fn write_root(mut current_data: RefMut<&mut [u8]>, root: &Pubkey) -> Result<()> {
-        let current_position_slice: &mut [u8] = &mut current_data[40..72];
-        current_position_slice.copy_from_slice(root.as_ref());
-        Ok(())
-    }
+    // pub fn write_root(mut current_data: RefMut<&mut [u8]>, root: &Pubkey) -> Result<()> {
+    //     let current_position_slice: &mut [u8] = &mut current_data[40..72];
+    //     current_position_slice.copy_from_slice(root.as_ref());
+    //     Ok(())
+    // }
 
-    pub fn write_data_length_max(
-        mut current_data: RefMut<&mut [u8]>,
-        max_data_length: u32,
-    ) -> Result<()> {
-        let max_length_slice: &mut [u8] = &mut current_data[80..84];
-        max_length_slice.copy_from_slice(&max_data_length.to_le_bytes());
-        Ok(())
-    }
+    // pub fn write_data_length_max(
+    //     mut current_data: RefMut<&mut [u8]>,
+    //     max_data_length: u32,
+    // ) -> Result<()> {
+    //     let max_length_slice: &mut [u8] = &mut current_data[80..84];
+    //     max_length_slice.copy_from_slice(&max_data_length.to_le_bytes());
+    //     Ok(())
+    // }
 
     pub fn write_data(
+        &self,
         mut current_data: RefMut<&mut [u8]>,
         data_to_add: &Vec<u8>,
         start_pos: u32,
     ) -> Result<()> {
-        let data_length_max = u32::from_le_bytes(current_data[80..84].try_into().unwrap());
-
-        if start_pos + data_to_add.len() as u32 > data_length_max {
+        
+        if start_pos + data_to_add.len() as u32 > self.size {
             return Err(ErrorCode::MaxSizeExceeded.into());
         }
 
-        let current_index = Inscription::BASE_SIZE + start_pos as usize;
+        let current_index = start_pos as usize;
         let data_slice: &mut [u8] =
             &mut current_data[current_index..current_index + data_to_add.len()];
         data_slice.copy_from_slice(data_to_add);

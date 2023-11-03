@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{Metadata, DelegatePermissions, PermissionType, Asset};
 
-use crate::{errors::ErrorCode};
+use crate::errors::ErrorCode;
 
 
 // Adds a metadata to a group
@@ -40,9 +40,7 @@ pub fn handler(ctx: Context<DeleteMetadata>
     let metadata = &mut ctx.accounts.metadata;
 
     if let Asset::Inscription {
-                    account_id: _,
-                    data_type: _,
-                    description: _
+                  ..
                  } = &metadata.asset {
                  return Err(ErrorCode::InvokeDeleteInscriptionMetadata.into())    
     };

@@ -21,8 +21,14 @@ pub struct WriteToInscription<'info> {
     pub authority: Signer<'info>,
 
     /// CHECK: Authority checked in logic
+    #[account(mut,
+        constraint = inscription.authority == authority.key(),
+        constraint = inscription.inscription_data == inscription_data.key())]
+    pub inscription: Account<'info, Inscription>,
+
+    /// CHECK: we never want anchor to handle this. It's just a data blob 
     #[account(mut)]
-    pub inscription: UncheckedAccount<'info>,
+    pub inscription_data: UncheckedAccount<'info>,
 
     pub system_program: Program<'info, System>,
 }
@@ -35,17 +41,21 @@ pub fn handler(
 
     let authority = &ctx.accounts.authority;
 
-    let inscription_account_info = inscription.to_account_info();
+    let inscription_data = &ctx.accounts.inscription_data;
+
+    let inscription_data_account_info = inscription_data.to_account_info();
     // check that the authority matches
 
-    let inscription_authority = Inscription::get_authority(inscription_account_info.data.borrow())?;
-
-    if inscription_authority != authority.key() {
+    if inscription.authority != authority.key() {
         return Err(ErrorCode::BadAuthority.into());
     }
 
-    Inscription::write_data(
-        inscription_account_info.data.borrow_mut(),
+    if inscription.inscription_data != inscription_data.key() {
+        return Err(ErrorCode::IncorrectInscriptionDataAccount.into());
+    }
+
+    inscription.write_data(
+        inscription_data_account_info.data.borrow_mut(),
         &inscription_input.data,
         inscription_input.start_pos,
     )?;

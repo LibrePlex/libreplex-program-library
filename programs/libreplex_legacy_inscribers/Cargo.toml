@@ -1,5 +1,5 @@
 [package]
-name = "legacy_inscriber"
+name = "libreplex_legacy_inscribers"
 version = "0.0.0"
 description = "Created with Anchor"
 edition = "2021"
@@ -8,7 +8,7 @@ repository = "https://github.com/LibrePlex/metadata"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "legacy_inscriber"
+name = "libreplex_legacy_inscribers"
 
 [features]
 no-entrypoint = []

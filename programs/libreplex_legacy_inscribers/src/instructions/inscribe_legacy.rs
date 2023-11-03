@@ -24,6 +24,10 @@ pub struct InscribeLegacy<'info> {
     #[account(mut)]
     pub inscription: UncheckedAccount<'info>,
 
+      /// CHECK: Checked via a CPI call
+      #[account(mut)]
+      pub inscription_data: UncheckedAccount<'info>,
+
     /// CHECK: Checked via a CPI call
     #[account(mut)]
     pub inscription_summary: UncheckedAccount<'info>,
@@ -69,12 +73,19 @@ pub struct InscribeLegacy<'info> {
 pub fn handler(ctx: Context<InscribeLegacy>, input: InscribeLegacyInput) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
+   
     let inscription = &mut ctx.accounts.inscription;
+    let inscription_data = &mut ctx.accounts.inscription_data;
     let system_program = &ctx.accounts.system_program;
     let authority = &ctx.accounts.authority;
     let mint = &ctx.accounts.mint;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
     let legacy_object = &ctx.accounts.legacy_object;
+    
+    let inscription_ranks_current_page = &ctx.accounts.inscription_ranks_current_page;
+    let inscription_ranks_next_page = &ctx.accounts.inscription_ranks_next_page;
+    
+
     match input.legacy_type {
         LegacyType::MetaplexMint => {
             // make sure we are dealing with the correct metadata object.
@@ -114,6 +125,7 @@ pub fn handler(ctx: Context<InscribeLegacy>, input: InscribeLegacyInput) -> Resu
         &[ctx.bumps["legacy_inscription"]],
     ];
 
+
     libreplex_inscriptions::cpi::create_inscription(
         CpiContext::new_with_signer(
             inscriptions_program.to_account_info(),
@@ -126,6 +138,9 @@ pub fn handler(ctx: Context<InscribeLegacy>, input: InscribeLegacyInput) -> Resu
                 inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),
                 payer: authority.to_account_info(),
+                inscription_data: inscription_data.to_account_info(),
+                inscription_ranks_current_page: inscription_ranks_current_page.to_account_info(),
+                inscription_ranks_next_page: inscription_ranks_next_page.to_account_info()
             },
             &[inscription_auth_seeds],
         ),

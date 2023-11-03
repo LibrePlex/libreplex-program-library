@@ -3,7 +3,7 @@ use instructions::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-declare_id!("LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p");
+declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
 
 pub mod constants;
 pub mod errors;
@@ -44,9 +44,8 @@ pub mod libreplex_metadata {
 
     pub fn make_immutable(
         ctx: Context<MakeImmutable>,
-        input: libreplex_inscriptions::instructions::MakeInscriptionImmutableInput,
         legacy_input: InscribeLegacyInput,
     ) -> Result<()> {
-        instructions::make_immutable::handler(ctx, input, legacy_input)
+        instructions::make_immutable::handler(ctx, legacy_input)
     }
 }

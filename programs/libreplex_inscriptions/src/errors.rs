@@ -18,5 +18,8 @@ pub enum ErrorCode {
     MaxSizeExceeded,
 
     #[msg("Bad page")]
-    BadInscriptionRankPage
+    BadInscriptionRankPage,
+
+    #[msg("Incorrect inscription data account")]
+    IncorrectInscriptionDataAccount
 }

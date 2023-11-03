@@ -1,6 +1,6 @@
 [package]
 name = "libreplex_inscriptions"
-version = "0.2.0"
+version = "0.2.1"
 description = "Inscriptions from LibrePlex"
 license = "MIT"
 edition = "2021"

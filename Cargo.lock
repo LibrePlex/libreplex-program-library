@@ -2031,21 +2031,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
-name = "legacy_inscriber"
-version = "0.0.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "libreplex_inscriptions",
- "mocha",
- "mpl-token-metadata",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
-]
-
-[[package]]
 name = "libc"
 version = "0.2.147"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2105,7 +2090,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_inscriptions"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anchor-attribute-event",
  "anchor-derive-accounts",
@@ -2118,8 +2103,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "libreplex_legacy_inscribers"
+version = "0.0.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "assert_matches",
+ "libreplex_inscriptions",
+ "mocha",
+ "mpl-token-metadata",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+]
+
+[[package]]
 name = "libreplex_metadata"
-version = "0.16.1"
+version = "0.16.2"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

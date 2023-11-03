@@ -2,10 +2,6 @@ use solana_program_test::{processor, tokio, ProgramTest};
 
 const METADATA_NAME: &str = "MD1";
 
-const METADATA_NAME_NEW: &str = "MD2";
-
-const METADATA_SYMBOL_NEW: &str = "SYMBOL2";
-
 pub mod create_metadata_update_summary_util;
 use create_metadata_update_summary_util::*;
 
