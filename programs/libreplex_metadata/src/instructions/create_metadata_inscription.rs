@@ -73,7 +73,7 @@ pub struct CreateInscriptionMetadata<'info> {
 
     /// CHECK: checked via CPI
     #[account(mut)]
-    pub inscription_data: Signer<'info>,
+    pub inscription_data: UncheckedAccount<'info>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)] 
@@ -137,7 +137,6 @@ pub fn handler(
         ),
         libreplex_inscriptions::instructions::CreateInscriptionInput {
             authority: Some(signer.key()),
-            max_data_length: 0,
             current_rank_page: 0,
             signer_type: SignerType::Root
         },

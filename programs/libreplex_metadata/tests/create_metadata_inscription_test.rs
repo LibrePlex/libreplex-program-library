@@ -1,5 +1,5 @@
-use anchor_spl::token::Mint as SplMint;
 use anchor_lang::Result;
+use anchor_spl::token::Mint as SplMint;
 use solana_program_test::*;
 use spl_token_2022::ID;
 
@@ -7,9 +7,12 @@ const METADATA_NAME: &str = "MD-inscription";
 
 mod permissions {
     use anchor_lang::{prelude::Account, system_program, InstructionData, Key, ToAccountMetas};
-    use libreplex_inscriptions::{Inscription, instructions::CreateInscriptionRankInput, accounts::CreateInscriptionRank};
+    use libreplex_inscriptions::{
+        accounts::CreateInscriptionRank, instructions::CreateInscriptionRankInput, Inscription,
+    };
     use libreplex_metadata::{
-        accounts::CreateInscriptionMetadata, instructions::CreateMetadataInscriptionInput, Metadata, Asset,
+        accounts::CreateInscriptionMetadata, instructions::CreateMetadataInscriptionInput, Asset,
+        Metadata,
     };
     use solana_program::{
         account_info::AccountInfo, instruction::Instruction, pubkey::Pubkey, system_instruction,
@@ -48,16 +51,13 @@ mod permissions {
             &ID,
         );
 
+        let inscription_ranks_current_page = create_inscription_rank_and_wait(&mut context, 0)
+            .await
+            .unwrap();
 
-        let inscription_ranks_current_page = create_inscription_rank_and_wait(
-            &mut context,
-            0
-        ).await.unwrap();
-
-        let inscription_ranks_next_page = create_inscription_rank_and_wait(
-            &mut context,
-            1
-        ).await.unwrap();
+        let inscription_ranks_next_page = create_inscription_rank_and_wait(&mut context, 1)
+            .await
+            .unwrap();
 
         let initialize_ix = spl_token_2022::instruction::initialize_mint2(
             &ID,
@@ -93,67 +93,57 @@ mod permissions {
         )
         .0;
 
-        let inscription_data = Keypair::new();
-
-        let rent = context.banks_client.get_rent().await.unwrap();
-
-        let initialise_inscription_data_tx = system_instruction::create_account(
-            &context.payer.pubkey(),
-            &inscription_data.pubkey(),
-            rent.minimum_balance(Inscription::BASE_SIZE + 1024_usize),
-            Inscription::BASE_SIZE as u64 + 1024_u64,
-            &libreplex_inscriptions::id(),
-        );
+        let inscription_data = Pubkey::find_program_address(
+            &["inscription_data".as_bytes(), mint.pubkey().as_ref()],
+            &libreplex_inscriptions::ID,
+        )
+        .0;
 
         // msg!("inscription {}", inscription.pubkey);
 
         let inscription_summary =
             Pubkey::find_program_address(&[b"inscription_summary"], &libreplex_inscriptions::ID).0;
 
-
-        let create_metadata_accounts = CreateInscriptionMetadata {
-            signer: collection_authority,
-            metadata: metadata.key(),
-            mint: mint.pubkey(),
-            inscription_summary,
-            inscription_ranks_current_page,
-            inscription_ranks_next_page,
-            inscription,
-            inscription_data: inscription_data.pubkey(),
-            inscriptions_program: libreplex_inscriptions::ID,
-            system_program: system_program::ID,
-        }
-        .to_account_metas(None);
-
-        let create_metadata = libreplex_metadata::instruction::CreateInscriptionMetadata {
-            metadata_input: CreateMetadataInscriptionInput {
-                description: None,
-                data_type: "".to_string(),
-                name: METADATA_NAME.to_string(),
-                update_authority: collection_authority,
-                symbol: "COOL".to_string(),
-                extensions: vec![],
-            },
-        };
-
-        let create_metadata = Instruction {
-            data: create_metadata.data(),
-            program_id: libreplex_metadata::ID,
-            accounts: create_metadata_accounts,
-        };
-
-        let transaction = Transaction::new_signed_with_payer(
-            &[initialise_inscription_data_tx, create_metadata],
-            Some(&context.payer.pubkey()),
-            &[&context.payer, &mint, &inscription_data],
-            context.last_blockhash,
-        );
+        println!("creating metadata");
 
         context
             .banks_client
-            .process_transaction(transaction)
+            .process_transaction(Transaction::new_signed_with_payer(
+                &[Instruction {
+                    data: libreplex_metadata::instruction::CreateInscriptionMetadata {
+                        metadata_input: CreateMetadataInscriptionInput {
+                            description: None,
+                            data_type: "".to_string(),
+                            name: METADATA_NAME.to_string(),
+                            update_authority: collection_authority,
+                            symbol: "COOL".to_string(),
+                            extensions: vec![],
+                        },
+                    }
+                    .data(),
+                    program_id: libreplex_metadata::ID,
+                    accounts: CreateInscriptionMetadata {
+                        signer: collection_authority,
+                        metadata: metadata.key(),
+                        mint: mint.pubkey(),
+                        inscription_summary,
+                        inscription_ranks_current_page,
+                        inscription_ranks_next_page,
+                        inscription,
+                        inscription_data,
+                        inscriptions_program: libreplex_inscriptions::ID,
+                        system_program: system_program::ID,
+                    }
+                    .to_account_metas(None),
+                }],
+                Some(&context.payer.pubkey()),
+                &[&context.payer, &mint],
+                context.last_blockhash,
+            ))
             .await
             .unwrap();
+
+        println!("metadata created");
 
         let mut metadata_account = context
             .banks_client
@@ -178,38 +168,42 @@ mod permissions {
         assert_eq!(metadata_obj.name, METADATA_NAME);
 
         match metadata_obj.asset {
-            Asset::Inscription { base_data_account_id, inscription_id, .. } => {
-                assert_eq!(base_data_account_id, inscription_data.pubkey());
+            Asset::Inscription {
+                base_data_account_id,
+                inscription_id,
+                ..
+            } => {
+                assert_eq!(base_data_account_id, inscription_data);
                 assert_eq!(inscription_id, inscription);
-            },
+            }
             _ => {
                 assert_eq!(true, false);
             }
-           
         };
     }
 
     pub async fn create_inscription_rank_and_wait(
         context: &mut ProgramTestContext,
         page_index: u32,
-    ) -> Result<Pubkey>{
+    ) -> Result<Pubkey> {
         let page = Pubkey::find_program_address(
-            &["inscription_rank".as_bytes(), &(page_index as u32).to_le_bytes()],
+            &[
+                "inscription_rank".as_bytes(),
+                &(page_index as u32).to_le_bytes(),
+            ],
             &libreplex_inscriptions::id(),
         )
         .0;
-      
-        let create_inscription_rank_input = libreplex_inscriptions::instruction::CreateInscriptionRankPage {
-            input: CreateInscriptionRankInput {
-                page_index
-            }
-        };
 
+        let create_inscription_rank_input =
+            libreplex_inscriptions::instruction::CreateInscriptionRankPage {
+                input: CreateInscriptionRankInput { page_index },
+            };
 
         let create_inscription_rank_accounts = CreateInscriptionRank {
             payer: context.payer.pubkey(),
             page,
-            system_program: system_program::ID
+            system_program: system_program::ID,
         };
 
         let create_inscription_rank_ix = Instruction {

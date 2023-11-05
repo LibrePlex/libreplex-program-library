@@ -23,11 +23,6 @@ mod create_metadata_update_summary_test {
             processor!(libreplex_metadata::entry),
         );
 
-        program.add_program(
-            "spl_token_2022",
-            ID,
-            processor!(spl_token_2022::processor::Processor::process),
-        );
 
         let mut context = program.start_with_context().await;
         let _collection_authority = context.payer.pubkey();

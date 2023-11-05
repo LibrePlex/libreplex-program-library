@@ -2,6 +2,9 @@ use std::cmp::{self};
 
 use crate::Inscription;
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::program::{invoke, invoke_signed};
+use anchor_lang::solana_program::system_instruction;
+use std::cmp::Ordering;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum Change {
@@ -57,13 +60,20 @@ pub struct ResizeInscription<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
     /// CHECK: validated in logic
     #[account(mut,
         constraint = inscription.authority == authority.key())]
     pub inscription: Account<'info, Inscription>,
 
     /// CHECK: validated in logic
-    #[account(mut)]
+    #[account(mut,
+    seeds=[
+        "inscription_data".as_bytes(),
+        inscription.root.as_ref()
+    ],bump)]
     pub inscription_data: UncheckedAccount<'info>,
 
     pub system_program: Program<'info, System>,
@@ -77,6 +87,11 @@ pub fn handler(
 
     let inscription_data = &mut ctx.accounts.inscription_data;
 
+    let system_program = &mut ctx.accounts.system_program;
+    let payer = &mut ctx.accounts.payer;
+
+    let size_old = inscription.size;
+    msg!("before: {}", size_old);
     inscription.size = match inscription_input.change {
         Change::Increase { amount } => {
             cmp::min(inscription.size + amount, inscription_input.target_size)
@@ -85,6 +100,51 @@ pub fn handler(
             cmp::max(inscription.size - amount, inscription_input.target_size)
         }
     };
+
+    let size_new = inscription.size;
+
+    let rent = Rent::get()?;
+    let new_minimum_balance = rent.minimum_balance(size_new as usize);
+
+    let inscription_root = inscription.root.key();
+    match size_new.cmp(&size_old) {
+        Ordering::Less => {
+            let lamports_diff = new_minimum_balance.saturating_sub(inscription_data.lamports());
+            // reducing
+            invoke(
+                &system_instruction::transfer(&payer.key(), inscription_data.key, lamports_diff),
+                &[
+                    payer.to_account_info(),
+                    inscription_data.to_account_info(),
+                    system_program.to_account_info(),
+                ],
+            )?;
+        }
+        Ordering::Greater => {
+            let auth_seeds = [
+                "inscription_data".as_bytes(),
+                inscription_root.as_ref(),
+                &[ctx.bumps["inscription_data"]],
+            ];
+
+            let lamports_diff = inscription_data
+                .lamports()
+                .saturating_sub(new_minimum_balance);
+            // increasing
+            invoke_signed(
+                &system_instruction::transfer(inscription_data.key, &payer.key(), lamports_diff),
+                &[
+                    inscription_data.to_account_info(),
+                    payer.to_account_info(),
+                    system_program.to_account_info(),
+                ],
+                &[&auth_seeds],
+            )?;
+        }
+        _ => {
+            // do nothing - already at target
+        }
+    }
 
     inscription_data.realloc(inscription.size as usize, false)?;
 

@@ -16,7 +16,6 @@ pub enum SignerType {
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateInscriptionInput {
-    pub max_data_length: u32,
     pub authority: Option<Pubkey>,
     // each rank page holds a maximum of 320000 inscription ids.
     // when this runs out, we move onto the next page
@@ -26,8 +25,7 @@ pub struct CreateInscriptionInput {
 
 impl CreateInscriptionInput {
     pub fn get_size(&self) -> u32 {
-        self.max_data_length
-            + 1
+            1
             + match self.authority {
                 Some(_) => 32,
                 None => 0,
@@ -78,7 +76,17 @@ pub struct CreateInscription<'info> {
         can be derived from the base address
     */
     /// CHECK: Created outside and zero
-    #[account(zero)]
+    #[account(
+        init,
+        payer = payer,
+        // starts with base anchor discriminator, although this will be overwritten
+        // by data
+        space = 8, 
+        seeds=[
+            "inscription_data".as_bytes(),
+            root.key().as_ref()
+        ],
+        bump)]
     pub inscription_data: Account<'info, InscriptionData>,
 
     /// CHECK: validated in logic
@@ -104,7 +112,6 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     let inscription = &mut ctx.accounts.inscription;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
 
-
     let authority = match input.authority {
         Some(x) => x.to_owned(),
         None => ctx.accounts.payer.key(),
@@ -126,7 +133,7 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     inscription_summary.inscription_count_total += 1;
 
     inscription.authority = authority;
-    inscription.size = input.max_data_length;
+    inscription.size = 8;
     inscription.inscription_data = inscription_data.key();
     inscription.root = ctx.accounts.root.key();
     let signer = ctx.accounts.signer.key();
@@ -202,7 +209,7 @@ fn reallocate_rank_page<'info>(
         &system_instruction::transfer(
             &payer.key(),
             inscriptions_ranks_page.key,
-            lamports_diff * 1000,
+            lamports_diff,
         ),
         &[
             payer.clone(),

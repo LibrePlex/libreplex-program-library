@@ -24,10 +24,10 @@ mod create_metadata_test {
         );
 
   
-        program.add_program(
-            "spl_token_2022", 
-            ID, 
-            processor!(spl_token_2022::processor::Processor::process));
+        // program.add_program(
+        //     "spl_token_2022", 
+        //     ID, 
+        //     processor!(spl_token_2022::processor::Processor::process));
        
 
         let mut context = program.start_with_context().await;

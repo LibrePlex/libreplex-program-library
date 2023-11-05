@@ -17,6 +17,9 @@ pub struct ResizeLegacyInscription<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
     /// CHECK: checked in logic
     pub owner: UncheckedAccount<'info>,
 
@@ -82,6 +85,8 @@ pub fn handler(
     let mint = &ctx.accounts.mint;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
 
+    let payer = &ctx.accounts.payer;
+
     let metaplex_metadata = &ctx.accounts.legacy_metadata;
     let mai = metaplex_metadata.to_account_info().clone();
     let data: &[u8] = &mai.try_borrow_data()?[..];
@@ -109,6 +114,7 @@ pub fn handler(
         CpiContext::new_with_signer(
             inscriptions_program.to_account_info(),
             ResizeInscription {
+                payer: payer.to_account_info(),
                 authority: legacy_inscription.to_account_info(),
                 inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),

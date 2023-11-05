@@ -192,7 +192,6 @@ pub fn handler(ctx: Context<InscribeLegacyMetadata>, authority_type: AuthorityTy
              3) make the inscription immutable (and get a rank)
             */
             authority: Some(legacy_inscription.key()), // this includes update auth / holder, hence
-            max_data_length: 0,
             current_rank_page: 0,
             signer_type: SignerType::LegacyMetadataSigner,
         },

@@ -3,6 +3,8 @@ use std::fmt;
 use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
+use crate::instructions::inscribe_metaplex_metadata::AuthorityType;
+
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, Debug)]
 pub enum LegacyType {
     MetaplexMint,
@@ -25,6 +27,7 @@ pub struct LegacyInscription {
     pub mint: Pubkey,
     pub inscription: Pubkey,
     pub legacy_type: LegacyType,
+    pub authority_type: AuthorityType
     
 }
 
