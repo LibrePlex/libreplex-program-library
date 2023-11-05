@@ -2,7 +2,7 @@ use crate::errors::ErrorCode;
 
 use crate::{
     Inscription, InscriptionData, InscriptionEvent, InscriptionEventType, InscriptionRankPage,
-    InscriptionSummary,
+    InscriptionSummary, MediaType, EncodingType,
 };
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke;
@@ -21,6 +21,8 @@ pub struct CreateInscriptionInput {
     // when this runs out, we move onto the next page
     pub current_rank_page: u32,
     pub signer_type: SignerType,
+    pub media_type: MediaType,
+    pub encoding_type: EncodingType
 }
 
 impl CreateInscriptionInput {
@@ -136,6 +138,8 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     inscription.size = 8;
     inscription.inscription_data = inscription_data.key();
     inscription.root = ctx.accounts.root.key();
+    inscription.media_type = input.media_type;
+    inscription.encoding_type = input.encoding_type;
     let signer = ctx.accounts.signer.key();
     let root_key = inscription.root.key();
 

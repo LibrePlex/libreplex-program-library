@@ -1,18 +1,26 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, TokenAccount};
 use libreplex_inscriptions::{
-    cpi::accounts::WriteToInscription, instructions::WriteToInscriptionInput,
+    cpi::accounts::WriteToInscription, instructions::WriteToInscriptionInput as WriteToInscriptionInputOrig,
     program::LibreplexInscriptions,
 };
 
 
 use crate::legacy_inscription::LegacyInscription;
 
-use super::inscribe_metaplex_metadata::AuthorityType;
+use super::check_permissions::check_permissions;
+
+// having to redefine this here as otherwise anchor IDL will be missing a type
+// hope this gets sorted at some point!
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct WriteToLegacyInscriptionInput {
+    pub data: Vec<u8>,
+    pub start_pos: u32,
+
+}
 
 // Adds a metadata to a group
 #[derive(Accounts)]
-#[instruction(authority_type: AuthorityType)]
 pub struct WriteToLegacyInscription<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -45,9 +53,12 @@ pub struct WriteToLegacyInscription<'info> {
     )]
     pub token_account: Box<Account<'info, TokenAccount>>,
 
+    /// CHECK: Checked in logic
+    #[account()]
+    pub legacy_metadata: UncheckedAccount<'info>,
+
     #[account(mut,
     seeds=[
-        &(authority_type as u32).to_le_bytes(),
         "legacy_inscription".as_bytes(),
         mint.key().as_ref()
     ], bump)]
@@ -67,8 +78,7 @@ pub struct WriteToLegacyInscription<'info> {
 
 pub fn handler(
     ctx: Context<WriteToLegacyInscription>,
-    authority_type: AuthorityType,
-    input: WriteToInscriptionInput,
+    input: WriteToLegacyInscriptionInput,
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription = &mut ctx.accounts.inscription;
@@ -83,11 +93,17 @@ pub fn handler(
     // metadata object
     let mint_key = mint.key();
     let inscription_auth_seeds: &[&[u8]] = &[
-        &(authority_type as u32).to_le_bytes(),
         mint_key.as_ref(),
         &[ctx.bumps["legacy_inscription"]],
     ];
 
+    let authority = &ctx.accounts.authority;
+
+    let auth_key = authority.key();
+
+    let legacy_metadata = &ctx.accounts.legacy_metadata;
+
+    check_permissions(legacy_metadata, mint, legacy_inscription.authority_type, auth_key)?;
 
     libreplex_inscriptions::cpi::write_to_inscription(
         CpiContext::new_with_signer(
@@ -101,7 +117,10 @@ pub fn handler(
             },
             &[inscription_auth_seeds],
         ),
-        input,
+        WriteToInscriptionInputOrig {
+            data: input.data,
+            start_pos: input.start_pos
+        },
     )?;
 
     Ok(())

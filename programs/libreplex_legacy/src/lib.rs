@@ -28,24 +28,28 @@ pub mod libreplex_legacy {
 
     pub fn write_to_legacy_inscription(
         ctx: Context<WriteToLegacyInscription>,
-        authority_type: AuthorityType,
-        input: libreplex_inscriptions::instructions::WriteToInscriptionInput,
+        input: WriteToLegacyInscriptionInput,
     ) -> Result<()> {
-        instructions::write_to_legacy_inscription::handler(ctx, authority_type,  input)
+        instructions::write_to_legacy_inscription::handler(ctx,  input)
     }
 
     pub fn resize_legacy_inscription(
         ctx: Context<ResizeLegacyInscription>,
-        input: libreplex_inscriptions::instructions::ResizeInscriptionInput,
-        authority_type: AuthorityType
+        input: ResizeLegacyInscriptionInput,
     ) -> Result<()> {
-        instructions::resize_legacy_inscription::handler(ctx, input, authority_type)
+        instructions::resize_legacy_inscription::handler(ctx, input)
     }
 
     pub fn make_immutable(
         ctx: Context<MakeImmutable>,
-        authority_type: AuthorityType
     ) -> Result<()> {
-        instructions::make_immutable::handler(ctx, authority_type)
+        instructions::make_immutable::handler(ctx)
+    }
+
+    pub fn set_validation_hash(
+        ctx: Context<SetValidationHash>,
+        validation_hash: Option<String>,
+    ) -> Result<()> {
+        instructions::set_validation_hash::handler(ctx, validation_hash)
     }
 }

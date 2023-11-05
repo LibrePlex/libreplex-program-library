@@ -10,10 +10,24 @@ pub enum SummaryExtension {
     None,
 }
 
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub enum MediaType {
+    Image,
+    Erc721
+}
+
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub enum EncodingType {
+    Base64,
+}
+
 #[account]
 pub struct InscriptionRankPage {
     pub size: u32,
 }
+
+
 
 impl InscriptionRankPage {
     // discriminator + vector size
@@ -57,7 +71,7 @@ pub struct InscriptionSummary {
 }
 
 impl InscriptionSummary {
-    pub const BASE_SIZE: usize = 8 + 8 + 8 + 32 + 32 + 8 + 2;
+    pub const BASE_SIZE: usize = 8 + 8 + 8 + 32 + 32 + 8 + 2 + 2;
 }
 
 #[account]
@@ -83,6 +97,12 @@ pub struct Inscription {
     // could also be called inscribee but that would
     // be weird
     pub root: Pubkey, // 8 + 32 = 40
+
+
+    // media type - image, erc721, mov, html, etc
+    pub media_type: MediaType,
+
+    pub encoding_type: EncodingType,
 
     // pointer to inscription data object. This allows us to keep the data
     // struct free of prefixes etc
@@ -118,40 +138,7 @@ pub struct Inscription {
 }
 
 impl Inscription {
-    pub const BASE_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 4 + 1; // no need for vector padding as we write bytes directly onto the account
-
-    // pub fn write_authority(mut current_data: RefMut<&mut [u8]>, authority: &Pubkey) -> Result<()> {
-    //     let current_position_slice: &mut [u8] = &mut current_data[8..40];
-    //     current_position_slice.copy_from_slice(authority.as_ref());
-    //     Ok(())
-    // }
-
-    // pub fn get_authority(current_data: Ref<&mut [u8]>) -> Result<Pubkey> {
-    //     Ok(Pubkey::try_from_slice(&current_data[8..40])?)
-    // }
-
-    // pub fn get_counter(current_data: Ref<&mut [u8]>) -> Result<u64> {
-    //     Ok(u64::try_from_slice(&current_data[72..76])?)
-    // }
-
-    // pub fn get_data_length(current_data: Ref<&mut [u8]>) -> Result<u32> {
-    //     Ok(u32::try_from_slice(&current_data[80..84])?)
-    // }
-
-    // pub fn write_root(mut current_data: RefMut<&mut [u8]>, root: &Pubkey) -> Result<()> {
-    //     let current_position_slice: &mut [u8] = &mut current_data[40..72];
-    //     current_position_slice.copy_from_slice(root.as_ref());
-    //     Ok(())
-    // }
-
-    // pub fn write_data_length_max(
-    //     mut current_data: RefMut<&mut [u8]>,
-    //     max_data_length: u32,
-    // ) -> Result<()> {
-    //     let max_length_slice: &mut [u8] = &mut current_data[80..84];
-    //     max_length_slice.copy_from_slice(&max_data_length.to_le_bytes());
-    //     Ok(())
-    // }
+    pub const BASE_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 4 + 1 + 2; // no need for vector padding as we write bytes directly onto the account
 
     pub fn write_data(
         &self,

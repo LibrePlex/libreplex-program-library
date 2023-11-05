@@ -1,31 +1,15 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
-    cpi::accounts::CreateInscription, program::LibreplexInscriptions, instructions::SignerType,
+    cpi::accounts::CreateInscription, program::LibreplexInscriptions, instructions::SignerType, EncodingType,
 };
-use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
-
-use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
 
-/* 
-    This signer is needed when holder inscribes their mints.
-    In that case, we need a second signer to validate the
-    inscription content.
 
-    For update authority we don't care so much. It's their 
-    collection and they can put whatever junk they want in the 
-    inscription.
+use crate::{legacy_inscription::LegacyInscription, LegacyType};
 
-    However we do want to prevent scenarios where the holder
-    buys a turbo-rug for 0.01 SOL and then uploads a mad lad 
-    skull as an inscription in the hopes of flogging it off
-    to the highest bidder.
-*/
-pub mod content_validator_signer {
-    use anchor_lang::declare_id;
-    declare_id!("S1GNkYN3NZxyKVZfaTecXbrb8tA8yDMEUYFxd9yuW22");
-}
+use super::check_permissions::check_permissions;
+
 
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize, PartialEq, Copy)]
@@ -97,7 +81,6 @@ pub struct InscribeLegacyMetadata<'info> {
         payer = authority,
         space = LegacyInscription::SIZE,
         seeds=[
-            &(authority_type as u32).to_le_bytes(),
             "legacy_inscription".as_bytes(),
             mint.key().as_ref()
         ], bump)]
@@ -131,13 +114,17 @@ pub fn handler(ctx: Context<InscribeLegacyMetadata>, authority_type: AuthorityTy
     let system_program = &ctx.accounts.system_program;
     let authority = &ctx.accounts.authority;
     let mint = &ctx.accounts.mint;
-    let legacy_inscription = &ctx.accounts.legacy_inscription;
+    let legacy_inscription = &mut ctx.accounts.legacy_inscription;
     let legacy_mint = &ctx.accounts.legacy_mint;
 
     let inscription_ranks_current_page = &ctx.accounts.inscription_ranks_current_page;
     let inscription_ranks_next_page = &ctx.accounts.inscription_ranks_next_page;
-    let metaplex_metadata = &ctx.accounts.legacy_metadata;
+    let legacy_metadata = &ctx.accounts.legacy_metadata;
 
+    legacy_inscription.authority_type = authority_type;
+    legacy_inscription.mint = mint.key();
+    legacy_inscription.inscription = inscription.key();
+    legacy_inscription.legacy_type = LegacyType::MetaplexMint;
     let auth_key = ctx.accounts.authority.key();
     // make sure we are dealing with the correct metadata object.
     // this is to ensure that the mint in question is in fact a legacy
@@ -145,9 +132,8 @@ pub fn handler(ctx: Context<InscribeLegacyMetadata>, authority_type: AuthorityTy
 
     let expected_bump = ctx.bumps["legacy_inscription"];
     let mint_key = mint.key();
-    check_permissions(metaplex_metadata, mint, authority_type, auth_key)?;
+    check_permissions(legacy_metadata, mint, authority_type, auth_key)?;
     let inscription_auth_seeds: &[&[u8]] = &[
-        &(authority_type as u32).to_le_bytes(),
         mint_key.as_ref(),
         &[expected_bump],
     ];
@@ -194,46 +180,10 @@ pub fn handler(ctx: Context<InscribeLegacyMetadata>, authority_type: AuthorityTy
             authority: Some(legacy_inscription.key()), // this includes update auth / holder, hence
             current_rank_page: 0,
             signer_type: SignerType::LegacyMetadataSigner,
+            encoding_type: EncodingType::Base64,
+            media_type: libreplex_inscriptions::MediaType::Image
         },
     )?;
 
-    Ok(())
-}
-
-fn check_permissions(metaplex_metadata: &UncheckedAccount<'_>, mint: &Account<Mint>, authority_type: AuthorityType, auth_key: Pubkey) 
-    -> Result<()> {
-    let mai = metaplex_metadata.to_account_info().clone();
-    let data: &[u8] = &mai.try_borrow_data()?[..];
-    let metadata_obj = Metadata::deserialize(&mut data.clone())?;
-    if metadata_obj.mint != mint.key() {
-        return Err(LegacyInscriptionErrorCode::BadMint.into());
-    }
-    if (authority_type == AuthorityType::UpdateAuthority
-        && metadata_obj.update_authority != auth_key)
-        || 
-        // if authority == Holder, anybody can sign this. Because of the second signature
-        // i.e. the content validator, we know that the request is bona fide and a hash 
-        // will be set. only the holder can upload / resize at this point, but the upload
-        // has to conform to the hash.
-        (authority_type == AuthorityType::Holder
-            && auth_key != content_validator_signer::id())
-    {
-        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
-    }
-    match metadata_obj.token_standard {
-        Some(x) => match &x {
-            TokenStandard::Fungible => {
-                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-            }
-            TokenStandard::FungibleAsset => {
-                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-            }
-            _ => {}
-        },
-        None => {
-            return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-        }
-    }
-   
     Ok(())
 }

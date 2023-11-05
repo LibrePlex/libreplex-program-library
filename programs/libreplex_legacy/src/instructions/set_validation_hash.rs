@@ -1,18 +1,23 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
-    cpi::accounts::SetValidationHash as BaseSetValidationHash,
-    program::LibreplexInscriptions,
+    cpi::accounts::SetValidationHash as BaseSetValidationHash, program::LibreplexInscriptions,
 };
+use mpl_token_metadata::accounts::Metadata;
 
-use crate::legacy_inscription::LegacyInscription;
+use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use super::inscribe_metaplex_metadata::AuthorityType;
+use super::{
+    check_permissions::content_validator_signer, inscribe_metaplex_metadata::AuthorityType,
+};
 
 // Adds a metadata to a group
 #[derive(Accounts)]
 #[instruction(authority_type: AuthorityType)]
 pub struct SetValidationHash<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -22,9 +27,12 @@ pub struct SetValidationHash<'info> {
     #[account(mut)]
     pub inscription: UncheckedAccount<'info>,
 
+    /// CHECK: Checked via a CPI call
+    #[account(mut)]
+    pub legacy_metadata: UncheckedAccount<'info>,
+
     #[account(mut,
     seeds=[
-        &(authority_type as u32).to_le_bytes(),
         "legacy_inscription".as_bytes(),
         mint.key().as_ref()
     ], bump)]
@@ -37,7 +45,6 @@ pub struct SetValidationHash<'info> {
 
 pub fn handler(
     ctx: Context<SetValidationHash>,
-    authority_type: AuthorityType,
     validation_hash: Option<String>,
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
@@ -46,7 +53,9 @@ pub fn handler(
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
+    let legacy_metadata = &ctx.accounts.legacy_metadata;
 
+    let authority = &ctx.accounts.authority;
     /*
     check that authority is OK.
     For update authority, no second signer is needed
@@ -54,11 +63,31 @@ pub fn handler(
     // TODO: Check permissions
 
     let mint_key = mint.key();
-    let inscription_auth_seeds: &[&[u8]] = &[
-        &(authority_type as u32).to_le_bytes(),
-        mint_key.as_ref(),
-        &[ctx.bumps["legacy_inscription"]],
-    ];
+    let inscription_auth_seeds: &[&[u8]] = &[mint_key.as_ref(), &[ctx.bumps["legacy_inscription"]]];
+
+    let mai = legacy_metadata.to_account_info().clone();
+    let data: &[u8] = &mai.try_borrow_data()?[..];
+    let metadata_obj = Metadata::deserialize(&mut data.clone())?;
+    if metadata_obj.mint != mint.key() {
+        return Err(LegacyInscriptionErrorCode::BadMint.into());
+    }
+
+    if authority.key() != content_validator_signer::ID {
+        match legacy_inscription.authority_type {
+            AuthorityType::Holder => {
+                // A holder cannot override the validation hash
+                return Err(LegacyInscriptionErrorCode::BadAuthorityForHolderInscription.into());
+            }
+            AuthorityType::UpdateAuthority => {
+                // update authority wallet can override the validation hash
+                if authority.key() != metadata_obj.update_authority {
+                    return Err(
+                        LegacyInscriptionErrorCode::BadAuthorityForUpdateAuthInscription.into(),
+                    );
+                }
+            }
+        }
+    }
 
     libreplex_inscriptions::cpi::set_validation_hash(
         CpiContext::new_with_signer(

@@ -7,5 +7,9 @@ pub enum LegacyInscriptionErrorCode {
     #[msg("Cannot inscribe a fungible asset")]
     CannotInscribeFungible,
     #[msg("Bad authority")]
-    BadAuthority
+    BadAuthority,
+    #[msg("Bad authority for holder inscription")]
+    BadAuthorityForHolderInscription,
+    #[msg("Bad authority for update auth inscription")]
+    BadAuthorityForUpdateAuthInscription
 }

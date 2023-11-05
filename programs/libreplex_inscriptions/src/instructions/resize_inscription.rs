@@ -6,11 +6,6 @@ use anchor_lang::solana_program::program::{invoke, invoke_signed};
 use anchor_lang::solana_program::system_instruction;
 use std::cmp::Ordering;
 
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum Change {
-    Reduce { amount: u32 },
-    Increase { amount: u32 },
-}
 
 /*
   inscription size changes are limited by the maximum increase per call.
@@ -38,7 +33,7 @@ pub struct InscriptionResizeFinal {
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct ResizeInscriptionInput {
-    pub change: Change,
+    pub change: i32,
     /*
         This only exists to show solana
         that each of the resize inputs is
@@ -92,13 +87,14 @@ pub fn handler(
 
     let size_old = inscription.size;
     msg!("before: {}", size_old);
-    inscription.size = match inscription_input.change {
-        Change::Increase { amount } => {
-            cmp::min(inscription.size + amount, inscription_input.target_size)
+    inscription.size = match inscription_input.change.cmp(&0) {
+        Ordering::Greater => {
+            cmp::min((inscription.size as i64 + inscription_input.change as i64) as u32, inscription_input.target_size)
         }
-        Change::Reduce { amount } => {
-            cmp::max(inscription.size - amount, inscription_input.target_size)
-        }
+        Ordering::Less => {
+            cmp::max((inscription.size as i64 + inscription_input.change as i64) as u32, inscription_input.target_size)
+        },
+        Ordering::Equal => inscription.size
     };
 
     let size_new = inscription.size;
@@ -108,7 +104,8 @@ pub fn handler(
 
     let inscription_root = inscription.root.key();
     match size_new.cmp(&size_old) {
-        Ordering::Less => {
+        Ordering::Greater => {
+            msg!("Increasing");
             let lamports_diff = new_minimum_balance.saturating_sub(inscription_data.lamports());
             // reducing
             invoke(
@@ -120,7 +117,8 @@ pub fn handler(
                 ],
             )?;
         }
-        Ordering::Greater => {
+        Ordering::Less => {
+            msg!("Decreasing");
             let auth_seeds = [
                 "inscription_data".as_bytes(),
                 inscription_root.as_ref(),

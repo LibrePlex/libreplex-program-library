@@ -2,6 +2,7 @@ use crate::state::Metadata;
 use crate::{Asset, MetadataEvent, MetadataEventType, MetadataExtension};
 use anchor_lang::prelude::*;
 
+use libreplex_inscriptions::EncodingType;
 use libreplex_inscriptions::cpi::accounts::CreateInscription;
 
 use libreplex_inscriptions::instructions::SignerType;
@@ -137,6 +138,8 @@ pub fn handler(
         ),
         libreplex_inscriptions::instructions::CreateInscriptionInput {
             authority: Some(signer.key()),
+            media_type: libreplex_inscriptions::MediaType::Image,
+            encoding_type: EncodingType::Base64,
             current_rank_page: 0,
             signer_type: SignerType::Root
         },

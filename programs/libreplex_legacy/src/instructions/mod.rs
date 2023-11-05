@@ -19,3 +19,7 @@ pub mod make_immutable;
 pub use set_validation_hash::*;
 
 pub mod set_validation_hash;
+
+pub use check_permissions::*;
+
+pub mod check_permissions;

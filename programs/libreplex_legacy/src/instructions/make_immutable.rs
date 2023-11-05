@@ -6,11 +6,10 @@ use libreplex_inscriptions::{
 
 use crate::legacy_inscription::LegacyInscription;
 
-use super::inscribe_metaplex_metadata::AuthorityType;
+use super::check_permissions::check_permissions;
 
 // Adds a metadata to a group
 #[derive(Accounts)]
-#[instruction(authority_type: AuthorityType)]
 pub struct MakeImmutable<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -25,6 +24,10 @@ pub struct MakeImmutable<'info> {
     #[account(mut)]
     pub inscription_summary: UncheckedAccount<'info>,
 
+    /// CHECK: Checked in logic
+    #[account()]
+    pub legacy_metadata: UncheckedAccount<'info>,
+
     #[account(
         token::mint = mint,
         token::authority = authority
@@ -33,7 +36,6 @@ pub struct MakeImmutable<'info> {
 
     #[account(mut,
         seeds=[
-            &(authority_type as u32).to_le_bytes(),
             "legacy_inscription".as_bytes(),
             mint.key().as_ref()
         ], bump)]
@@ -50,7 +52,7 @@ pub struct MakeImmutable<'info> {
     pub inscriptions_program: Program<'info, LibreplexInscriptions>,
 }
 
-pub fn handler(ctx: Context<MakeImmutable>, authority_type: AuthorityType) -> Result<()> {
+pub fn handler(ctx: Context<MakeImmutable>) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription = &mut ctx.accounts.inscription;
     let system_program = &ctx.accounts.system_program;
@@ -58,21 +60,30 @@ pub fn handler(ctx: Context<MakeImmutable>, authority_type: AuthorityType) -> Re
     let mint = &ctx.accounts.mint;
     let inscription_summary = &ctx.accounts.inscription_summary;
 
-    let metaplex_inscription = &ctx.accounts.legacy_inscription;
+    let legacy_inscription = &ctx.accounts.legacy_inscription;
+
+    let legacy_metadata = &ctx.accounts.legacy_metadata;
+
     // make sure we are dealing with the correct metadata object.
     // this is to ensure that the mint in question is in fact a legacy
     // metadata object
     let mint_key = mint.key();
     let inscription_auth_seeds: &[&[u8]] = &[
-        &(authority_type as u32).to_le_bytes(),
         mint_key.as_ref(),
         &[ctx.bumps["legacy_inscription"]],
     ];
 
+    let auth_key = ctx.accounts.authority.key();
+    // make sure we are dealing with the correct metadata object.
+    // this is to ensure that the mint in question is in fact a legacy
+    // metadata object
+
+    check_permissions(legacy_metadata, mint, legacy_inscription.authority_type, auth_key)?;
+
     libreplex_inscriptions::cpi::make_inscription_immutable(CpiContext::new_with_signer(
         inscriptions_program.to_account_info(),
         MakeInscriptionImmutable {
-            authority: metaplex_inscription.to_account_info(),
+            authority: legacy_inscription.to_account_info(),
             inscription: inscription.to_account_info(),
             system_program: system_program.to_account_info(),
             payer: authority.to_account_info(),

@@ -1,18 +1,38 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, TokenAccount};
 use libreplex_inscriptions::{
-    cpi::accounts::ResizeInscription, instructions::ResizeInscriptionInput,
-    program::LibreplexInscriptions, Inscription,
+    cpi::accounts::ResizeInscription, 
+        program::LibreplexInscriptions, Inscription, instructions::ResizeInscriptionInput, 
 };
 use mpl_token_metadata::accounts::Metadata;
 
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use super::inscribe_metaplex_metadata::AuthorityType;
+use super::check_permissions::check_permissions;
+
+
+// duplicated to get this exposed correctly via anchor IDL
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct ResizeLegacyInscriptionInput {
+    pub change: i32,
+    /*
+        This only exists to show solana
+        that each of the resize inputs is
+        in fact a separate transaction
+    */
+    pub expected_start_size: u32,
+    /*
+        target size is specified
+        to make sure that multiple resizes
+        executed concurrently never increase / decrease
+        the size beyond target size
+    */
+    pub target_size: u32,
+}
+
 
 // Adds a metadata to a group
 #[derive(Accounts)]
-#[instruction(authority_type: AuthorityType)]
 pub struct ResizeLegacyInscription<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -56,7 +76,6 @@ pub struct ResizeLegacyInscription<'info> {
 
     #[account(mut,
         seeds=[
-            &(authority_type as u32).to_le_bytes(),
             "legacy_inscription".as_bytes(),
             mint.key().as_ref()
         ], bump)]
@@ -75,8 +94,7 @@ pub struct ResizeLegacyInscription<'info> {
 
 pub fn handler(
     ctx: Context<ResizeLegacyInscription>,
-    input: ResizeInscriptionInput,
-    authority_type: AuthorityType,
+    input: ResizeLegacyInscriptionInput,
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription = &mut ctx.accounts.inscription;
@@ -84,7 +102,7 @@ pub fn handler(
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
-
+    let legacy_metadata = &ctx.accounts.legacy_metadata;
     let payer = &ctx.accounts.payer;
 
     let metaplex_metadata = &ctx.accounts.legacy_metadata;
@@ -105,10 +123,13 @@ pub fn handler(
 
     let mint_key = mint.key();
     let inscription_auth_seeds: &[&[u8]] = &[
-        &(authority_type as u32).to_le_bytes(),
         mint_key.as_ref(),
         &[ctx.bumps["legacy_inscription"]],
     ];
+
+    let auth_key = ctx.accounts.authority.key();
+
+    check_permissions(legacy_metadata, mint, legacy_inscription.authority_type, auth_key)?;
 
     libreplex_inscriptions::cpi::resize_inscription(
         CpiContext::new_with_signer(
@@ -122,7 +143,12 @@ pub fn handler(
             },
             &[inscription_auth_seeds],
         ),
-        input,
+        ResizeInscriptionInput {
+            change: input.change,
+            expected_start_size: input.expected_start_size,
+            target_size: input.target_size,
+        }
+        
     )?;
 
     Ok(())
