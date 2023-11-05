@@ -22,7 +22,8 @@ pub struct CreateInscriptionInput {
     pub current_rank_page: u32,
     pub signer_type: SignerType,
     pub media_type: MediaType,
-    pub encoding_type: EncodingType
+    pub encoding_type: EncodingType,
+    pub validation_hash: Option<String>
 }
 
 impl CreateInscriptionInput {
@@ -93,7 +94,10 @@ pub struct CreateInscription<'info> {
 
     /// CHECK: validated in logic
     #[account(init,
-        space = Inscription::BASE_SIZE,
+        space = Inscription::BASE_SIZE + match &inscription_input.validation_hash {
+            Some(x) => 4 + x.len(),
+            None => 0
+        },
         seeds=[
             "inscription".as_bytes(),
             root.key().as_ref()
@@ -140,6 +144,7 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     inscription.root = ctx.accounts.root.key();
     inscription.media_type = input.media_type;
     inscription.encoding_type = input.encoding_type;
+    inscription.validation_hash = input.validation_hash;
     let signer = ctx.accounts.signer.key();
     let root_key = inscription.root.key();
 

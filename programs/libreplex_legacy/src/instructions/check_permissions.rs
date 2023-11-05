@@ -6,7 +6,7 @@ use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
 
 use crate::LegacyInscriptionErrorCode;
 
-use super::inscribe_metaplex_metadata::AuthorityType;
+use super::inscribe_legacy_metadata::AuthorityType;
 
 
 /* 

@@ -23,9 +23,13 @@ mod inscriptions_tests {
     };
     use libreplex_inscriptions::{EncodingType, InscriptionRankPage, InscriptionSummary};
     use solana_program::account_info::AccountInfo;
+    use solana_program::sysvar::Sysvar;
     use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program};
 
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
+
+    use solana_sdk::clock::Clock;
+
 
     use super::*;
 
@@ -54,11 +58,17 @@ mod inscriptions_tests {
             processor!(libreplex_inscriptions::entry),
         );
 
+        // TODO: Obtain the current slot dynamically from context.
+        // I tried but I'm a potato so got stuck and had to move on
+        let slot = 1000;
         let mut context: ProgramTestContext = program.start_with_context().await;
+
+        
+        // let slot = Clock::get().unwrap().slot;
 
         // resize tests take a while so we need to advance slots in order to
         // avoid RpcError(DeadlineExceeded) on test execution
-        context.warp_to_slot(100).unwrap();
+        context.warp_to_slot(slot + 100).unwrap();
 
         let authority = context.payer.pubkey();
 
@@ -71,8 +81,11 @@ mod inscriptions_tests {
         let inscription_ranks_current_page =
             create_inscription_rank_page(&mut context, 0).await.unwrap();
 
+        context.warp_to_slot(slot + 200).unwrap();
         let inscription_ranks_next_page =
             create_inscription_rank_page(&mut context, 1).await.unwrap();
+
+        context.warp_to_slot(slot + 300).unwrap();
 
         println!(
             "Current page: {}, next page: {}",
@@ -93,6 +106,8 @@ mod inscriptions_tests {
             .await
             .unwrap()
             .unwrap();
+
+        context.warp_to_slot(slot + 400).unwrap();
 
         let inscription_account_info = AccountInfo::new(
             &inscription,
@@ -115,7 +130,7 @@ mod inscriptions_tests {
         let mut i: u32 = 0;
         let max_increases = 10;
         while i < max_increases {
-            context.warp_to_slot((i as u64 + 2) * 100).unwrap();
+            context.warp_to_slot(slot + 400 + (i as u64 + 2) * 100).unwrap();
             context
                 .banks_client
                 .process_transaction(Transaction::new_signed_with_payer(
@@ -172,7 +187,7 @@ mod inscriptions_tests {
 
         let max_decreases = 8;
         while i < max_decreases {
-            context.warp_to_slot((i as u64 + 2) * 100).unwrap();
+            context.warp_to_slot(slot + 4000 + (i as u64 + 2) * 100).unwrap();
             context
                 .banks_client
                 .process_transaction(Transaction::new_signed_with_payer(
@@ -522,6 +537,7 @@ mod inscriptions_tests {
                 signer_type: SignerType::Root,
                 media_type: libreplex_inscriptions::MediaType::Image,
                 encoding_type: EncodingType::Base64,
+                validation_hash: None
             },
         };
 
@@ -530,6 +546,8 @@ mod inscriptions_tests {
             data: create_inscription_input.data(),
             accounts: inscription_account.to_account_metas(None),
         };
+
+        
 
         println!("Creating tx");
         let create_inscription_tx = Transaction::new_signed_with_payer(

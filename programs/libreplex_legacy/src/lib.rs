@@ -21,9 +21,12 @@ pub mod libreplex_legacy {
 
     pub fn inscribe_legacy_metadata(
         ctx: Context<InscribeLegacyMetadata>,
-        authority_type: AuthorityType
+        authority_type: AuthorityType,
+        // not optional - for legacy metadata we need to have some validation hash
+        // so we can verify the inscription once it's fully written
+        validation_hash: String
     ) -> Result<()> {
-        instructions::inscribe_metaplex_metadata::handler(ctx,authority_type)
+        instructions::inscribe_legacy_metadata::handler(ctx,authority_type, validation_hash)
     }
 
     pub fn write_to_legacy_inscription(

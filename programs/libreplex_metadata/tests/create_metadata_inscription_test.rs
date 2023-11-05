@@ -118,6 +118,7 @@ mod permissions {
                             update_authority: collection_authority,
                             symbol: "COOL".to_string(),
                             extensions: vec![],
+                            validation_hash: Some("Slartibartfast".to_owned())
                         },
                     }
                     .data(),

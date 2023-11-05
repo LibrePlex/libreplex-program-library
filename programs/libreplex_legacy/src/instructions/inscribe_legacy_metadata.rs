@@ -1,54 +1,54 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
-    cpi::accounts::CreateInscription, program::LibreplexInscriptions, instructions::SignerType, EncodingType,
+    cpi::accounts::CreateInscription, instructions::SignerType, program::LibreplexInscriptions,
+    EncodingType,
 };
-
-
 
 use crate::{legacy_inscription::LegacyInscription, LegacyType};
 
-use super::check_permissions::check_permissions;
-
-
+use super::check_permissions::{check_permissions, content_validator_signer};
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize, PartialEq, Copy)]
 pub enum AuthorityType {
     /*
-        Holder-created inscription. Update authority holder
-        can not touch the inscription. However they can 
-        remove the mint from their collection and airdrop
-        a new mint with inscription to the holder in case 
-        they want to have a collection-wide inscription
-        owned by the update authority.
+       Holder-created inscription. Update authority holder
+       can not touch the inscription. However they can
+       remove the mint from their collection and airdrop
+       a new mint with inscription to the holder in case
+       they want to have a collection-wide inscription
+       owned by the update authority.
 
-        For mutable inscriptions, holder can resize / update 
-        if the underlying offchain image changes. holder can 
-        also close the inscription and reclaim the rent.
+       For mutable inscriptions, holder can resize / update
+       if the underlying offchain image changes. holder can
+       also close the inscription and reclaim the rent.
 
-        For immutable inscriptions, nothing can be done to it. 
-        Rent from ommutable inscriptions CANNOT BE RECLAIMED.
-     */
+       For immutable inscriptions, nothing can be done to it.
+       Rent from ommutable inscriptions CANNOT BE RECLAIMED.
+    */
     Holder,
 
     /*
-        Update-authority created inscription. If it is immutable,
-        it is forever. If it is mutable, the update authority can
-        resize / update the inscription.
+       Update-authority created inscription. If it is immutable,
+       it is forever. If it is mutable, the update authority can
+       resize / update the inscription.
 
-        Holder cannot create a new inscription of a mint that
-        already has an update authority inscription on it.
+       Holder cannot create a new inscription of a mint that
+       already has an update authority inscription on it.
 
-        For immutable inscriptions, nothing can be done to it. 
-        Rent from ommutable inscriptions CANNOT BE RECLAIMED.
-     */
+       For immutable inscriptions, nothing can be done to it.
+       Rent from ommutable inscriptions CANNOT BE RECLAIMED.
+    */
     UpdateAuthority,
 }
 
 // Adds a metadata to a group
 #[derive(Accounts)]
-#[instruction(authority_type: AuthorityType, hash: String)]
+#[instruction(authority_type: AuthorityType, validation_hash: String)]
 pub struct InscribeLegacyMetadata<'info> {
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
     #[account(mut)]
     pub authority: Signer<'info>,
 
@@ -86,10 +86,9 @@ pub struct InscribeLegacyMetadata<'info> {
         ], bump)]
     pub legacy_inscription: Account<'info, LegacyInscription>,
 
-    /// CHECK: Checked in logic
-    #[account()]
-    pub legacy_mint: UncheckedAccount<'info>,
-
+    // /// CHECK: Checked in logic
+    // #[account()]
+    // pub legacy_mint: UncheckedAccount<'info>,
     /// CHECK: Checked in logic
     #[account()]
     pub legacy_metadata: UncheckedAccount<'info>,
@@ -105,17 +104,19 @@ pub struct InscribeLegacyMetadata<'info> {
     pub inscriptions_program: Program<'info, LibreplexInscriptions>,
 }
 
-pub fn handler(ctx: Context<InscribeLegacyMetadata>, authority_type: AuthorityType) -> Result<()> {
+pub fn handler(
+    ctx: Context<InscribeLegacyMetadata>,
+    authority_type: AuthorityType,
+    validation_hash: String,
+) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
 
     let inscription = &mut ctx.accounts.inscription;
     let inscription_data = &mut ctx.accounts.inscription_data;
     let system_program = &ctx.accounts.system_program;
-    let authority = &ctx.accounts.authority;
     let mint = &ctx.accounts.mint;
     let legacy_inscription = &mut ctx.accounts.legacy_inscription;
-    let legacy_mint = &ctx.accounts.legacy_mint;
 
     let inscription_ranks_current_page = &ctx.accounts.inscription_ranks_current_page;
     let inscription_ranks_next_page = &ctx.accounts.inscription_ranks_next_page;
@@ -123,17 +124,26 @@ pub fn handler(ctx: Context<InscribeLegacyMetadata>, authority_type: AuthorityTy
 
     legacy_inscription.authority_type = authority_type;
     legacy_inscription.mint = mint.key();
+
     legacy_inscription.inscription = inscription.key();
     legacy_inscription.legacy_type = LegacyType::MetaplexMint;
-    let auth_key = ctx.accounts.authority.key();
+    let auth_key = ctx.accounts.payer.key();
     // make sure we are dealing with the correct metadata object.
     // this is to ensure that the mint in question is in fact a legacy
     // metadata object
+
+    let authority = &ctx.accounts.authority;
+
+    // we need either update authority or
+    if authority.key() != content_validator_signer::ID
+        && authority.key() == content_validator_signer::ID
+    {}
 
     let expected_bump = ctx.bumps["legacy_inscription"];
     let mint_key = mint.key();
     check_permissions(legacy_metadata, mint, authority_type, auth_key)?;
     let inscription_auth_seeds: &[&[u8]] = &[
+        "legacy_inscription".as_bytes(),
         mint_key.as_ref(),
         &[expected_bump],
     ];
@@ -151,7 +161,7 @@ pub fn handler(ctx: Context<InscribeLegacyMetadata>, authority_type: AuthorityTy
                 /// this legacy inscription must be the signer
                 /// this is ok as the inscriptions guarantee uniqueness
                 /// per mint.
-                signer: legacy_mint.to_account_info(),
+                signer: legacy_inscription.to_account_info(),
                 inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),
                 payer: authority.to_account_info(),
@@ -181,7 +191,8 @@ pub fn handler(ctx: Context<InscribeLegacyMetadata>, authority_type: AuthorityTy
             current_rank_page: 0,
             signer_type: SignerType::LegacyMetadataSigner,
             encoding_type: EncodingType::Base64,
-            media_type: libreplex_inscriptions::MediaType::Image
+            media_type: libreplex_inscriptions::MediaType::Image,
+            validation_hash: Some(validation_hash),
         },
     )?;
 

@@ -138,7 +138,7 @@ pub struct Inscription {
 }
 
 impl Inscription {
-    pub const BASE_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 4 + 1 + 2; // no need for vector padding as we write bytes directly onto the account
+    pub const BASE_SIZE: usize = 8 + 32 + 32 + 2 + 2 + 32 + 8 + 4 + 1 + 1; // no need for vector padding as we write bytes directly onto the account
 
     pub fn write_data(
         &self,

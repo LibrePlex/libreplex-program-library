@@ -1,8 +1,8 @@
 
 
-pub use inscribe_metaplex_metadata::*;
+pub use inscribe_legacy_metadata::*;
 
-pub mod inscribe_metaplex_metadata;
+pub mod inscribe_legacy_metadata;
 
 pub use resize_legacy_inscription::*;
 

@@ -16,7 +16,7 @@ pub struct SetValidationHash<'info> {
         realloc = Inscription::BASE_SIZE + match &validation_hash {
             Some(x)=> 4 + x.len(),
             None => 0
-        }, // add group size. TODO: Remove the group size on base metadata
+        },
         realloc::payer = payer,
         realloc::zero = true,
         constraint = inscription.authority == signer.key())]

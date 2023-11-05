@@ -3,7 +3,7 @@ use std::fmt;
 use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-use crate::instructions::inscribe_metaplex_metadata::AuthorityType;
+use crate::instructions::inscribe_legacy_metadata::AuthorityType;
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, Debug)]
 pub enum LegacyType {

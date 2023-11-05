@@ -8,7 +8,7 @@ use mpl_token_metadata::accounts::Metadata;
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
 use super::{
-    check_permissions::content_validator_signer, inscribe_metaplex_metadata::AuthorityType,
+    check_permissions::content_validator_signer, inscribe_legacy_metadata::AuthorityType,
 };
 
 // Adds a metadata to a group
@@ -56,11 +56,6 @@ pub fn handler(
     let legacy_metadata = &ctx.accounts.legacy_metadata;
 
     let authority = &ctx.accounts.authority;
-    /*
-    check that authority is OK.
-    For update authority, no second signer is needed
-     */
-    // TODO: Check permissions
 
     let mint_key = mint.key();
     let inscription_auth_seeds: &[&[u8]] = &[mint_key.as_ref(), &[ctx.bumps["legacy_inscription"]]];

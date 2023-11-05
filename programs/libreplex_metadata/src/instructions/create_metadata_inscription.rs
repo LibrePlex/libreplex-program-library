@@ -26,6 +26,7 @@ pub struct CreateMetadataInscriptionInput {
     pub extensions: Vec<MetadataExtension>,
     pub description: Option<String>,
     pub data_type: String,
+    pub validation_hash: Option<String>
 }
 
 impl CreateMetadataInscriptionInput {
@@ -95,7 +96,7 @@ pub struct CreateInscriptionMetadata<'info> {
 
 pub fn handler(
     ctx: Context<CreateInscriptionMetadata>,
-    metadata_input: CreateMetadataInscriptionInput
+    input: CreateMetadataInscriptionInput
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let inscription = &mut ctx.accounts.inscription;
@@ -141,25 +142,26 @@ pub fn handler(
             media_type: libreplex_inscriptions::MediaType::Image,
             encoding_type: EncodingType::Base64,
             current_rank_page: 0,
-            signer_type: SignerType::Root
+            signer_type: SignerType::Root,
+            validation_hash: input.validation_hash
         },
     )?;
 
     // Update the metadata state account
     metadata.mint = ctx.accounts.mint.key();
     metadata.is_mutable = true;
-    metadata.symbol = metadata_input.symbol.clone();
-    metadata.name = metadata_input.name.clone();
-    metadata.update_authority = metadata_input.update_authority;
+    metadata.symbol = input.symbol.clone();
+    metadata.name = input.name.clone();
+    metadata.update_authority = input.update_authority;
     metadata.asset = Asset::Inscription {
         inscription_id: ctx.accounts.inscription.key(),
         base_data_account_id: ctx.accounts.inscription_data.key(),
-        data_type: metadata_input.data_type,
-        description: metadata_input.description,
+        data_type: input.data_type,
+        description: input.description,
         chunks: 1 // everything starts with 1 chunk
     };
     metadata.creator = signer.key();
-    metadata.extensions = metadata_input.extensions;
+    metadata.extensions = input.extensions;
 
     msg!(
         "metadata created for mint with pubkey {}",
