@@ -21,5 +21,11 @@ pub enum ErrorCode {
     BadInscriptionRankPage,
 
     #[msg("Incorrect inscription data account")]
-    IncorrectInscriptionDataAccount
+    IncorrectInscriptionDataAccount,
+
+    #[msg("Root signer mismatch")]
+    RootSignerMismatch,
+
+    #[msg("Legacy metadata signer key does not match the expected PDA")]
+    LegacyMetadataSignerMismatch
 }

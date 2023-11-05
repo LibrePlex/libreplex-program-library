@@ -76,6 +76,16 @@ pub mod libreplex_inscriptions {
         )
     }
 
+    pub fn set_validation_hash(
+        ctx: Context<SetValidationHash>,
+        validation_hash: Option<String>
+    ) -> Result<()> {
+        instructions::set_validation_hash::handler(
+            ctx,
+            validation_hash
+        )
+    }
+
 
 
 }

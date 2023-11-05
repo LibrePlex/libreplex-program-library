@@ -9,7 +9,7 @@ mod inscriptions_tests {
 
     use anchor_lang::prelude::Account;
     use libreplex_inscriptions::accounts::CreateInscriptionRank;
-    use libreplex_inscriptions::instructions::CreateInscriptionRankInput;
+    use libreplex_inscriptions::instructions::{CreateInscriptionRankInput, SignerType};
     use libreplex_inscriptions::{
         accounts::CreateInscription,
         accounts::MakeInscriptionImmutable,
@@ -442,6 +442,7 @@ mod inscriptions_tests {
             inscription_ranks_current_page,
             inscription_ranks_next_page,
             payer: ctx.payer.pubkey(),
+            signer: root.pubkey(),
             root: root.pubkey(),
             inscription,
             system_program: system_program::id(),
@@ -453,6 +454,7 @@ mod inscriptions_tests {
                 max_data_length,
                 authority: Some(ctx.payer.pubkey()),
                 current_rank_page: current_page_index as u32,
+                signer_type: SignerType::Root
             },
         };
 

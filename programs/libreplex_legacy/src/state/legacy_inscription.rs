@@ -5,7 +5,8 @@ use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, Debug)]
 pub enum LegacyType {
-    MetaplexMint
+    MetaplexMint,
+    
 }
 
 impl fmt::Display for LegacyType {
@@ -23,7 +24,8 @@ pub struct LegacyInscription {
     // each mint is allowed a single metaplex inscription
     pub mint: Pubkey,
     pub inscription: Pubkey,
-    pub legacy_type: LegacyType
+    pub legacy_type: LegacyType,
+    
 }
 
 impl LegacyInscription {

@@ -1,5 +1,5 @@
 [package]
-name = "libreplex_legacy_inscribers"
+name = "libreplex_legacy"
 version = "0.0.0"
 description = "Created with Anchor"
 edition = "2021"
@@ -8,7 +8,7 @@ repository = "https://github.com/LibrePlex/metadata"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "libreplex_legacy_inscribers"
+name = "libreplex_legacy"
 
 [features]
 no-entrypoint = []
@@ -21,8 +21,9 @@ default = []
 anchor-lang = {version = "~0.28", features = ["init-if-needed"]}
 anchor-spl = {version = "~0.28"}
 libreplex_inscriptions = {version = "*", path="../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
+spl-associated-token-account = "2.2.0"
 solana-program = {version = "~1.16"}
-mpl-token-metadata = { version="=3.1.0" }
+mpl-token-metadata = { version="~3" }
 
 [dev-dependencies]
 mocha = "0.1.1"

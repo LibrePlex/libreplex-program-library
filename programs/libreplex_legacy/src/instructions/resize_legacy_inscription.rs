@@ -4,27 +4,34 @@ use libreplex_inscriptions::{
     cpi::accounts::ResizeInscription, instructions::ResizeInscriptionInput,
     program::LibreplexInscriptions, Inscription,
 };
+use mpl_token_metadata::accounts::Metadata;
 
+use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use crate::legacy_inscription::LegacyInscription;
-
-use super::InscribeLegacyInput;
+use super::inscribe_metaplex_metadata::AuthorityType;
 
 // Adds a metadata to a group
 #[derive(Accounts)]
-#[instruction(input: InscribeLegacyInput)]
+#[instruction(authority_type: AuthorityType)]
 pub struct ResizeLegacyInscription<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    /// CHECK: checked in logic
+    pub owner: UncheckedAccount<'info>,
+
     pub mint: Box<Account<'info, Mint>>,
+
+    /// CHECK: Checked in logic
+    #[account()]
+    pub legacy_metadata: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub inscription: Account<'info, Inscription>,
 
-     /// CHECK: Checked via a CPI call
-     #[account(mut)]
-     pub inscription_data: UncheckedAccount<'info>,
+    /// CHECK: Checked via a CPI call
+    #[account(mut)]
+    pub inscription_data: UncheckedAccount<'info>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
@@ -40,15 +47,16 @@ pub struct ResizeLegacyInscription<'info> {
 
     #[account(
         token::mint = mint,
-        token::authority = authority
+        token::authority = owner
     )]
     pub token_account: Box<Account<'info, TokenAccount>>,
 
     #[account(mut,
-    seeds=[
-        input.legacy_type.to_string().as_bytes(),
-        mint.key().as_ref()
-    ], bump)]
+        seeds=[
+            &(authority_type as u32).to_le_bytes(),
+            "legacy_inscription".as_bytes(),
+            mint.key().as_ref()
+        ], bump)]
     pub legacy_inscription: Account<'info, LegacyInscription>,
 
     /// CHECK: The token program
@@ -65,7 +73,7 @@ pub struct ResizeLegacyInscription<'info> {
 pub fn handler(
     ctx: Context<ResizeLegacyInscription>,
     input: ResizeInscriptionInput,
-    legacy_input: InscribeLegacyInput
+    authority_type: AuthorityType,
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription = &mut ctx.accounts.inscription;
@@ -73,11 +81,26 @@ pub fn handler(
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
-    
+
+    let metaplex_metadata = &ctx.accounts.legacy_metadata;
+    let mai = metaplex_metadata.to_account_info().clone();
+    let data: &[u8] = &mai.try_borrow_data()?[..];
+    let metadata_obj = Metadata::deserialize(&mut data.clone())?;
+
+    if metadata_obj.mint != ctx.accounts.mint.key() {
+        return Err(LegacyInscriptionErrorCode::BadMint.into());
+    }
+
+    if metadata_obj.update_authority != ctx.accounts.authority.key()
+        && ctx.accounts.authority.key() != ctx.accounts.owner.key()
+    {
+        // return bad authority - only the owner of the mint / update authority can sign
+        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
+    }
+
     let mint_key = mint.key();
-    let legacy_type = legacy_input.legacy_type.to_string();
     let inscription_auth_seeds: &[&[u8]] = &[
-        legacy_type.as_bytes(),
+        &(authority_type as u32).to_le_bytes(),
         mint_key.as_ref(),
         &[ctx.bumps["legacy_inscription"]],
     ];

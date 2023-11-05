@@ -4,6 +4,7 @@ use anchor_lang::prelude::*;
 
 use libreplex_inscriptions::cpi::accounts::CreateInscription;
 
+use libreplex_inscriptions::instructions::SignerType;
 use libreplex_inscriptions::program::LibreplexInscriptions;
 
 /*
@@ -109,13 +110,9 @@ pub fn handler(
     let signer = &ctx.accounts.signer;
 
     let mint = &ctx.accounts.mint;
-    let mint_key = &mint.key();
-
-    let metadata_seeds: &[&[u8]] = &[b"metadata", mint_key.as_ref(), &[ctx.bumps["metadata"]]];
-
-
+    
     libreplex_inscriptions::cpi::create_inscription(
-        CpiContext::new_with_signer(
+        CpiContext::new(
             inscriptions_program.to_account_info(),
             CreateInscription {
                 inscription_summary: inscription_summary.to_account_info(),
@@ -129,19 +126,20 @@ pub fn handler(
                  mint etc
                 */
                 root: mint.to_account_info(),
+                signer: mint.to_account_info(),
                 inscription_ranks_current_page: inscription_ranks_current_page.to_account_info(),
                 inscription_ranks_next_page: inscription_ranks_next_page.to_account_info(),
                 inscription: inscription.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),
                 system_program: system_program.to_account_info(),
                 payer: signer.to_account_info(),
-            },
-            &[metadata_seeds],
+            }
         ),
         libreplex_inscriptions::instructions::CreateInscriptionInput {
             authority: Some(signer.key()),
             max_data_length: 0,
-            current_rank_page: 0
+            current_rank_page: 0,
+            signer_type: SignerType::Root
         },
     )?;
 

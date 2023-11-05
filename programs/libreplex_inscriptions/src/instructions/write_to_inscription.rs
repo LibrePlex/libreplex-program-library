@@ -7,6 +7,7 @@ use crate::Inscription;
 pub struct WriteToInscriptionInput {
     pub data: Vec<u8>,
     pub start_pos: u32,
+
 }
 
 #[event]

@@ -15,37 +15,37 @@ pub use constants::*;
 pub use state::*;
 
 #[program]
-pub mod libreplex_metadata {
+pub mod libreplex_legacy {
 
     use super::*;
 
-    pub fn inscribe_legacy_object(
-        ctx: Context<InscribeLegacy>,
-        input: InscribeLegacyInput,
+    pub fn inscribe_legacy_metadata(
+        ctx: Context<InscribeLegacyMetadata>,
+        authority_type: AuthorityType
     ) -> Result<()> {
-        instructions::inscribe_legacy::handler(ctx, input)
+        instructions::inscribe_metaplex_metadata::handler(ctx,authority_type)
     }
 
     pub fn write_to_legacy_inscription(
         ctx: Context<WriteToLegacyInscription>,
+        authority_type: AuthorityType,
         input: libreplex_inscriptions::instructions::WriteToInscriptionInput,
-        legacy_input: InscribeLegacyInput,
     ) -> Result<()> {
-        instructions::write_to_legacy_inscription::handler(ctx, input, legacy_input)
+        instructions::write_to_legacy_inscription::handler(ctx, authority_type,  input)
     }
 
     pub fn resize_legacy_inscription(
         ctx: Context<ResizeLegacyInscription>,
         input: libreplex_inscriptions::instructions::ResizeInscriptionInput,
-        legacy_input: InscribeLegacyInput,
+        authority_type: AuthorityType
     ) -> Result<()> {
-        instructions::resize_legacy_inscription::handler(ctx, input, legacy_input)
+        instructions::resize_legacy_inscription::handler(ctx, input, authority_type)
     }
 
     pub fn make_immutable(
         ctx: Context<MakeImmutable>,
-        legacy_input: InscribeLegacyInput,
+        authority_type: AuthorityType
     ) -> Result<()> {
-        instructions::make_immutable::handler(ctx, legacy_input)
+        instructions::make_immutable::handler(ctx, authority_type)
     }
 }

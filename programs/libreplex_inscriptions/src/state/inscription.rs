@@ -96,14 +96,29 @@ pub struct Inscription {
                       // we do not mark the following field as being serialized at all. instead we
                       // write to it directly via append_data method
                       // pub data: Vec<u8>
+    /* 
+        Validation hash is used to ensure that any inscription
+        uploaded is in sync. This is important as uploading a 
+        large inscription typically takes multiple transactions
+        and we want to know whether the content was written 
+        correctly and in its entirety.
+
+        Validation hash can be updated by the inscription authority.
+
+        For immutable inscriptions, the inscription authority is an
+        account that cannot sign. Hence it's important we check the
+        validation hash before allowing for immutability. Therefore 
+        an inscription can only be made immutable if the inscription
+        content validates against the hash.
+
+        Validation hash is optional in case no validation is required.
+
+    */
+    pub validation_hash: Option<String>
 }
 
 impl Inscription {
-    pub const SIZE: usize = 8 + 32 + 32 + 32 + 8 + 4; // no need for vector padding as we write bytes directly onto the account
-
-    // pub fn get_size(&self) -> usize {
-    //     Inscription::BASE_SIZE + self.size as usize
-    // }
+    pub const BASE_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 4 + 1; // no need for vector padding as we write bytes directly onto the account
 
     // pub fn write_authority(mut current_data: RefMut<&mut [u8]>, authority: &Pubkey) -> Result<()> {
     //     let current_position_slice: &mut [u8] = &mut current_data[8..40];
