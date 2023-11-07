@@ -2090,7 +2090,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_inscriptions"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "anchor-attribute-event",
  "anchor-derive-accounts",
@@ -2120,7 +2120,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_metadata"
-version = "0.16.2"
+version = "0.16.3"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

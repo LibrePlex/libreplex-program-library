@@ -8,7 +8,7 @@ use libreplex_inscriptions::{
 
 use crate::legacy_inscription::LegacyInscription;
 
-use super::check_permissions::check_permissions;
+use super::check_metadata_type::check_metadata_type;
 
 // having to redefine this here as otherwise anchor IDL will be missing a type
 // hope this gets sorted at some point!
@@ -97,13 +97,9 @@ pub fn handler(
         &[ctx.bumps["legacy_inscription"]],
     ];
 
-    let authority = &ctx.accounts.authority;
-
-    let auth_key = authority.key();
-
     let legacy_metadata = &ctx.accounts.legacy_metadata;
 
-    check_permissions(legacy_metadata, mint, legacy_inscription.authority_type, auth_key)?;
+    check_metadata_type(legacy_metadata, mint)?;
 
     libreplex_inscriptions::cpi::write_to_inscription(
         CpiContext::new_with_signer(

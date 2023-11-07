@@ -7,9 +7,7 @@ use mpl_token_metadata::accounts::Metadata;
 
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use super::{
-    check_permissions::content_validator_signer, inscribe_legacy_metadata::AuthorityType,
-};
+use super::{check_metadata_type::content_validator_signer, create_legacy_inscription_logic::AuthorityType};
 
 // Adds a metadata to a group
 #[derive(Accounts)]

@@ -8,7 +8,7 @@ use mpl_token_metadata::accounts::Metadata;
 
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use super::check_permissions::check_permissions;
+use super::check_metadata_type::check_metadata_type;
 
 
 // duplicated to get this exposed correctly via anchor IDL
@@ -127,9 +127,8 @@ pub fn handler(
         &[ctx.bumps["legacy_inscription"]],
     ];
 
-    let auth_key = ctx.accounts.authority.key();
 
-    check_permissions(legacy_metadata, mint, legacy_inscription.authority_type, auth_key)?;
+    check_metadata_type(legacy_metadata, mint)?;
 
     libreplex_inscriptions::cpi::resize_inscription(
         CpiContext::new_with_signer(

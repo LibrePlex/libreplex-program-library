@@ -4,10 +4,9 @@ use libreplex_inscriptions::{
     cpi::accounts::CreateInscription, instructions::SignerType, program::LibreplexInscriptions,
     EncodingType,
 };
+use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
 
-use crate::{legacy_inscription::LegacyInscription, LegacyType};
-
-use super::check_permissions::{check_permissions, content_validator_signer};
+use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode, LegacyType};
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize, PartialEq, Copy)]
 pub enum AuthorityType {
@@ -42,111 +41,31 @@ pub enum AuthorityType {
     UpdateAuthority,
 }
 
-// Adds a metadata to a group
-#[derive(Accounts)]
-#[instruction(authority_type: AuthorityType, validation_hash: String)]
-pub struct InscribeLegacyMetadata<'info> {
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
-    #[account(mut)]
-    pub authority: Signer<'info>,
-
-    /// CHECK: Can be any wallet
-    pub owner: UncheckedAccount<'info>,
-
-    pub mint: Box<Account<'info, Mint>>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription: UncheckedAccount<'info>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription_data: UncheckedAccount<'info>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription_summary: UncheckedAccount<'info>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription_ranks_current_page: UncheckedAccount<'info>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription_ranks_next_page: UncheckedAccount<'info>,
-
-    #[account(init,
-        payer = authority,
-        space = LegacyInscription::SIZE,
-        seeds=[
-            "legacy_inscription".as_bytes(),
-            mint.key().as_ref()
-        ], bump)]
-    pub legacy_inscription: Account<'info, LegacyInscription>,
-
-    // /// CHECK: Checked in logic
-    // #[account()]
-    // pub legacy_mint: UncheckedAccount<'info>,
-    /// CHECK: Checked in logic
-    #[account()]
-    pub legacy_metadata: UncheckedAccount<'info>,
-
-    /// CHECK: The token program
-    #[account(
-        address = anchor_spl::token::ID
-    )]
-    pub token_program: UncheckedAccount<'info>,
-
-    pub system_program: Program<'info, System>,
-
-    pub inscriptions_program: Program<'info, LibreplexInscriptions>,
-}
-
-pub fn handler(
-    ctx: Context<InscribeLegacyMetadata>,
+pub fn create_legacy_inscription_logic<'a>(
+    mint: &Account<'a, Mint>,
+    legacy_inscription: &mut Account<'a, LegacyInscription>,
     authority_type: AuthorityType,
+    inscription: &mut UncheckedAccount<'a>,
+    expected_bump: u8,
+    inscriptions_program: &Program<'a, LibreplexInscriptions>,
+    inscription_summary: &mut UncheckedAccount<'a>,
+    legacy_signer: &UncheckedAccount<'a>,
+    system_program: &Program<'a, System>,
+    payer: &Signer<'a>,
+    inscription_data: &mut UncheckedAccount<'a>,
+    inscription_ranks_current_page: &UncheckedAccount<'a>,
+    inscription_ranks_next_page: &UncheckedAccount<'a>,
     validation_hash: String,
+    signer_type: SignerType,
+    encoding_type: EncodingType,
+    media_type: libreplex_inscriptions::MediaType,
 ) -> Result<()> {
-    let inscriptions_program = &ctx.accounts.inscriptions_program;
-    let inscription_summary = &mut ctx.accounts.inscription_summary;
-
-    let inscription = &mut ctx.accounts.inscription;
-    let inscription_data = &mut ctx.accounts.inscription_data;
-    let system_program = &ctx.accounts.system_program;
-    let mint = &ctx.accounts.mint;
-    let legacy_inscription = &mut ctx.accounts.legacy_inscription;
-
-    let inscription_ranks_current_page = &ctx.accounts.inscription_ranks_current_page;
-    let inscription_ranks_next_page = &ctx.accounts.inscription_ranks_next_page;
-    let legacy_metadata = &ctx.accounts.legacy_metadata;
-
+    let mint_key = mint.key();
     legacy_inscription.authority_type = authority_type;
     legacy_inscription.mint = mint.key();
-
     legacy_inscription.inscription = inscription.key();
     legacy_inscription.legacy_type = LegacyType::MetaplexMint;
-    let auth_key = ctx.accounts.payer.key();
-    // make sure we are dealing with the correct metadata object.
-    // this is to ensure that the mint in question is in fact a legacy
-    // metadata object
-
-    let authority = &ctx.accounts.authority;
-
-    // we need either update authority or
-    if authority.key() != content_validator_signer::ID
-        && authority.key() == content_validator_signer::ID
-    {}
-
-    let expected_bump = ctx.bumps["legacy_inscription"];
-    let mint_key = mint.key();
-    check_permissions(legacy_metadata, mint, authority_type, auth_key)?;
-    let inscription_auth_seeds: &[&[u8]] = &[
-        "legacy_inscription".as_bytes(),
-        mint_key.as_ref(),
-        &[expected_bump],
-    ];
+    let inscription_auth_seeds: &[&[u8]] = &[mint_key.as_ref(), &[expected_bump]];
     libreplex_inscriptions::cpi::create_inscription(
         CpiContext::new_with_signer(
             inscriptions_program.to_account_info(),
@@ -161,10 +80,10 @@ pub fn handler(
                 /// this legacy inscription must be the signer
                 /// this is ok as the inscriptions guarantee uniqueness
                 /// per mint.
-                signer: legacy_inscription.to_account_info(),
+                signer: legacy_signer.to_account_info(),
                 inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),
-                payer: authority.to_account_info(),
+                payer: payer.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),
                 inscription_ranks_current_page: inscription_ranks_current_page.to_account_info(),
                 inscription_ranks_next_page: inscription_ranks_next_page.to_account_info(),
@@ -189,12 +108,46 @@ pub fn handler(
             */
             authority: Some(legacy_inscription.key()), // this includes update auth / holder, hence
             current_rank_page: 0,
-            signer_type: SignerType::LegacyMetadataSigner,
-            encoding_type: EncodingType::Base64,
-            media_type: libreplex_inscriptions::MediaType::Image,
+            signer_type,
+            encoding_type,
+            media_type,
+            // signer_type: SignerType::LegacyMetadataSigner,
+            // encoding_type: EncodingType::Base64,
+            // media_type: libreplex_inscriptions::MediaType::Image,
             validation_hash: Some(validation_hash),
         },
     )?;
+    Ok(())
+}
+
+pub fn check_permissions_for_authority(
+    legacy_metadata: &UncheckedAccount<'_>,
+    mint: &Account<Mint>,
+    auth_key: Pubkey,
+) -> Result<()> {
+    let mai = legacy_metadata.to_account_info().clone();
+    let data: &[u8] = &mai.try_borrow_data()?[..];
+    let metadata_obj = Metadata::deserialize(&mut data.clone())?;
+    if metadata_obj.mint != mint.key() {
+        return Err(LegacyInscriptionErrorCode::BadMint.into());
+    }
+    if metadata_obj.update_authority != auth_key {
+        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
+    }
+    match metadata_obj.token_standard {
+        Some(x) => match &x {
+            TokenStandard::Fungible => {
+                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
+            }
+            TokenStandard::FungibleAsset => {
+                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
+            }
+            _ => {}
+        },
+        None => {
+            return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
+        }
+    }
 
     Ok(())
 }

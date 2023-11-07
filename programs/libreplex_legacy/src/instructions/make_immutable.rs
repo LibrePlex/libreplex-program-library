@@ -6,7 +6,7 @@ use libreplex_inscriptions::{
 
 use crate::legacy_inscription::LegacyInscription;
 
-use super::check_permissions::check_permissions;
+use super::check_metadata_type::check_metadata_type;
 
 // Adds a metadata to a group
 #[derive(Accounts)]
@@ -73,12 +73,11 @@ pub fn handler(ctx: Context<MakeImmutable>) -> Result<()> {
         &[ctx.bumps["legacy_inscription"]],
     ];
 
-    let auth_key = ctx.accounts.authority.key();
     // make sure we are dealing with the correct metadata object.
     // this is to ensure that the mint in question is in fact a legacy
     // metadata object
 
-    check_permissions(legacy_metadata, mint, legacy_inscription.authority_type, auth_key)?;
+    check_metadata_type(legacy_metadata, mint)?;
 
     libreplex_inscriptions::cpi::make_inscription_immutable(CpiContext::new_with_signer(
         inscriptions_program.to_account_info(),
