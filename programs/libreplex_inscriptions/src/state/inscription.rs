@@ -75,14 +75,6 @@ impl InscriptionSummary {
 }
 
 #[account]
-pub struct InscriptionRank {
-    // rank of the inscription, the earlier the inscription, the lower the rank
-    pub rank: u64,
-    // a pointer to the inscription at this rank
-    pub inscription: Pubkey,
-}
-
-#[account]
 pub struct InscriptionData {
     // no explicit fields. This contains the inscription data itself
 }
@@ -111,7 +103,7 @@ pub struct Inscription {
     // rank 0 - unranked. ranks 1,2,3,4,5,6 represent the rank of this inscription in the order they are made immutable
     // only immutable inscriptions are ranked.
 
-    pub rank: u64, // 8 + 32 + 32 = 72
+    pub order: u64, // 8 + 32 + 32 = 72
     pub size: u32,    // 8 + 32 + 32 + 8 = 80
                       // we do not mark the following field as being serialized at all. instead we
                       // write to it directly via append_data method

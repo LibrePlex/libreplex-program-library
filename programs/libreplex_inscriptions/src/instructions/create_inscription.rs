@@ -169,7 +169,7 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
 
     // ok we have a valid signer.
 
-    inscription.rank = inscription_summary.inscription_count_total;
+    inscription.order = inscription_summary.inscription_count_total;
     println!(
         "Inscription count {}",
         inscription_summary.inscription_count_total

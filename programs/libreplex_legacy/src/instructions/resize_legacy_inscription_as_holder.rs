@@ -1,15 +1,16 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, TokenAccount};
 use libreplex_inscriptions::{
-    cpi::accounts::ResizeInscription, 
-        program::LibreplexInscriptions, Inscription, instructions::ResizeInscriptionInput, 
+    cpi::accounts::ResizeInscription, instructions::ResizeInscriptionInput,
+    program::LibreplexInscriptions, Inscription,
 };
 use mpl_token_metadata::accounts::Metadata;
 
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use super::check_metadata_type::check_metadata_type;
-
+use super::{
+    check_metadata_type::check_metadata_type, create_legacy_inscription_logic::AuthorityType,
+};
 
 // duplicated to get this exposed correctly via anchor IDL
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -30,10 +31,9 @@ pub struct ResizeLegacyInscriptionInput {
     pub target_size: u32,
 }
 
-
 // Adds a metadata to a group
 #[derive(Accounts)]
-pub struct ResizeLegacyInscription<'info> {
+pub struct ResizeLegacyInscriptionAsHolder<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
@@ -55,18 +55,6 @@ pub struct ResizeLegacyInscription<'info> {
     /// CHECK: Checked via a CPI call
     #[account(mut)]
     pub inscription_data: UncheckedAccount<'info>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription_summary: UncheckedAccount<'info>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription_ranks_current_page: UncheckedAccount<'info>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription_ranks_next_page: UncheckedAccount<'info>,
 
     #[account(
         token::mint = mint,
@@ -93,7 +81,7 @@ pub struct ResizeLegacyInscription<'info> {
 }
 
 pub fn handler(
-    ctx: Context<ResizeLegacyInscription>,
+    ctx: Context<ResizeLegacyInscriptionAsHolder>,
     input: ResizeLegacyInscriptionInput,
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
@@ -114,8 +102,8 @@ pub fn handler(
         return Err(LegacyInscriptionErrorCode::BadMint.into());
     }
 
-    if metadata_obj.update_authority != ctx.accounts.authority.key()
-        && ctx.accounts.authority.key() != ctx.accounts.owner.key()
+    if ctx.accounts.authority.key() != ctx.accounts.owner.key()
+            || legacy_inscription.authority_type != AuthorityType::Holder
     {
         // return bad authority - only the owner of the mint / update authority can sign
         return Err(LegacyInscriptionErrorCode::BadAuthority.into());
@@ -123,10 +111,10 @@ pub fn handler(
 
     let mint_key = mint.key();
     let inscription_auth_seeds: &[&[u8]] = &[
+        "legacy_inscription".as_bytes(),
         mint_key.as_ref(),
         &[ctx.bumps["legacy_inscription"]],
     ];
-
 
     check_metadata_type(legacy_metadata, mint)?;
 
@@ -146,8 +134,7 @@ pub fn handler(
             change: input.change,
             expected_start_size: input.expected_start_size,
             target_size: input.target_size,
-        }
-        
+        },
     )?;
 
     Ok(())

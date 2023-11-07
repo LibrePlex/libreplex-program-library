@@ -50,11 +50,18 @@ pub mod libreplex_legacy {
         instructions::write_to_legacy_inscription::handler(ctx, input)
     }
 
-    pub fn resize_legacy_inscription(
-        ctx: Context<ResizeLegacyInscription>,
+    pub fn resize_legacy_inscription_as_uauth(
+        ctx: Context<ResizeLegacyInscriptionAsUauth>,
         input: ResizeLegacyInscriptionInput,
     ) -> Result<()> {
-        instructions::resize_legacy_inscription::handler(ctx, input)
+        instructions::resize_legacy_inscription_as_uauth::handler(ctx, input)
+    }
+
+    pub fn resize_legacy_inscription_as_holder(
+        ctx: Context<ResizeLegacyInscriptionAsHolder>,
+        input: ResizeLegacyInscriptionInput,
+    ) -> Result<()> {
+        instructions::resize_legacy_inscription_as_holder::handler(ctx, input)
     }
 
     pub fn make_immutable(ctx: Context<MakeImmutable>) -> Result<()> {

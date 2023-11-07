@@ -414,7 +414,7 @@ mod inscriptions_tests {
         // nothing has been made immutable yet, so inscription slice should have length = 0
         assert_eq!(inscription_slice.len(), 2);
 
-        assert_eq!(inscription_obj.rank, 1);
+        assert_eq!(inscription_obj.order, 1);
 
         // we invert the order here and check the rank ordering afterwards
         make_inscription_immutable(&mut context, 0, inscription_2).await;
@@ -489,7 +489,7 @@ mod inscriptions_tests {
         let inscription_2_obj: Account<Inscription> =
             Account::try_from(&inscription_account_2_info).unwrap();
 
-        assert_eq!(inscription_2_obj.rank, 2);
+        assert_eq!(inscription_2_obj.order, 2);
     }
 
     async fn create_inscription(
