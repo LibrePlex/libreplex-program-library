@@ -1,15 +1,28 @@
-
-use crate::{
-    Inscription, InscriptionEvent, InscriptionEventType, InscriptionSummary,
-};
+use crate::{EncodingType, MediaType};
+use crate::{Inscription, InscriptionSummary};
 use anchor_lang::prelude::*;
 
 use anchor_lang::system_program;
 
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct InscriptionEventData {
+    pub authority: Pubkey, // 8
+    pub root: Pubkey, // 8 + 32 = 40
+    pub media_type: MediaType,
+    pub encoding_type: EncodingType,
+    pub inscription_data: Pubkey,
+    pub order: u64, // 8 + 32 + 32 = 72
+    pub size: u32,  // 8 + 32 + 32 + 8 = 80
+    pub validation_hash: Option<String>,
+}
 
+#[event]
+pub struct InscriptionEventUpdate {
+    pub id: Pubkey,
+    pub data: InscriptionEventData,
+}
 
 // limited by the max size of a PDA account, i.e. 10K (each inscription pubkey is 32 bytes)
-
 
 #[derive(Accounts)]
 pub struct MakeInscriptionImmutable<'info> {
@@ -23,7 +36,6 @@ pub struct MakeInscriptionImmutable<'info> {
         bump, payer = payer, space = InscriptionSummary::BASE_SIZE)]
     pub inscription_summary: Box<Account<'info, InscriptionSummary>>,
 
-
     /// CHECK: validated in logic
     #[account(mut,
         constraint = inscription.authority == authority.key())]
@@ -32,9 +44,7 @@ pub struct MakeInscriptionImmutable<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(
-    ctx: Context<MakeInscriptionImmutable>
-) -> Result<()> {
+pub fn handler(ctx: Context<MakeInscriptionImmutable>) -> Result<()> {
     let inscription = &mut ctx.accounts.inscription;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
     // let inscription_account_info = inscription.to_account_info();
@@ -43,19 +53,26 @@ pub fn handler(
     inscription.authority = system_program::ID;
 
     inscription_summary.inscription_count_immutables += 1;
-   
+
     let clock = Clock::get()?;
 
     inscription_summary.last_inscription_create_time = clock.unix_timestamp;
     inscription_summary.last_inscription = inscription.key();
     inscription_summary.last_inscriber = ctx.accounts.payer.key();
-    
 
-    emit!(InscriptionEvent {
+    emit!(InscriptionEventUpdate {
         id: inscription.key(),
-        event_type: InscriptionEventType::Create
+        data: InscriptionEventData {
+            authority: inscription.authority,
+            root: inscription.root,
+            media_type: inscription.media_type.clone(),
+            encoding_type: inscription.encoding_type.clone(),
+            inscription_data: inscription.inscription_data,
+            order: inscription.order,
+            size: inscription.size,
+            validation_hash: inscription.validation_hash.clone()
+        },
     });
 
     Ok(())
 }
-

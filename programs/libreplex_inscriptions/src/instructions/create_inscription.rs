@@ -1,18 +1,44 @@
 use crate::errors::ErrorCode;
 
 use crate::{
-    Inscription, InscriptionData, InscriptionEvent, InscriptionEventType, InscriptionRankPage,
+    Inscription, InscriptionData, InscriptionRankPage,
     InscriptionSummary, MediaType, EncodingType,
 };
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
 
+use super::InscriptionEventData;
+
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum SignerType {
     Root,
     LegacyMetadataSigner,
 }
+
+
+
+
+#[event]
+pub struct InscriptionEventCreate {
+    pub id: Pubkey,
+    pub data: InscriptionEventData
+}
+
+
+
+
+// #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+// pub struct InscriptionEventData {
+//     pub authority: Pubkey, // 8
+//     pub root: Pubkey, // 8 + 32 = 40
+//     pub media_type: MediaType,
+//     pub encoding_type: EncodingType,
+//     pub inscription_data: Pubkey, 
+//     pub order: u64, // 8 + 32 + 32 = 72
+//     pub size: u32,    // 8 + 32 + 32 + 8 = 80
+//     pub validation_hash: Option<String>
+// }
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateInscriptionInput {
@@ -194,9 +220,18 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     reallocate_rank_page(page_rank_accountinfo, payer, system_program)?;
     add_inscription_to_rank_page(page_to_update, inscription)?;
 
-    emit!(InscriptionEvent {
+    emit!(InscriptionEventCreate {
         id: inscription.key(),
-        event_type: InscriptionEventType::Create
+        data: InscriptionEventData { 
+            authority: inscription.authority, 
+            root: inscription.root, 
+            media_type: inscription.media_type.clone(),
+            encoding_type: inscription.encoding_type.clone(),
+            inscription_data: inscription.inscription_data,
+            order: inscription.order,
+            size: inscription.size,
+            validation_hash: inscription.validation_hash.clone()
+        }
     });
 
     Ok(())
