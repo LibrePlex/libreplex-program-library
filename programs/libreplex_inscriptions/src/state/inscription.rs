@@ -129,6 +129,10 @@ pub struct Inscription {
     pub validation_hash: Option<String>
 }
 
+
+
+
+
 impl Inscription {
     pub const BASE_SIZE: usize = 8 + 32 + 32 + 2 + 2 + 32 + 8 + 4 + 1 + 1; // no need for vector padding as we write bytes directly onto the account
 
@@ -159,3 +163,17 @@ pub enum InscriptionEventType {
     Resize,
 }
 
+
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct InscriptionEventData {
+    pub authority: Pubkey, // 8
+    pub root: Pubkey, // 8 + 32 = 40
+    pub media_type: MediaType,
+    pub encoding_type: EncodingType,
+    pub inscription_data: Pubkey, 
+
+    pub order: u64, // 8 + 32 + 32 = 72
+    pub size: u32,    // 8 + 32 + 32 + 8 = 80
+    pub validation_hash: Option<String>
+}

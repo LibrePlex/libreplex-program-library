@@ -1,4 +1,4 @@
-use crate::{EncodingType, MediaType};
+use crate::InscriptionEventData;
 use crate::{Inscription, InscriptionSummary};
 use anchor_lang::prelude::*;
 

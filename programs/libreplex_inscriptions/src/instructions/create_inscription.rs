@@ -2,13 +2,13 @@ use crate::errors::ErrorCode;
 
 use crate::{
     Inscription, InscriptionData, InscriptionRankPage,
-    InscriptionSummary, MediaType, EncodingType,
+    InscriptionSummary, MediaType, EncodingType, InscriptionEventData,
 };
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
 
-use super::InscriptionEventData;
+
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum SignerType {
     Root,
@@ -38,6 +38,14 @@ impl CreateInscriptionInput {
 }
 
 const INSCRIPTIONS_PER_PAGE: u64 = 300000;
+
+
+#[event]
+pub struct InscriptionEventCreate {
+    id: Pubkey,
+    data: InscriptionEventData
+}
+
 
 #[derive(Accounts)]
 #[instruction(inscription_input: CreateInscriptionInput)]

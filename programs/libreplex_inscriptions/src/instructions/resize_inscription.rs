@@ -1,7 +1,7 @@
 use std::cmp::{self};
 
-use crate::instructions::{InscriptionEventData, InscriptionEventUpdate};
-use crate::Inscription;
+use crate::instructions::InscriptionEventUpdate;
+use crate::{Inscription, InscriptionEventData};
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::{invoke, invoke_signed};
 use anchor_lang::solana_program::system_instruction;
