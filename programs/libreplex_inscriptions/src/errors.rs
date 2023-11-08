@@ -18,5 +18,14 @@ pub enum ErrorCode {
     MaxSizeExceeded,
 
     #[msg("Bad page")]
-    BadInscriptionRankPage
+    BadInscriptionRankPage,
+
+    #[msg("Incorrect inscription data account")]
+    IncorrectInscriptionDataAccount,
+
+    #[msg("Root signer mismatch")]
+    RootSignerMismatch,
+
+    #[msg("Legacy metadata signer key does not match the expected PDA")]
+    LegacyMetadataSignerMismatch
 }

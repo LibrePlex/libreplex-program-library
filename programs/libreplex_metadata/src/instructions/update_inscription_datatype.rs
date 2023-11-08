@@ -82,7 +82,8 @@ pub fn handler(ctx: Context<UpdateInscriptionDataType>,
         }
     }
 
-    if let Some(delegated_metadata_specific_permissions_account) = ctx.accounts.delegated_metadata_specific_permissions.as_ref() {
+    if let Some(delegated_metadata_specific_permissions_account) 
+        = ctx.accounts.delegated_metadata_specific_permissions.as_ref() {
         let delegated_metadata_specific_permissions = &delegated_metadata_specific_permissions_account.permissions;
 
         can_edit = can_edit || delegated_metadata_specific_permissions.contains(&PermissionType::Update);
@@ -92,28 +93,13 @@ pub fn handler(ctx: Context<UpdateInscriptionDataType>,
         return Err(ErrorCode::InvalidPermissions.into())
     }
 
-    // match &metadata.asset {
-    //     Asset::Inscription {
-    //         data_type:_,
-    //         account_id,
-    //         description,
-    //     } => {
-    //         msg!("Updating asset datatype: {}", update_metadata_input.data_type);
-    //         metadata.asset= Asset::Inscription { account_id: *account_id, data_type: "asdasd".to_owned(), //update_metadata_input.data_type.clone(), 
-    //             description:  match description {
-    //                 Some(x)=>Some(x.clone()),
-    //                 None => None
-    //             } }
-    //     },
-    //     _ => {
-    //         return Err(ErrorCode::WrongAssetType.into())
-    //     }
-    // }
-
     let old_val = metadata.asset.clone();
     metadata.asset = match old_val {
-        Asset::Inscription { account_id, data_type:_, description } => Asset::Inscription { account_id, data_type: update_metadata_input.data_type,
-             description },
+        Asset::Inscription {   base_data_account_id,
+            inscription_id, data_type:_, description, chunks } => 
+        Asset::Inscription {   base_data_account_id,
+                    inscription_id, data_type: update_metadata_input.data_type,
+             description, chunks },
         _ => {
             return Err(ErrorCode::WrongAssetType.into())
         }

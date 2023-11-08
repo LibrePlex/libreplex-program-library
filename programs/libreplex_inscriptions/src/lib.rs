@@ -30,12 +30,10 @@ pub mod libreplex_inscriptions {
     }
 
     pub fn make_inscription_immutable(
-        ctx: Context<MakeInscriptionImmutable>,
-        input: MakeInscriptionImmutableInput,
+        ctx: Context<MakeInscriptionImmutable>
     ) -> Result<()> {
         instructions::make_inscription_immutable::handler(
-            ctx,
-            input
+            ctx
         )
     }
 
@@ -75,6 +73,16 @@ pub mod libreplex_inscriptions {
         instructions::write_to_inscription::handler(
             ctx,
             input
+        )
+    }
+
+    pub fn set_validation_hash(
+        ctx: Context<SetValidationHash>,
+        validation_hash: Option<String>
+    ) -> Result<()> {
+        instructions::set_validation_hash::handler(
+            ctx,
+            validation_hash
         )
     }
 

@@ -2,10 +2,6 @@ use solana_program_test::{processor, tokio, ProgramTest};
 
 const METADATA_NAME: &str = "MD1";
 
-const METADATA_NAME_NEW: &str = "MD2";
-
-const METADATA_SYMBOL_NEW: &str = "SYMBOL2";
-
 pub mod create_metadata_util;
 use create_metadata_util::*;
 
@@ -28,10 +24,10 @@ mod create_metadata_test {
         );
 
   
-        program.add_program(
-            "spl_token_2022", 
-            ID, 
-            processor!(spl_token_2022::processor::Processor::process));
+        // program.add_program(
+        //     "spl_token_2022", 
+        //     ID, 
+        //     processor!(spl_token_2022::processor::Processor::process));
        
 
         let mut context = program.start_with_context().await;

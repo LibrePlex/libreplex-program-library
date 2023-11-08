@@ -1,31 +1,35 @@
-use std::{cell::RefCell, rc::Rc};
+
 
 use anchor_lang::Result;
-use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
+
 use solana_program_test::*;
 
-mod metadata_tests {
-    use anchor_lang::{InstructionData, Key, ToAccountInfo, ToAccountMetas};
+mod inscriptions_tests {
+    use anchor_lang::{InstructionData, ToAccountInfo, ToAccountMetas};
 
     use anchor_lang::prelude::Account;
     use libreplex_inscriptions::accounts::CreateInscriptionRank;
-    use libreplex_inscriptions::instructions::{
-        CreateInscriptionRankInput, MakeInscriptionImmutableInput,
-    };
+    use libreplex_inscriptions::instructions::{CreateInscriptionRankInput, SignerType};
     use libreplex_inscriptions::{
         accounts::CreateInscription,
         accounts::MakeInscriptionImmutable,
+        accounts::ResizeInscription,
         accounts::WriteToInscription,
-        instructions::{create_inscription::CreateInscriptionInput, WriteToInscriptionInput},
+        instructions::{
+            create_inscription::CreateInscriptionInput, ResizeInscriptionInput,
+            WriteToInscriptionInput,
+        },
         Inscription,
     };
-    use libreplex_inscriptions::{InscriptionRankPage, InscriptionSummary};
+    use libreplex_inscriptions::{EncodingType, InscriptionRankPage, InscriptionSummary};
     use solana_program::account_info::AccountInfo;
-    use solana_program::{
-        instruction::Instruction, pubkey::Pubkey, system_instruction, system_program,
-    };
-    use solana_sdk::signature::Signable;
+    use solana_program::sysvar::Sysvar;
+    use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program};
+
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
+
+    use solana_sdk::clock::Clock;
+
 
     use super::*;
 
@@ -54,111 +58,221 @@ mod metadata_tests {
             processor!(libreplex_inscriptions::entry),
         );
 
+        // TODO: Obtain the current slot dynamically from context.
+        // I tried but I'm a potato so got stuck and had to move on
+        let slot = 1000;
         let mut context: ProgramTestContext = program.start_with_context().await;
+
+        
+        // let slot = Clock::get().unwrap().slot;
+
+        // resize tests take a while so we need to advance slots in order to
+        // avoid RpcError(DeadlineExceeded) on test execution
+        context.warp_to_slot(slot + 100).unwrap();
+
         let authority = context.payer.pubkey();
 
         let mint = Keypair::new();
 
         let root = Keypair::new();
 
-        let inscription = Keypair::new();
-
-        // let inscription_ranks_current_page = Pubkey::find_program_address(
-        //     &["inscription_rank".as_bytes(), &(0 as usize).to_le_bytes()],
-        //     &libreplex_inscriptions::id(),
-        // )
-        // .0;
-        // let inscription_ranks_next_page = Pubkey::find_program_address(
-        //     &["inscription_rank".as_bytes(), &(1 as usize).to_le_bytes()],
-        //     &libreplex_inscriptions::id(),
-        // )
-        // .0;
+        let root_2 = Keypair::new();
 
         let inscription_ranks_current_page =
             create_inscription_rank_page(&mut context, 0).await.unwrap();
 
+        context.warp_to_slot(slot + 200).unwrap();
         let inscription_ranks_next_page =
             create_inscription_rank_page(&mut context, 1).await.unwrap();
+
+        context.warp_to_slot(slot + 300).unwrap();
 
         println!(
             "Current page: {}, next page: {}",
             inscription_ranks_current_page, inscription_ranks_next_page
         );
 
-        let inscription_res = create_inscription(
-            &mut context,
-            &root,
-            authority,
-            (initial_data.len() + append_data.len()) as u32,
-            0,
-        )
-        .await;
+        let (inscription, inscription_data) =
+            create_inscription(&mut context, &root, 0).await.unwrap();
 
-        let inscription_res_2 = create_inscription(
-            &mut context,
-            &root,
-            authority,
-            (initial_data.len() + append_data.len()) as u32,
-            0,
-        )
-        .await;
+        println!("created inscription 1");
 
-        let inscription = inscription_res.unwrap();
+        let (inscription_2, inscription_data_2) =
+            create_inscription(&mut context, &root_2, 0).await.unwrap();
 
-        let inscription_2 = inscription_res_2.unwrap();
-
-        let account_after_create = context
+        let mut account_after_create = context
             .banks_client
-            .get_account(inscription.pubkey())
+            .get_account(inscription)
             .await
             .unwrap()
             .unwrap();
 
-        let inscription_size =
-            u32::from_le_bytes(account_after_create.data[80..84].try_into().unwrap());
+        context.warp_to_slot(slot + 400).unwrap();
 
-        assert_eq!(
-            inscription_size,
-            (initial_data.len() + append_data.len()) as u32
+        let inscription_account_info = AccountInfo::new(
+            &inscription,
+            false,
+            false,
+            &mut account_after_create.lamports,
+            &mut account_after_create.data,
+            &account_after_create.owner,
+            account_after_create.executable,
+            account_after_create.rent_epoch,
         );
 
-        // WRITE SOME INITIAL DATA AT POS 0
-        let append_to_inscription_accounts = WriteToInscription {
-            authority,
-            inscription: inscription.pubkey(),
-            system_program: system_program::id(),
-        };
+        let inscription_obj: Account<Inscription> =
+            Account::try_from(&inscription_account_info).unwrap();
 
-        let append_to_inscription_input: libreplex_inscriptions::instruction::WriteToInscription =
-            libreplex_inscriptions::instruction::WriteToInscription {
-                input: WriteToInscriptionInput {
-                    data: initial_data.clone(),
-                    start_pos: 0,
-                },
-            };
+        assert_eq!(inscription_obj.size, 8);
 
-        let append_to_inscription_ix = Instruction {
-            program_id: libreplex_inscriptions::id(),
-            data: append_to_inscription_input.data(),
-            accounts: append_to_inscription_accounts.to_account_metas(None),
-        };
+        // increase the size to 10MB max incrementally
 
-        let append_to_inscription_tx = Transaction::new_signed_with_payer(
-            &[append_to_inscription_ix],
-            Some(&authority),
-            &[&context.payer],
-            context.last_blockhash,
-        );
+        let mut i: u32 = 0;
+        let max_increases = 10;
+        while i < max_increases {
+            context.warp_to_slot(slot + 400 + (i as u64 + 2) * 100).unwrap();
+            context
+                .banks_client
+                .process_transaction(Transaction::new_signed_with_payer(
+                    &[Instruction {
+                        program_id: libreplex_inscriptions::id(),
+                        data: libreplex_inscriptions::instruction::ResizeInscription {
+                            input: ResizeInscriptionInput {
+                                change: 8192,
+                                expected_start_size: 8 + 8192 * i,
+                                target_size: 8 + 8192 * max_increases,
+                            },
+                        }
+                        .data(),
+                        accounts: ResizeInscription {
+                            authority,
+                            payer: authority,
+                            inscription,
+                            inscription_data,
+                            system_program: system_program::id(),
+                        }
+                        .to_account_metas(None),
+                    }],
+                    Some(&authority),
+                    &[&context.payer],
+                    context.last_blockhash,
+                ))
+                .await
+                .unwrap();
+
+            let mut account_after_resize = context
+                .banks_client
+                .get_account(inscription)
+                .await
+                .unwrap()
+                .unwrap();
+
+            let inscription_account_info = AccountInfo::new(
+                &inscription,
+                false,
+                false,
+                &mut account_after_resize.lamports,
+                &mut account_after_resize.data,
+                &account_after_resize.owner,
+                account_after_resize.executable,
+                account_after_resize.rent_epoch,
+            );
+
+            let inscription_obj: Account<Inscription> =
+                Account::try_from(&inscription_account_info).unwrap();
+
+            assert_eq!(inscription_obj.size, 8 + 8192 * (i + 1));
+            i += 1;
+        }
+
+        let max_decreases = 8;
+        while i < max_decreases {
+            context.warp_to_slot(slot + 4000 + (i as u64 + 2) * 100).unwrap();
+            context
+                .banks_client
+                .process_transaction(Transaction::new_signed_with_payer(
+                    &[Instruction {
+                        program_id: libreplex_inscriptions::id(),
+                        data: libreplex_inscriptions::instruction::ResizeInscription {
+                            input: ResizeInscriptionInput {
+                                change: -8192,
+                                expected_start_size: 8 + 8192 * (max_increases - i),
+                                target_size: 8 + 8192 * (max_increases - i - 1),
+                            },
+                        }
+                        .data(),
+                        accounts: ResizeInscription {
+                            authority,
+                            payer: authority,
+                            inscription,
+                            inscription_data,
+                            system_program: system_program::id(),
+                        }
+                        .to_account_metas(None),
+                    }],
+                    Some(&authority),
+                    &[&context.payer],
+                    context.last_blockhash,
+                ))
+                .await
+                .unwrap();
+
+            let mut account_after_resize = context
+                .banks_client
+                .get_account(inscription)
+                .await
+                .unwrap()
+                .unwrap();
+
+            let inscription_account_info = AccountInfo::new(
+                &inscription,
+                false,
+                false,
+                &mut account_after_resize.lamports,
+                &mut account_after_resize.data,
+                &account_after_resize.owner,
+                account_after_resize.executable,
+                account_after_resize.rent_epoch,
+            );
+
+            let inscription_obj: Account<Inscription> =
+                Account::try_from(&inscription_account_info).unwrap();
+
+            assert_eq!(inscription_obj.size, 8 + 8192 * (max_increases - i));
+            i += 1;
+        }
 
         context
             .banks_client
-            .process_transaction(append_to_inscription_tx)
+            .process_transaction(Transaction::new_signed_with_payer(
+                &[Instruction {
+                    program_id: libreplex_inscriptions::id(),
+                    data: libreplex_inscriptions::instruction::WriteToInscription {
+                        input: WriteToInscriptionInput {
+                            data: initial_data.clone(),
+                            start_pos: 0,
+                        },
+                    }
+                    .data(),
+                    accounts: WriteToInscription {
+                        authority,
+                        inscription: inscription,
+                        inscription_data,
+                        system_program: system_program::id(),
+                    }
+                    .to_account_metas(None),
+                }],
+                Some(&authority),
+                &[&context.payer],
+                context.last_blockhash,
+            ))
             .await
             .unwrap();
 
         let write_to_inscription_accounts = WriteToInscription {
             authority,
-            inscription: inscription.pubkey(),
+            inscription_data,
+            inscription: inscription,
             system_program: system_program::id(),
         };
 
@@ -203,41 +317,40 @@ mod metadata_tests {
 
         let mut final_account = context
             .banks_client
-            .get_account(inscription.pubkey())
+            .get_account(inscription_data)
             .await
+            .unwrap()
             .unwrap();
 
         let expected_data: Vec<u8> = [&initial_data[..], &append_data[..]].concat();
+        assert_eq!(
+            expected_data.as_slice(),
+            &final_account.data[0..(initial_data.len() + append_data.len())]
+        );
 
-        match &mut final_account {
-            Some(x) => {
-                let l = u32::from_le_bytes(x.data[80..84].try_into().unwrap());
+        let mut inscription_account = context
+            .banks_client
+            .get_account(inscription)
+            .await
+            .unwrap()
+            .unwrap();
 
-                println!("{:?}", l);
-                let endidx = 84 + l;
-                assert_eq!(expected_data.as_slice(), &x.data[84..endidx as usize]);
+        let inscription_pubkey = inscription;
+        let inscription_account_info = AccountInfo::new(
+            &inscription_pubkey,
+            false,
+            false,
+            &mut inscription_account.lamports,
+            &mut inscription_account.data,
+            &inscription_account.owner,
+            inscription_account.executable,
+            inscription_account.rent_epoch,
+        );
 
-                let inscription_pubkey = inscription.pubkey();
-                let inscription_account_info = AccountInfo::new(
-                    &inscription_pubkey,
-                    false,
-                    false,
-                    &mut x.lamports,
-                    &mut x.data,
-                    &x.owner,
-                    x.executable,
-                    x.rent_epoch,
-                );
+        let inscription_obj: Account<Inscription> =
+            Account::try_from(&inscription_account_info).unwrap();
 
-                let inscription_obj: Account<Inscription> =
-                    Account::try_from(&inscription_account_info).unwrap();
-
-                assert_eq!(inscription_obj.root, root.pubkey());
-            }
-            None => {
-                assert_eq!(true, false);
-            }
-        }
+        assert_eq!(inscription_obj.root, root.pubkey());
 
         let inscription_summary =
             Pubkey::find_program_address(&[b"inscription_summary"], &libreplex_inscriptions::ID).0;
@@ -267,10 +380,7 @@ mod metadata_tests {
 
         assert_eq!(inscription_summary_obj.inscription_count_immutables, 0);
 
-        assert_eq!(
-            inscription_summary_obj.last_inscription,
-            inscription_2.pubkey()
-        );
+        assert_eq!(inscription_summary_obj.last_inscription, inscription_2);
 
         assert_eq!(
             inscription_summary_obj.last_inscriber,
@@ -302,12 +412,14 @@ mod metadata_tests {
             InscriptionRankPage::get_inscriptions(&account_info.data.borrow_mut(), 0, 2).collect();
 
         // nothing has been made immutable yet, so inscription slice should have length = 0
-        assert_eq!(inscription_slice.len(), 0);
+        assert_eq!(inscription_slice.len(), 2);
+
+        assert_eq!(inscription_obj.order, 1);
 
         // we invert the order here and check the rank ordering afterwards
-        make_inscription_immutable(&mut context, 0, inscription_2.pubkey()).await;
+        make_inscription_immutable(&mut context, 0, inscription_2).await;
 
-        make_inscription_immutable(&mut context, 0, inscription.pubkey()).await;
+        make_inscription_immutable(&mut context, 0, inscription).await;
 
         let mut account_summary = context
             .banks_client
@@ -336,7 +448,7 @@ mod metadata_tests {
 
         // check that ranks have been updated
 
-        let inscription_key = inscription.pubkey();
+        let inscription_key = inscription;
         let mut inscription_account = context
             .banks_client
             .get_account(inscription_key)
@@ -355,11 +467,7 @@ mod metadata_tests {
             inscription_account.rent_epoch,
         );
 
-        let inscription_obj: Account<Inscription> = Account::try_from(&inscription_info).unwrap();
-
-        assert_eq!(inscription_obj.rank, 2);
-
-        let inscription_2_pubkey = inscription_2.pubkey();
+        let inscription_2_pubkey = inscription_2;
         let mut inscription_account_2 = context
             .banks_client
             .get_account(inscription_2_pubkey)
@@ -381,79 +489,57 @@ mod metadata_tests {
         let inscription_2_obj: Account<Inscription> =
             Account::try_from(&inscription_account_2_info).unwrap();
 
-            
-        assert_eq!(inscription_2_obj.rank, 1);
+        assert_eq!(inscription_2_obj.order, 2);
     }
 
     async fn create_inscription(
-        context: &mut ProgramTestContext,
+        ctx: &mut ProgramTestContext,
         root: &Keypair,
-        authority: Pubkey,
-        max_data_length: u32,
         current_page_index: u32,
-    ) -> Result<solana_sdk::signature::Keypair> {
-        let inscription = Keypair::new();
-        let inscription_ranks_current_page = Pubkey::find_program_address(
-            &[
-                "inscription_rank".as_bytes(),
-                &(current_page_index as u32).to_le_bytes(),
-            ],
-            &libreplex_inscriptions::id(),
-        )
-        .0;
-        let inscription_ranks_next_page = Pubkey::find_program_address(
-            &[
-                "inscription_rank".as_bytes(),
-                &((current_page_index + 1) as u32).to_le_bytes(),
-            ],
-            &libreplex_inscriptions::id(),
+    ) -> Result<(Pubkey, Pubkey)> {
+        // let inscription_data = Keypair::new();
+
+        let inscription = Pubkey::find_program_address(
+            &["inscription".as_bytes(), root.pubkey().as_ref()],
+            &libreplex_inscriptions::ID,
         )
         .0;
 
-        let create_inscription_input = libreplex_inscriptions::instruction::CreateInscription {
-            inscription_input: CreateInscriptionInput {
-                max_data_length,
-                authority: Some(authority.key()),
-                current_rank_page: current_page_index as u32,
-            },
-        };
+        let inscription_data = Pubkey::find_program_address(
+            &["inscription_data".as_bytes(), root.pubkey().as_ref()],
+            &libreplex_inscriptions::ID,
+        )
+        .0;
 
         let inscription_summary =
             Pubkey::find_program_address(&[b"inscription_summary"], &libreplex_inscriptions::ID).0;
 
+        let inscription_ranks_current_page = create_inscription_rank_page(ctx, 0).await.unwrap();
+
+        let inscription_ranks_next_page = create_inscription_rank_page(ctx, 1).await.unwrap();
+
         let inscription_account = CreateInscription {
             inscription_summary,
-            payer: context.payer.pubkey(),
+            inscription_ranks_current_page,
+            inscription_ranks_next_page,
+            payer: ctx.payer.pubkey(),
+            signer: root.pubkey(),
             root: root.pubkey(),
-            inscription: inscription.pubkey(),
+            inscription,
             system_program: system_program::id(),
+            inscription_data,
         };
 
-        // CREATE INSCRIPTION ACCOUNT
-        let rent = context.banks_client.get_rent().await.unwrap();
-
-        let create_inscription_account_tx = Transaction::new_signed_with_payer(
-            &[system_instruction::create_account(
-                &context.payer.pubkey(),
-                &inscription.pubkey(),
-                rent.minimum_balance(
-                    Inscription::BASE_SIZE
-                        + create_inscription_input.inscription_input.max_data_length as usize,
-                ),
-                Inscription::BASE_SIZE as u64
-                    + create_inscription_input.inscription_input.max_data_length as u64,
-                &libreplex_inscriptions::id(),
-            )],
-            Some(&context.payer.pubkey()),
-            &[&context.payer, &inscription],
-            context.last_blockhash,
-        );
-
-        context
-            .banks_client
-            .process_transaction(create_inscription_account_tx)
-            .await
-            .unwrap();
+        let create_inscription_input = libreplex_inscriptions::instruction::CreateInscription {
+            inscription_input: CreateInscriptionInput {
+                authority: Some(ctx.payer.pubkey()),
+                current_rank_page: current_page_index as u32,
+                signer_type: SignerType::Root,
+                media_type: libreplex_inscriptions::MediaType::Image,
+                encoding_type: EncodingType::Base64,
+                validation_hash: None
+            },
+        };
 
         let create_inscription_ix = Instruction {
             program_id: libreplex_inscriptions::id(),
@@ -461,19 +547,23 @@ mod metadata_tests {
             accounts: inscription_account.to_account_metas(None),
         };
 
+        
+
+        println!("Creating tx");
         let create_inscription_tx = Transaction::new_signed_with_payer(
             &[create_inscription_ix],
-            Some(&authority),
-            &[&context.payer, &root],
-            context.last_blockhash,
+            Some(&ctx.payer.pubkey()),
+            &[&ctx.payer, &root],
+            ctx.last_blockhash,
         );
+        println!("Executing tx");
 
-        context
-            .banks_client
+        ctx.banks_client
             .process_transaction(create_inscription_tx)
             .await
             .unwrap();
-        Ok(inscription)
+        println!("");
+        Ok((inscription, inscription_data))
     }
 
     pub async fn create_inscription_rank_page(
@@ -526,30 +616,8 @@ mod metadata_tests {
         page_index: u32,
         inscription: Pubkey,
     ) {
-        let inscription_ranks_current_page = Pubkey::find_program_address(
-            &[
-                "inscription_rank".as_bytes(),
-                &(page_index as u32).to_le_bytes(),
-            ],
-            &libreplex_inscriptions::id(),
-        )
-        .0;
-
-        let inscription_ranks_next_page = Pubkey::find_program_address(
-            &[
-                "inscription_rank".as_bytes(),
-                &(page_index + 1 as u32).to_le_bytes(),
-            ],
-            &libreplex_inscriptions::id(),
-        )
-        .0;
-
         let make_inscription_immutable_input =
-            libreplex_inscriptions::instruction::MakeInscriptionImmutable {
-                input: MakeInscriptionImmutableInput {
-                    current_rank_page: page_index,
-                },
-            };
+            libreplex_inscriptions::instruction::MakeInscriptionImmutable {};
 
         let inscription_summary =
             Pubkey::find_program_address(&[b"inscription_summary"], &libreplex_inscriptions::ID).0;
@@ -559,8 +627,6 @@ mod metadata_tests {
             system_program: system_program::ID,
             authority: context.payer.pubkey(),
             inscription_summary,
-            inscription_ranks_current_page,
-            inscription_ranks_next_page,
             inscription,
         };
 

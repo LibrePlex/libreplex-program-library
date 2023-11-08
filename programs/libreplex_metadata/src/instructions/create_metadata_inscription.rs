@@ -2,8 +2,10 @@ use crate::state::Metadata;
 use crate::{Asset, MetadataEvent, MetadataEventType, MetadataExtension};
 use anchor_lang::prelude::*;
 
+use libreplex_inscriptions::EncodingType;
 use libreplex_inscriptions::cpi::accounts::CreateInscription;
 
+use libreplex_inscriptions::instructions::SignerType;
 use libreplex_inscriptions::program::LibreplexInscriptions;
 
 /*
@@ -24,6 +26,7 @@ pub struct CreateMetadataInscriptionInput {
     pub extensions: Vec<MetadataExtension>,
     pub description: Option<String>,
     pub data_type: String,
+    pub validation_hash: Option<String>
 }
 
 impl CreateMetadataInscriptionInput {
@@ -35,11 +38,14 @@ impl CreateMetadataInscriptionInput {
             // inscription asset
             Asset::BASE_SIZE + 
             32 +
+            32 +
             4 + self.data_type.len() +
             1 + match &self.description {
                 Some(x) => 4 + x.len(),
                 None => 0,
-            } + self.extensions.iter().map(|x|x.get_size()).sum::<usize>()
+            } 
+            + 4
+            + self.extensions.iter().map(|x|x.get_size()).sum::<usize>()
     }
 }
 
@@ -63,8 +69,13 @@ pub struct CreateInscriptionMetadata<'info> {
     #[account(mut)]
     pub mint: Signer<'info>,
 
+    /// CHECK: checked via CPI
     #[account(mut)]
-    pub inscription: Signer<'info>,
+    pub inscription: UncheckedAccount<'info>,
+
+    /// CHECK: checked via CPI
+    #[account(mut)]
+    pub inscription_data: UncheckedAccount<'info>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)] 
@@ -85,24 +96,25 @@ pub struct CreateInscriptionMetadata<'info> {
 
 pub fn handler(
     ctx: Context<CreateInscriptionMetadata>,
-    metadata_input: CreateMetadataInscriptionInput
+    input: CreateMetadataInscriptionInput
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let inscription = &mut ctx.accounts.inscription;
+    let inscription_data = &mut ctx.accounts.inscription_data;
 
     let inscription_summary = &mut ctx.accounts.inscription_summary;
     
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let system_program = &ctx.accounts.system_program;
+    let inscription_ranks_current_page = &ctx.accounts.inscription_ranks_current_page;
+    let inscription_ranks_next_page = &ctx.accounts.inscription_ranks_next_page;
+    
     let signer = &ctx.accounts.signer;
 
-    let mint_key = &ctx.accounts.mint.key();
-
-    let metadata_seeds: &[&[u8]] = &[b"metadata", mint_key.as_ref(), &[ctx.bumps["metadata"]]];
-
-
+    let mint = &ctx.accounts.mint;
+    
     libreplex_inscriptions::cpi::create_inscription(
-        CpiContext::new_with_signer(
+        CpiContext::new(
             inscriptions_program.to_account_info(),
             CreateInscription {
                 inscription_summary: inscription_summary.to_account_info(),
@@ -115,33 +127,41 @@ pub fn handler(
                  including, f ex a wallet, legacy 
                  mint etc
                 */
-                root: metadata.to_account_info(),
+                root: mint.to_account_info(),
+                signer: mint.to_account_info(),
+                inscription_ranks_current_page: inscription_ranks_current_page.to_account_info(),
+                inscription_ranks_next_page: inscription_ranks_next_page.to_account_info(),
                 inscription: inscription.to_account_info(),
+                inscription_data: inscription_data.to_account_info(),
                 system_program: system_program.to_account_info(),
                 payer: signer.to_account_info(),
-            },
-            &[metadata_seeds],
+            }
         ),
         libreplex_inscriptions::instructions::CreateInscriptionInput {
             authority: Some(signer.key()),
-            max_data_length: 0,
-            current_rank_page: 0
+            media_type: libreplex_inscriptions::MediaType::Image,
+            encoding_type: EncodingType::Base64,
+            current_rank_page: 0,
+            signer_type: SignerType::Root,
+            validation_hash: input.validation_hash
         },
     )?;
 
     // Update the metadata state account
     metadata.mint = ctx.accounts.mint.key();
     metadata.is_mutable = true;
-    metadata.symbol = metadata_input.symbol.clone();
-    metadata.name = metadata_input.name.clone();
-    metadata.update_authority = metadata_input.update_authority;
+    metadata.symbol = input.symbol.clone();
+    metadata.name = input.name.clone();
+    metadata.update_authority = input.update_authority;
     metadata.asset = Asset::Inscription {
-        account_id: ctx.accounts.inscription.key(),
-        data_type: metadata_input.data_type,
-        description: metadata_input.description,
+        inscription_id: ctx.accounts.inscription.key(),
+        base_data_account_id: ctx.accounts.inscription_data.key(),
+        data_type: input.data_type,
+        description: input.description,
+        chunks: 1 // everything starts with 1 chunk
     };
     metadata.creator = signer.key();
-    metadata.extensions = metadata_input.extensions;
+    metadata.extensions = input.extensions;
 
     msg!(
         "metadata created for mint with pubkey {}",

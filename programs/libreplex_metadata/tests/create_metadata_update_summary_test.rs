@@ -2,10 +2,6 @@ use solana_program_test::{processor, tokio, ProgramTest};
 
 const METADATA_NAME: &str = "MD1";
 
-const METADATA_NAME_NEW: &str = "MD2";
-
-const METADATA_SYMBOL_NEW: &str = "SYMBOL2";
-
 pub mod create_metadata_update_summary_util;
 use create_metadata_update_summary_util::*;
 
@@ -27,11 +23,6 @@ mod create_metadata_update_summary_test {
             processor!(libreplex_metadata::entry),
         );
 
-        program.add_program(
-            "spl_token_2022",
-            ID,
-            processor!(spl_token_2022::processor::Processor::process),
-        );
 
         let mut context = program.start_with_context().await;
         let _collection_authority = context.payer.pubkey();

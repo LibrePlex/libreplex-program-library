@@ -43,7 +43,34 @@ pub enum Asset {
     Image { url: String, description: Option<String> },
     ChainRenderer { 
         program_id: Pubkey },
-    Inscription { account_id: Pubkey, data_type: String, description: Option<String> },
+    Inscription { 
+        // base inscription account id. The base account (and the PDAs derived from it)
+        // store the actual on-chain data
+        base_data_account_id: Pubkey,
+        // inscription stores the "config" of the inscription, such as 
+        // authority, rank etc. The intention is to keep the base_data_account as "pure"
+        // as possible 
+        inscription_id: Pubkey,
+        data_type: String,
+        description: Option<String>,
+           /* 
+            Chunks tells you the number of inscription accounts.
+            each inscription accounts can hold up to 10MB of data
+            so for large media, you may need to split this into chunks.
+
+            each chunk points to an InscriptionData struct which is a
+            PDA owned by the inscription program with seed [base_data_account_id, <idx>]
+            where idx runs from 0,1,2,3,4 ... N
+            and account_id is the pointer to the inscription.
+
+            We keep the total number of chunks here for ease of indexing.
+
+            I.e. we should not need multiple hops to get all the data, just 
+            use the chunks to calculate the PDAs off the metadata and then
+            fetch all in fell swoop
+        */  
+        chunks: usize,
+    },
 }
 
 impl Asset {
@@ -55,11 +82,20 @@ impl Asset {
                 Asset::Json { url } => 4 + url.len(),
                 Asset::Image { url , description} => 4 + url.len() + 1 + match &description {Some(x) => 4 + x.len(), None => 0},
                 Asset::ChainRenderer { program_id: _} => 32 + 32,
-                // Asset::Inscription { account_id: _, description } => 32 + 1  + match &description {Some(x) => 4 + x.len(), None => 0},
-                Asset::Inscription { account_id: _, data_type, description } => 32 
+                Asset::Inscription { 
+                    base_data_account_id: _,
+                    inscription_id: _,
+                    data_type,
+                    description,
+                    chunks: _,
+                } => 32 // base_data_account_id 
+                + 32 // inscription_id
                 + 4 + data_type.len()
-                + 1 + match &description {Some(x) => 4 + x.len(), None => 0}
-                
+                + 1 + match description {
+                    Some(x) => 4 + x.len(),
+                    None => 0 
+                }
+                + 4 // chunks
             }
     }
 }
