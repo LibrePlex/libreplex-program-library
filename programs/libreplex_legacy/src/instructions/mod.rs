@@ -16,9 +16,9 @@ pub use resize_legacy_inscription_as_holder::*;
 
 pub mod resize_legacy_inscription_as_holder;
 
-pub use write_to_legacy_inscription::*;
+pub use write_to_legacy_inscription_as_holder::*;
 
-pub mod write_to_legacy_inscription;
+pub mod write_to_legacy_inscription_as_holder;
 
 pub use make_immutable::*;
 

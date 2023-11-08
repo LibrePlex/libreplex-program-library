@@ -9,7 +9,8 @@ use mpl_token_metadata::accounts::Metadata;
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
 use super::{
-    check_metadata_type::check_metadata_type, create_legacy_inscription_logic::AuthorityType, resize_legacy_inscription_as_holder::ResizeLegacyInscriptionInput,
+    create_legacy_inscription_logic::AuthorityType,
+    resize_legacy_inscription_as_holder::ResizeLegacyInscriptionInput,
 };
 
 // Adds a metadata to a group
@@ -62,7 +63,6 @@ pub fn handler(
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
-    let legacy_metadata = &ctx.accounts.legacy_metadata;
     let payer = &ctx.accounts.payer;
 
     let metaplex_metadata = &ctx.accounts.legacy_metadata;
@@ -87,8 +87,6 @@ pub fn handler(
         mint_key.as_ref(),
         &[ctx.bumps["legacy_inscription"]],
     ];
-
-    check_metadata_type(legacy_metadata, mint)?;
 
     libreplex_inscriptions::cpi::resize_inscription(
         CpiContext::new_with_signer(

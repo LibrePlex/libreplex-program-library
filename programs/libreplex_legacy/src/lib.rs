@@ -17,6 +17,7 @@ pub use state::*;
 #[program]
 pub mod libreplex_legacy {
 
+    
     use super::*;
 
     pub fn inscribe_legacy_metadata_as_uauth(
@@ -43,11 +44,11 @@ pub mod libreplex_legacy {
         )
     }
 
-    pub fn write_to_legacy_inscription(
-        ctx: Context<WriteToLegacyInscription>,
+    pub fn write_to_legacy_inscription_as_holder(
+        ctx: Context<WriteToLegacyInscriptionAsHolder>,
         input: WriteToLegacyInscriptionInput,
     ) -> Result<()> {
-        instructions::write_to_legacy_inscription::handler(ctx, input)
+        instructions::write_to_legacy_inscription_as_holder::handler(ctx, input)
     }
 
     pub fn resize_legacy_inscription_as_uauth(

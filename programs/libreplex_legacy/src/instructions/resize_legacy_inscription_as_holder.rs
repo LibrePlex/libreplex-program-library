@@ -4,13 +4,11 @@ use libreplex_inscriptions::{
     cpi::accounts::ResizeInscription, instructions::ResizeInscriptionInput,
     program::LibreplexInscriptions, Inscription,
 };
-use mpl_token_metadata::accounts::Metadata;
+
 
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use super::{
-    check_metadata_type::check_metadata_type, create_legacy_inscription_logic::AuthorityType,
-};
+use super::create_legacy_inscription_logic::AuthorityType;
 
 // duplicated to get this exposed correctly via anchor IDL
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -44,10 +42,6 @@ pub struct ResizeLegacyInscriptionAsHolder<'info> {
     pub owner: UncheckedAccount<'info>,
 
     pub mint: Box<Account<'info, Mint>>,
-
-    /// CHECK: Checked in logic
-    #[account()]
-    pub legacy_metadata: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub inscription: Account<'info, Inscription>,
@@ -90,17 +84,7 @@ pub fn handler(
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
-    let legacy_metadata = &ctx.accounts.legacy_metadata;
     let payer = &ctx.accounts.payer;
-
-    let metaplex_metadata = &ctx.accounts.legacy_metadata;
-    let mai = metaplex_metadata.to_account_info().clone();
-    let data: &[u8] = &mai.try_borrow_data()?[..];
-    let metadata_obj = Metadata::deserialize(&mut data.clone())?;
-
-    if metadata_obj.mint != ctx.accounts.mint.key() {
-        return Err(LegacyInscriptionErrorCode::BadMint.into());
-    }
 
     if ctx.accounts.authority.key() != ctx.accounts.owner.key()
             || legacy_inscription.authority_type != AuthorityType::Holder
@@ -115,8 +99,6 @@ pub fn handler(
         mint_key.as_ref(),
         &[ctx.bumps["legacy_inscription"]],
     ];
-
-    check_metadata_type(legacy_metadata, mint)?;
 
     libreplex_inscriptions::cpi::resize_inscription(
         CpiContext::new_with_signer(
