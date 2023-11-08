@@ -9,36 +9,11 @@ use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
 
 use super::InscriptionEventData;
-
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum SignerType {
     Root,
     LegacyMetadataSigner,
 }
-
-
-
-
-#[event]
-pub struct InscriptionEventCreate {
-    pub id: Pubkey,
-    pub data: InscriptionEventData
-}
-
-
-
-
-// #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-// pub struct InscriptionEventData {
-//     pub authority: Pubkey, // 8
-//     pub root: Pubkey, // 8 + 32 = 40
-//     pub media_type: MediaType,
-//     pub encoding_type: EncodingType,
-//     pub inscription_data: Pubkey, 
-//     pub order: u64, // 8 + 32 + 32 = 72
-//     pub size: u32,    // 8 + 32 + 32 + 8 = 80
-//     pub validation_hash: Option<String>
-// }
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateInscriptionInput {
@@ -173,6 +148,7 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     inscription.validation_hash = input.validation_hash;
     let signer = ctx.accounts.signer.key();
     let root_key = inscription.root.key();
+
 
     // check signer - it must be either the mint itself
     // or a PDA signed by an authorised signer program

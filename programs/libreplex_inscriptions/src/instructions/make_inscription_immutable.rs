@@ -4,17 +4,6 @@ use anchor_lang::prelude::*;
 
 use anchor_lang::system_program;
 
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct InscriptionEventData {
-    pub authority: Pubkey, // 8
-    pub root: Pubkey, // 8 + 32 = 40
-    pub media_type: MediaType,
-    pub encoding_type: EncodingType,
-    pub inscription_data: Pubkey,
-    pub order: u64, // 8 + 32 + 32 = 72
-    pub size: u32,  // 8 + 32 + 32 + 8 = 80
-    pub validation_hash: Option<String>,
-}
 
 #[event]
 pub struct InscriptionEventUpdate {
@@ -53,7 +42,6 @@ pub fn handler(ctx: Context<MakeInscriptionImmutable>) -> Result<()> {
     inscription.authority = system_program::ID;
 
     inscription_summary.inscription_count_immutables += 1;
-
     let clock = Clock::get()?;
 
     inscription_summary.last_inscription_create_time = clock.unix_timestamp;
