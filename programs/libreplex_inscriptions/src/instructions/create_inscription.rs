@@ -1,13 +1,14 @@
 use crate::errors::ErrorCode;
 
 use crate::{
-    Inscription, InscriptionData, InscriptionEvent, InscriptionEventType, InscriptionRankPage,
+    Inscription, InscriptionData, InscriptionRankPage,
     InscriptionSummary, MediaType, EncodingType,
 };
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
 
+use super::InscriptionEventData;
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum SignerType {
     Root,
@@ -148,6 +149,7 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     let signer = ctx.accounts.signer.key();
     let root_key = inscription.root.key();
 
+
     // check signer - it must be either the mint itself
     // or a PDA signed by an authorised signer program
 
@@ -194,9 +196,18 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     reallocate_rank_page(page_rank_accountinfo, payer, system_program)?;
     add_inscription_to_rank_page(page_to_update, inscription)?;
 
-    emit!(InscriptionEvent {
+    emit!(InscriptionEventCreate {
         id: inscription.key(),
-        event_type: InscriptionEventType::Create
+        data: InscriptionEventData { 
+            authority: inscription.authority, 
+            root: inscription.root, 
+            media_type: inscription.media_type.clone(),
+            encoding_type: inscription.encoding_type.clone(),
+            inscription_data: inscription.inscription_data,
+            order: inscription.order,
+            size: inscription.size,
+            validation_hash: inscription.validation_hash.clone()
+        }
     });
 
     Ok(())

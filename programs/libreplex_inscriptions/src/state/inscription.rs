@@ -159,8 +159,3 @@ pub enum InscriptionEventType {
     Resize,
 }
 
-#[event]
-pub struct InscriptionEvent {
-    pub id: Pubkey,
-    pub event_type: InscriptionEventType,
-}

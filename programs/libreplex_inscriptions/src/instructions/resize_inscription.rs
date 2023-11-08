@@ -1,11 +1,11 @@
 use std::cmp::{self};
 
+use crate::instructions::{InscriptionEventData, InscriptionEventUpdate};
 use crate::Inscription;
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::{invoke, invoke_signed};
 use anchor_lang::solana_program::system_instruction;
 use std::cmp::Ordering;
-
 
 /*
   inscription size changes are limited by the maximum increase per call.
@@ -20,13 +20,6 @@ use std::cmp::Ordering;
 // fired whenever inscription size is changed, whether it hits the target or not.
 #[event]
 pub struct InscriptionResizeEvent {
-    id: Pubkey,
-    size: u32,
-}
-
-// fired when inscription size hits the target (i.e. this is the final increase / decrease)
-#[event]
-pub struct InscriptionResizeFinal {
     id: Pubkey,
     size: u32,
 }
@@ -88,13 +81,15 @@ pub fn handler(
     let size_old = inscription.size;
     msg!("before: {}", size_old);
     inscription.size = match inscription_input.change.cmp(&0) {
-        Ordering::Greater => {
-            cmp::min((inscription.size as i64 + inscription_input.change as i64) as u32, inscription_input.target_size)
-        }
-        Ordering::Less => {
-            cmp::max((inscription.size as i64 + inscription_input.change as i64) as u32, inscription_input.target_size)
-        },
-        Ordering::Equal => inscription.size
+        Ordering::Greater => cmp::min(
+            (inscription.size as i64 + inscription_input.change as i64) as u32,
+            inscription_input.target_size,
+        ),
+        Ordering::Less => cmp::max(
+            (inscription.size as i64 + inscription_input.change as i64) as u32,
+            inscription_input.target_size,
+        ),
+        Ordering::Equal => inscription.size,
     };
 
     let size_new = inscription.size;
@@ -147,9 +142,18 @@ pub fn handler(
     inscription_data.realloc(inscription.size as usize, false)?;
 
     if inscription.size == inscription_input.target_size {
-        emit!(InscriptionResizeFinal {
+        emit!(InscriptionEventUpdate {
             id: inscription.key(),
-            size: inscription_input.target_size,
+            data: InscriptionEventData {
+                authority: inscription.authority,
+                root: inscription.root,
+                media_type: inscription.media_type.clone(),
+                encoding_type: inscription.encoding_type.clone(),
+                inscription_data: inscription.inscription_data,
+                order: inscription.order,
+                size: inscription.size,
+                validation_hash: inscription.validation_hash.clone()
+            },
         });
     } else {
         emit!(InscriptionResizeEvent {
