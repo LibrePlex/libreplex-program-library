@@ -3,7 +3,7 @@ use std::cmp::{self};
 use crate::instructions::InscriptionEventUpdate;
 use crate::{Inscription, InscriptionEventData};
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::program::{invoke, invoke_signed};
+use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
 use std::cmp::Ordering;
 
@@ -57,7 +57,8 @@ pub struct ResizeInscription<'info> {
     pub inscription: Account<'info, Inscription>,
 
     /// CHECK: validated in logic
-    #[account(mut,
+    #[account(
+        mut,
     seeds=[
         "inscription_data".as_bytes(),
         inscription.root.as_ref()
@@ -97,7 +98,6 @@ pub fn handler(
     let rent = Rent::get()?;
     let new_minimum_balance = rent.minimum_balance(size_new as usize);
 
-    let inscription_root = inscription.root.key();
     match size_new.cmp(&size_old) {
         Ordering::Greater => {
             msg!("Increasing");
@@ -111,35 +111,33 @@ pub fn handler(
                     system_program.to_account_info(),
                 ],
             )?;
+            // reallocate second
+            inscription_data.realloc(inscription.size as usize, false)?;
         }
         Ordering::Less => {
-            msg!("Decreasing");
-            let auth_seeds = [
-                "inscription_data".as_bytes(),
-                inscription_root.as_ref(),
-                &[ctx.bumps["inscription_data"]],
-            ];
+            msg!("Decreasing to {}", new_minimum_balance);
+            // reallocate first
 
             let lamports_diff = inscription_data
                 .lamports()
                 .saturating_sub(new_minimum_balance);
             // increasing
-            invoke_signed(
-                &system_instruction::transfer(inscription_data.key, &payer.key(), lamports_diff),
-                &[
-                    inscription_data.to_account_info(),
-                    payer.to_account_info(),
-                    system_program.to_account_info(),
-                ],
-                &[&auth_seeds],
-            )?;
+
+            msg!("Lamports diff {}", lamports_diff);
+
+            inscription_data.realloc(inscription.size as usize, true)?;
+            
+            // we cannot reclaim lamports in the same transaction as the realloc as this
+            // would result in error: "from cannot carry data"
+
+            // we also cannot use realloc macro because inscription_data account discriminator
+            // has been overwritten by data.
+        
         }
         _ => {
             // do nothing - already at target
         }
     }
-
-    inscription_data.realloc(inscription.size as usize, false)?;
 
     if inscription.size == inscription_input.target_size {
         emit!(InscriptionEventUpdate {

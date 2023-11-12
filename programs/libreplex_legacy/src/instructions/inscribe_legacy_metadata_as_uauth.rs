@@ -4,12 +4,14 @@ use libreplex_inscriptions::{
     instructions::SignerType, program::LibreplexInscriptions,
     EncodingType, MediaType,
 };
-use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
+use mpl_token_metadata::types::TokenStandard;
+
 
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
 use super::create_legacy_inscription_logic::create_legacy_inscription_logic;
 use super::create_legacy_inscription_logic::AuthorityType;
+use super::resize_legacy_inscription_as_uauth::check_metadata_uauth;
 
 // Adds a metadata to a group
 #[derive(Accounts)]
@@ -20,15 +22,13 @@ pub struct InscribeLegacyMetadataAsUauth<'info> {
 
     /// CHECK: For PDA signing only
     #[account(
+        mut,
         seeds=[
             mint.key().as_ref(),
         ],
         bump
     )]
     pub legacy_signer: UncheckedAccount<'info>,
-
-    /// CHECK: Can be any wallet
-    pub owner: UncheckedAccount<'info>,
 
     pub mint: Box<Account<'info, Mint>>,
 
@@ -134,15 +134,16 @@ pub fn check_permissions_for_authority(
     mint: &Account<Mint>,
     auth_key: Pubkey,
 ) -> Result<()> {
-    let mai = legacy_metadata.to_account_info().clone();
-    let data: &[u8] = &mai.try_borrow_data()?[..];
-    let metadata_obj = Metadata::deserialize(&mut data.clone())?;
-    if metadata_obj.mint != mint.key() {
-        return Err(LegacyInscriptionErrorCode::BadMint.into());
-    }
-    if metadata_obj.update_authority != auth_key {
-        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
-    }
+    // let mai = legacy_metadata.to_account_info().clone();
+    // let data: &[u8] = &mai.try_borrow_data()?[..];
+    // let metadata_obj = Metadata::deserialize(&mut data.clone())?;
+    // if metadata_obj.mint != mint.key() {
+    //     return Err(LegacyInscriptionErrorCode::BadMint.into());
+    // }
+    // if metadata_obj.update_authority != auth_key {
+    //     return Err(LegacyInscriptionErrorCode::BadAuthority.into());
+    // }
+    let metadata_obj = check_metadata_uauth(legacy_metadata, mint.key(), auth_key, AuthorityType::UpdateAuthority)?;
     match metadata_obj.token_standard {
         Some(x) => match &x {
             TokenStandard::Fungible => {

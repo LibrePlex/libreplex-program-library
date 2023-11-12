@@ -1,22 +1,18 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
-    cpi::accounts::ResizeInscription, instructions::ResizeInscriptionInput,
+    cpi::accounts::ClaimExcessRent,
     program::LibreplexInscriptions, Inscription,
 };
 use mpl_token_metadata::accounts::Metadata;
 
-
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use super::{
-    create_legacy_inscription_logic::AuthorityType,
-    resize_legacy_inscription_as_holder::ResizeLegacyInscriptionInput,
-};
+use super::create_legacy_inscription_logic::AuthorityType;
 
 // Adds a metadata to a group
 #[derive(Accounts)]
-pub struct ResizeLegacyInscriptionAsUauth<'info> {
+pub struct ClaimExcessRentAsUauth<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
@@ -55,8 +51,7 @@ pub struct ResizeLegacyInscriptionAsUauth<'info> {
 }
 
 pub fn handler(
-    ctx: Context<ResizeLegacyInscriptionAsUauth>,
-    input: ResizeLegacyInscriptionInput,
+    ctx: Context<ClaimExcessRentAsUauth>
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription = &mut ctx.accounts.inscription;
@@ -82,24 +77,17 @@ pub fn handler(
         &[ctx.bumps["legacy_inscription"]],
     ];
 
-    libreplex_inscriptions::cpi::resize_inscription(
-        CpiContext::new_with_signer(
-            inscriptions_program.to_account_info(),
-            ResizeInscription {
-                payer: payer.to_account_info(),
-                authority: legacy_inscription.to_account_info(),
-                inscription: inscription.to_account_info(),
-                system_program: system_program.to_account_info(),
-                inscription_data: inscription_data.to_account_info(),
-            },
-            &[inscription_auth_seeds],
-        ),
-        ResizeInscriptionInput {
-            change: input.change,
-            expected_start_size: input.expected_start_size,
-            target_size: input.target_size,
+    libreplex_inscriptions::cpi::claim_excess_rent(CpiContext::new_with_signer(
+        inscriptions_program.to_account_info(),
+        ClaimExcessRent {
+            payer: payer.to_account_info(),
+            authority: legacy_inscription.to_account_info(),
+            inscription: inscription.to_account_info(),
+            system_program: system_program.to_account_info(),
+            inscription_data: inscription_data.to_account_info(),
         },
-    )?;
+        &[inscription_auth_seeds],
+    ))?;
 
     Ok(())
 }
@@ -116,11 +104,11 @@ pub fn check_metadata_uauth(
     if metadata_obj.mint != mint {
         return Err(LegacyInscriptionErrorCode::BadMint.into());
     }
-        if metadata_obj.update_authority != authority
-            || authority_type != AuthorityType::UpdateAuthority
-        {
-            // return bad authority - only the owner of the mint / update authority can sign
-            return Err(LegacyInscriptionErrorCode::BadAuthority.into());
-        }
-        Ok( metadata_obj)
+    if metadata_obj.update_authority != authority
+        || authority_type != AuthorityType::UpdateAuthority
+    {
+        // return bad authority - only the owner of the mint / update authority can sign
+        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
+    }
+    Ok(metadata_obj)
 }

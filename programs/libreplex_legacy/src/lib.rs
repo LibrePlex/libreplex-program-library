@@ -20,6 +20,16 @@ pub mod libreplex_legacy {
     
     use super::*;
 
+    pub fn claim_excess_rent_as_uauth(
+        ctx: Context<ClaimExcessRentAsUauth>,
+        // not optional - for legacy metadata we need to have some validation hash
+        // so we can verify the inscription once it's fully written
+    ) -> Result<()> {
+        instructions::claim_excess_rent_as_uauth::handler(
+            ctx
+        )
+    }
+
     pub fn inscribe_legacy_metadata_as_uauth(
         ctx: Context<InscribeLegacyMetadataAsUauth>,
         // not optional - for legacy metadata we need to have some validation hash
@@ -49,6 +59,13 @@ pub mod libreplex_legacy {
         input: WriteToLegacyInscriptionInput,
     ) -> Result<()> {
         instructions::write_to_legacy_inscription_as_holder::handler(ctx, input)
+    }
+
+    pub fn write_to_legacy_inscription_as_uauth(
+        ctx: Context<WriteToLegacyInscriptionAsUAuth>,
+        input: WriteToLegacyInscriptionInput,
+    ) -> Result<()> {
+        instructions::write_to_legacy_inscription_as_uauth::handler(ctx, input)
     }
 
     pub fn resize_legacy_inscription_as_uauth(

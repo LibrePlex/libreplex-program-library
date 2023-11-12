@@ -201,7 +201,7 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
 
     let page_rank_accountinfo = &mut page_to_update.to_account_info();
 
-    reallocate_rank_page(page_rank_accountinfo, payer, system_program)?;
+    reallocate_rank_page(page_rank_accountinfo, payer, system_program, inscription_summary.inscription_count_total as usize)?;
     add_inscription_to_rank_page(page_to_update, inscription)?;
 
     emit!(InscriptionEventCreate {
@@ -225,8 +225,9 @@ fn reallocate_rank_page<'info>(
     inscriptions_ranks_page: &mut AccountInfo<'info>,
     payer: &AccountInfo<'info>,
     system_program: &AccountInfo<'info>,
+    new_count: usize
 ) -> Result<()> {
-    let new_size = inscriptions_ranks_page.data.borrow().len() + 32;
+    let new_size = 12 + (new_count % INSCRIPTIONS_PER_PAGE as usize) * 32;
     println!("new size {}", new_size);
     let rent = Rent::get()?;
     let new_minimum_balance = rent.minimum_balance(new_size);

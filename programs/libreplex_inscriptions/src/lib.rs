@@ -17,6 +17,7 @@ pub use state::*;
 #[program]
 pub mod libreplex_inscriptions {
 
+    
     use super::*;
 
     pub fn create_inscription_rank_page(
@@ -62,6 +63,14 @@ pub mod libreplex_inscriptions {
         instructions::resize_inscription::handler(
             ctx,
             input
+        )
+    }
+
+    pub fn claim_excess_rent(
+        ctx: Context<ClaimExcessRent>,
+    ) -> Result<()> {
+        instructions::claim_excess_rent::handler(
+            ctx
         )
     }
 
