@@ -139,7 +139,7 @@ pub fn handler(
         ),
         libreplex_inscriptions::instructions::CreateInscriptionInput {
             authority: Some(signer.key()),
-            media_type: libreplex_inscriptions::MediaType::Image,
+            media_type: libreplex_inscriptions::MediaType::None,
             encoding_type: EncodingType::Base64,
             current_rank_page: 0,
             signer_type: SignerType::Root,

@@ -28,11 +28,16 @@ pub struct CreateInscriptionInput {
 }
 
 impl CreateInscriptionInput {
-    pub fn get_size(&self) -> u32 {
+    pub fn get_size(&self) -> usize {
             1
             + match self.authority {
                 Some(_) => 32,
                 None => 0,
+            } 
+            + self.media_type.get_size()
+            + 1 + match &self.validation_hash {
+                Some(x)=> x.len() + 4,
+                None => 0
             }
     }
 }
@@ -103,10 +108,7 @@ pub struct CreateInscription<'info> {
 
     /// CHECK: validated in logic
     #[account(init,
-        space = Inscription::BASE_SIZE + match &inscription_input.validation_hash {
-            Some(x) => 4 + x.len(),
-            None => 0
-        },
+        space = Inscription::BASE_SIZE + inscription_input.get_size(),
         seeds=[
             "inscription".as_bytes(),
             root.key().as_ref()

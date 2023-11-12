@@ -1,14 +1,13 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, TokenAccount};
+use libreplex_inscriptions::Inscription;
 use libreplex_inscriptions::{
-    instructions::SignerType, program::LibreplexInscriptions,
-    EncodingType, MediaType,
+    instructions::SignerType, program::LibreplexInscriptions, EncodingType, MediaType,
 };
-
 
 use crate::legacy_inscription::LegacyInscription;
 
-use super::check_metadata_type::{content_validator_signer, check_metadata_type};
+use super::check_metadata_type::{check_metadata_type, content_validator_signer};
 use super::create_legacy_inscription_logic::{create_legacy_inscription_logic, AuthorityType};
 
 // Adds a metadata to a group
@@ -43,7 +42,7 @@ pub struct InscribeLegacyMetadataAsHolder<'info> {
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
-    pub inscription: UncheckedAccount<'info>,
+    pub inscription: Account<'info, Inscription>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
@@ -97,6 +96,8 @@ pub struct InscribeLegacyMetadataAsHolder<'info> {
 pub fn handler(
     ctx: Context<InscribeLegacyMetadataAsHolder>,
     validation_hash: String,
+    media_type: Option<MediaType>,
+    encoding_type: Option<EncodingType>,
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
@@ -110,6 +111,14 @@ pub fn handler(
     let inscription_ranks_current_page = &ctx.accounts.inscription_ranks_current_page;
     let inscription_ranks_next_page = &ctx.accounts.inscription_ranks_next_page;
 
+    if let Some(x) = media_type {
+        inscription.media_type = x;
+    }
+
+    if let Some(x) = encoding_type {
+        inscription.encoding_type = x;
+    }
+
     // make sure we are dealing with the correct metadata object.
     // this is to ensure that the mint in question is in fact a legacy
     // metadata object
@@ -117,7 +126,7 @@ pub fn handler(
     let legacy_signer = &ctx.accounts.legacy_signer;
     let legacy_metadata = &ctx.accounts.legacy_metadata;
 
-    let expected_bump = ctx.bumps["legacy_signer"];
+    let expected_bump = ctx.bumps.legacy_signer;
 
     check_metadata_type(legacy_metadata, mint)?;
 
@@ -137,8 +146,8 @@ pub fn handler(
         inscription_ranks_next_page,
         validation_hash,
         SignerType::LegacyMetadataSigner,
-        EncodingType::Base64,
-        MediaType::Image
+        EncodingType::None,
+        MediaType::None,
     )?;
     Ok(())
 }

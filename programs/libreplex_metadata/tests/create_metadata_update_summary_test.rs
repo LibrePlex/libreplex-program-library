@@ -20,7 +20,7 @@ mod create_metadata_update_summary_test {
         let mut program = ProgramTest::new(
             "libreplex_metadata",
             libreplex_metadata::ID,
-            processor!(libreplex_metadata::entry),
+            None
         );
 
 

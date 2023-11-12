@@ -23,7 +23,7 @@ mod permissions {
         let program = ProgramTest::new(
             "libreplex_metadata",
             libreplex_metadata::ID,
-            processor!(libreplex_metadata::entry),
+            None
         );
 
         let mut context = program.start_with_context().await;

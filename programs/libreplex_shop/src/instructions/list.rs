@@ -4,7 +4,7 @@ use crate::{
     state::{Listing, ListingFilter, ListingFilterType, Price}, empty_account_placeholder,
 };
 use anchor_lang::{
-    error::{Error as AnchorError},
+    error::Error as AnchorError,
     prelude::{
         error,
         require_keys_neq,
@@ -16,7 +16,8 @@ use anchor_lang::{
     },
     AnchorDeserialize, AnchorSerialize, Key, ToAccountInfo,
 };
-use anchor_spl::{associated_token::AssociatedToken};
+use anchor_spl::associated_token::AssociatedToken;
+
 use libreplex_metadata::Metadata;
 use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
 

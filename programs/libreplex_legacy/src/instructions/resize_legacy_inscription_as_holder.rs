@@ -97,7 +97,7 @@ pub fn handler(
     let inscription_auth_seeds: &[&[u8]] = &[
         "legacy_inscription".as_bytes(),
         mint_key.as_ref(),
-        &[ctx.bumps["legacy_inscription"]],
+        &[ctx.bumps.legacy_inscription],
     ];
 
     libreplex_inscriptions::cpi::resize_inscription(

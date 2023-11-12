@@ -1,18 +1,21 @@
-use anchor_lang::prelude::*;
 use crate::errors::ErrorCode;
+use anchor_lang::prelude::*;
 
-use crate::Inscription;
+use crate::{EncodingType, Inscription, MediaType};
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct WriteToInscriptionInput {
     pub data: Vec<u8>,
     pub start_pos: u32,
-
+    // when provided, will toggle the media type of the inscription
+    pub media_type: Option<MediaType>,
+    pub encoding_type: Option<EncodingType>,
 }
+
 
 #[event]
 pub struct InscriptionWriteEvent {
-    pub id: Pubkey
+    pub id: Pubkey,
 }
 
 #[derive(Accounts)]
@@ -21,13 +24,21 @@ pub struct WriteToInscription<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    // required for the realloc if inscription size changes due
+    // to media_type / encoding_type
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
     /// CHECK: Authority checked in logic
     #[account(mut,
+        realloc = Inscription::BASE_SIZE + inscription.get_new_size(&inscription_input),
+        realloc::payer = payer,
+        realloc::zero = false,
         constraint = inscription.authority == authority.key(),
         constraint = inscription.inscription_data == inscription_data.key())]
     pub inscription: Account<'info, Inscription>,
 
-    /// CHECK: we never want anchor to handle this. It's just a data blob 
+    /// CHECK: we never want anchor to handle this. It's just a data blob
     #[account(mut)]
     pub inscription_data: UncheckedAccount<'info>,
 
@@ -55,15 +66,24 @@ pub fn handler(
         return Err(ErrorCode::IncorrectInscriptionDataAccount.into());
     }
 
-    inscription.write_data(
-        inscription_data_account_info.data.borrow_mut(),
-        &inscription_input.data,
-        inscription_input.start_pos,
-    )?;
+    if let Some(x) =inscription_input.media_type {
+        inscription.media_type = x;
+    }
+
+    if let Some(x) =inscription_input.encoding_type {
+        inscription.encoding_type = x;
+    }
+    if !inscription_input.data.is_empty() {
+        inscription.write_data(
+            inscription_data_account_info.data.borrow_mut(),
+            &inscription_input.data,
+            inscription_input.start_pos,
+        )?;
+    }
 
     emit!(InscriptionWriteEvent {
         id: inscription.key(),
     });
-    
+
     Ok(())
 }

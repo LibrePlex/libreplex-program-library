@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use instructions::*;
-
+use libreplex_inscriptions::{MediaType, EncodingType};
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
 declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
@@ -18,6 +18,8 @@ pub use state::*;
 pub mod libreplex_legacy {
 
     
+    use libreplex_inscriptions::{MediaType, EncodingType};
+
     use super::*;
 
     pub fn claim_excess_rent_as_uauth(
@@ -47,23 +49,27 @@ pub mod libreplex_legacy {
         // not optional - for legacy metadata we need to have some validation hash
         // so we can verify the inscription once it's fully written
         validation_hash: String,
+        media_type: Option<MediaType>,
+        encoding_type: Option<EncodingType>
     ) -> Result<()> {
         instructions::inscribe_legacy_metadata_as_holder::handler(
             ctx,
             validation_hash,
+            media_type,
+            encoding_type
         )
     }
 
     pub fn write_to_legacy_inscription_as_holder(
         ctx: Context<WriteToLegacyInscriptionAsHolder>,
-        input: WriteToLegacyInscriptionInput,
+        input: libreplex_inscriptions::instructions::WriteToInscriptionInput,
     ) -> Result<()> {
         instructions::write_to_legacy_inscription_as_holder::handler(ctx, input)
     }
 
     pub fn write_to_legacy_inscription_as_uauth(
         ctx: Context<WriteToLegacyInscriptionAsUAuth>,
-        input: WriteToLegacyInscriptionInput,
+        input: libreplex_inscriptions::instructions::WriteToInscriptionInput,
     ) -> Result<()> {
         instructions::write_to_legacy_inscription_as_uauth::handler(ctx, input)
     }

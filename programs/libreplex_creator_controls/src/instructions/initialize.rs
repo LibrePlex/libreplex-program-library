@@ -37,7 +37,7 @@ pub fn handler(ctx: Context<Initialize>, input: InitializeInput) -> Result<()> {
     controller.phases = input.phases;
     controller.update_authority = ctx.accounts.update_authority.key();
     controller.seed = input.seed;
-    controller.bump = *ctx.bumps.get("creator_controller").unwrap();
+    controller.bump = ctx.bumps.creator_controller;
     controller.creator = creator.key();
 
 

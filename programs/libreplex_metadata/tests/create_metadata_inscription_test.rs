@@ -25,13 +25,13 @@ mod permissions {
         let mut program = ProgramTest::new(
             "libreplex_metadata",
             libreplex_metadata::ID,
-            processor!(libreplex_metadata::entry),
+            None,
         );
 
         program.add_program(
             "libreplex_inscriptions",
             libreplex_inscriptions::ID,
-            processor!(libreplex_inscriptions::entry),
+            None,
         );
         let mut context: ProgramTestContext = program.start_with_context().await;
 

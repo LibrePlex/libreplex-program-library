@@ -20,9 +20,9 @@ pub mod empty_account_placeholder {
 pub mod libreplex_shop {
 
     use super::*;
-    pub fn list(ctx: Context<List>, list_input: ListInput) -> Result<()> {
-        instructions::list::handler(ctx, list_input)
-    }
+    // pub fn list(ctx: Context<List>, list_input: ListInput) -> Result<()> {
+    //     instructions::list::handler(ctx, list_input)
+    // }
 
     pub fn delist<'info>(ctx: Context<'_, '_, '_, 'info, Delist<'info>>) -> Result<()> {
         instructions::delist::handler(ctx)

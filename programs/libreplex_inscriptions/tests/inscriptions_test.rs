@@ -21,7 +21,7 @@ mod inscriptions_tests {
         },
         Inscription,
     };
-    use libreplex_inscriptions::{EncodingType, InscriptionRankPage, InscriptionSummary};
+    use libreplex_inscriptions::{EncodingType, InscriptionRankPage, InscriptionSummary, MediaType};
     use solana_program::account_info::AccountInfo;
     use solana_program::sysvar::Sysvar;
     use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program};
@@ -55,7 +55,8 @@ mod inscriptions_tests {
         let program = ProgramTest::new(
             "libreplex_inscriptions",
             libreplex_inscriptions::ID,
-            processor!(libreplex_inscriptions::entry),
+            None
+            // processor!(libreplex_inscriptions::entry),
         );
 
         // TODO: Obtain the current slot dynamically from context.
@@ -251,11 +252,14 @@ mod inscriptions_tests {
                         input: WriteToInscriptionInput {
                             data: initial_data.clone(),
                             start_pos: 0,
+                            media_type: Some(MediaType::None),
+                            encoding_type: Some(EncodingType::Base64)
                         },
                     }
                     .data(),
                     accounts: WriteToInscription {
                         authority,
+                        payer: authority,
                         inscription: inscription,
                         inscription_data,
                         system_program: system_program::id(),
@@ -271,6 +275,7 @@ mod inscriptions_tests {
 
         let write_to_inscription_accounts = WriteToInscription {
             authority,
+            payer: authority,
             inscription_data,
             inscription: inscription,
             system_program: system_program::id(),
@@ -281,6 +286,8 @@ mod inscriptions_tests {
                 input: WriteToInscriptionInput {
                     data: append_data.clone(),
                     start_pos: initial_data.len() as u32,
+                    media_type: Some(MediaType::None),
+                    encoding_type: Some(EncodingType::Base64)
                 },
             };
 
@@ -535,7 +542,9 @@ mod inscriptions_tests {
                 authority: Some(ctx.payer.pubkey()),
                 current_rank_page: current_page_index as u32,
                 signer_type: SignerType::Root,
-                media_type: libreplex_inscriptions::MediaType::Image,
+                media_type: libreplex_inscriptions::MediaType::Image {
+                    subtype: "svg".to_owned()
+                },
                 encoding_type: EncodingType::Base64,
                 validation_hash: None
             },

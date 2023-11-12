@@ -28,7 +28,7 @@ mod legacy_inscribers {
         let mut program = ProgramTest::new(
             "libreplex_inscriptions",
             libreplex_inscriptions::ID,
-            processor!(libreplex_inscriptions::entry),
+            None
         );
 
         program.prefer_bpf(true);

@@ -53,7 +53,7 @@ pub fn handler(
     let auth_seeds = [
         "inscription_data".as_bytes(),
         inscription_root.as_ref(),
-        &[ctx.bumps["inscription_data"]],
+        &[ctx.bumps.inscription_data],
     ];
 
     let lamports_diff = inscription_data

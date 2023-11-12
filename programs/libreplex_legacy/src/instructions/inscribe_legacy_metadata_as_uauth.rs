@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
+use libreplex_inscriptions::Inscription;
 use libreplex_inscriptions::{
     instructions::SignerType, program::LibreplexInscriptions,
     EncodingType, MediaType,
@@ -34,7 +35,7 @@ pub struct InscribeLegacyMetadataAsUauth<'info> {
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
-    pub inscription: UncheckedAccount<'info>,
+    pub inscription: Account<'info, Inscription>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
@@ -102,7 +103,7 @@ pub fn handler(
     let payer = &ctx.accounts.payer;
     let legacy_signer = &ctx.accounts.legacy_signer;
 
-    let expected_bump = ctx.bumps["legacy_signer"];
+    let expected_bump = ctx.bumps.legacy_signer;
 
     check_permissions_for_authority(legacy_metadata, mint, payer_key)?;
 
@@ -122,8 +123,8 @@ pub fn handler(
         inscription_ranks_next_page,
         validation_hash,
         SignerType::LegacyMetadataSigner,
-        EncodingType::Base64,
-        MediaType::Image
+        EncodingType::None,
+        MediaType::None
     )?;
 
     Ok(())

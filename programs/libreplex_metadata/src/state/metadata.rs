@@ -69,7 +69,7 @@ pub enum Asset {
             use the chunks to calculate the PDAs off the metadata and then
             fetch all in fell swoop
         */  
-        chunks: usize,
+        chunks: u32,
     },
 }
 

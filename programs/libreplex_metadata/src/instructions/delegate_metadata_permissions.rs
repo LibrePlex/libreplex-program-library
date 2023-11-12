@@ -37,7 +37,7 @@ pub fn handler(ctx: Context<DelegateMetadataPermissions>, edit_permissions_input
 
     
     user_permissions.permissions = permissions;
-    user_permissions.bump = *ctx.bumps.get("user_permissions").unwrap();
+    user_permissions.bump = ctx.bumps.user_permissions;
     user_permissions.reference = ctx.accounts.metadata.key();
     user_permissions.user = ctx.accounts.delegated_user.key();
     user_permissions.update_authority = ctx.accounts.update_authority.key();

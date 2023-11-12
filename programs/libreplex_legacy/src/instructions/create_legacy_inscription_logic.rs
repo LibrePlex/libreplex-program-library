@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
     cpi::accounts::CreateInscription, instructions::SignerType, program::LibreplexInscriptions,
-    EncodingType,
+    EncodingType, Inscription,
 };
 use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
 
@@ -45,7 +45,7 @@ pub fn create_legacy_inscription_logic<'a>(
     mint: &Account<'a, Mint>,
     legacy_inscription: &mut Account<'a, LegacyInscription>,
     authority_type: AuthorityType,
-    inscription: &mut UncheckedAccount<'a>,
+    inscription: &mut Account<'a, Inscription>,
     expected_bump: u8,
     inscriptions_program: &Program<'a, LibreplexInscriptions>,
     inscription_summary: &mut UncheckedAccount<'a>,

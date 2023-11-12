@@ -8,7 +8,9 @@ use mpl_token_metadata::accounts::Metadata;
 
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use super::create_legacy_inscription_logic::AuthorityType;
+use super::{
+    create_legacy_inscription_logic::AuthorityType,
+};
 
 // Adds a metadata to a group
 #[derive(Accounts)]
@@ -74,7 +76,7 @@ pub fn handler(
     let inscription_auth_seeds: &[&[u8]] = &[
         "legacy_inscription".as_bytes(),
         mint_key.as_ref(),
-        &[ctx.bumps["legacy_inscription"]],
+        &[ctx.bumps.legacy_inscription],
     ];
 
     libreplex_inscriptions::cpi::claim_excess_rent(CpiContext::new_with_signer(

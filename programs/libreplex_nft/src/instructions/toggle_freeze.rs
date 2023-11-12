@@ -54,8 +54,8 @@ pub fn handler(ctx: Context<ToggleFreezeCtx>, input: ToggleFreezeInput) -> Resul
         return Err(ErrorCode::InvalidTokenAccount.into());
     }
 
-    let bump = ctx.bumps.get("wrapped_mint").unwrap();
-    let signer_seeds = [token_account.mint.as_ref(), &[*bump]];
+    let bump = ctx.bumps.wrapped_mint;
+    let signer_seeds = [token_account.mint.as_ref(), &[bump]];
 
     match input {
         ToggleFreezeInput::Freeze => {

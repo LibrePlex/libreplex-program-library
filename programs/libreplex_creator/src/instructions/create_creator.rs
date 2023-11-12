@@ -67,7 +67,7 @@ pub fn handler(ctx: Context<CreateCreator>, input: CreateCreatorInput) -> Result
 
     creator.name = input.name;
     creator.collection = input.collection;
-    creator.bump = *ctx.bumps.get("creator").unwrap();
+    creator.bump = ctx.bumps.creator;
     creator.description = input.description;
     creator.attribute_mappings = input.attribute_mappings;
 

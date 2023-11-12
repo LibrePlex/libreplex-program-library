@@ -2,13 +2,13 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
     cpi::accounts::WriteToInscription,
-    instructions::WriteToInscriptionInput as WriteToInscriptionInputOrig,
+    instructions::WriteToInscriptionInput,
     program::LibreplexInscriptions,
 };
 
 use crate::legacy_inscription::LegacyInscription;
 
-use super::{write_to_legacy_inscription_as_holder::WriteToLegacyInscriptionInput, resize_legacy_inscription_as_uauth::check_metadata_uauth};
+use super::resize_legacy_inscription_as_uauth::check_metadata_uauth;
 
 // having to redefine this here as otherwise anchor IDL will be missing a type
 // hope this gets sorted at some point!
@@ -48,7 +48,7 @@ pub struct WriteToLegacyInscriptionAsUAuth<'info> {
 
 pub fn handler(
     ctx: Context<WriteToLegacyInscriptionAsUAuth>,
-    input: WriteToLegacyInscriptionInput,
+    input: WriteToInscriptionInput,
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription = &mut ctx.accounts.inscription;
@@ -59,6 +59,8 @@ pub fn handler(
     let mint = &ctx.accounts.mint;
     let authority = &ctx.accounts.authority;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
+
+
     // make sure we are dealing with the correct metadata object.
     // this is to ensure that the mint in question is in fact a legacy
     // metadata object
@@ -66,7 +68,7 @@ pub fn handler(
     let inscription_auth_seeds: &[&[u8]] = &[
         "legacy_inscription".as_bytes(),
         mint_key.as_ref(),
-        &[ctx.bumps["legacy_inscription"]],
+        &[ctx.bumps.legacy_inscription]
     ];
     let metaplex_metadata = &ctx.accounts.legacy_metadata;
     check_metadata_uauth(
@@ -81,16 +83,14 @@ pub fn handler(
             inscriptions_program.to_account_info(),
             WriteToInscription {
                 authority: legacy_inscription.to_account_info(),
+                payer: authority.to_account_info(),
                 inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),
             },
             &[inscription_auth_seeds],
         ),
-        WriteToInscriptionInputOrig {
-            data: input.data,
-            start_pos: input.start_pos,
-        },
+        input,
     )?;
 
     Ok(())

@@ -56,7 +56,8 @@ pub fn handler(
     let authority = &ctx.accounts.authority;
 
     let mint_key = mint.key();
-    let inscription_auth_seeds: &[&[u8]] = &["legacy_inscription".as_bytes(), mint_key.as_ref(), &[ctx.bumps["legacy_inscription"]]];
+    let inscription_auth_seeds: &[&[u8]] = &["legacy_inscription".as_bytes(), mint_key.as_ref(), 
+    &[ctx.bumps.legacy_inscription]];
 
     let mai = legacy_metadata.to_account_info().clone();
     let data: &[u8] = &mai.try_borrow_data()?[..];

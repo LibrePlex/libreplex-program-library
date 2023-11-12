@@ -70,7 +70,7 @@ pub fn handler(ctx: Context<MakeImmutable>) -> Result<()> {
     let mint_key = mint.key();
     let inscription_auth_seeds: &[&[u8]] = &[
         mint_key.as_ref(),
-        &[ctx.bumps["legacy_inscription"]],
+        &[ctx.bumps.legacy_inscription],
     ];
 
     // make sure we are dealing with the correct metadata object.
