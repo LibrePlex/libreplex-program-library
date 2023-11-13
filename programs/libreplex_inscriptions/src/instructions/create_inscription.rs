@@ -22,8 +22,6 @@ pub struct CreateInscriptionInput {
     // when this runs out, we move onto the next page
     pub current_rank_page: u32,
     pub signer_type: SignerType,
-    pub media_type: MediaType,
-    pub encoding_type: EncodingType,
     pub validation_hash: Option<String>
 }
 
@@ -34,7 +32,7 @@ impl CreateInscriptionInput {
                 Some(_) => 32,
                 None => 0,
             } 
-            + self.media_type.get_size()
+            + 2 // default media type length
             + 1 + match &self.validation_hash {
                 Some(x)=> x.len() + 4,
                 None => 0
@@ -153,8 +151,8 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     inscription.size = 8;
     inscription.inscription_data = inscription_data.key();
     inscription.root = ctx.accounts.root.key();
-    inscription.media_type = input.media_type;
-    inscription.encoding_type = input.encoding_type;
+    inscription.media_type = MediaType::None;
+    inscription.encoding_type = EncodingType::None;
     inscription.validation_hash = input.validation_hash;
     let signer = ctx.accounts.signer.key();
     let root_key = inscription.root.key();

@@ -1,9 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
-use libreplex_inscriptions::Inscription;
+
 use libreplex_inscriptions::{
     instructions::SignerType, program::LibreplexInscriptions,
-    EncodingType, MediaType,
 };
 use mpl_token_metadata::types::TokenStandard;
 
@@ -35,7 +34,7 @@ pub struct InscribeLegacyMetadataAsUauth<'info> {
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
-    pub inscription: Account<'info, Inscription>,
+    pub inscription: UncheckedAccount<'info>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
@@ -123,8 +122,6 @@ pub fn handler(
         inscription_ranks_next_page,
         validation_hash,
         SignerType::LegacyMetadataSigner,
-        EncodingType::None,
-        MediaType::None
     )?;
 
     Ok(())

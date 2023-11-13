@@ -1,5 +1,3 @@
-
-
 use anchor_lang::Result;
 
 use solana_program_test::*;
@@ -17,11 +15,13 @@ mod inscriptions_tests {
         accounts::WriteToInscription,
         instructions::{
             create_inscription::CreateInscriptionInput, ResizeInscriptionInput,
-            WriteToInscriptionInput,
+            WriteToInscriptionInput, 
         },
         Inscription,
     };
-    use libreplex_inscriptions::{EncodingType, InscriptionRankPage, InscriptionSummary, MediaType};
+    use libreplex_inscriptions::{
+        EncodingType, InscriptionRankPage, InscriptionSummary, MediaType,
+    };
     use solana_program::account_info::AccountInfo;
     use solana_program::sysvar::Sysvar;
     use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program};
@@ -29,7 +29,6 @@ mod inscriptions_tests {
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 
     use solana_sdk::clock::Clock;
-
 
     use super::*;
 
@@ -55,8 +54,7 @@ mod inscriptions_tests {
         let program = ProgramTest::new(
             "libreplex_inscriptions",
             libreplex_inscriptions::ID,
-            None
-            // processor!(libreplex_inscriptions::entry),
+            None, // processor!(libreplex_inscriptions::entry),
         );
 
         // TODO: Obtain the current slot dynamically from context.
@@ -64,7 +62,6 @@ mod inscriptions_tests {
         let slot = 1000;
         let mut context: ProgramTestContext = program.start_with_context().await;
 
-        
         // let slot = Clock::get().unwrap().slot;
 
         // resize tests take a while so we need to advance slots in order to
@@ -131,7 +128,9 @@ mod inscriptions_tests {
         let mut i: u32 = 0;
         let max_increases = 10;
         while i < max_increases {
-            context.warp_to_slot(slot + 400 + (i as u64 + 2) * 100).unwrap();
+            context
+                .warp_to_slot(slot + 400 + (i as u64 + 2) * 100)
+                .unwrap();
             context
                 .banks_client
                 .process_transaction(Transaction::new_signed_with_payer(
@@ -188,7 +187,9 @@ mod inscriptions_tests {
 
         let max_decreases = 8;
         while i < max_decreases {
-            context.warp_to_slot(slot + 4000 + (i as u64 + 2) * 100).unwrap();
+            context
+                .warp_to_slot(slot + 4000 + (i as u64 + 2) * 100)
+                .unwrap();
             context
                 .banks_client
                 .process_transaction(Transaction::new_signed_with_payer(
@@ -253,7 +254,7 @@ mod inscriptions_tests {
                             data: initial_data.clone(),
                             start_pos: 0,
                             media_type: Some(MediaType::None),
-                            encoding_type: Some(EncodingType::Base64)
+                            encoding_type: Some(EncodingType::Base64),
                         },
                     }
                     .data(),
@@ -287,7 +288,7 @@ mod inscriptions_tests {
                     data: append_data.clone(),
                     start_pos: initial_data.len() as u32,
                     media_type: Some(MediaType::None),
-                    encoding_type: Some(EncodingType::Base64)
+                    encoding_type: Some(EncodingType::Base64),
                 },
             };
 
@@ -542,11 +543,7 @@ mod inscriptions_tests {
                 authority: Some(ctx.payer.pubkey()),
                 current_rank_page: current_page_index as u32,
                 signer_type: SignerType::Root,
-                media_type: libreplex_inscriptions::MediaType::Image {
-                    subtype: "svg".to_owned()
-                },
-                encoding_type: EncodingType::Base64,
-                validation_hash: None
+                validation_hash: None,
             },
         };
 
@@ -555,8 +552,6 @@ mod inscriptions_tests {
             data: create_inscription_input.data(),
             accounts: inscription_account.to_account_metas(None),
         };
-
-        
 
         println!("Creating tx");
         let create_inscription_tx = Transaction::new_signed_with_payer(

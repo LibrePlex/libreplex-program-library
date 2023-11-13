@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, TokenAccount};
-use libreplex_inscriptions::Inscription;
+
 use libreplex_inscriptions::{
-    instructions::SignerType, program::LibreplexInscriptions, EncodingType, MediaType,
+    instructions::SignerType, program::LibreplexInscriptions,
 };
 
 use crate::legacy_inscription::LegacyInscription;
@@ -42,7 +42,7 @@ pub struct InscribeLegacyMetadataAsHolder<'info> {
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
-    pub inscription: Account<'info, Inscription>,
+    pub inscription: UncheckedAccount<'info>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
@@ -96,8 +96,6 @@ pub struct InscribeLegacyMetadataAsHolder<'info> {
 pub fn handler(
     ctx: Context<InscribeLegacyMetadataAsHolder>,
     validation_hash: String,
-    media_type: Option<MediaType>,
-    encoding_type: Option<EncodingType>,
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
@@ -110,14 +108,6 @@ pub fn handler(
 
     let inscription_ranks_current_page = &ctx.accounts.inscription_ranks_current_page;
     let inscription_ranks_next_page = &ctx.accounts.inscription_ranks_next_page;
-
-    if let Some(x) = media_type {
-        inscription.media_type = x;
-    }
-
-    if let Some(x) = encoding_type {
-        inscription.encoding_type = x;
-    }
 
     // make sure we are dealing with the correct metadata object.
     // this is to ensure that the mint in question is in fact a legacy
@@ -146,8 +136,6 @@ pub fn handler(
         inscription_ranks_next_page,
         validation_hash,
         SignerType::LegacyMetadataSigner,
-        EncodingType::None,
-        MediaType::None,
     )?;
     Ok(())
 }

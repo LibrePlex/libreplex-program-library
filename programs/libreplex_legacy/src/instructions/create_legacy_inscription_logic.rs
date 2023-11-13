@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
     cpi::accounts::CreateInscription, instructions::SignerType, program::LibreplexInscriptions,
-    EncodingType, Inscription,
 };
 use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
 
@@ -45,7 +44,7 @@ pub fn create_legacy_inscription_logic<'a>(
     mint: &Account<'a, Mint>,
     legacy_inscription: &mut Account<'a, LegacyInscription>,
     authority_type: AuthorityType,
-    inscription: &mut Account<'a, Inscription>,
+    inscription: &mut UncheckedAccount<'a>,
     expected_bump: u8,
     inscriptions_program: &Program<'a, LibreplexInscriptions>,
     inscription_summary: &mut UncheckedAccount<'a>,
@@ -57,8 +56,6 @@ pub fn create_legacy_inscription_logic<'a>(
     inscription_ranks_next_page: &UncheckedAccount<'a>,
     validation_hash: String,
     signer_type: SignerType,
-    encoding_type: EncodingType,
-    media_type: libreplex_inscriptions::MediaType,
 ) -> Result<()> {
     let mint_key = mint.key();
     legacy_inscription.authority_type = authority_type;
@@ -109,8 +106,6 @@ pub fn create_legacy_inscription_logic<'a>(
             authority: Some(legacy_inscription.key()), // this includes update auth / holder, hence
             current_rank_page: 0,
             signer_type,
-            encoding_type,
-            media_type,
             // signer_type: SignerType::LegacyMetadataSigner,
             // encoding_type: EncodingType::Base64,
             // media_type: libreplex_inscriptions::MediaType::Image,
