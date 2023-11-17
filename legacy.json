@@ -1,0 +1,6199 @@
+[
+  {
+    "version": "0.12.1",
+    "name": "libreplex_creator",
+    "instructions": [
+      {
+        "name": "createCreator",
+        "accounts": [
+          {
+            "name": "signer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "creator",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "minterNumbers",
+            "isMut": true,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "creatorInput",
+            "type": {
+              "defined": "CreateCreatorInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "update",
+        "accounts": [
+          {
+            "name": "updateAuthority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "creator",
+            "isMut": true,
+            "isSigner": false,
+            "relations": [
+              "update_authority"
+            ]
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "UpdateInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "mint",
+        "accounts": [
+          {
+            "name": "receiver",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "receiverTokenAccount",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "creatorAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mintWrapper",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mintAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "creator",
+            "isMut": true,
+            "isSigner": false,
+            "relations": [
+              "creator_authority"
+            ]
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "collection",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "collectionPermissions",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "minterNumbers",
+            "isMut": true,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "attributeConfig",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "libreplexMetadataProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "recentSlothashes",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "libreplexNftProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      }
+    ],
+    "accounts": [
+      {
+        "name": "AttributeConfig",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "publicKey"
+            },
+            {
+              "name": "current",
+              "type": "u32"
+            },
+            {
+              "name": "maxOnchainAttributeCount",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Creator",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "creatorAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "seed",
+              "type": "publicKey"
+            },
+            {
+              "name": "supply",
+              "type": "u32"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "assetUrl",
+              "type": {
+                "defined": "AssetUrl"
+              }
+            },
+            {
+              "name": "minted",
+              "type": "u32"
+            },
+            {
+              "name": "collection",
+              "type": "publicKey"
+            },
+            {
+              "name": "bump",
+              "type": "u8"
+            },
+            {
+              "name": "description",
+              "type": {
+                "option": "string"
+              }
+            },
+            {
+              "name": "attributeMappings",
+              "type": {
+                "option": "publicKey"
+              }
+            },
+            {
+              "name": "isOrdered",
+              "type": "bool"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "minterNumbers",
+              "type": {
+                "option": "publicKey"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "MintNumbers",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "creator",
+              "type": "publicKey"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Collection",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "seed",
+              "type": "publicKey"
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "creator",
+              "type": "publicKey"
+            },
+            {
+              "name": "itemCount",
+              "type": "u32"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "url",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "name": "royalties",
+              "type": {
+                "option": {
+                  "defined": "Royalties"
+                }
+              }
+            },
+            {
+              "name": "permittedSigners",
+              "type": {
+                "vec": "publicKey"
+              }
+            },
+            {
+              "name": "attributeTypes",
+              "type": {
+                "vec": {
+                  "defined": "AttributeType"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "types": [
+      {
+        "name": "CreateCreatorInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "maxMints",
+              "type": "u32"
+            },
+            {
+              "name": "seed",
+              "type": "publicKey"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "assetUrl",
+              "type": {
+                "defined": "AssetUrl"
+              }
+            },
+            {
+              "name": "collection",
+              "type": "publicKey"
+            },
+            {
+              "name": "description",
+              "type": {
+                "option": "string"
+              }
+            },
+            {
+              "name": "attributeMappings",
+              "type": {
+                "option": "publicKey"
+              }
+            },
+            {
+              "name": "mintAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "isOrdered",
+              "type": "bool"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      {
+        "name": "UpdateInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "mintAuthority",
+              "type": "publicKey"
+            }
+          ]
+        }
+      },
+      {
+        "name": "AssetUrl",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "JsonPrefix",
+              "fields": [
+                {
+                  "name": "url",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "ChainRenderer",
+              "fields": [
+                {
+                  "name": "programId",
+                  "type": "publicKey"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "AccountEventType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Create"
+            },
+            {
+              "name": "Update"
+            },
+            {
+              "name": "Delete"
+            }
+          ]
+        }
+      },
+      {
+        "name": "AttributeType",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "permittedValues",
+              "type": {
+                "vec": {
+                  "defined": "AttributeValue"
+                }
+              }
+            },
+            {
+              "name": "deleted",
+              "type": "bool"
+            },
+            {
+              "name": "continuedAtIndex",
+              "type": {
+                "option": "u32"
+              }
+            },
+            {
+              "name": "continuedFromIndex",
+              "type": {
+                "option": "u32"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "AttributeValue",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Word",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "U8",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u8"
+                }
+              ]
+            },
+            {
+              "name": "U16",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u16"
+                }
+              ]
+            },
+            {
+              "name": "U32",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u32"
+                }
+              ]
+            },
+            {
+              "name": "U64",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u64"
+                }
+              ]
+            },
+            {
+              "name": "I8",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i8"
+                }
+              ]
+            },
+            {
+              "name": "I16",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i16"
+                }
+              ]
+            },
+            {
+              "name": "I32",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i32"
+                }
+              ]
+            },
+            {
+              "name": "I64",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i64"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "Royalties",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "bps",
+              "type": "u16"
+            },
+            {
+              "name": "shares",
+              "type": {
+                "vec": {
+                  "defined": "RoyaltyShare"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "RoyaltyShare",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "recipient",
+              "type": "publicKey"
+            },
+            {
+              "name": "share",
+              "type": "u16"
+            }
+          ]
+        }
+      }
+    ],
+    "events": [
+      {
+        "name": "AccountEvent",
+        "fields": [
+          {
+            "name": "reference",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "eventType",
+            "type": {
+              "defined": "AccountEventType"
+            },
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "MintEvent",
+        "fields": [
+          {
+            "name": "collection",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "number",
+            "type": "u32",
+            "index": false
+          },
+          {
+            "name": "authority",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "holder",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "mint",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "totalMinted",
+            "type": "u32",
+            "index": false
+          }
+        ]
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "MissingMintNumbers",
+        "msg": "Missing mint numbers"
+      },
+      {
+        "code": 6001,
+        "name": "WrongMintNumbers",
+        "msg": "Wrong mint numbers"
+      },
+      {
+        "code": 6002,
+        "name": "MissingAttributeConfig",
+        "msg": "Attribute config missing"
+      },
+      {
+        "code": 6003,
+        "name": "SoldOut",
+        "msg": "Sold out"
+      },
+      {
+        "code": 6004,
+        "name": "InvalidTokenAccout",
+        "msg": "Provided token account is not valid"
+      }
+    ]
+  },
+  {
+    "version": "0.3.1",
+    "name": "libreplex_creator_controls",
+    "instructions": [
+      {
+        "name": "mint",
+        "accounts": [
+          {
+            "name": "creatorController",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "receiver",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "receiverTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mintWrapper",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mintAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "creator",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "collection",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "collectionPermissions",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "minterNumbers",
+            "isMut": true,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "libreplexMetadataProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "libreplexNftProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "recentSlothashes",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "attributeConfig",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "libreplexCreatorProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "MintInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "initialize",
+        "accounts": [
+          {
+            "name": "updateAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "creatorController",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "creator",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "libreplexCreatorProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "InitializeInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "update",
+        "accounts": [
+          {
+            "name": "updateAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "creatorController",
+            "isMut": true,
+            "isSigner": false,
+            "relations": [
+              "update_authority"
+            ]
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "UpdateInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "ping",
+        "accounts": [],
+        "args": []
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Creator",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "creatorAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "seed",
+              "type": "publicKey"
+            },
+            {
+              "name": "supply",
+              "type": "u32"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "assetUrl",
+              "type": {
+                "defined": "AssetUrl"
+              }
+            },
+            {
+              "name": "minted",
+              "type": "u32"
+            },
+            {
+              "name": "collection",
+              "type": "publicKey"
+            },
+            {
+              "name": "bump",
+              "type": "u8"
+            },
+            {
+              "name": "description",
+              "type": {
+                "option": "string"
+              }
+            },
+            {
+              "name": "attributeMappings",
+              "type": {
+                "option": "publicKey"
+              }
+            },
+            {
+              "name": "isOrdered",
+              "type": "bool"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "minterNumbers",
+              "type": {
+                "option": "publicKey"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "CreatorController",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "seed",
+              "type": "publicKey"
+            },
+            {
+              "name": "bump",
+              "type": "u8"
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "creator",
+              "type": "publicKey"
+            },
+            {
+              "name": "phases",
+              "type": {
+                "vec": {
+                  "defined": "Phase"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "types": [
+      {
+        "name": "AssetUrl",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "JsonPrefix",
+              "fields": [
+                {
+                  "name": "url",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "ChainRenderer",
+              "fields": [
+                {
+                  "name": "programId",
+                  "type": "publicKey"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "AllowList",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "label",
+              "type": "string"
+            },
+            {
+              "name": "root",
+              "type": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "ControlType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "AllowList",
+              "fields": [
+                {
+                  "defined": "AllowList"
+                }
+              ]
+            },
+            {
+              "name": "Payment",
+              "fields": [
+                {
+                  "defined": "Payment"
+                }
+              ]
+            },
+            {
+              "name": "SplPayment",
+              "fields": [
+                {
+                  "defined": "SplPayment"
+                }
+              ]
+            },
+            {
+              "name": "MintLimit",
+              "fields": [
+                {
+                  "defined": "MintLimit"
+                }
+              ]
+            },
+            {
+              "name": "CustomProgram",
+              "fields": [
+                {
+                  "defined": "CustomProgram"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "CustomProgram",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "label",
+              "type": "string"
+            },
+            {
+              "name": "programId",
+              "type": "publicKey"
+            },
+            {
+              "name": "instructionData",
+              "type": "bytes"
+            },
+            {
+              "name": "remainingAccountMetas",
+              "type": {
+                "vec": {
+                  "defined": "CustomProgramAccountMeta"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "CustomProgramAccountMeta",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "key",
+              "type": {
+                "defined": "CustomProgramAcountMetaKey"
+              }
+            },
+            {
+              "name": "isSigner",
+              "type": "bool"
+            },
+            {
+              "name": "isWritable",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "CustomProgramAcountMetaKey",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Pubkey",
+              "fields": [
+                "publicKey"
+              ]
+            },
+            {
+              "name": "DerivedFromSeeds",
+              "fields": [
+                {
+                  "defined": "KeySeedDerivation"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "KeySeedDerivation",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "programId",
+              "type": "publicKey"
+            },
+            {
+              "name": "seeds",
+              "type": {
+                "vec": {
+                  "defined": "Seed"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "MintLimit",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "limit",
+              "type": "u32"
+            },
+            {
+              "name": "accountKey",
+              "type": {
+                "vec": "publicKey"
+              }
+            },
+            {
+              "name": "scopedToBuyer",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Payment",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "amount",
+              "type": "u64"
+            },
+            {
+              "name": "recepient",
+              "type": "publicKey"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Seed",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Bytes",
+              "fields": [
+                "bytes"
+              ]
+            },
+            {
+              "name": "MintPlaceHolder"
+            },
+            {
+              "name": "ReceiverPlaceHolder"
+            },
+            {
+              "name": "PayerPlaceHolder"
+            }
+          ]
+        }
+      },
+      {
+        "name": "SplPayment",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "amount",
+              "type": "u64"
+            },
+            {
+              "name": "mint",
+              "type": "publicKey"
+            },
+            {
+              "name": "recepient",
+              "type": "publicKey"
+            },
+            {
+              "name": "tokenProgram",
+              "type": "publicKey"
+            }
+          ]
+        }
+      },
+      {
+        "name": "InitializeInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "phases",
+              "type": {
+                "vec": {
+                  "defined": "Phase"
+                }
+              }
+            },
+            {
+              "name": "seed",
+              "type": "publicKey"
+            }
+          ]
+        }
+      },
+      {
+        "name": "MintInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "args",
+              "type": {
+                "vec": "bytes"
+              }
+            },
+            {
+              "name": "chosenPhase",
+              "type": {
+                "option": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "UpdateInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "phases",
+              "type": {
+                "vec": {
+                  "defined": "Phase"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Phase",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "start",
+              "type": "i64"
+            },
+            {
+              "name": "end",
+              "type": {
+                "option": "i64"
+              }
+            },
+            {
+              "name": "label",
+              "type": "string"
+            },
+            {
+              "name": "controls",
+              "type": {
+                "vec": {
+                  "defined": "ControlType"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "MissingArgument",
+        "msg": "Missing argument"
+      },
+      {
+        "code": 6001,
+        "name": "InvalidProof",
+        "msg": "Invalid proof"
+      },
+      {
+        "code": 6002,
+        "name": "MissingAccount",
+        "msg": "Missing Account"
+      },
+      {
+        "code": 6003,
+        "name": "InvalidMintFundsRecepient",
+        "msg": "Invalid Mint funds recepient"
+      },
+      {
+        "code": 6004,
+        "name": "InvalidTokenRecepient",
+        "msg": "Invalid token recepient"
+      },
+      {
+        "code": 6005,
+        "name": "InvalidTotalMintsAccount",
+        "msg": "Invalid total mints account"
+      },
+      {
+        "code": 6006,
+        "name": "MintLimitExceeded",
+        "msg": "Mint Limit Exceeded"
+      },
+      {
+        "code": 6007,
+        "name": "NoActivePhases",
+        "msg": "No Active Phases"
+      },
+      {
+        "code": 6008,
+        "name": "PhaseNotSpecified",
+        "msg": "Phase not specified"
+      },
+      {
+        "code": 6009,
+        "name": "InvalidTokenProgram",
+        "msg": "Invalid token program"
+      },
+      {
+        "code": 6010,
+        "name": "InvalidRemainingAccountsForCustomProgramControl",
+        "msg": "Invalid remaining accounts for custom program control."
+      },
+      {
+        "code": 6011,
+        "name": "InvalidCustomProgram",
+        "msg": "InvalidCustomProgram"
+      }
+    ]
+  },
+  {
+    "version": "0.1.2",
+    "name": "libreplex_default_renderer",
+    "instructions": [
+      {
+        "name": "canonical",
+        "accounts": [
+          {
+            "name": "metadata",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "group",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "renderState",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "outputAccount",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "renderInput",
+            "type": {
+              "defined": "RenderInput"
+            }
+          }
+        ],
+        "returns": "bytes"
+      }
+    ],
+    "types": [
+      {
+        "name": "RenderInput",
+        "type": {
+          "kind": "struct",
+          "fields": []
+        }
+      }
+    ]
+  },
+  {
+    "version": "0.2.2",
+    "name": "libreplex_inscriptions",
+    "instructions": [
+      {
+        "name": "createInscriptionRankPage",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "page",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "CreateInscriptionRankInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "makeInscriptionImmutable",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "authority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "inscriptionSummary",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "createInscription",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "signer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "root",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionSummary",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionRanksCurrentPage",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionRanksNextPage",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "inscriptionInput",
+            "type": {
+              "defined": "CreateInscriptionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "deleteInscription",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "resizeInscription",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "ResizeInscriptionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "claimExcessRent",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "writeToInscription",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "WriteToInscriptionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "setValidationHash",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "signer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Inscription",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "publicKey"
+            },
+            {
+              "name": "root",
+              "type": "publicKey"
+            },
+            {
+              "name": "mediaType",
+              "type": {
+                "defined": "MediaType"
+              }
+            },
+            {
+              "name": "encodingType",
+              "type": {
+                "defined": "EncodingType"
+              }
+            },
+            {
+              "name": "inscriptionData",
+              "type": "publicKey"
+            },
+            {
+              "name": "order",
+              "type": "u64"
+            },
+            {
+              "name": "size",
+              "type": "u32"
+            },
+            {
+              "name": "validationHash",
+              "type": {
+                "option": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "InscriptionData",
+        "type": {
+          "kind": "struct",
+          "fields": []
+        }
+      },
+      {
+        "name": "InscriptionRankPage",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "size",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      {
+        "name": "InscriptionSummary",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "inscriptionCountTotal",
+              "type": "u64"
+            },
+            {
+              "name": "inscriptionCountImmutables",
+              "type": "u64"
+            },
+            {
+              "name": "lastInscription",
+              "type": "publicKey"
+            },
+            {
+              "name": "lastInscriber",
+              "type": "publicKey"
+            },
+            {
+              "name": "lastInscriptionCreateTime",
+              "type": "i64"
+            },
+            {
+              "name": "extension",
+              "type": {
+                "defined": "SummaryExtension"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "types": [
+      {
+        "name": "CreateInscriptionInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": {
+                "option": "publicKey"
+              }
+            },
+            {
+              "name": "currentRankPage",
+              "type": "u32"
+            },
+            {
+              "name": "signerType",
+              "type": {
+                "defined": "SignerType"
+              }
+            },
+            {
+              "name": "mediaType",
+              "type": {
+                "defined": "MediaType"
+              }
+            },
+            {
+              "name": "encodingType",
+              "type": {
+                "defined": "EncodingType"
+              }
+            },
+            {
+              "name": "validationHash",
+              "type": {
+                "option": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "SignerType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Root"
+            },
+            {
+              "name": "LegacyMetadataSigner"
+            }
+          ]
+        }
+      },
+      {
+        "name": "CreateInscriptionRankInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "pageIndex",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      {
+        "name": "ResizeInscriptionInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "change",
+              "type": "i32"
+            },
+            {
+              "name": "expectedStartSize",
+              "type": "u32"
+            },
+            {
+              "name": "targetSize",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      {
+        "name": "WriteToInscriptionInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "name": "startPos",
+              "type": "u32"
+            },
+            {
+              "name": "mediaType",
+              "type": {
+                "option": {
+                  "defined": "MediaType"
+                }
+              }
+            },
+            {
+              "name": "encodingType",
+              "type": {
+                "option": {
+                  "defined": "EncodingType"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "EncodingType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Base64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "InscriptionEventData",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "publicKey"
+            },
+            {
+              "name": "root",
+              "type": "publicKey"
+            },
+            {
+              "name": "mediaType",
+              "type": {
+                "defined": "MediaType"
+              }
+            },
+            {
+              "name": "encodingType",
+              "type": {
+                "defined": "EncodingType"
+              }
+            },
+            {
+              "name": "inscriptionData",
+              "type": "publicKey"
+            },
+            {
+              "name": "order",
+              "type": "u64"
+            },
+            {
+              "name": "size",
+              "type": "u32"
+            },
+            {
+              "name": "validationHash",
+              "type": {
+                "option": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "MediaType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Audio",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Application",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Image",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Video",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Text",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Custom",
+              "fields": [
+                {
+                  "name": "mediaType",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Erc721"
+            }
+          ]
+        }
+      },
+      {
+        "name": "SummaryExtension",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            }
+          ]
+        }
+      }
+    ],
+    "events": [
+      {
+        "name": "InscriptionEventCreate",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "data",
+            "type": {
+              "defined": "InscriptionEventData"
+            },
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "InscriptionEventDelete",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "InscriptionEventUpdate",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "data",
+            "type": {
+              "defined": "InscriptionEventData"
+            },
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "InscriptionResizeEvent",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "size",
+            "type": "u32",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "InscriptionWriteEvent",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "BadAuthority",
+        "msg": "Bad authority"
+      },
+      {
+        "code": 6001,
+        "name": "MaxSizeExceeded",
+        "msg": "Max size exceeded"
+      },
+      {
+        "code": 6002,
+        "name": "BadInscriptionRankPage",
+        "msg": "Bad page"
+      },
+      {
+        "code": 6003,
+        "name": "IncorrectInscriptionDataAccount",
+        "msg": "Incorrect inscription data account"
+      },
+      {
+        "code": 6004,
+        "name": "RootSignerMismatch",
+        "msg": "Root signer mismatch"
+      },
+      {
+        "code": 6005,
+        "name": "LegacyMetadataSignerMismatch",
+        "msg": "Legacy metadata signer key does not match the expected PDA"
+      }
+    ]
+  },
+  {
+    "version": "0.0.0",
+    "name": "libreplex_legacy",
+    "instructions": [
+      {
+        "name": "claimExcessRentAsUauth",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "legacyMetadata",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "legacyInscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "inscribeLegacyMetadataAsUauth",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "legacySigner",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionSummary",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionRanksCurrentPage",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionRanksNextPage",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "legacyInscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "legacyMetadata",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "validationHash",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "inscribeLegacyMetadataAsHolder",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "secondSignature",
+            "isMut": true,
+            "isSigner": true,
+            "docs": [
+              "cannot inscribe any old garbage.  Second signature",
+              "is used to provide a validation hash that is consistent",
+              "with the legacy offline content"
+            ]
+          },
+          {
+            "name": "legacySigner",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "owner",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionSummary",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionRanksCurrentPage",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionRanksNextPage",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "legacyInscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenAccount",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "legacyMetadata",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "validationHash",
+            "type": "string"
+          },
+          {
+            "name": "mediaType",
+            "type": {
+              "option": {
+                "defined": "MediaType"
+              }
+            }
+          },
+          {
+            "name": "encodingType",
+            "type": {
+              "option": {
+                "defined": "EncodingType"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "writeToLegacyInscriptionAsHolder",
+        "accounts": [
+          {
+            "name": "owner",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenAccount",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "legacyInscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "WriteToInscriptionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "writeToLegacyInscriptionAsUauth",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "legacyMetadata",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "legacyInscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "WriteToInscriptionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "resizeLegacyInscriptionAsUauth",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "legacyMetadata",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "legacyInscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "ResizeLegacyInscriptionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "resizeLegacyInscriptionAsHolder",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "owner",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenAccount",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "legacyInscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "ResizeLegacyInscriptionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "makeImmutable",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionSummary",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "legacyMetadata",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenAccount",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "legacyInscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "setValidationHash",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "legacyMetadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "legacyInscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Inscription",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "publicKey"
+            },
+            {
+              "name": "root",
+              "type": "publicKey"
+            },
+            {
+              "name": "mediaType",
+              "type": {
+                "defined": "MediaType"
+              }
+            },
+            {
+              "name": "encodingType",
+              "type": {
+                "defined": "EncodingType"
+              }
+            },
+            {
+              "name": "inscriptionData",
+              "type": "publicKey"
+            },
+            {
+              "name": "order",
+              "type": "u64"
+            },
+            {
+              "name": "size",
+              "type": "u32"
+            },
+            {
+              "name": "validationHash",
+              "type": {
+                "option": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "LegacyInscription",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "mint",
+              "type": "publicKey"
+            },
+            {
+              "name": "inscription",
+              "type": "publicKey"
+            },
+            {
+              "name": "legacyType",
+              "type": {
+                "defined": "LegacyType"
+              }
+            },
+            {
+              "name": "authorityType",
+              "type": {
+                "defined": "AuthorityType"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "types": [
+      {
+        "name": "WriteToInscriptionInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "name": "startPos",
+              "type": "u32"
+            },
+            {
+              "name": "mediaType",
+              "type": {
+                "option": {
+                  "defined": "MediaType"
+                }
+              }
+            },
+            {
+              "name": "encodingType",
+              "type": {
+                "option": {
+                  "defined": "EncodingType"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "EncodingType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Base64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "MediaType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Audio",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Application",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Image",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Video",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Text",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Custom",
+              "fields": [
+                {
+                  "name": "mediaType",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Erc721"
+            }
+          ]
+        }
+      },
+      {
+        "name": "AuthorityType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Holder"
+            },
+            {
+              "name": "UpdateAuthority"
+            }
+          ]
+        }
+      },
+      {
+        "name": "ResizeLegacyInscriptionInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "change",
+              "type": "i32"
+            },
+            {
+              "name": "expectedStartSize",
+              "type": "u32"
+            },
+            {
+              "name": "targetSize",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      {
+        "name": "LegacyType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "MetaplexMint"
+            }
+          ]
+        }
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "BadMint",
+        "msg": "Metadata has a bad mint"
+      },
+      {
+        "code": 6001,
+        "name": "CannotInscribeFungible",
+        "msg": "Cannot inscribe a fungible asset"
+      },
+      {
+        "code": 6002,
+        "name": "BadAuthority",
+        "msg": "Bad authority"
+      },
+      {
+        "code": 6003,
+        "name": "BadAuthorityForHolderInscription",
+        "msg": "Bad authority for holder inscription"
+      },
+      {
+        "code": 6004,
+        "name": "BadAuthorityForUpdateAuthInscription",
+        "msg": "Bad authority for update auth inscription"
+      }
+    ]
+  },
+  {
+    "version": "0.16.3",
+    "name": "libreplex_metadata",
+    "instructions": [
+      {
+        "name": "createCollection",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "collection",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "seed",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "collectionInput",
+            "type": {
+              "defined": "CollectionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "updateCollection",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "delegatedGroupWidePermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "group",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "collectionInput",
+            "type": {
+              "defined": "CollectionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "updateCollectionAuthority",
+        "accounts": [
+          {
+            "name": "updateAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "collection",
+            "isMut": true,
+            "isSigner": false,
+            "relations": [
+              "update_authority"
+            ]
+          }
+        ],
+        "args": [
+          {
+            "name": "newUpdateAuthority",
+            "type": "publicKey"
+          }
+        ]
+      },
+      {
+        "name": "updateMetadata",
+        "accounts": [
+          {
+            "name": "editor",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "delegatedMetadataSpecificPermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "delegatedGroupWidePermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "collection",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "UpdateMetadataInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "addMetadataToCollection",
+        "accounts": [
+          {
+            "name": "metadataAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "collectionAuthority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "delegatedMetadataSpecificPermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "delegatedCollectionWidePermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "collection",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "removeMetadataFromCollection",
+        "accounts": [
+          {
+            "name": "collectionAuthority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "delegatedGroupWidePermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "collection",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "updatePermissions",
+        "accounts": [
+          {
+            "name": "updateAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "user",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "userPermissions",
+            "isMut": true,
+            "isSigner": false,
+            "relations": [
+              "update_authority"
+            ]
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "EditPermissionsInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "delegateCollectionPermissions",
+        "accounts": [
+          {
+            "name": "updateAuthority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "userPermissions",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "collection",
+            "isMut": false,
+            "isSigner": false,
+            "relations": [
+              "update_authority"
+            ]
+          },
+          {
+            "name": "delegatedUser",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "editPermissionsInput",
+            "type": {
+              "defined": "EditPermissionsInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "delegateMetadataPermissions",
+        "accounts": [
+          {
+            "name": "updateAuthority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "userPermissions",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "metadata",
+            "isMut": false,
+            "isSigner": false,
+            "relations": [
+              "update_authority"
+            ]
+          },
+          {
+            "name": "delegatedUser",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "editPermissionsInput",
+            "type": {
+              "defined": "EditPermissionsInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "createMetadata",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "authority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "invokedMigratorProgram",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          }
+        ],
+        "args": [
+          {
+            "name": "metadataInput",
+            "type": {
+              "defined": "CreateMetadataInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "createMetadataUpdateSummary",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "metadataSummary",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "authority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "invokedMigratorProgram",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          }
+        ],
+        "args": [
+          {
+            "name": "metadataInput",
+            "type": {
+              "defined": "CreateMetadataInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "deleteMetadata",
+        "accounts": [
+          {
+            "name": "metadataAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "delegatedMetadataSpecificPermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "deleteGroup",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "group",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "deleteCollection",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "group",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "createInscriptionMetadata",
+        "accounts": [
+          {
+            "name": "signer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "inscription",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionData",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionSummary",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionRanksCurrentPage",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionRanksNextPage",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "metadataInput",
+            "type": {
+              "defined": "CreateMetadataInscriptionInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "updateInscriptionDatatype",
+        "accounts": [
+          {
+            "name": "editor",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "delegatedMetadataSpecificPermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "delegatedGroupWidePermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "collection",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "inscriptionInput",
+            "type": {
+              "defined": "UpdateInscriptionDataTypeInput"
+            }
+          }
+        ]
+      },
+      {
+        "name": "deleteMetadataInscription",
+        "accounts": [
+          {
+            "name": "metadataAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "delegatedMetadataSpecificPermissions",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "inscription",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "inscriptionsProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "deletePermissions",
+        "accounts": [
+          {
+            "name": "updateAuthority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "permissions",
+            "isMut": true,
+            "isSigner": false,
+            "relations": [
+              "update_authority"
+            ]
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Inscription",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "publicKey"
+            },
+            {
+              "name": "root",
+              "type": "publicKey"
+            },
+            {
+              "name": "mediaType",
+              "type": {
+                "defined": "MediaType"
+              }
+            },
+            {
+              "name": "encodingType",
+              "type": {
+                "defined": "EncodingType"
+              }
+            },
+            {
+              "name": "inscriptionData",
+              "type": "publicKey"
+            },
+            {
+              "name": "order",
+              "type": "u64"
+            },
+            {
+              "name": "size",
+              "type": "u32"
+            },
+            {
+              "name": "validationHash",
+              "type": {
+                "option": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Collection",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "seed",
+              "type": "publicKey"
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "creator",
+              "type": "publicKey"
+            },
+            {
+              "name": "itemCount",
+              "type": "u32"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "url",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "name": "royalties",
+              "type": {
+                "option": {
+                  "defined": "Royalties"
+                }
+              }
+            },
+            {
+              "name": "permittedSigners",
+              "type": {
+                "vec": "publicKey"
+              }
+            },
+            {
+              "name": "attributeTypes",
+              "type": {
+                "vec": {
+                  "defined": "libreplex_metadata::state::collection::AttributeType"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Group",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "seed",
+              "type": "publicKey"
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "creator",
+              "type": "publicKey"
+            },
+            {
+              "name": "itemCount",
+              "type": "u32"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "url",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "name": "templateConfiguration",
+              "type": {
+                "defined": "TemplateConfiguration"
+              }
+            },
+            {
+              "name": "royalties",
+              "type": {
+                "option": {
+                  "defined": "Royalties"
+                }
+              }
+            },
+            {
+              "name": "permittedSigners",
+              "type": {
+                "vec": "publicKey"
+              }
+            },
+            {
+              "name": "attributeTypes",
+              "type": {
+                "vec": {
+                  "defined": "libreplex_metadata::state::group::AttributeType"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Metadata",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "mint",
+              "type": "publicKey"
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "creator",
+              "type": "publicKey"
+            },
+            {
+              "name": "isMutable",
+              "type": "bool"
+            },
+            {
+              "name": "collection",
+              "type": {
+                "option": "publicKey"
+              }
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "asset",
+              "type": {
+                "defined": "Asset"
+              }
+            },
+            {
+              "name": "extensions",
+              "type": {
+                "vec": {
+                  "defined": "MetadataExtension"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "MetadataSummary",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "metadataCountTotal",
+              "type": "u64"
+            },
+            {
+              "name": "lastMetadataMint",
+              "type": "publicKey"
+            },
+            {
+              "name": "lastMetadataCreator",
+              "type": "publicKey"
+            },
+            {
+              "name": "lastMetadataCreateTime",
+              "type": "i64"
+            },
+            {
+              "name": "extension",
+              "type": {
+                "defined": "SummaryExtension"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "DelegatePermissions",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "bump",
+              "type": "u8"
+            },
+            {
+              "name": "user",
+              "type": "publicKey"
+            },
+            {
+              "name": "reference",
+              "type": "publicKey"
+            },
+            {
+              "name": "permissions",
+              "type": {
+                "vec": {
+                  "defined": "PermissionType"
+                }
+              }
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            }
+          ]
+        }
+      }
+    ],
+    "types": [
+      {
+        "name": "EncodingType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Base64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "MediaType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Audio",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Application",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Image",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Video",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Text",
+              "fields": [
+                {
+                  "name": "subtype",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Custom",
+              "fields": [
+                {
+                  "name": "mediaType",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Erc721"
+            }
+          ]
+        }
+      },
+      {
+        "name": "CreateMetadataInscriptionInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "extensions",
+              "type": {
+                "vec": {
+                  "defined": "MetadataExtension"
+                }
+              }
+            },
+            {
+              "name": "description",
+              "type": {
+                "option": "string"
+              }
+            },
+            {
+              "name": "dataType",
+              "type": "string"
+            },
+            {
+              "name": "validationHash",
+              "type": {
+                "option": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "UpdateInscriptionDataTypeInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "dataType",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      {
+        "name": "EditPermissionsInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "permissions",
+              "type": {
+                "vec": {
+                  "defined": "PermissionType"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "libreplex_metadata::state::collection::AttributeType",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "permittedValues",
+              "type": {
+                "vec": {
+                  "defined": "libreplex_metadata::state::collection::AttributeValue"
+                }
+              }
+            },
+            {
+              "name": "deleted",
+              "type": "bool"
+            },
+            {
+              "name": "continuedAtIndex",
+              "type": {
+                "option": "u32"
+              }
+            },
+            {
+              "name": "continuedFromIndex",
+              "type": {
+                "option": "u32"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "libreplex_metadata::state::collection::AttributeValue",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Word",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "U8",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u8"
+                }
+              ]
+            },
+            {
+              "name": "U16",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u16"
+                }
+              ]
+            },
+            {
+              "name": "U32",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u32"
+                }
+              ]
+            },
+            {
+              "name": "U64",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u64"
+                }
+              ]
+            },
+            {
+              "name": "I8",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i8"
+                }
+              ]
+            },
+            {
+              "name": "I16",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i16"
+                }
+              ]
+            },
+            {
+              "name": "I32",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i32"
+                }
+              ]
+            },
+            {
+              "name": "I64",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i64"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "CollectionInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "url",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "name": "royalties",
+              "type": {
+                "option": {
+                  "defined": "Royalties"
+                }
+              }
+            },
+            {
+              "name": "attributeTypes",
+              "type": {
+                "vec": {
+                  "defined": "libreplex_metadata::state::collection::AttributeType"
+                }
+              }
+            },
+            {
+              "name": "permittedSigners",
+              "type": {
+                "vec": "publicKey"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "libreplex_metadata::state::group::AttributeType",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "permittedValues",
+              "type": {
+                "vec": {
+                  "defined": "libreplex_metadata::state::group::AttributeValue"
+                }
+              }
+            },
+            {
+              "name": "deleted",
+              "type": "bool"
+            },
+            {
+              "name": "continuedAtIndex",
+              "type": {
+                "option": "u32"
+              }
+            },
+            {
+              "name": "continuedFromIndex",
+              "type": {
+                "option": "u32"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "libreplex_metadata::state::group::AttributeValue",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Word",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "U8",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u8"
+                }
+              ]
+            },
+            {
+              "name": "U16",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u16"
+                }
+              ]
+            },
+            {
+              "name": "U32",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u32"
+                }
+              ]
+            },
+            {
+              "name": "U64",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u64"
+                }
+              ]
+            },
+            {
+              "name": "I8",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i8"
+                }
+              ]
+            },
+            {
+              "name": "I16",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i16"
+                }
+              ]
+            },
+            {
+              "name": "I32",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i32"
+                }
+              ]
+            },
+            {
+              "name": "I64",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i64"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "GroupEventType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Create"
+            },
+            {
+              "name": "Update"
+            },
+            {
+              "name": "Delete"
+            }
+          ]
+        }
+      },
+      {
+        "name": "TemplateConfiguration",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Asset",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Json",
+              "fields": [
+                {
+                  "name": "url",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Image",
+              "fields": [
+                {
+                  "name": "url",
+                  "type": "string"
+                },
+                {
+                  "name": "description",
+                  "type": {
+                    "option": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ChainRenderer",
+              "fields": [
+                {
+                  "name": "programId",
+                  "type": "publicKey"
+                }
+              ]
+            },
+            {
+              "name": "Inscription",
+              "fields": [
+                {
+                  "name": "baseDataAccountId",
+                  "type": "publicKey"
+                },
+                {
+                  "name": "inscriptionId",
+                  "type": "publicKey"
+                },
+                {
+                  "name": "dataType",
+                  "type": "string"
+                },
+                {
+                  "name": "description",
+                  "type": {
+                    "option": "string"
+                  }
+                },
+                {
+                  "name": "chunks",
+                  "type": "u32"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "CreateMetadataInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "asset",
+              "type": {
+                "defined": "Asset"
+              }
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "extensions",
+              "type": {
+                "vec": {
+                  "defined": "MetadataExtension"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "MetadataEventType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Create"
+            },
+            {
+              "name": "Update"
+            },
+            {
+              "name": "Delete"
+            }
+          ]
+        }
+      },
+      {
+        "name": "UpdateMetadataInput",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "asset",
+              "type": {
+                "defined": "Asset"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "SummaryExtension",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            }
+          ]
+        }
+      },
+      {
+        "name": "License",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "NoLicense"
+            },
+            {
+              "name": "Custom",
+              "fields": [
+                {
+                  "name": "licenseUrl",
+                  "type": "string"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "MetadataExtension",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Attributes",
+              "fields": [
+                {
+                  "name": "attributes",
+                  "type": "bytes"
+                }
+              ]
+            },
+            {
+              "name": "Signers",
+              "fields": [
+                {
+                  "name": "signers",
+                  "type": {
+                    "vec": "publicKey"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Royalties",
+              "fields": [
+                {
+                  "name": "royalties",
+                  "type": {
+                    "defined": "Royalties"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "License",
+              "fields": [
+                {
+                  "name": "license",
+                  "type": {
+                    "defined": "License"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "PermissionEventType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Update"
+            },
+            {
+              "name": "Delete"
+            }
+          ]
+        }
+      },
+      {
+        "name": "PermissionType",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Update"
+            },
+            {
+              "name": "Delete"
+            },
+            {
+              "name": "AddToGroup"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Royalties",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "bps",
+              "type": "u16"
+            },
+            {
+              "name": "shares",
+              "type": {
+                "vec": {
+                  "defined": "RoyaltyShare"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "RoyaltyShare",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "recipient",
+              "type": "publicKey"
+            },
+            {
+              "name": "share",
+              "type": "u16"
+            }
+          ]
+        }
+      }
+    ],
+    "events": [
+      {
+        "name": "CollectionEventCreate",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "index": false
+          },
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "CollectionEventDelete",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "index": false
+          },
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "CollectionEventUpdate",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "index": false
+          },
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "DeleteEvent",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "EditCollectionEvent",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "creator",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "EditMetadataEvent",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "GroupEvent",
+        "fields": [
+          {
+            "name": "eventType",
+            "type": {
+              "defined": "GroupEventType"
+            },
+            "index": false
+          },
+          {
+            "name": "authority",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "index": false
+          },
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "MetadataEvent",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "mint",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "eventType",
+            "type": {
+              "defined": "MetadataEventType"
+            },
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "MetadataPermissionEvent",
+        "fields": [
+          {
+            "name": "metadata",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "user",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "PermissionEvent",
+        "fields": [
+          {
+            "name": "reference",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "user",
+            "type": "publicKey",
+            "index": false
+          },
+          {
+            "name": "eventType",
+            "type": {
+              "defined": "PermissionEventType"
+            },
+            "index": false
+          }
+        ]
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "ArithmeticError",
+        "msg": "failed to perform some math operation safely"
+      },
+      {
+        "code": 6001,
+        "name": "UnknownInstruction",
+        "msg": "unknown instruction called"
+      },
+      {
+        "code": 6002,
+        "name": "InvalidParameter",
+        "msg": "invalid parameter passed in"
+      },
+      {
+        "code": 6003,
+        "name": "AnchorSerializationIssue",
+        "msg": "anchor serialization issue"
+      },
+      {
+        "code": 6004,
+        "name": "AmountMismatch",
+        "msg": "two amounts that are supposed to be equal are not"
+      },
+      {
+        "code": 6005,
+        "name": "AccountDiscriminatorMismatch",
+        "msg": "account discriminator doesn't match"
+      },
+      {
+        "code": 6006,
+        "name": "Reserved6"
+      },
+      {
+        "code": 6007,
+        "name": "Reserved7"
+      },
+      {
+        "code": 6008,
+        "name": "Reserved8"
+      },
+      {
+        "code": 6009,
+        "name": "Reserved9"
+      },
+      {
+        "code": 6010,
+        "name": "Reserved10"
+      },
+      {
+        "code": 6011,
+        "name": "InvalidStringInput",
+        "msg": "A constraint on max string length was violated"
+      },
+      {
+        "code": 6012,
+        "name": "InvalidBpsInput",
+        "msg": "The value of the basis points input must not exceed 10,000"
+      },
+      {
+        "code": 6013,
+        "name": "InvalidPermissions",
+        "msg": "Invalid Permissions"
+      },
+      {
+        "code": 6014,
+        "name": "MissingPermissionAdmin",
+        "msg": "Missing admin permission"
+      },
+      {
+        "code": 6015,
+        "name": "MissingPermissionEditCollection",
+        "msg": "Missing edit collection permission"
+      },
+      {
+        "code": 6016,
+        "name": "MissingPermissionDeleteCollection",
+        "msg": "Missing delete collection permission"
+      },
+      {
+        "code": 6017,
+        "name": "MissingPermissionCreateMetadata",
+        "msg": "Missing create metadata permission"
+      },
+      {
+        "code": 6018,
+        "name": "MissingPermissionEditMetadata",
+        "msg": "Missing edit metadata permission"
+      },
+      {
+        "code": 6019,
+        "name": "MissingPermissionDeleteMetadata",
+        "msg": "Missing delete metadata permission"
+      },
+      {
+        "code": 6020,
+        "name": "CollectionExists",
+        "msg": "Collection exists"
+      },
+      {
+        "code": 6021,
+        "name": "IncompatibleMetadataType",
+        "msg": "Incompatible metadata type"
+      },
+      {
+        "code": 6022,
+        "name": "CollectionHasItems",
+        "msg": "Collection has items"
+      },
+      {
+        "code": 6023,
+        "name": "PermissionAccountEmpty",
+        "msg": "Permission account is empty"
+      },
+      {
+        "code": 6024,
+        "name": "InvalidBump",
+        "msg": "Invalid bump"
+      },
+      {
+        "code": 6025,
+        "name": "RoyaltiesBadSum",
+        "msg": "Royalties must add up to 10000"
+      },
+      {
+        "code": 6026,
+        "name": "UnexpectedPermissionsKey",
+        "msg": "Unexpected permission is empty"
+      },
+      {
+        "code": 6027,
+        "name": "MaxSizeExceeded",
+        "msg": "Max size exceeded"
+      },
+      {
+        "code": 6028,
+        "name": "BadAuthority",
+        "msg": "Bad authority"
+      },
+      {
+        "code": 6029,
+        "name": "MetadataBelongsToCollection",
+        "msg": "Metadata belongs to a group"
+      },
+      {
+        "code": 6030,
+        "name": "DerivedKeyInvalid",
+        "msg": "Derived key invalid"
+      },
+      {
+        "code": 6031,
+        "name": "InvalidSignedProgram",
+        "msg": "Invalid signer program"
+      },
+      {
+        "code": 6032,
+        "name": "MetadataDoesNotBelongToACollection",
+        "msg": "Metadata does not have a group"
+      },
+      {
+        "code": 6033,
+        "name": "MetadataIsNotMutable",
+        "msg": "Metadata is not mutable"
+      },
+      {
+        "code": 6034,
+        "name": "InvokeDeleteInscriptionMetadata",
+        "msg": "Inscription metadata is deleted via a separate method"
+      },
+      {
+        "code": 6035,
+        "name": "OnlyUsedForInscriptionMetadata",
+        "msg": "Only used for inscription metadata"
+      },
+      {
+        "code": 6036,
+        "name": "WrongAssetType",
+        "msg": "Wrong asset type"
+      },
+      {
+        "code": 6037,
+        "name": "InvalidMetadataPointer",
+        "msg": "Invalid metadata pointer"
+      },
+      {
+        "code": 6038,
+        "name": "Reserved37"
+      },
+      {
+        "code": 6039,
+        "name": "Reserved38"
+      },
+      {
+        "code": 6040,
+        "name": "Reserved39"
+      },
+      {
+        "code": 6041,
+        "name": "Reserved40"
+      },
+      {
+        "code": 6042,
+        "name": "Reserved41"
+      },
+      {
+        "code": 6043,
+        "name": "Reserved42"
+      },
+      {
+        "code": 6044,
+        "name": "Reserved43"
+      },
+      {
+        "code": 6045,
+        "name": "Reserved44"
+      },
+      {
+        "code": 6046,
+        "name": "Reserved45"
+      },
+      {
+        "code": 6047,
+        "name": "Reserved46"
+      },
+      {
+        "code": 6048,
+        "name": "Reserved47"
+      },
+      {
+        "code": 6049,
+        "name": "Reserved48"
+      },
+      {
+        "code": 6050,
+        "name": "Reserved49"
+      },
+      {
+        "code": 6051,
+        "name": "Reserved50"
+      },
+      {
+        "code": 6052,
+        "name": "Reserved51"
+      },
+      {
+        "code": 6053,
+        "name": "Reserved52"
+      },
+      {
+        "code": 6054,
+        "name": "Reserved53"
+      },
+      {
+        "code": 6055,
+        "name": "Reserved54"
+      },
+      {
+        "code": 6056,
+        "name": "Reserved55"
+      },
+      {
+        "code": 6057,
+        "name": "Reserved56"
+      },
+      {
+        "code": 6058,
+        "name": "Reserved57"
+      },
+      {
+        "code": 6059,
+        "name": "Reserved58"
+      },
+      {
+        "code": 6060,
+        "name": "Reserved59"
+      },
+      {
+        "code": 6061,
+        "name": "Reserved60"
+      },
+      {
+        "code": 6062,
+        "name": "Reserved61"
+      },
+      {
+        "code": 6063,
+        "name": "Reserved62"
+      },
+      {
+        "code": 6064,
+        "name": "Reserved63"
+      },
+      {
+        "code": 6065,
+        "name": "Reserved64"
+      },
+      {
+        "code": 6066,
+        "name": "Reserved65"
+      },
+      {
+        "code": 6067,
+        "name": "Reserved66"
+      },
+      {
+        "code": 6068,
+        "name": "Reserved67"
+      },
+      {
+        "code": 6069,
+        "name": "Reserved68"
+      },
+      {
+        "code": 6070,
+        "name": "Reserved69"
+      },
+      {
+        "code": 6071,
+        "name": "Reserved70"
+      },
+      {
+        "code": 6072,
+        "name": "Reserved71"
+      },
+      {
+        "code": 6073,
+        "name": "Reserved72"
+      },
+      {
+        "code": 6074,
+        "name": "Reserved73"
+      },
+      {
+        "code": 6075,
+        "name": "Reserved74"
+      },
+      {
+        "code": 6076,
+        "name": "Reserved75"
+      },
+      {
+        "code": 6077,
+        "name": "Reserved76"
+      },
+      {
+        "code": 6078,
+        "name": "Reserved77"
+      },
+      {
+        "code": 6079,
+        "name": "Reserved78"
+      },
+      {
+        "code": 6080,
+        "name": "Reserved79"
+      }
+    ]
+  },
+  {
+    "version": "0.10.0",
+    "name": "libreplex_nft",
+    "instructions": [
+      {
+        "name": "wrap",
+        "accounts": [
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "wrappedMint",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "toggleFreeze",
+        "accounts": [
+          {
+            "name": "delegate",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "wrappedMint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "input",
+            "type": {
+              "defined": "ToggleFreezeInput"
+            }
+          }
+        ]
+      }
+    ],
+    "accounts": [
+      {
+        "name": "WrappedMint",
+        "type": {
+          "kind": "struct",
+          "fields": []
+        }
+      }
+    ],
+    "types": [
+      {
+        "name": "ToggleFreezeInput",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Freeze"
+            },
+            {
+              "name": "Unfreeze"
+            }
+          ]
+        }
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "InvalidMintAuthority",
+        "msg": "InvalidMintAuthority"
+      },
+      {
+        "code": 6001,
+        "name": "MintCannotRepresentNFT",
+        "msg": "MintCannotRepresentNFT"
+      },
+      {
+        "code": 6002,
+        "name": "InvalidMint",
+        "msg": "InvalidMint"
+      },
+      {
+        "code": 6003,
+        "name": "InvalidTokenAccount",
+        "msg": "InvalidTokenAccount"
+      }
+    ]
+  },
+  {
+    "version": "0.6.1",
+    "name": "libreplex_shop",
+    "instructions": [
+      {
+        "name": "delist",
+        "accounts": [
+          {
+            "name": "lister",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "listing",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "escrowTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "listerTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "associatedTokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram2022",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "execute",
+        "accounts": [
+          {
+            "name": "seller",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "metadata",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "collection",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "listing",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "buyer",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "escrowTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "buyerTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "listerPaymentTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "buyerPaymentTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "paymentMint",
+            "isMut": false,
+            "isSigner": false,
+            "isOptional": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "associatedTokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram2022",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Collection",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "seed",
+              "type": "publicKey"
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "creator",
+              "type": "publicKey"
+            },
+            {
+              "name": "itemCount",
+              "type": "u32"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "url",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "name": "royalties",
+              "type": {
+                "option": {
+                  "defined": "Royalties"
+                }
+              }
+            },
+            {
+              "name": "permittedSigners",
+              "type": {
+                "vec": "publicKey"
+              }
+            },
+            {
+              "name": "attributeTypes",
+              "type": {
+                "vec": {
+                  "defined": "AttributeType"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Metadata",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "mint",
+              "type": "publicKey"
+            },
+            {
+              "name": "updateAuthority",
+              "type": "publicKey"
+            },
+            {
+              "name": "creator",
+              "type": "publicKey"
+            },
+            {
+              "name": "isMutable",
+              "type": "bool"
+            },
+            {
+              "name": "collection",
+              "type": {
+                "option": "publicKey"
+              }
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "asset",
+              "type": {
+                "defined": "Asset"
+              }
+            },
+            {
+              "name": "extensions",
+              "type": {
+                "vec": {
+                  "defined": "MetadataExtension"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Listing",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "mint",
+              "type": "publicKey"
+            },
+            {
+              "name": "lister",
+              "type": "publicKey"
+            },
+            {
+              "name": "amount",
+              "type": "u64"
+            },
+            {
+              "name": "listingBump",
+              "type": "u8"
+            },
+            {
+              "name": "collection",
+              "type": {
+                "option": "publicKey"
+              }
+            },
+            {
+              "name": "price",
+              "type": {
+                "defined": "Price"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "types": [
+      {
+        "name": "AttributeType",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "permittedValues",
+              "type": {
+                "vec": {
+                  "defined": "AttributeValue"
+                }
+              }
+            },
+            {
+              "name": "deleted",
+              "type": "bool"
+            },
+            {
+              "name": "continuedAtIndex",
+              "type": {
+                "option": "u32"
+              }
+            },
+            {
+              "name": "continuedFromIndex",
+              "type": {
+                "option": "u32"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "AttributeValue",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Word",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "U8",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u8"
+                }
+              ]
+            },
+            {
+              "name": "U16",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u16"
+                }
+              ]
+            },
+            {
+              "name": "U32",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u32"
+                }
+              ]
+            },
+            {
+              "name": "U64",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "u64"
+                }
+              ]
+            },
+            {
+              "name": "I8",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i8"
+                }
+              ]
+            },
+            {
+              "name": "I16",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i16"
+                }
+              ]
+            },
+            {
+              "name": "I32",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i32"
+                }
+              ]
+            },
+            {
+              "name": "I64",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": "i64"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "Asset",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "None"
+            },
+            {
+              "name": "Json",
+              "fields": [
+                {
+                  "name": "url",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "name": "Image",
+              "fields": [
+                {
+                  "name": "url",
+                  "type": "string"
+                },
+                {
+                  "name": "description",
+                  "type": {
+                    "option": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ChainRenderer",
+              "fields": [
+                {
+                  "name": "programId",
+                  "type": "publicKey"
+                }
+              ]
+            },
+            {
+              "name": "Inscription",
+              "fields": [
+                {
+                  "name": "baseDataAccountId",
+                  "type": "publicKey"
+                },
+                {
+                  "name": "inscriptionId",
+                  "type": "publicKey"
+                },
+                {
+                  "name": "dataType",
+                  "type": "string"
+                },
+                {
+                  "name": "description",
+                  "type": {
+                    "option": "string"
+                  }
+                },
+                {
+                  "name": "chunks",
+                  "type": "u32"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "License",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "NoLicense"
+            },
+            {
+              "name": "Custom",
+              "fields": [
+                {
+                  "name": "licenseUrl",
+                  "type": "string"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "MetadataExtension",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Attributes",
+              "fields": [
+                {
+                  "name": "attributes",
+                  "type": "bytes"
+                }
+              ]
+            },
+            {
+              "name": "Signers",
+              "fields": [
+                {
+                  "name": "signers",
+                  "type": {
+                    "vec": "publicKey"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Royalties",
+              "fields": [
+                {
+                  "name": "royalties",
+                  "type": {
+                    "defined": "Royalties"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "License",
+              "fields": [
+                {
+                  "name": "license",
+                  "type": {
+                    "defined": "License"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "Royalties",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "bps",
+              "type": "u16"
+            },
+            {
+              "name": "shares",
+              "type": {
+                "vec": {
+                  "defined": "RoyaltyShare"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "RoyaltyShare",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "recipient",
+              "type": "publicKey"
+            },
+            {
+              "name": "share",
+              "type": "u16"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Price",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Native",
+              "fields": [
+                {
+                  "name": "lamports",
+                  "type": "u64"
+                }
+              ]
+            },
+            {
+              "name": "Spl",
+              "fields": [
+                {
+                  "name": "mint",
+                  "type": "publicKey"
+                },
+                {
+                  "name": "amount",
+                  "type": "u64"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "events": [
+      {
+        "name": "DelistEvent",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      },
+      {
+        "name": "ExecuteEvent",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey",
+            "index": false
+          }
+        ]
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "CollectionHasActiveFilters",
+        "msg": "Collection has active filters"
+      },
+      {
+        "code": 6001,
+        "name": "UnsupportFilterType",
+        "msg": "Unsupported filter type"
+      },
+      {
+        "code": 6002,
+        "name": "ListerNotAllowed",
+        "msg": "Lister not allowed"
+      },
+      {
+        "code": 6003,
+        "name": "CollectionNotAllowed",
+        "msg": "Collection not allowed"
+      },
+      {
+        "code": 6004,
+        "name": "CollectionHasActiveListings",
+        "msg": "Collection has active listings"
+      }
+    ]
+  }
+]

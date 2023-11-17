@@ -4,20 +4,26 @@ use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
     instructions::SignerType, program::LibreplexInscriptions,
 };
-use mpl_token_metadata::types::TokenStandard;
+// use mpl_token_metadata::types::TokenStandard;
 
 
-use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
+use crate::legacy_inscription::LegacyInscription;
 
+
+use super::check_metadata_uauth;
 use super::create_legacy_inscription_logic::create_legacy_inscription_logic;
 use super::create_legacy_inscription_logic::AuthorityType;
-use super::resize_legacy_inscription_as_uauth::check_metadata_uauth;
+
 
 // Adds a metadata to a group
 #[derive(Accounts)]
 #[instruction(validation_hash: String)]
 pub struct InscribeLegacyMetadataAsUauth<'info> {
-    #[account(mut)]
+    #[account(mut
+
+    // constraint = payer.key().to_string() == "F1QyW2RiabaUTHYYMZs6kVQmjw3QzhRWtAJNUp6ifWAe"
+
+)]
     pub payer: Signer<'info>,
 
     /// CHECK: For PDA signing only
@@ -104,7 +110,7 @@ pub fn handler(
 
     let expected_bump = ctx.bumps.legacy_signer;
 
-    check_permissions_for_authority(legacy_metadata, mint, payer_key)?;
+    check_metadata_uauth(legacy_metadata, mint.key(), payer_key, AuthorityType::UpdateAuthority)?;
 
     create_legacy_inscription_logic(
         mint,
@@ -127,35 +133,4 @@ pub fn handler(
     Ok(())
 }
 
-pub fn check_permissions_for_authority(
-    legacy_metadata: &UncheckedAccount<'_>,
-    mint: &Account<Mint>,
-    auth_key: Pubkey,
-) -> Result<()> {
-    // let mai = legacy_metadata.to_account_info().clone();
-    // let data: &[u8] = &mai.try_borrow_data()?[..];
-    // let metadata_obj = Metadata::deserialize(&mut data.clone())?;
-    // if metadata_obj.mint != mint.key() {
-    //     return Err(LegacyInscriptionErrorCode::BadMint.into());
-    // }
-    // if metadata_obj.update_authority != auth_key {
-    //     return Err(LegacyInscriptionErrorCode::BadAuthority.into());
-    // }
-    let metadata_obj = check_metadata_uauth(legacy_metadata, mint.key(), auth_key, AuthorityType::UpdateAuthority)?;
-    match metadata_obj.token_standard {
-        Some(x) => match &x {
-            TokenStandard::Fungible => {
-                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-            }
-            TokenStandard::FungibleAsset => {
-                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-            }
-            _ => {}
-        },
-        None => {
-            return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-        }
-    }
 
-    Ok(())
-}

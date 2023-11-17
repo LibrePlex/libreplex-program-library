@@ -48,13 +48,13 @@ pub mod libreplex_inscriptions {
         )
     }
 
-    pub fn delete_inscription(
-        ctx: Context<DeleteInscription>
-    ) -> Result<()> {
-        instructions::delete_inscription::handler(
-            ctx
-        )
-    }
+    // pub fn delete_inscription(
+    //     ctx: Context<DeleteInscription>
+    // ) -> Result<()> {
+    //     instructions::delete_inscription::handler(
+    //         ctx
+    //     )
+    // }
 
     pub fn resize_inscription(
         ctx: Context<ResizeInscription>,
@@ -66,13 +66,13 @@ pub mod libreplex_inscriptions {
         )
     }
 
-    pub fn claim_excess_rent(
-        ctx: Context<ClaimExcessRent>,
-    ) -> Result<()> {
-        instructions::claim_excess_rent::handler(
-            ctx
-        )
-    }
+    // pub fn claim_excess_rent(
+    //     ctx: Context<ClaimExcessRent>,
+    // ) -> Result<()> {
+    //     instructions::claim_excess_rent::handler(
+    //         ctx
+    //     )
+    // }
 
 
     pub fn write_to_inscription(

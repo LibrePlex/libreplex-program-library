@@ -18,6 +18,7 @@
     "libreplex_metadata:deploy:devnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_shop:deploy:devnet": "anchor build -p libreplex_shop && anchor deploy -p libreplex_shop --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_legacy:deploy:devnet": "anchor build -p libreplex_legacy && anchor deploy -p libreplex_legacy --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_legacy:deploy:mainnet": "anchor build -p libreplex_legacy && anchor deploy -p libreplex_legacy --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
 
     "libreplex_metadata:deploy:mainnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_creator:deploy:mainnet": "anchor build -p libreplex_creator && anchor deploy -p libreplex_creator --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",

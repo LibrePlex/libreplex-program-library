@@ -1,9 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, TokenAccount};
 
-use libreplex_inscriptions::{
-    instructions::SignerType, program::LibreplexInscriptions,
-};
+use libreplex_inscriptions::{instructions::SignerType, program::LibreplexInscriptions};
 
 use crate::legacy_inscription::LegacyInscription;
 
@@ -14,7 +12,11 @@ use super::create_legacy_inscription_logic::{create_legacy_inscription_logic, Au
 #[derive(Accounts)]
 #[instruction(validation_hash: String)]
 pub struct InscribeLegacyMetadataAsHolder<'info> {
-    #[account(mut)]
+    #[account(mut,
+        // disabling holder inscriptions for now
+    constraint = payer.key().to_string() == "11111111111111111111111111111111"
+)
+]
     pub payer: Signer<'info>,
 
     /// CHECK: Second signature is provided so that holders

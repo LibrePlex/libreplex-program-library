@@ -3,9 +3,9 @@ use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
     cpi::accounts::CreateInscription, instructions::SignerType, program::LibreplexInscriptions,
 };
-use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
 
-use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode, LegacyType};
+
+use crate::{legacy_inscription::LegacyInscription, LegacyType};
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize, PartialEq, Copy)]
 pub enum AuthorityType {
@@ -115,34 +115,3 @@ pub fn create_legacy_inscription_logic<'a>(
     Ok(())
 }
 
-pub fn check_permissions_for_authority(
-    legacy_metadata: &UncheckedAccount<'_>,
-    mint: &Account<Mint>,
-    auth_key: Pubkey,
-) -> Result<()> {
-    let mai = legacy_metadata.to_account_info().clone();
-    let data: &[u8] = &mai.try_borrow_data()?[..];
-    let metadata_obj = Metadata::deserialize(&mut data.clone())?;
-    if metadata_obj.mint != mint.key() {
-        return Err(LegacyInscriptionErrorCode::BadMint.into());
-    }
-    if metadata_obj.update_authority != auth_key {
-        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
-    }
-    match metadata_obj.token_standard {
-        Some(x) => match &x {
-            TokenStandard::Fungible => {
-                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-            }
-            TokenStandard::FungibleAsset => {
-                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-            }
-            _ => {}
-        },
-        None => {
-            return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-        }
-    }
-
-    Ok(())
-}

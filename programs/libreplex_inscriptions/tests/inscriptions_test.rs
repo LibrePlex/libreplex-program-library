@@ -121,7 +121,7 @@ mod inscriptions_tests {
         let inscription_obj: Account<Inscription> =
             Account::try_from(&inscription_account_info).unwrap();
 
-        assert_eq!(inscription_obj.size, 8);
+        assert_eq!(inscription_obj.size, 10000);
 
         // increase the size to 10MB max incrementally
 
@@ -139,8 +139,8 @@ mod inscriptions_tests {
                         data: libreplex_inscriptions::instruction::ResizeInscription {
                             input: ResizeInscriptionInput {
                                 change: 8192,
-                                expected_start_size: 8 + 8192 * i,
-                                target_size: 8 + 8192 * max_increases,
+                                expected_start_size: 10000 + 8192 * i,
+                                target_size: 10000 + 8192 * max_increases,
                             },
                         }
                         .data(),
@@ -181,7 +181,7 @@ mod inscriptions_tests {
             let inscription_obj: Account<Inscription> =
                 Account::try_from(&inscription_account_info).unwrap();
 
-            assert_eq!(inscription_obj.size, 8 + 8192 * (i + 1));
+            assert_eq!(inscription_obj.size, 10000 + 8192 * (i + 1));
             i += 1;
         }
 
@@ -323,7 +323,7 @@ mod inscriptions_tests {
         )
         .0;
 
-        let mut final_account = context
+        let final_account = context
             .banks_client
             .get_account(inscription_data)
             .await
@@ -425,9 +425,9 @@ mod inscriptions_tests {
         assert_eq!(inscription_obj.order, 1);
 
         // we invert the order here and check the rank ordering afterwards
-        make_inscription_immutable(&mut context, 0, inscription_2).await;
-
+        
         make_inscription_immutable(&mut context, 0, inscription).await;
+
 
         let mut account_summary = context
             .banks_client
@@ -452,7 +452,7 @@ mod inscriptions_tests {
 
         assert_eq!(inscription_summary_obj.inscription_count_total, 2);
 
-        assert_eq!(inscription_summary_obj.inscription_count_immutables, 2);
+        assert_eq!(inscription_summary_obj.inscription_count_immutables, 1);
 
         // check that ranks have been updated
 
@@ -474,6 +474,15 @@ mod inscriptions_tests {
             inscription_account.executable,
             inscription_account.rent_epoch,
         );
+
+        let inscription_obj: Account<Inscription> =
+        Account::try_from(&inscription_info).unwrap();
+
+        assert_eq!(inscription_obj.order, 1);
+        assert_eq!(inscription_obj.authority, system_program::ID);
+
+        make_inscription_immutable(&mut context, 0, inscription_2).await;
+        
 
         let inscription_2_pubkey = inscription_2;
         let mut inscription_account_2 = context
@@ -498,6 +507,7 @@ mod inscriptions_tests {
             Account::try_from(&inscription_account_2_info).unwrap();
 
         assert_eq!(inscription_2_obj.order, 2);
+        assert_eq!(inscription_2_obj.authority, system_program::ID);
     }
 
     async fn create_inscription(

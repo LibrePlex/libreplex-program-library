@@ -6,7 +6,6 @@ use libreplex_inscriptions::{
 };
 use mpl_token_metadata::accounts::Metadata;
 
-
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
 use super::{
@@ -116,11 +115,11 @@ pub fn check_metadata_uauth(
     if metadata_obj.mint != mint {
         return Err(LegacyInscriptionErrorCode::BadMint.into());
     }
-        if metadata_obj.update_authority != authority
-            || authority_type != AuthorityType::UpdateAuthority
-        {
-            // return bad authority - only the owner of the mint / update authority can sign
-            return Err(LegacyInscriptionErrorCode::BadAuthority.into());
-        }
-        Ok( metadata_obj)
+    if metadata_obj.update_authority != authority
+        || authority_type != AuthorityType::UpdateAuthority
+    {
+        // return bad authority - only the owner of the mint / update authority can sign
+        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
+    }
+    Ok(metadata_obj)
 }

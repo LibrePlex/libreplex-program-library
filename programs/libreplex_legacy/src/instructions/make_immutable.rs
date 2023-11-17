@@ -1,7 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, TokenAccount};
 use libreplex_inscriptions::{
-    cpi::accounts::MakeInscriptionImmutable, program::LibreplexInscriptions,
+    cpi::accounts::MakeInscriptionImmutable, 
+    program::LibreplexInscriptions,
 };
 
 use crate::legacy_inscription::LegacyInscription;

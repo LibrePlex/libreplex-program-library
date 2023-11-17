@@ -49,7 +49,7 @@ pub struct InscriptionEventCreate {
     data: InscriptionEventData
 }
 
-
+const INITIAL_SIZE: usize = 10000;
 #[derive(Accounts)]
 #[instruction(inscription_input: CreateInscriptionInput)]
 pub struct CreateInscription<'info> {
@@ -96,7 +96,7 @@ pub struct CreateInscription<'info> {
         payer = payer,
         // starts with base anchor discriminator, although this will be overwritten
         // by data
-        space = 8, 
+        space = INITIAL_SIZE, // set a base rent for now, reduce later
         seeds=[
             "inscription_data".as_bytes(),
             root.key().as_ref()
@@ -127,6 +127,8 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     let inscription = &mut ctx.accounts.inscription;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
 
+    
+
     let authority = match input.authority {
         Some(x) => x.to_owned(),
         None => ctx.accounts.payer.key(),
@@ -144,11 +146,14 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     inscription_summary.last_inscription = inscription.key();
     inscription_summary.last_inscriber = ctx.accounts.payer.key();
 
+    // if inscription_summary.inscription_count_total > 19998 {
+    //     return Err(ErrorCode::LegacyMetadataSignerMismatch.into());
+    // }
     // augment the total count but not the immutable count
     inscription_summary.inscription_count_total += 1;
 
     inscription.authority = authority;
-    inscription.size = 8;
+    inscription.size = INITIAL_SIZE as u32;
     inscription.inscription_data = inscription_data.key();
     inscription.root = ctx.accounts.root.key();
     inscription.media_type = MediaType::None;

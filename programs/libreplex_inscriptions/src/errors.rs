@@ -27,5 +27,8 @@ pub enum ErrorCode {
     RootSignerMismatch,
 
     #[msg("Legacy metadata signer key does not match the expected PDA")]
-    LegacyMetadataSignerMismatch
+    LegacyMetadataSignerMismatch,
+
+    #[msg("20,000 inscriptions. Libre is taking little a coffee break.")]
+    LibreIsTakingACoffeeBreak
 }

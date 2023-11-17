@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 
-use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
+use mpl_token_metadata::accounts::Metadata;
 
 
 use crate::LegacyInscriptionErrorCode;
@@ -36,25 +36,5 @@ pub fn check_metadata_type(
     if metadata_obj.mint != mint.key() {
         return Err(LegacyInscriptionErrorCode::BadMint.into());
     }
-
-    match metadata_obj.token_standard {
-        Some(x) => match &x {
-            TokenStandard::Fungible => {
-                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-            }
-            TokenStandard::FungibleAsset => {
-                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-            }
-            _ => {}
-        },
-        None => {
-            // no token standard, let's check supply on the mint.
-            // that's the best we can do for now
-            if mint.decimals != 0 || mint.supply != 1 {
-                return Err(LegacyInscriptionErrorCode::CannotInscribeFungible.into());
-            }
-        }
-    }
-
     Ok(())
 }
