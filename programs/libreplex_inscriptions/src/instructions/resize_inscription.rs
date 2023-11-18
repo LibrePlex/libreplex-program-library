@@ -1,7 +1,7 @@
 use std::cmp::{self};
 
 use crate::instructions::InscriptionEventUpdate;
-use crate::{Inscription, InscriptionEventData};
+use crate::{Inscription, InscriptionEventData, InscriptionV3};
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
@@ -57,6 +57,11 @@ pub struct ResizeInscription<'info> {
     pub inscription: Account<'info, Inscription>,
 
     /// CHECK: validated in logic
+    #[account(mut,
+        constraint = inscription.authority == authority.key())]
+    pub inscription2: Option<Account<'info, InscriptionV3>>,
+
+    /// CHECK: validated in logic
     #[account(
         mut,
     seeds=[
@@ -73,6 +78,7 @@ pub fn handler(
     inscription_input: ResizeInscriptionInput,
 ) -> Result<()> {
     let inscription = &mut ctx.accounts.inscription;
+    let inscription_v2 = &mut ctx.accounts.inscription2;
 
     let inscription_data = &mut ctx.accounts.inscription_data;
 
@@ -92,6 +98,15 @@ pub fn handler(
         ),
         Ordering::Equal => inscription.size,
     };
+
+    match inscription_v2 {
+        Some(x) => {
+            x.size = inscription.size;
+        },
+        None => {
+
+        }
+    }
 
     let size_new = inscription.size;
 

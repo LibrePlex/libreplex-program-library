@@ -42,6 +42,9 @@ pub struct InscribeLegacyMetadataAsUauth<'info> {
     #[account(mut)]
     pub inscription: UncheckedAccount<'info>,
 
+    #[account(mut)]
+    pub inscription_v2: UncheckedAccount<'info>,
+
     /// CHECK: Checked via a CPI call
     #[account(mut)]
     pub inscription_data: UncheckedAccount<'info>,
@@ -93,6 +96,7 @@ pub fn handler(
     let inscription_summary = &mut ctx.accounts.inscription_summary;
 
     let inscription = &mut ctx.accounts.inscription;
+    let inscription_v2 = &mut ctx.accounts.inscription_v2;
     let inscription_data = &mut ctx.accounts.inscription_data;
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
@@ -117,6 +121,7 @@ pub fn handler(
         legacy_inscription,
         AuthorityType::UpdateAuthority,
         inscription,
+        inscription_v2,
         expected_bump,
         inscriptions_program,
         inscription_summary,

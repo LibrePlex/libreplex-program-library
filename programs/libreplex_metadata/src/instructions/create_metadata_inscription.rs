@@ -73,6 +73,9 @@ pub struct CreateInscriptionMetadata<'info> {
     #[account(mut)]
     pub inscription: UncheckedAccount<'info>,
 
+    #[account(mut)]
+    pub inscription_v2: UncheckedAccount<'info>,
+
     /// CHECK: checked via CPI
     #[account(mut)]
     pub inscription_data: UncheckedAccount<'info>,
@@ -100,6 +103,7 @@ pub fn handler(
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let inscription = &mut ctx.accounts.inscription;
+    let inscription_v2 = &mut ctx.accounts.inscription_v2;
     let inscription_data = &mut ctx.accounts.inscription_data;
 
     let inscription_summary = &mut ctx.accounts.inscription_summary;
@@ -132,6 +136,7 @@ pub fn handler(
                 inscription_ranks_current_page: inscription_ranks_current_page.to_account_info(),
                 inscription_ranks_next_page: inscription_ranks_next_page.to_account_info(),
                 inscription: inscription.to_account_info(),
+                inscription2: inscription_v2.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),
                 system_program: system_program.to_account_info(),
                 payer: signer.to_account_info(),

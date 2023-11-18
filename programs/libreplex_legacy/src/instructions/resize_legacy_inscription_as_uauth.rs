@@ -8,10 +8,27 @@ use mpl_token_metadata::accounts::Metadata;
 
 use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
-use super::{
-    create_legacy_inscription_logic::AuthorityType,
-    resize_legacy_inscription_as_holder::ResizeLegacyInscriptionInput,
-};
+use super::create_legacy_inscription_logic::AuthorityType;
+
+// duplicated to get this exposed correctly via anchor IDL
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct ResizeLegacyInscriptionInput {
+    pub change: i32,
+    /*
+        This only exists to show solana
+        that each of the resize inputs is
+        in fact a separate transaction
+    */
+    pub expected_start_size: u32,
+    /*
+        target size is specified
+        to make sure that multiple resizes
+        executed concurrently never increase / decrease
+        the size beyond target size
+    */
+    pub target_size: u32,
+}
+
 
 // Adds a metadata to a group
 #[derive(Accounts)]
@@ -30,6 +47,9 @@ pub struct ResizeLegacyInscriptionAsUauth<'info> {
 
     #[account(mut)]
     pub inscription: Account<'info, Inscription>,
+
+    #[account(mut)]
+    pub inscription_v2: UncheckedAccount<'info>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
@@ -59,6 +79,7 @@ pub fn handler(
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription = &mut ctx.accounts.inscription;
+    let inscription_v2 = &mut ctx.accounts.inscription_v2;
     let inscription_data = &mut ctx.accounts.inscription_data;
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
@@ -81,6 +102,17 @@ pub fn handler(
         &[ctx.bumps.legacy_inscription],
     ];
 
+    let inscription_v2_seeds: &[&[u8]] = &[
+        "inscription_v3".as_bytes(),
+        mint_key.as_ref()
+    ];
+
+    let expected_inscription_v2_key = Pubkey::find_program_address(inscription_v2_seeds, &libreplex_inscriptions::id()).0;
+
+    if expected_inscription_v2_key != inscription_v2.key() {
+        return Err(LegacyInscriptionErrorCode::Inscription2KeyMismatch.into());
+    }
+
     libreplex_inscriptions::cpi::resize_inscription(
         CpiContext::new_with_signer(
             inscriptions_program.to_account_info(),
@@ -90,6 +122,10 @@ pub fn handler(
                 inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),
+                inscription2: match inscription_v2.data_is_empty() {
+                    true => None,
+                    _ => Some(inscription_v2.to_account_info()),
+                },
             },
             &[inscription_auth_seeds],
         ),

@@ -90,12 +90,12 @@ mod inscriptions_tests {
             inscription_ranks_current_page, inscription_ranks_next_page
         );
 
-        let (inscription, inscription_data) =
+        let (inscription, inscription_v2, inscription_data) =
             create_inscription(&mut context, &root, 0).await.unwrap();
 
         println!("created inscription 1");
 
-        let (inscription_2, inscription_data_2) =
+        let (inscription_2, inscription_v2_2, inscription_data_2) =
             create_inscription(&mut context, &root_2, 0).await.unwrap();
 
         let mut account_after_create = context
@@ -148,6 +148,7 @@ mod inscriptions_tests {
                             authority,
                             payer: authority,
                             inscription,
+                            inscription2: Some(inscription_v2),
                             inscription_data,
                             system_program: system_program::id(),
                         }
@@ -207,6 +208,7 @@ mod inscriptions_tests {
                             authority,
                             payer: authority,
                             inscription,
+                            inscription2: Some(inscription_v2),
                             inscription_data,
                             system_program: system_program::id(),
                         }
@@ -262,6 +264,7 @@ mod inscriptions_tests {
                         authority,
                         payer: authority,
                         inscription: inscription,
+                        inscription2: Some(inscription_v2),
                         inscription_data,
                         system_program: system_program::id(),
                     }
@@ -279,6 +282,9 @@ mod inscriptions_tests {
             payer: authority,
             inscription_data,
             inscription: inscription,
+            inscription2: Some(inscription_v2),
+
+
             system_program: system_program::id(),
         };
 
@@ -426,7 +432,7 @@ mod inscriptions_tests {
 
         // we invert the order here and check the rank ordering afterwards
         
-        make_inscription_immutable(&mut context, 0, inscription).await;
+        make_inscription_immutable(&mut context, 0, inscription, inscription_v2).await;
 
 
         let mut account_summary = context
@@ -481,7 +487,7 @@ mod inscriptions_tests {
         assert_eq!(inscription_obj.order, 1);
         assert_eq!(inscription_obj.authority, system_program::ID);
 
-        make_inscription_immutable(&mut context, 0, inscription_2).await;
+        make_inscription_immutable(&mut context, 0, inscription_2, inscription_v2_2).await;
         
 
         let inscription_2_pubkey = inscription_2;
@@ -514,11 +520,17 @@ mod inscriptions_tests {
         ctx: &mut ProgramTestContext,
         root: &Keypair,
         current_page_index: u32,
-    ) -> Result<(Pubkey, Pubkey)> {
+    ) -> Result<(Pubkey, Pubkey, Pubkey)> {
         // let inscription_data = Keypair::new();
 
         let inscription = Pubkey::find_program_address(
             &["inscription".as_bytes(), root.pubkey().as_ref()],
+            &libreplex_inscriptions::ID,
+        )
+        .0;
+
+        let inscription_v2 = Pubkey::find_program_address(
+            &["inscription_v3".as_bytes(), root.pubkey().as_ref()],
             &libreplex_inscriptions::ID,
         )
         .0;
@@ -544,6 +556,7 @@ mod inscriptions_tests {
             signer: root.pubkey(),
             root: root.pubkey(),
             inscription,
+            inscription2: inscription_v2,
             system_program: system_program::id(),
             inscription_data,
         };
@@ -577,7 +590,7 @@ mod inscriptions_tests {
             .await
             .unwrap();
         println!("");
-        Ok((inscription, inscription_data))
+        Ok((inscription, inscription_v2, inscription_data))
     }
 
     pub async fn create_inscription_rank_page(
@@ -629,6 +642,7 @@ mod inscriptions_tests {
         context: &mut ProgramTestContext,
         page_index: u32,
         inscription: Pubkey,
+        inscription_v2: Pubkey,
     ) {
         let make_inscription_immutable_input =
             libreplex_inscriptions::instruction::MakeInscriptionImmutable {};
@@ -642,6 +656,7 @@ mod inscriptions_tests {
             authority: context.payer.pubkey(),
             inscription_summary,
             inscription,
+            inscription2: Some(inscription_v2),
         };
 
         let create_inscription_rank_ix = Instruction {

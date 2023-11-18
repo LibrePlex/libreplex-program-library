@@ -44,24 +44,24 @@ pub mod libreplex_legacy {
         )
     }
 
-    pub fn inscribe_legacy_metadata_as_holder(
-        ctx: Context<InscribeLegacyMetadataAsHolder>,
-        // not optional - for legacy metadata we need to have some validation hash
-        // so we can verify the inscription once it's fully written
-        validation_hash: String,
-    ) -> Result<()> {
-        instructions::inscribe_legacy_metadata_as_holder::handler(
-            ctx,
-            validation_hash,
-        )
-    }
+    // pub fn inscribe_legacy_metadata_as_holder(
+    //     ctx: Context<InscribeLegacyMetadataAsHolder>,
+    //     // not optional - for legacy metadata we need to have some validation hash
+    //     // so we can verify the inscription once it's fully written
+    //     validation_hash: String,
+    // ) -> Result<()> {
+    //     instructions::inscribe_legacy_metadata_as_holder::handler(
+    //         ctx,
+    //         validation_hash,
+    //     )
+    // }
 
-    pub fn write_to_legacy_inscription_as_holder(
-        ctx: Context<WriteToLegacyInscriptionAsHolder>,
-        input: libreplex_inscriptions::instructions::WriteToInscriptionInput,
-    ) -> Result<()> {
-        instructions::write_to_legacy_inscription_as_holder::handler(ctx, input)
-    }
+    // pub fn write_to_legacy_inscription_as_holder(
+    //     ctx: Context<WriteToLegacyInscriptionAsHolder>,
+    //     input: libreplex_inscriptions::instructions::WriteToInscriptionInput,
+    // ) -> Result<()> {
+    //     instructions::write_to_legacy_inscription_as_holder::handler(ctx, input)
+    // }
 
     pub fn write_to_legacy_inscription_as_uauth(
         ctx: Context<WriteToLegacyInscriptionAsUAuth>,
@@ -77,12 +77,12 @@ pub mod libreplex_legacy {
         instructions::resize_legacy_inscription_as_uauth::handler(ctx, input)
     }
 
-    pub fn resize_legacy_inscription_as_holder(
-        ctx: Context<ResizeLegacyInscriptionAsHolder>,
-        input: ResizeLegacyInscriptionInput,
-    ) -> Result<()> {
-        instructions::resize_legacy_inscription_as_holder::handler(ctx, input)
-    }
+    // pub fn resize_legacy_inscription_as_holder(
+    //     ctx: Context<ResizeLegacyInscriptionAsHolder>,
+    //     input: ResizeLegacyInscriptionInput,
+    // ) -> Result<()> {
+    //     instructions::resize_legacy_inscription_as_holder::handler(ctx, input)
+    // }
 
     pub fn make_immutable(ctx: Context<MakeImmutable>) -> Result<()> {
         instructions::make_immutable::handler(ctx)

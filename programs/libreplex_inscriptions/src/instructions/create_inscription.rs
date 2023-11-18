@@ -2,7 +2,7 @@ use crate::errors::ErrorCode;
 
 use crate::{
     Inscription, InscriptionData, InscriptionRankPage,
-    InscriptionSummary, MediaType, EncodingType, InscriptionEventData,
+    InscriptionSummary, MediaType, EncodingType, InscriptionEventData, InscriptionV3,
 };
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke;
@@ -115,6 +115,17 @@ pub struct CreateInscription<'info> {
         payer = payer)]
     pub inscription: Account<'info, Inscription>,
 
+    /// CHECK: validated in logic
+    #[account(init,
+        space = Inscription::BASE_SIZE + inscription_input.get_size(), // v1 and v2 have the same size
+        seeds=[
+            "inscription_v3".as_bytes(),
+            root.key().as_ref()
+        ],
+        bump,
+        payer = payer)]
+    pub inscription2: Account<'info, InscriptionV3>,
+
     pub system_program: Program<'info, System>,
 }
 
@@ -124,10 +135,10 @@ pub mod legacy_inscriber {
 }
 
 pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -> Result<()> {
-    let inscription = &mut ctx.accounts.inscription;
-    let inscription_summary = &mut ctx.accounts.inscription_summary;
 
-    
+    let inscription = &mut ctx.accounts.inscription;
+    let inscription_v2 = &mut ctx.accounts.inscription2;
+    let inscription_summary = &mut ctx.accounts.inscription_summary;
 
     let authority = match input.authority {
         Some(x) => x.to_owned(),
@@ -145,20 +156,30 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     inscription_summary.last_inscription_create_time = clock.unix_timestamp;
     inscription_summary.last_inscription = inscription.key();
     inscription_summary.last_inscriber = ctx.accounts.payer.key();
-
-    // if inscription_summary.inscription_count_total > 19998 {
-    //     return Err(ErrorCode::LegacyMetadataSignerMismatch.into());
-    // }
-    // augment the total count but not the immutable count
     inscription_summary.inscription_count_total += 1;
 
+
+    // inscription v1
     inscription.authority = authority;
     inscription.size = INITIAL_SIZE as u32;
     inscription.inscription_data = inscription_data.key();
     inscription.root = ctx.accounts.root.key();
     inscription.media_type = MediaType::None;
     inscription.encoding_type = EncodingType::None;
-    inscription.validation_hash = input.validation_hash;
+    inscription.validation_hash = input.validation_hash.clone();
+    inscription.order = inscription_summary.inscription_count_total;
+
+    // inscription v2
+    inscription_v2.authority = authority;
+    inscription_v2.size = INITIAL_SIZE as u32;
+    inscription_v2.inscription_data = inscription_data.key();
+    inscription_v2.root = ctx.accounts.root.key();
+    inscription_v2.content_type = "".to_owned();
+    inscription_v2.encoding = "".to_owned();
+    inscription_v2.validation_hash = input.validation_hash.clone();
+    inscription_v2.order = inscription_summary.inscription_count_total;
+    
+    
     let signer = ctx.accounts.signer.key();
     let root_key = inscription.root.key();
 
@@ -182,14 +203,6 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
         }
     }
 
-    // ok we have a valid signer.
-
-    inscription.order = inscription_summary.inscription_count_total;
-    println!(
-        "Inscription count {}",
-        inscription_summary.inscription_count_total
-    );
-
     let page_to_update: &mut Box<Account<'_, InscriptionRankPage>>;
     // if inscription_summary.inscription_count_total > inscription_input.current_rank_page * INSCRIPTIONS_PER_PAGE  {
     if inscription_summary.inscription_count_total - 1
@@ -209,6 +222,7 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
     reallocate_rank_page(page_rank_accountinfo, payer, system_program, inscription_summary.inscription_count_total as usize)?;
     add_inscription_to_rank_page(page_to_update, inscription)?;
 
+    // for now, only fire events for inscription v1
     emit!(InscriptionEventCreate {
         id: inscription.key(),
         data: InscriptionEventData { 

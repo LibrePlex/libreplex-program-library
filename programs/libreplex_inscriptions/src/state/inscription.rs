@@ -45,15 +45,27 @@ pub enum MediaType {
 impl MediaType {
     pub fn get_size(&self) -> usize {
         match self {
-                MediaType::Application { subtype } => 4 + subtype.len(),
-                MediaType::Audio { subtype } => 4 + subtype.len(),
-                MediaType::Erc721 => 0,
-                MediaType::Custom { media_type } => 4 + media_type.len(),
-                MediaType::Image { subtype } => 4 + subtype.len(),
-                MediaType::Text { subtype } => 4 + subtype.len(),
-                MediaType::Video { subtype } => 4 + subtype.len(),
-                MediaType::None => 0,
-            
+            MediaType::Application { subtype } => 4 + subtype.len(),
+            MediaType::Audio { subtype } => 4 + subtype.len(),
+            MediaType::Erc721 => 0,
+            MediaType::Custom { media_type } => 4 + media_type.len(),
+            MediaType::Image { subtype } => 4 + subtype.len(),
+            MediaType::Text { subtype } => 4 + subtype.len(),
+            MediaType::Video { subtype } => 4 + subtype.len(),
+            MediaType::None => 0,
+        }
+    }
+
+    pub fn convert_to_string(&self) -> String {
+        match self {
+            MediaType::Application { subtype } => format!("application/{subtype}"),
+            MediaType::Audio { subtype } => format!("audio/{subtype}"),
+            MediaType::Erc721 => "application/erc721".to_string(),
+            MediaType::Custom { media_type } => media_type.to_owned(),
+            MediaType::Image { subtype } => format!("image/{subtype}"),
+            MediaType::Text { subtype } => format!("text/{subtype}"),
+            MediaType::Video { subtype } => format!("video/{subtype}"),
+            MediaType::None => "".to_owned()
         }
     }
 }
@@ -64,6 +76,15 @@ pub enum EncodingType {
     // when inscription is written
     None,
     Base64,
+}
+
+impl EncodingType {
+    pub fn convert_to_string(&self) -> String {
+        match self {
+            EncodingType::Base64 => "base64".to_owned(),
+            EncodingType::None => "".to_owned(),
+        }
+    }
 }
 
 #[account]
@@ -197,14 +218,17 @@ impl Inscription {
 
     pub fn get_new_size(&self, input: &WriteToInscriptionInput) -> usize {
         Inscription::BASE_SIZE
-            + std::cmp::max(self.media_type.get_size(),
+            + std::cmp::max(
+                self.media_type.get_size(),
                 match &input.media_type {
-                Some(x) => x.get_size(),
-                _ => self.media_type.get_size(),
-            })
-            + 1 + match &self.validation_hash {
+                    Some(x) => x.get_size(),
+                    _ => self.media_type.get_size(),
+                },
+            )
+            + 1
+            + match &self.validation_hash {
                 Some(x) => 4 + x.len(),
-                None => 0
+                None => 0,
             }
     }
 }
@@ -227,4 +251,46 @@ pub struct InscriptionEventData {
     pub order: u64, // 8 + 32 + 32 = 72
     pub size: u32,  // 8 + 32 + 32 + 8 = 80
     pub validation_hash: Option<String>,
+}
+
+// inscription v2 swaps order and size fields around to the middle for easier indexing.
+#[account]
+pub struct InscriptionV3 {
+    // no option to keep data easier to write into
+    // set to 11111111.... or whatever to make this inscription immutable
+    pub authority: Pubkey,
+
+    // root is the thing that the Inscription inscribes
+    // could also be called inscribee but that would
+    // be weird
+    pub root: Pubkey,
+
+    pub inscription_data: Pubkey,
+
+    pub order: u64,
+    pub size: u32,
+
+    pub content_type: String,
+
+    pub encoding: String,
+    /*
+        Validation hash is used to ensure that any inscription
+        uploaded is in sync. This is important as uploading a
+        large inscription typically takes multiple transactions
+        and we want to know whether the content was written
+        correctly and in its entirety.
+
+        Validation hash can be updated by the inscription authority.
+
+        For immutable inscriptions, the inscription authority is an
+        account that cannot sign. Hence it's important we check the
+        validation hash before allowing for immutability. Therefore
+        an inscription can only be made immutable if the inscription
+        content validates against the hash.
+
+        Validation hash is optional in case no validation is required.
+
+    */
+    pub validation_hash: Option<String>,
+    // media type - image, erc721, mov, html, etc
 }

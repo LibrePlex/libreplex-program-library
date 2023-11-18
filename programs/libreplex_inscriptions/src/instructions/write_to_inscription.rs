@@ -1,4 +1,4 @@
-use crate::errors::ErrorCode;
+use crate::{errors::ErrorCode, InscriptionV3};
 use anchor_lang::prelude::*;
 
 use crate::{EncodingType, Inscription, MediaType};
@@ -38,6 +38,15 @@ pub struct WriteToInscription<'info> {
         constraint = inscription.inscription_data == inscription_data.key())]
     pub inscription: Account<'info, Inscription>,
 
+    /// CHECK: Authority checked in logic
+    #[account(mut,
+        realloc = Inscription::BASE_SIZE + inscription.get_new_size(&inscription_input),
+        realloc::payer = payer,
+        realloc::zero = false,
+        constraint = inscription.authority == authority.key(),
+        constraint = inscription.inscription_data == inscription_data.key())]
+    pub inscription2: Option<Account<'info, InscriptionV3>>,
+
     /// CHECK: we never want anchor to handle this. It's just a data blob
     #[account(mut)]
     pub inscription_data: UncheckedAccount<'info>,
@@ -50,6 +59,7 @@ pub fn handler(
     inscription_input: WriteToInscriptionInput,
 ) -> Result<()> {
     let inscription = &mut ctx.accounts.inscription;
+    let inscription_v2 = &mut ctx.accounts.inscription2;
 
     let authority = &ctx.accounts.authority;
 
@@ -67,11 +77,31 @@ pub fn handler(
     }
 
     if let Some(x) =inscription_input.media_type {
-        inscription.media_type = x;
+        inscription.media_type = x.to_owned();
+        match inscription_v2 {
+            Some(y)=>{ 
+                y.content_type = x.convert_to_string();
+            },
+            None => {
+
+            }
+            
+        }
+        
     }
 
     if let Some(x) =inscription_input.encoding_type {
-        inscription.encoding_type = x;
+        inscription.encoding_type = x.to_owned();
+        match inscription_v2 {
+            Some(y)=>{ 
+                y.encoding = x.convert_to_string();
+            },
+            None => {
+
+            }
+            
+        }
+
     }
     if !inscription_input.data.is_empty() {
         inscription.write_data(

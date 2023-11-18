@@ -1,5 +1,6 @@
-use crate::InscriptionEventData;
-use crate::{Inscription, InscriptionSummary};
+use crate::errors::ErrorCode;
+use crate::{InscriptionEventData, Inscription, InscriptionV3};
+use crate::InscriptionSummary;
 use anchor_lang::prelude::*;
 
 use anchor_lang::system_program;
@@ -30,13 +31,33 @@ pub struct MakeInscriptionImmutable<'info> {
         constraint = inscription.authority == authority.key())]
     pub inscription: Account<'info, Inscription>,
 
+    /// CHECK: validated in logic
+    #[account(mut,
+        constraint = inscription.authority == authority.key())]
+    pub inscription2: Option<Account<'info, InscriptionV3>>,
+
+
+
     pub system_program: Program<'info, System>,
 }
 
 pub fn handler(ctx: Context<MakeInscriptionImmutable>) -> Result<()> {
     let inscription = &mut ctx.accounts.inscription;
+    let inscription_v2 = &mut ctx.accounts.inscription2;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
     // let inscription_account_info = inscription.to_account_info();
+
+    match inscription_v2 {
+        Some(x) => {
+            if !x.root.eq(&inscription.root) {
+                return Err(ErrorCode::MismatchingInscriptions.into());
+            } else {
+                x.authority = system_program::ID;
+            }
+        }, None => {
+
+        }
+    }
 
     // we set the auth to the system program. This prevents any further changes
     inscription.authority = system_program::ID;

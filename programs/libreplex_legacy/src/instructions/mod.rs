@@ -4,21 +4,21 @@ pub use inscribe_legacy_metadata_as_uauth::*;
 
 pub mod inscribe_legacy_metadata_as_uauth;
 
-pub use inscribe_legacy_metadata_as_holder::*;
+// pub use inscribe_legacy_metadata_as_holder::*;
 
-pub mod inscribe_legacy_metadata_as_holder;
+// pub mod inscribe_legacy_metadata_as_holder;
 
 pub use resize_legacy_inscription_as_uauth::*;
 
 pub mod resize_legacy_inscription_as_uauth;
 
-pub use resize_legacy_inscription_as_holder::*;
+// pub use resize_legacy_inscription_as_holder::*;
 
-pub mod resize_legacy_inscription_as_holder;
+// pub mod resize_legacy_inscription_as_holder;
 
-pub use write_to_legacy_inscription_as_holder::*;
+// pub use write_to_legacy_inscription_as_holder::*;
 
-pub mod write_to_legacy_inscription_as_holder;
+// pub mod write_to_legacy_inscription_as_holder;
 
 pub use write_to_legacy_inscription_as_uauth::*;
 

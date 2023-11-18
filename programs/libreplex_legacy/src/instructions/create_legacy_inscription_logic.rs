@@ -45,6 +45,7 @@ pub fn create_legacy_inscription_logic<'a>(
     legacy_inscription: &mut Account<'a, LegacyInscription>,
     authority_type: AuthorityType,
     inscription: &mut UncheckedAccount<'a>,
+    inscription_v2: &mut UncheckedAccount<'a>,
     expected_bump: u8,
     inscriptions_program: &Program<'a, LibreplexInscriptions>,
     inscription_summary: &mut UncheckedAccount<'a>,
@@ -79,6 +80,8 @@ pub fn create_legacy_inscription_logic<'a>(
                 /// per mint.
                 signer: legacy_signer.to_account_info(),
                 inscription: inscription.to_account_info(),
+                inscription2: inscription_v2.to_account_info(),
+
                 system_program: system_program.to_account_info(),
                 payer: payer.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),

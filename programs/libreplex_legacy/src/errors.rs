@@ -22,5 +22,9 @@ pub enum LegacyInscriptionErrorCode {
     MultiSigThresholdMustBeOne,
 
     #[msg("Not squads member")]
-    NotSquadsMember
+    NotSquadsMember,
+
+    #[msg("Inscription V2 key mismatch")]
+    Inscription2KeyMismatch
+
 }
