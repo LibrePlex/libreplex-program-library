@@ -1,5 +1,5 @@
 use crate::{errors::ErrorCode, InscriptionV3};
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 
 use crate::{EncodingType, Inscription, MediaType};
 
@@ -8,10 +8,9 @@ pub struct WriteToInscriptionInput {
     pub data: Vec<u8>,
     pub start_pos: u32,
     // when provided, will toggle the media type of the inscription
-    pub media_type: Option<MediaType>,
-    pub encoding_type: Option<EncodingType>,
+    pub media_type: Option<String>,
+    pub encoding_type: Option<String>,
 }
-
 
 #[event]
 pub struct InscriptionWriteEvent {
@@ -40,9 +39,6 @@ pub struct WriteToInscription<'info> {
 
     /// CHECK: Authority checked in logic
     #[account(mut,
-        realloc = Inscription::BASE_SIZE + inscription.get_new_size(&inscription_input),
-        realloc::payer = payer,
-        realloc::zero = false,
         constraint = inscription.authority == authority.key(),
         constraint = inscription.inscription_data == inscription_data.key())]
     pub inscription2: Option<Account<'info, InscriptionV3>>,
@@ -61,6 +57,9 @@ pub fn handler(
     let inscription = &mut ctx.accounts.inscription;
     let inscription_v2 = &mut ctx.accounts.inscription2;
 
+    let payer = &mut ctx.accounts.payer;
+
+    let system_program = &ctx.accounts.system_program;
     let authority = &ctx.accounts.authority;
 
     let inscription_data = &ctx.accounts.inscription_data;
@@ -76,32 +75,52 @@ pub fn handler(
         return Err(ErrorCode::IncorrectInscriptionDataAccount.into());
     }
 
-    if let Some(x) =inscription_input.media_type {
-        inscription.media_type = x.to_owned();
-        match inscription_v2 {
-            Some(y)=>{ 
-                y.content_type = x.convert_to_string();
-            },
-            None => {
+    match inscription_v2 {
+        Some(x) => {
+            let new_length = InscriptionV3::get_new_size(x, &inscription_input);
 
+            let rent = Rent::get()?;
+            let new_minimum_balance = rent.minimum_balance(new_length);
+            let lamports_diff = new_minimum_balance.saturating_sub(x.to_account_info().lamports());
+
+            if lamports_diff > 0 {
+                system_program::transfer(
+                    CpiContext::new(
+                        system_program.to_account_info(),
+                        system_program::Transfer {
+                            from: payer.to_account_info(),
+                            to: x.to_account_info(),
+                        },
+                    ),
+                    lamports_diff,
+                )?;
             }
-            
+
+            x.to_account_info().realloc(new_length, true)?;
         }
-        
+        None => {}
     }
 
-    if let Some(x) =inscription_input.encoding_type {
-        inscription.encoding_type = x.to_owned();
+    if let Some(x) = inscription_input.media_type {
+        inscription.media_type = MediaType::Custom {
+            media_type: x.to_owned(),
+        };
         match inscription_v2 {
-            Some(y)=>{ 
-                y.encoding = x.convert_to_string();
-            },
-            None => {
-
+            Some(y) => {
+                y.content_type = x.clone();
             }
-            
+            None => {}
         }
+    }
 
+    if let Some(x) = inscription_input.encoding_type {
+        inscription.encoding_type = EncodingType::Base64;
+        match inscription_v2 {
+            Some(y) => {
+                y.encoding = x.clone();
+            }
+            None => {}
+        }
     }
     if !inscription_input.data.is_empty() {
         inscription.write_data(

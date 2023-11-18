@@ -255,8 +255,8 @@ mod inscriptions_tests {
                         input: WriteToInscriptionInput {
                             data: initial_data.clone(),
                             start_pos: 0,
-                            media_type: Some(MediaType::None),
-                            encoding_type: Some(EncodingType::Base64),
+                            media_type: Some("image/png".to_owned()),
+                            encoding_type: Some("base64".to_owned()),
                         },
                     }
                     .data(),
@@ -293,8 +293,8 @@ mod inscriptions_tests {
                 input: WriteToInscriptionInput {
                     data: append_data.clone(),
                     start_pos: initial_data.len() as u32,
-                    media_type: Some(MediaType::None),
-                    encoding_type: Some(EncodingType::Base64),
+                    media_type: Some("image/svg+xml".to_owned()),
+                    encoding_type: Some("base64".to_owned()),
                 },
             };
 

@@ -16,3 +16,7 @@ pub use write_to_inscription::*;
 pub use create_inscription::*;
 // pub use claim_excess_rent::*;
 pub use set_validation_hash::*;
+
+pub mod migrate_to_v3;
+
+pub use migrate_to_v3::*;

@@ -221,7 +221,7 @@ impl Inscription {
             + std::cmp::max(
                 self.media_type.get_size(),
                 match &input.media_type {
-                    Some(x) => x.get_size(),
+                    Some(x) => x.len(),
                     _ => self.media_type.get_size(),
                 },
             )
@@ -294,3 +294,29 @@ pub struct InscriptionV3 {
     pub validation_hash: Option<String>,
     // media type - image, erc721, mov, html, etc
 }
+ impl InscriptionV3 {
+    pub const BASE_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 4 + 4 + 1;
+
+    pub fn get_new_size (&self, input: &WriteToInscriptionInput) -> usize {        
+
+        InscriptionV3::BASE_SIZE + 4 + match &input.encoding_type {
+            Some(x) =>  x.len(),
+            None => self.encoding.len()
+        } + match &input.media_type {
+            Some(x) =>  x.len(),
+            None => self.content_type.len()
+        } + match &self.validation_hash {
+            Some(x) => x.len(),
+            None => 0
+        }
+    }
+
+    pub fn get_new_size_for_init (input: &Inscription) -> usize {        
+
+        InscriptionV3::BASE_SIZE + 4 + input.encoding_type.convert_to_string().len()
+        + input.media_type.convert_to_string().len()+ 1
+    }
+
+ }
+
+ 
