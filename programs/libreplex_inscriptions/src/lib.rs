@@ -85,6 +85,14 @@ pub mod libreplex_inscriptions {
         )
     }
 
+    pub fn migrate_to_v3(
+        ctx: Context<MigrateToV3>,
+    ) -> Result<()> {
+        instructions::migrate_to_v3::handler(
+            ctx
+        )
+    }
+
     pub fn set_validation_hash(
         ctx: Context<SetValidationHash>,
         validation_hash: Option<String>

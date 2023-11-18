@@ -314,9 +314,19 @@ pub struct InscriptionV3 {
     pub fn get_new_size_for_init (input: &Inscription) -> usize {        
 
         InscriptionV3::BASE_SIZE + 4 + input.encoding_type.convert_to_string().len()
-        + input.media_type.convert_to_string().len()+ 1
+        + 4 + input.media_type.convert_to_string().len()+ 1 + match &input.validation_hash {
+            Some(x)=>4 + x.len(),
+            None => 0
+        }
     }
 
+ }
+
+ // a small token of recognition for those who helped us migrate from v1 to v3
+#[account]
+ pub struct Migrator {
+    pub root: Pubkey,
+    pub migrator: Pubkey
  }
 
  
