@@ -23,12 +23,9 @@ mod inscriptions_tests {
         EncodingType, InscriptionRankPage, InscriptionSummary, MediaType,
     };
     use solana_program::account_info::AccountInfo;
-    use solana_program::sysvar::Sysvar;
     use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program};
 
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
-
-    use solana_sdk::clock::Clock;
 
     use super::*;
 
@@ -57,16 +54,12 @@ mod inscriptions_tests {
             None, // processor!(libreplex_inscriptions::entry),
         );
 
-        // TODO: Obtain the current slot dynamically from context.
-        // I tried but I'm a potato so got stuck and had to move on
-        let slot = 1000;
         let mut context: ProgramTestContext = program.start_with_context().await;
 
         // let slot = Clock::get().unwrap().slot;
 
         // resize tests take a while so we need to advance slots in order to
         // avoid RpcError(DeadlineExceeded) on test execution
-        context.warp_to_slot(slot + 100).unwrap();
 
         let authority = context.payer.pubkey();
 
@@ -79,11 +72,8 @@ mod inscriptions_tests {
         let inscription_ranks_current_page =
             create_inscription_rank_page(&mut context, 0).await.unwrap();
 
-        context.warp_to_slot(slot + 200).unwrap();
         let inscription_ranks_next_page =
             create_inscription_rank_page(&mut context, 1).await.unwrap();
-
-        context.warp_to_slot(slot + 300).unwrap();
 
         println!(
             "Current page: {}, next page: {}",
@@ -105,8 +95,6 @@ mod inscriptions_tests {
             .unwrap()
             .unwrap();
 
-        context.warp_to_slot(slot + 400).unwrap();
-
         let inscription_account_info = AccountInfo::new(
             &inscription,
             false,
@@ -124,13 +112,9 @@ mod inscriptions_tests {
         assert_eq!(inscription_obj.size, 10000);
 
         // increase the size to 10MB max incrementally
-
-        let mut i: u32 = 0;
+        let mut applied_increases: u32 = 0;
         let max_increases = 10;
-        while i < max_increases {
-            context
-                .warp_to_slot(slot + 400 + (i as u64 + 2) * 100)
-                .unwrap();
+        while applied_increases < max_increases {
             context
                 .banks_client
                 .process_transaction(Transaction::new_signed_with_payer(
@@ -139,7 +123,7 @@ mod inscriptions_tests {
                         data: libreplex_inscriptions::instruction::ResizeInscription {
                             input: ResizeInscriptionInput {
                                 change: 8192,
-                                expected_start_size: 10000 + 8192 * i,
+                                expected_start_size: 10000 + 8192 * applied_increases,
                                 target_size: 10000 + 8192 * max_increases,
                             },
                         }
@@ -160,7 +144,6 @@ mod inscriptions_tests {
                 ))
                 .await
                 .unwrap();
-
             let mut account_after_resize = context
                 .banks_client
                 .get_account(inscription)
@@ -168,6 +151,8 @@ mod inscriptions_tests {
                 .unwrap()
                 .unwrap();
 
+            let data_account_after_resize = context.banks_client.get_account(inscription_data).await.unwrap().unwrap();
+            
             let inscription_account_info = AccountInfo::new(
                 &inscription,
                 false,
@@ -182,15 +167,14 @@ mod inscriptions_tests {
             let inscription_obj: Account<Inscription> =
                 Account::try_from(&inscription_account_info).unwrap();
 
-            assert_eq!(inscription_obj.size, 10000 + 8192 * (i + 1));
-            i += 1;
+            assert_eq!(inscription_obj.size, 10000 + 8192 * (applied_increases + 1));
+            assert_eq!(inscription_obj.size as usize, data_account_after_resize.data.len());
+            assert_eq!(data_account_after_resize.lamports, context.banks_client.get_rent().await.unwrap().minimum_balance(inscription_obj.size as usize));
+            applied_increases += 1;
         }
-
+        let mut applied_decreases = 0;
         let max_decreases = 8;
-        while i < max_decreases {
-            context
-                .warp_to_slot(slot + 4000 + (i as u64 + 2) * 100)
-                .unwrap();
+        while applied_decreases < max_decreases {
             context
                 .banks_client
                 .process_transaction(Transaction::new_signed_with_payer(
@@ -199,8 +183,8 @@ mod inscriptions_tests {
                         data: libreplex_inscriptions::instruction::ResizeInscription {
                             input: ResizeInscriptionInput {
                                 change: -8192,
-                                expected_start_size: 8 + 8192 * (max_increases - i),
-                                target_size: 8 + 8192 * (max_increases - i - 1),
+                                expected_start_size: 10000 + 8192 * (applied_increases - applied_decreases),
+                                target_size: 10000 + 8192 * (max_increases - max_decreases - 1),
                             },
                         }
                         .data(),
@@ -242,8 +226,12 @@ mod inscriptions_tests {
             let inscription_obj: Account<Inscription> =
                 Account::try_from(&inscription_account_info).unwrap();
 
-            assert_eq!(inscription_obj.size, 8 + 8192 * (max_increases - i));
-            i += 1;
+            let data_account_after_resize = context.banks_client.get_account(inscription_data).await.unwrap().unwrap();
+            assert_eq!(inscription_obj.size, 10000 + 8192 * (applied_increases - applied_decreases - 1));
+            assert_eq!(inscription_obj.size as usize, data_account_after_resize.data.len());
+            assert_eq!(data_account_after_resize.lamports, 
+                context.banks_client.get_rent().await.unwrap().minimum_balance(inscription_obj.size as usize));
+            applied_decreases += 1;
         }
 
         context
