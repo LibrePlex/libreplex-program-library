@@ -33,7 +33,7 @@ pub struct ResizeLegacyInscriptionInput {
 // Adds a metadata to a group
 #[derive(Accounts)]
 pub struct ResizeLegacyInscriptionAsUauth<'info> {
-    #[account(mut)]
+    #[account()]
     pub authority: Signer<'info>,
 
     #[account(mut)]

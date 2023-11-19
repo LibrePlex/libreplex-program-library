@@ -1,26 +1,24 @@
-
-
+use std::cmp;
 
 use crate::Inscription;
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::program::invoke_signed;
-use anchor_lang::solana_program::system_instruction;
 
 #[derive(Accounts)]
 pub struct ClaimExcessRent<'info> {
-    #[account(mut)]
+    #[account()]
     pub authority: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
 
     /// CHECK: validated in logic
-    #[account(mut,
+    #[account(
         constraint = inscription.authority == authority.key())]
     pub inscription: Account<'info, Inscription>,
 
     /// CHECK: validated in logic
     #[account(
+        mut,
     seeds=[
         "inscription_data".as_bytes(),
         inscription.root.as_ref()
@@ -30,48 +28,36 @@ pub struct ClaimExcessRent<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(
-    ctx: Context<ClaimExcessRent>,
-) -> Result<()> {
+const MINIMUM_LAMPORTS: u64 = 70_490_880;
+
+pub fn handler(ctx: Context<ClaimExcessRent>) -> Result<()> {
     let inscription = &mut ctx.accounts.inscription;
 
     let inscription_data = &mut ctx.accounts.inscription_data;
 
-    let system_program = &mut ctx.accounts.system_program;
     let payer = &mut ctx.accounts.payer;
 
-
     let rent = Rent::get()?;
-    let minimum_balance = rent.minimum_balance(inscription.size as usize);
 
-    
-    let inscription_root = inscription.root.key();
+    let minimum_balance_for_rent = rent.minimum_balance(inscription.size as usize);
 
-    msg!("Decreasing to {}", minimum_balance);
-    // reallocate first
+    let minimum_balance = cmp::max(
+        minimum_balance_for_rent,
+        MINIMUM_LAMPORTS,
+    );
+    msg!("minimum_balance {}", minimum_balance);
 
-    let auth_seeds = [
-        "inscription_data".as_bytes(),
-        inscription_root.as_ref(),
-        &[ctx.bumps.inscription_data],
-    ];
+    msg!("minimum_balance_for_rent {}", minimum_balance_for_rent);
 
-    let lamports_diff = inscription_data
-        .lamports()
-        .saturating_sub(minimum_balance);
+    msg!("inscription size {}", inscription.size);
 
-    msg!("Lamports diff {}", lamports_diff);
+    let lamports_diff = inscription_data.lamports().saturating_sub(minimum_balance);
 
-    invoke_signed(
-        &system_instruction::transfer(inscription_data.key, &payer.key(), lamports_diff),
-        &[
-            inscription_data.to_account_info(),
-            payer.to_account_info(),
-            system_program.to_account_info(),
-        ],
-        &[&auth_seeds],
-    )?;
-    
+    msg!("lamports {}", lamports_diff);
+    if lamports_diff > 0 {
+        inscription_data.sub_lamports(lamports_diff)?;
+        payer.add_lamports(lamports_diff)?;
+    }
 
     Ok(())
 }
