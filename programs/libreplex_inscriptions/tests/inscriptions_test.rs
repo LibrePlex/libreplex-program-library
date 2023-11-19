@@ -7,6 +7,7 @@ mod inscriptions_tests {
 
     use anchor_lang::prelude::Account;
     use libreplex_inscriptions::accounts::CreateInscriptionRank;
+    use libreplex_inscriptions::constants;
     use libreplex_inscriptions::instructions::{CreateInscriptionRankInput, SignerType};
     use libreplex_inscriptions::{
         accounts::CreateInscription,
@@ -173,7 +174,7 @@ mod inscriptions_tests {
             applied_increases += 1;
         }
         let mut applied_decreases = 0;
-        let max_decreases = 8;
+        let max_decreases = 11;
         while applied_decreases < max_decreases {
             context
                 .banks_client
@@ -183,8 +184,8 @@ mod inscriptions_tests {
                         data: libreplex_inscriptions::instruction::ResizeInscription {
                             input: ResizeInscriptionInput {
                                 change: -8192,
-                                expected_start_size: 10000 + 8192 * (applied_increases - applied_decreases),
-                                target_size: 10000 + 8192 * (max_increases - max_decreases - 1),
+                                expected_start_size: 10000 + 8192 * applied_increases - 8192 * applied_decreases,
+                                target_size: 10000 + 8192 * max_increases - 8192 * max_decreases,
                             },
                         }
                         .data(),
@@ -227,12 +228,81 @@ mod inscriptions_tests {
                 Account::try_from(&inscription_account_info).unwrap();
 
             let data_account_after_resize = context.banks_client.get_account(inscription_data).await.unwrap().unwrap();
-            assert_eq!(inscription_obj.size, 10000 + 8192 * (applied_increases - applied_decreases - 1));
+            assert_eq!(inscription_obj.size, 10000 + 8192 * applied_increases - 8192 * applied_decreases - 8192);
             assert_eq!(inscription_obj.size as usize, data_account_after_resize.data.len());
-            assert_eq!(data_account_after_resize.lamports, 
-                context.banks_client.get_rent().await.unwrap().minimum_balance(inscription_obj.size as usize));
+            assert_eq!(data_account_after_resize.lamports,
+                std::cmp::max(constants::MINIMUM_INSCRIPTION_LAMPORTS,
+                context.banks_client.get_rent().await.unwrap().minimum_balance(inscription_obj.size as usize)));
             applied_decreases += 1;
         }
+
+        // test for withdrawing if lamports balance is higher than required for the space
+        let mut inscription_data_account = context.banks_client.get_account(inscription_data).await.unwrap().unwrap();
+        let inscription_data_account_lamports = inscription_data_account.lamports;
+        inscription_data_account.lamports += 1;
+        context.set_account(&inscription_data,&inscription_data_account.into());
+
+        assert_eq!(context.banks_client.get_account(inscription_data).await.unwrap().unwrap().lamports,
+            inscription_data_account_lamports + 1);
+
+
+        context
+                .banks_client
+                .process_transaction(Transaction::new_signed_with_payer(
+                    &[Instruction {
+                        program_id: libreplex_inscriptions::id(),
+                        data: libreplex_inscriptions::instruction::ResizeInscription {
+                            input: ResizeInscriptionInput {
+                                change: 0,
+                                expected_start_size: 10000 + 8192 * applied_increases - 8192 * applied_decreases,
+                                target_size: 10000 + 8192 * max_increases - 8192 * max_decreases,
+                            },
+                        }
+                        .data(),
+                        accounts: ResizeInscription {
+                            authority,
+                            payer: authority,
+                            inscription,
+                            inscription2: Some(inscription_v2),
+                            inscription_data,
+                            system_program: system_program::id(),
+                        }
+                        .to_account_metas(None),
+                    }],
+                    Some(&authority),
+                    &[&context.payer],
+                    context.last_blockhash,
+                ))
+                .await
+                .unwrap();
+
+            let mut account_after_resize = context
+                .banks_client
+                .get_account(inscription)
+                .await
+                .unwrap()
+                .unwrap();
+
+            let inscription_account_info = AccountInfo::new(
+                &inscription,
+                false,
+                false,
+                &mut account_after_resize.lamports,
+                &mut account_after_resize.data,
+                &account_after_resize.owner,
+                account_after_resize.executable,
+                account_after_resize.rent_epoch,
+            );
+
+            let inscription_obj: Account<Inscription> =
+                Account::try_from(&inscription_account_info).unwrap();
+
+            let data_account_after_resize = context.banks_client.get_account(inscription_data).await.unwrap().unwrap();
+            assert_eq!(inscription_obj.size, 10000 + 8192 * applied_increases - 8192 * applied_decreases);
+            assert_eq!(inscription_obj.size as usize, data_account_after_resize.data.len());
+            assert_eq!(data_account_after_resize.lamports,
+                std::cmp::max(constants::MINIMUM_INSCRIPTION_LAMPORTS,
+                context.banks_client.get_rent().await.unwrap().minimum_balance(inscription_obj.size as usize)));
 
         context
             .banks_client

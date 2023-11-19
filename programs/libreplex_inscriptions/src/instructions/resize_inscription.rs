@@ -1,7 +1,7 @@
 use std::cmp::{self};
 
 use crate::instructions::InscriptionEventUpdate;
-use crate::{Inscription, InscriptionEventData, InscriptionV3};
+use crate::{Inscription, InscriptionEventData, InscriptionV3, constants};
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
@@ -107,7 +107,9 @@ pub fn handler(
     let size_new = inscription.size;
 
     let rent = Rent::get()?;
-    let new_minimum_balance = rent.minimum_balance(size_new as usize);
+    let new_minimum_balance = cmp::max(
+        constants::MINIMUM_INSCRIPTION_LAMPORTS,
+        rent.minimum_balance(size_new as usize));
     msg!("Size before: {} New size {}",size_old, size_new);
 
     match size_new.cmp(&size_old) {
@@ -115,14 +117,16 @@ pub fn handler(
             let lamports_diff = new_minimum_balance.saturating_sub(inscription_data.lamports());
             msg!("Increasing inscription capacity by {} and debiting {} lamports for rent exemption", size_new-size_old, lamports_diff);
             // transferring lamport diff to inscription_data
-            invoke(
-                &system_instruction::transfer(&payer.key(), inscription_data.key, lamports_diff),
-                &[
-                    payer.to_account_info(),
-                    inscription_data.to_account_info(),
-                    system_program.to_account_info(),
-                ],
-            )?;
+            if lamports_diff > 0 {
+                invoke(
+                    &system_instruction::transfer(&payer.key(), inscription_data.key, lamports_diff),
+                    &[
+                        payer.to_account_info(),
+                        inscription_data.to_account_info(),
+                        system_program.to_account_info(),
+                    ],
+                )?;
+            }
             
             inscription_data.realloc(inscription.size as usize, false)?;
         }
@@ -137,15 +141,24 @@ pub fn handler(
             payer.add_lamports(lamports_diff)?;
 
             inscription_data.realloc(inscription.size as usize, false)?;
-            
 
             // we cannot use realloc macro because inscription_data account discriminator
             // has been overwritten by data.
         
         }
         _ => {
-            msg!("Inscription capacity is already at target, no changes were made")
-            // do nothing - already at target
+
+            let lamports_diff = inscription_data
+            .lamports()
+            .saturating_sub(new_minimum_balance);
+            
+            msg!("Inscription capacity unchanged. Crediting {} lamports for rent exemption", lamports_diff);
+            if lamports_diff > 0 {
+                // transferring lamport diff to payer
+                inscription_data.sub_lamports(lamports_diff)?;
+                payer.add_lamports(lamports_diff)?;
+                    // transfer lamport diff to payer if > 0
+            }
         }
     }
 
