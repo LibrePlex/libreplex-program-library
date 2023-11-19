@@ -78,7 +78,7 @@ pub fn handler(
     match inscription_v2 {
         Some(x) => {
             let new_length = InscriptionV3::get_new_size(x, &inscription_input);
-
+            msg!("new length {}", new_length);
             let rent = Rent::get()?;
             let new_minimum_balance = rent.minimum_balance(new_length);
             let lamports_diff = new_minimum_balance.saturating_sub(x.to_account_info().lamports());

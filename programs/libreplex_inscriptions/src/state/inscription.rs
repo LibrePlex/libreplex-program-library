@@ -302,10 +302,10 @@ pub struct InscriptionV3 {
         InscriptionV3::BASE_SIZE + 4 + match &input.encoding_type {
             Some(x) =>  x.len(),
             None => self.encoding.len()
-        } + match &input.media_type {
+        } + 4+ match &input.media_type {
             Some(x) =>  x.len(),
             None => self.content_type.len()
-        } + match &self.validation_hash {
+        } + 1 + match &self.validation_hash {
             Some(x) => x.len(),
             None => 0
         }
