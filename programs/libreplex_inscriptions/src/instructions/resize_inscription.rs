@@ -1,7 +1,7 @@
 use std::cmp::{self};
 
 use crate::instructions::InscriptionEventUpdate;
-use crate::{Inscription, InscriptionEventData, InscriptionV3};
+use crate::{Inscription, InscriptionEventData, InscriptionV3, constants};
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
@@ -55,7 +55,6 @@ pub struct ResizeInscription<'info> {
     #[account(mut,
         constraint = inscription.authority == authority.key())]
     pub inscription: Account<'info, Inscription>,
-
     /// CHECK: validated in logic
     #[account(mut,
         constraint = inscription.authority == authority.key())]
@@ -86,7 +85,6 @@ pub fn handler(
     let payer = &mut ctx.accounts.payer;
 
     let size_old = inscription.size;
-    msg!("before: {}", size_old);
     inscription.size = match inscription_input.change.cmp(&0) {
         Ordering::Greater => cmp::min(
             (inscription.size as i64 + inscription_input.change as i64) as u32,
@@ -98,7 +96,6 @@ pub fn handler(
         ),
         Ordering::Equal => inscription.size,
     };
-
     match inscription_v2 {
         Some(x) => {
             x.size = inscription.size;
@@ -107,50 +104,61 @@ pub fn handler(
 
         }
     }
-
     let size_new = inscription.size;
 
     let rent = Rent::get()?;
-    let new_minimum_balance = rent.minimum_balance(size_new as usize);
+    let new_minimum_balance = cmp::max(
+        constants::MINIMUM_INSCRIPTION_LAMPORTS,
+        rent.minimum_balance(size_new as usize));
+    msg!("Size before: {} New size {}",size_old, size_new);
 
     match size_new.cmp(&size_old) {
         Ordering::Greater => {
-            msg!("Increasing");
             let lamports_diff = new_minimum_balance.saturating_sub(inscription_data.lamports());
-            // reducing
-            invoke(
-                &system_instruction::transfer(&payer.key(), inscription_data.key, lamports_diff),
-                &[
-                    payer.to_account_info(),
-                    inscription_data.to_account_info(),
-                    system_program.to_account_info(),
-                ],
-            )?;
-            // reallocate second
+            msg!("Increasing inscription capacity by {} and debiting {} lamports for rent exemption", size_new-size_old, lamports_diff);
+            // transferring lamport diff to inscription_data
+            if lamports_diff > 0 {
+                invoke(
+                    &system_instruction::transfer(&payer.key(), inscription_data.key, lamports_diff),
+                    &[
+                        payer.to_account_info(),
+                        inscription_data.to_account_info(),
+                        system_program.to_account_info(),
+                    ],
+                )?;
+            }
+            
             inscription_data.realloc(inscription.size as usize, false)?;
         }
         Ordering::Less => {
-            msg!("Decreasing to {}", new_minimum_balance);
-            // reallocate first
-
             let lamports_diff = inscription_data
                 .lamports()
                 .saturating_sub(new_minimum_balance);
-            // increasing
-
-            msg!("Lamports diff {}", lamports_diff);
-
-            inscription_data.realloc(inscription.size as usize, true)?;
+            msg!("Decreasing inscription capacity by {} and crediting {} lamports for rent exemption", size_old-size_new, lamports_diff);
             
-            // we cannot reclaim lamports in the same transaction as the realloc as this
-            // would result in error: "from cannot carry data"
+            // transferring lamport diff to payer
+            inscription_data.sub_lamports(lamports_diff)?;
+            payer.add_lamports(lamports_diff)?;
 
-            // we also cannot use realloc macro because inscription_data account discriminator
+            inscription_data.realloc(inscription.size as usize, false)?;
+
+            // we cannot use realloc macro because inscription_data account discriminator
             // has been overwritten by data.
         
         }
         _ => {
-            // do nothing - already at target
+
+            let lamports_diff = inscription_data
+            .lamports()
+            .saturating_sub(new_minimum_balance);
+            
+            msg!("Inscription capacity unchanged. Crediting {} lamports for rent exemption", lamports_diff);
+            if lamports_diff > 0 {
+                // transferring lamport diff to payer
+                inscription_data.sub_lamports(lamports_diff)?;
+                payer.add_lamports(lamports_diff)?;
+                    // transfer lamport diff to payer if > 0
+            }
         }
     }
 
