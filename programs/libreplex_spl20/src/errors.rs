@@ -5,6 +5,6 @@ pub enum Spl20Error {
     #[msg("Ticker to long")]
     TickerToLong,
 
-    #[msg("Url to long")]
-    UrlToLong,
+    #[msg("Root type to long")]
+    RootTypeToLong,
 }

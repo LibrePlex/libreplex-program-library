@@ -18,6 +18,10 @@ pub mod libreplex_spl20 {
         if new_deployment.ticker.len() > TICKER_LIMIT {
             return Err(Spl20Error::TickerToLong.into());
         }
+
+        if new_deployment.root_type.len() > ROOT_TYPE_LIMIT {
+            return Err(Spl20Error::RootTypeToLong.into())
+        }
         
         deployment.creator = new_deployment.creator;
         deployment.limit = new_deployment.limit;
@@ -25,6 +29,7 @@ pub mod libreplex_spl20 {
         deployment.collection = new_deployment.collection;
         deployment.ticker = new_deployment.ticker;
         deployment.root = new_deployment.root;
+        deployment.root_type = new_deployment.root_type;
 
         Ok(())
     }
