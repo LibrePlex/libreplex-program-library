@@ -60,8 +60,8 @@ pub fn handler(
     &[ctx.bumps.legacy_inscription]];
 
     let mai = legacy_metadata.to_account_info().clone();
-    let data: &[u8] = &mai.try_borrow_data()?[..];
-    let metadata_obj = Metadata::deserialize(&mut data.clone())?;
+    let mut data: &[u8] = &mai.try_borrow_data()?[..];
+    let metadata_obj = Metadata::deserialize(&mut data)?;
     if metadata_obj.mint != mint.key() {
         return Err(LegacyInscriptionErrorCode::BadMint.into());
     }
