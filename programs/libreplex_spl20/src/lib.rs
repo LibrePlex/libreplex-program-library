@@ -12,7 +12,7 @@ pub mod errors;
 pub mod libreplex_spl20 {
     use super::*;
 
-    pub fn register_token(ctx: Context<RegisterTokenCtx>, new_deployment: TokenDeployment) -> Result<()> {
+    pub fn register_token(ctx: Context<RegisterTokenCtx>, new_deployment: RegisterTokenInput) -> Result<()> {
         let deployment = &mut ctx.accounts.new_deployment_account;
 
         if new_deployment.ticker.len() > TICKER_LIMIT {
@@ -36,7 +36,7 @@ pub mod libreplex_spl20 {
 }
 
 #[derive(Accounts)]
-#[instruction(new_deployment: TokenDeployment)]
+#[instruction(new_deployment: RegisterTokenInput)]
 pub struct RegisterTokenCtx<'info>  {
     #[account(init, payer = payer, space = 8 + TokenDeployment::INIT_SPACE + EXCESS, 
         seeds = ["spl20".as_ref(), new_deployment.ticker.as_ref()], bump)]
@@ -46,4 +46,18 @@ pub struct RegisterTokenCtx<'info>  {
     pub payer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
+}
+
+#[derive(AnchorDeserialize, AnchorSerialize)]
+pub struct RegisterTokenInput {
+    pub creator: Pubkey,
+    pub limit: u64,
+    pub max: u64,
+    pub collection: Pubkey,
+
+    pub ticker: String,
+    
+    pub root: Pubkey,
+
+    pub root_type: String,
 }
