@@ -49,7 +49,7 @@ pub struct InscriptionEventCreate {
     data: InscriptionEventData
 }
 
-const INITIAL_SIZE: usize = 10000;
+const INITIAL_SIZE: usize = 8;
 #[derive(Accounts)]
 #[instruction(inscription_input: CreateInscriptionInput)]
 pub struct CreateInscription<'info> {

@@ -1,6 +1,6 @@
 use std::cmp;
 
-use crate::Inscription;
+use crate::{Inscription, MINIMUM_INSCRIPTION_LAMPORTS};
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
@@ -28,8 +28,6 @@ pub struct ClaimExcessRent<'info> {
     pub system_program: Program<'info, System>,
 }
 
-const MINIMUM_LAMPORTS: u64 = 70_490_880;
-
 pub fn handler(ctx: Context<ClaimExcessRent>) -> Result<()> {
     let inscription = &mut ctx.accounts.inscription;
 
@@ -43,14 +41,9 @@ pub fn handler(ctx: Context<ClaimExcessRent>) -> Result<()> {
 
     let minimum_balance = cmp::max(
         minimum_balance_for_rent,
-        MINIMUM_LAMPORTS,
+        MINIMUM_INSCRIPTION_LAMPORTS,
     );
-    msg!("minimum_balance {}", minimum_balance);
-
-    msg!("minimum_balance_for_rent {}", minimum_balance_for_rent);
-
-    msg!("inscription size {}", inscription.size);
-
+    
     let lamports_diff = inscription_data.lamports().saturating_sub(minimum_balance);
 
     msg!("lamports {}", lamports_diff);
