@@ -48,6 +48,7 @@ pub struct ResizeLegacyInscriptionAsUauth<'info> {
     #[account(mut)]
     pub inscription: Account<'info, Inscription>,
 
+    /// CHECK: Checked via a CPI call
     #[account(mut)]
     pub inscription_v2: UncheckedAccount<'info>,
 
@@ -146,8 +147,8 @@ pub fn check_metadata_uauth(
     authority_type: AuthorityType,
 ) -> Result<Metadata> {
     let mai = metaplex_metadata.to_account_info().clone();
-    let data: &[u8] = &mai.try_borrow_data()?[..];
-    let metadata_obj = Metadata::deserialize(&mut data.clone())?;
+    let mut data: &[u8] = &mai.try_borrow_data()?[..];
+    let metadata_obj = Metadata::deserialize(&mut data)?;
     if metadata_obj.mint != mint {
         return Err(LegacyInscriptionErrorCode::BadMint.into());
     }

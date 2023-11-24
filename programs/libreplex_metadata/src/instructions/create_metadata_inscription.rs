@@ -73,6 +73,7 @@ pub struct CreateInscriptionMetadata<'info> {
     #[account(mut)]
     pub inscription: UncheckedAccount<'info>,
 
+    /// CHECK: Checked via CPI
     #[account(mut)]
     pub inscription_v2: UncheckedAccount<'info>,
 
