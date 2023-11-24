@@ -2178,39 +2178,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "libreplex_shared"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "solana-program",
- "spl-token-2022 0.7.0",
-]
-
-[[package]]
-name = "libreplex_shop"
-version = "0.6.1"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "libreplex_metadata",
- "libreplex_shared 0.1.0",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token-2022 0.7.0",
-]
-
-[[package]]
 name = "libreplex_spl20"
 version = "0.0.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "libreplex_inscriptions",
- "libreplex_shared 0.0.0",
+ "libreplex_shared",
  "solana-program",
  "spl-token-2022 0.9.0",
 ]
