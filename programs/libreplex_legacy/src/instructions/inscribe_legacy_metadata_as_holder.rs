@@ -46,6 +46,7 @@ pub struct InscribeLegacyMetadataAsHolder<'info> {
     #[account(mut)]
     pub inscription: UncheckedAccount<'info>,
 
+    /// CHECK: Checked via a CPI call
     #[account(mut)]
     pub inscription_v2: UncheckedAccount<'info>,
 
