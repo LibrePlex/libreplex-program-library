@@ -2124,6 +2124,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "libreplex_legacy_spl20"
+version = "0.0.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "assert_matches",
+ "libreplex_inscriptions",
+ "mocha",
+ "mpl-token-metadata",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "spl-associated-token-account",
+]
+
+[[package]]
 name = "libreplex_metadata"
 version = "0.16.3"
 dependencies = [
@@ -2152,6 +2168,17 @@ dependencies = [
 
 [[package]]
 name = "libreplex_shared"
+version = "0.0.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "mpl-token-metadata",
+ "solana-program",
+ "spl-token 3.5.0",
+]
+
+[[package]]
+name = "libreplex_shared"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",
@@ -2168,12 +2195,24 @@ dependencies = [
  "anchor-spl",
  "assert_matches",
  "libreplex_metadata",
- "libreplex_shared",
+ "libreplex_shared 0.1.0",
  "mocha",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
  "spl-token-2022 0.7.0",
+]
+
+[[package]]
+name = "libreplex_spl20"
+version = "0.0.1"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "libreplex_inscriptions",
+ "libreplex_shared 0.0.0",
+ "solana-program",
+ "spl-token-2022 0.9.0",
 ]
 
 [[package]]
@@ -2392,9 +2431,9 @@ dependencies = [
 
 [[package]]
 name = "mpl-token-metadata"
-version = "3.2.0"
+version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc9e782878c85bfb68eef56a6732ebdf375cf116061d3d0a11884c3cdb61f2c4"
+checksum = "177204bbe7486b22ac35af2c91a82630f830a6ddd3392651aefde1ef346aba3d"
 dependencies = [
  "borsh 0.10.3",
  "num-derive 0.3.3",
