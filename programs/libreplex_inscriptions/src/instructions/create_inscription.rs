@@ -5,8 +5,6 @@ use crate::{
     InscriptionSummary, MediaType, EncodingType, InscriptionEventData, InscriptionV3,
 };
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::program::invoke;
-use anchor_lang::solana_program::system_instruction;
 
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -40,16 +38,13 @@ impl CreateInscriptionInput {
     }
 }
 
-const INSCRIPTIONS_PER_PAGE: u64 = 300000;
-
-
 #[event]
 pub struct InscriptionEventCreate {
     id: Pubkey,
     data: InscriptionEventData
 }
 
-const INITIAL_SIZE: usize = 10000;
+const INITIAL_SIZE: usize = 8;
 #[derive(Accounts)]
 #[instruction(inscription_input: CreateInscriptionInput)]
 pub struct CreateInscription<'info> {
@@ -144,12 +139,7 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
         Some(x) => x.to_owned(),
         None => ctx.accounts.payer.key(),
     };
-    let system_program = &ctx.accounts.system_program;
-    let payer = &ctx.accounts.payer;
     let inscription_data = &ctx.accounts.inscription_data;
-
-    let inscriptions_ranks_current_page = &mut ctx.accounts.inscription_ranks_current_page;
-    let inscriptions_ranks_next_page = &mut ctx.accounts.inscription_ranks_next_page;
 
     let clock = Clock::get()?;
 
@@ -203,24 +193,24 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
         }
     }
 
-    let page_to_update: &mut Box<Account<'_, InscriptionRankPage>>;
-    // if inscription_summary.inscription_count_total > inscription_input.current_rank_page * INSCRIPTIONS_PER_PAGE  {
-    if inscription_summary.inscription_count_total - 1
-        <= (input.current_rank_page as u64 + 1) * INSCRIPTIONS_PER_PAGE
-    {
-        page_to_update = inscriptions_ranks_current_page;
-    } else if inscription_summary.inscription_count_total - 1
-        <= (input.current_rank_page as u64 + 2) * INSCRIPTIONS_PER_PAGE
-    {
-        page_to_update = inscriptions_ranks_next_page;
-    } else {
-        return Err(ErrorCode::BadInscriptionRankPage.into());
-    }
+    // let page_to_update: &mut Box<Account<'_, InscriptionRankPage>>;
+    // // if inscription_summary.inscription_count_total > inscription_input.current_rank_page * INSCRIPTIONS_PER_PAGE  {
+    // if inscription_summary.inscription_count_total - 1
+    //     <= (input.current_rank_page as u64 + 1) * INSCRIPTIONS_PER_PAGE
+    // {
+    //     page_to_update = inscriptions_ranks_current_page;
+    // } else if inscription_summary.inscription_count_total - 1
+    //     <= (input.current_rank_page as u64 + 2) * INSCRIPTIONS_PER_PAGE
+    // {
+    //     page_to_update = inscriptions_ranks_next_page;
+    // } else {
+    //     return Err(ErrorCode::BadInscriptionRankPage.into());
+    // }
 
-    let page_rank_accountinfo = &mut page_to_update.to_account_info();
+    // let page_rank_accountinfo = &mut page_to_update.to_account_info();
 
-    reallocate_rank_page(page_rank_accountinfo, payer, system_program, inscription_summary.inscription_count_total as usize)?;
-    add_inscription_to_rank_page(page_to_update, inscription)?;
+    // reallocate_rank_page(page_rank_accountinfo, payer, system_program, inscription_summary.inscription_count_total as usize)?;
+    // add_inscription_to_rank_page(page_to_update, inscription)?;
 
     // for now, only fire events for inscription v1
     emit!(InscriptionEventCreate {
@@ -237,48 +227,5 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
         }
     });
 
-    Ok(())
-}
-
-fn reallocate_rank_page<'info>(
-    inscriptions_ranks_page: &mut AccountInfo<'info>,
-    payer: &AccountInfo<'info>,
-    system_program: &AccountInfo<'info>,
-    new_count: usize
-) -> Result<()> {
-    let new_size = 12 + (new_count % INSCRIPTIONS_PER_PAGE as usize) * 32;
-    println!("new size {}", new_size);
-    let rent = Rent::get()?;
-    let new_minimum_balance = rent.minimum_balance(new_size);
-    let lamports_diff = new_minimum_balance.saturating_sub(inscriptions_ranks_page.lamports());
-    println!("lamports_diff {}", lamports_diff);
-
-    invoke(
-        &system_instruction::transfer(
-            &payer.key(),
-            inscriptions_ranks_page.key,
-            lamports_diff,
-        ),
-        &[
-            payer.clone(),
-            inscriptions_ranks_page.clone(),
-            system_program.clone(),
-        ],
-    )?;
-    inscriptions_ranks_page.realloc(new_size, false)?;
-    Ok(())
-}
-
-fn add_inscription_to_rank_page(
-    inscriptions_ranks_page: &mut Box<Account<'_, InscriptionRankPage>>,
-    inscription: &mut Account<'_, Inscription>,
-) -> Result<()> {
-    println!("Adding inscription {}", inscription.key());
-    let inscriptions_ranks_current_page_account_info = inscriptions_ranks_page.to_account_info();
-    let current_data = inscriptions_ranks_current_page_account_info
-        .data
-        .borrow_mut();
-
-    InscriptionRankPage::add_inscription(inscriptions_ranks_page, current_data, inscription.key())?;
     Ok(())
 }
