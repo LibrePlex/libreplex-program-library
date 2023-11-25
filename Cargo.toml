@@ -2,6 +2,7 @@
 members = [
     "programs/*",
 ]
+resolver = "2"
 
 exclude = ["programs/libreplex_shared"]
 

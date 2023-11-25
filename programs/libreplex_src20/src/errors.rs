@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[error_code]
-pub enum Spl20Error {
+pub enum Src20Error {
     #[msg("Ticker too long")]
     TickerTooLong,
 

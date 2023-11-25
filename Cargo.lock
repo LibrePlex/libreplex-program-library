@@ -2131,6 +2131,8 @@ dependencies = [
  "anchor-spl",
  "assert_matches",
  "libreplex_inscriptions",
+ "libreplex_shared",
+ "libreplex_src20",
  "mocha",
  "mpl-token-metadata",
  "solana-program",
@@ -2178,7 +2180,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "libreplex_spl20"
+name = "libreplex_src20"
 version = "0.0.1"
 dependencies = [
  "anchor-lang",
@@ -2186,6 +2188,8 @@ dependencies = [
  "libreplex_inscriptions",
  "libreplex_shared",
  "solana-program",
+ "solana-program-test",
+ "solana-sdk",
  "spl-token-2022 0.9.0",
 ]
 

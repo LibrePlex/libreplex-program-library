@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
-use anchor_spl::{token::{mint_to, Mint, TokenAccount, Token, MintTo}, associated_token::AssociatedToken};
-use libreplex_inscriptions::{InscriptionSummary, Inscription, InscriptionV3};
+use anchor_spl::{
+    associated_token::AssociatedToken,
+    token::{mint_to, Mint, MintTo, Token, TokenAccount},
+};
+use libreplex_inscriptions::InscriptionSummary;
 use libreplex_shared::sysvar_instructions_program;
 
 use libreplex_inscriptions::{
@@ -8,27 +11,41 @@ use libreplex_inscriptions::{
     cpi::accounts::MakeInscriptionImmutable,
     cpi::accounts::ResizeInscription,
     cpi::accounts::WriteToInscription,
-    instructions::{SignerType, WriteToInscriptionInput}
+    instructions::{SignerType, WriteToInscriptionInput},
 };
 
+use crate::{errors::Src20Error, TokenDeployment};
 
-
-
-use crate::{TokenDeployment, errors::Spl20Error};
+#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct MintInput {
+    pub ticker: String,
+}
 
 #[derive(Accounts)]
+#[instruction(input: MintInput)]
 pub struct MintCtx<'info> {
-    #[account(mut)]
-    pub token_deployment: Account<'info, TokenDeployment>,
+    #[account(mut,
+        seeds = ["deployment".as_ref(), input.ticker.as_ref()], bump)]
+    pub deployment: Account<'info, TokenDeployment>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
     #[account(mut)]
     pub inscriber: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub fungible_mint: Account<'info, Mint>,
+
+    // when we create an "op" operation, we mint the corresponding amount of
+    // spl tokens into this token account
+    #[account(
+        mut,
+        constraint = fungible_escrow.owner == deployment.key(),
+        constraint = fungible_escrow.mint == fungible_mint.key()
+    )]
+    pub fungible_escrow: Account<'info, TokenAccount>,
 
     // legacy - TokenKeg
     // libre - Token22
@@ -40,40 +57,25 @@ pub struct MintCtx<'info> {
     )]
     pub non_fungible_mint: Account<'info, Mint>,
 
-    // when we create an "op" operation, we mint the corresponding amount of
-    // spl tokens into this token account
-    #[account(
-        mut,
-        constraint = token_account_escrow.owner == escrow.key(),
-        constraint = token_account_escrow.mint == fungible_mint.key()
-    )]
-    pub token_account_escrow: Account<'info, TokenAccount>,
-
     #[account(
         mut,
         token::mint = non_fungible_mint,
         token::authority = inscriber,
     )]
-    pub inscriber_token_account: Account<'info, TokenAccount>,
-
-    #[account(mut,
-        seeds = ["escrow".as_ref(), token_deployment.key().as_ref()], bump)]
-    pub escrow: UncheckedAccount<'info>,
+    pub non_fungible_token_account: Account<'info, TokenAccount>,
 
     #[account(mut)]
     pub inscription_summary: Account<'info, InscriptionSummary>,
 
-    // CHECK: passed in via CPI to libreplex_inscriptions program
+    /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
-    pub inscription: Account<'info, Inscription>,
+    pub inscription: UncheckedAccount<'info>,
 
+    /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
-    pub inscription_v3: Account<'info, InscriptionV3>,
+    pub inscription_v3: UncheckedAccount<'info>,
 
-    #[account(mut)]
-    pub master_edition: UncheckedAccount<'info>,
-
-    /// Check: sent via CPI
+    /// CHECK: sent via CPI to libreplex_inscriptions_program
     #[account()]
     pub inscription_data: UncheckedAccount<'info>,
 
@@ -83,7 +85,7 @@ pub struct MintCtx<'info> {
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// CHECK: Passed in via CPI
+    /// CHECK: Checked in constraint
     #[account(
         constraint = inscriptions_program.key() == libreplex_inscriptions::ID
     )]
@@ -92,36 +94,36 @@ pub struct MintCtx<'info> {
     #[account()]
     pub system_program: Program<'info, System>,
 
+    /// CHECK: Checked in constraint
     #[account(
         constraint = sysvar_instructions.key() == sysvar_instructions_program::ID
     )]
     sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn mint(ctx: Context<MintCtx>) -> Result<()> {
-    let token_deployment = &mut ctx.accounts.token_deployment;
+pub fn mint(ctx: Context<MintCtx>, input: MintInput) -> Result<()> {
+    let deployment = &mut ctx.accounts.deployment;
 
     // to be discussed w/ everybody and feedback. Not strictly in line with BRC 20 thinking
     // but seems pointless to issue tokens if they can never be valid
-    if token_deployment.number_of_tokens_issued >= token_deployment.max_number_of_tokens {
-        return Err(Spl20Error::MaxNumberOfTokenExceeded.into());
+    if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens {
+        return Err(Src20Error::MaxNumberOfTokenExceeded.into());
     }
 
     let inscription_summary = &ctx.accounts.inscription_summary;
 
     let inscriptions_program = &ctx.accounts.inscriptions_program;
-    let mint = &ctx.accounts.non_fungible_mint;
+    let non_fungible_mint = &ctx.accounts.non_fungible_mint;
     let inscription = &ctx.accounts.inscription;
     let inscription_v3 = &ctx.accounts.inscription_v3;
     let inscription_data = &ctx.accounts.inscription_data;
-    let token_account_escrow = &ctx.accounts.token_account_escrow;
+    let token_account_escrow = &ctx.accounts.fungible_escrow;
     let token_program = &ctx.accounts.token_program;
     let system_program = &ctx.accounts.system_program;
     let payer = &ctx.accounts.payer;
     let fungible_mint = &ctx.accounts.fungible_mint;
-    let escrow = &ctx.accounts.escrow;
 
-    token_deployment.number_of_tokens_issued += 1;
+    deployment.number_of_tokens_issued += 1;
 
     // mint X number of tokens into escrow token account
 
@@ -137,10 +139,10 @@ pub fn mint(ctx: Context<MintCtx>) -> Result<()> {
                 */
                 inscription_summary: inscription_summary.to_account_info(),
 
-                root: mint.to_account_info(),
+                root: non_fungible_mint.to_account_info(),
                 /// since root in this case can sign (we are creating a brand new mint),
                 /// it will sign
-                signer: mint.to_account_info(),
+                signer: non_fungible_mint.to_account_info(),
                 inscription: inscription.to_account_info(),
                 inscription2: inscription_v3.to_account_info(),
 
@@ -157,7 +159,7 @@ pub fn mint(ctx: Context<MintCtx>) -> Result<()> {
         },
     )?;
 
-    let data_bytes = token_deployment.mint_template.clone().into_bytes();
+    let data_bytes = deployment.mint_template.clone().into_bytes();
 
     libreplex_inscriptions::cpi::resize_inscription(
         CpiContext::new(
@@ -215,7 +217,7 @@ pub fn mint(ctx: Context<MintCtx>) -> Result<()> {
     ))?;
 
     /*
-        this the solana way where we meet brc 20 type thinking:
+        Step 2: this the solana way where we meet brc 20 type thinking:
 
         As we create a 'mint' op inscription, we also mint a corresponding amount of
         spl tokens into an escrow account held by a PDA.
@@ -224,15 +226,23 @@ pub fn mint(ctx: Context<MintCtx>) -> Result<()> {
         amount of traditional SPL token AND vice versa.
     */
 
+    let deployment_seeds: &[&[u8]] = &[
+        "deployment".as_bytes(),
+        input.ticker.as_ref(),
+        &[ctx.bumps.deployment],
+    ];
+
     mint_to(
-        CpiContext::new(
+        CpiContext::new_with_signer(
             token_program.to_account_info(),
             MintTo {
-            mint: fungible_mint.to_account_info(),
-            to: token_account_escrow.to_account_info(),
-            authority: escrow.to_account_info(),
-        }),
-        token_deployment.limit_per_mint,
+                mint: fungible_mint.to_account_info(),
+                to: token_account_escrow.to_account_info(),
+                authority: deployment.to_account_info(),
+            },
+            &[deployment_seeds],
+        ),
+        deployment.limit_per_mint,
     )?;
 
     Ok(())

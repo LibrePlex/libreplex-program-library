@@ -1,21 +1,16 @@
-use anchor_spl::associated_token::create;
-use anchor_spl::token_interface::spl_token_2022::offchain;
 use mpl_token_metadata::instructions::{
     CreateMasterEditionV3Builder, CreateMetadataAccountV3Builder,
 };
 
 use mpl_token_metadata::instructions::SignMetadataBuilder;
 
-// {
-//     sign_metadata, CreateMasterEditionArgs, MetadataInstruction,
-// };
 
 use anchor_spl::token::Mint as SplMint;
 use anchor_spl::token::ID;
 
 use mpl_token_metadata::types::Creator;
 use mpl_token_metadata::types::DataV2;
-use solana_program::instruction::Instruction;
+
 use solana_program::{
     program::{invoke, invoke_signed},
     system_instruction,
@@ -23,10 +18,6 @@ use solana_program::{
 
 use anchor_lang::prelude::*;
 
-// use mpl_token_metadata::{
-//     instructions::{create_master_edition_v3, create_metadata_accounts_v3},
-//     state::Creator,
-// };
 
 use crate::SharedError;
 
@@ -59,14 +50,12 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
     let payer_key = payer.key();
     let mint_key = mint.key();
     let metadata_key = metadata.key();
-    let token_metadata_program_key = metadata_program.key();
-
+    
     let mint_infos = vec![payer.to_account_info(), mint.to_account_info()];
 
     let owner_key = &owner.key();
 
-    // this is the PDA of the multimint itself
-
+    
     // CREATE MINT
     invoke_signed(
         &system_instruction::create_account(
@@ -80,9 +69,6 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
         mint_infos.as_slice(),
         &[&authority_seeds],
     )?;
-
-    // msg!("mint {}", mint_key);
-    // msg!("owner {}", owner_key);
 
     // initialize mint
     invoke(
@@ -151,37 +137,6 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
         }
     }
 
-    // // CREATE METADATA
-
-    let metadata_infos = vec![
-        metadata.to_account_info(),
-        mint.to_account_info(),
-        owner.to_account_info(), // mint authority: initially equal to payer
-        payer.to_account_info(), // update authority: initially equal to payer
-        metadata_program.to_account_info(),
-        token_program.to_account_info(),
-        system_program.to_account_info(),
-        rent.to_account_info(),
-        verified_creator.to_account_info(),
-    ];
-
-    // program_id: Pubkey,
-    // metadata_account: Pubkey,
-    // mint: Pubkey,
-    // mint_authority: Pubkey,
-    // payer: Pubkey,
-    // update_authority: Pubkey,
-    // name: String,
-    // symbol: String,
-    // uri: String,
-    // creators: Option<Vec<Creator>>,
-    // seller_fee_basis_points: u16,
-    // update_authority_is_signer: bool,
-    // is_mutable: bool,
-    // collection: Option<Collection>,
-    // uses: Option<Uses>,
-    // collection_details: Option<CollectionDetails>,
-
     let mut create_metadata_builder = CreateMetadataAccountV3Builder::new();
 
     create_metadata_builder
@@ -199,32 +154,6 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
             collection: None,
             uses: None,
         });
-
-    let ix = create_metadata_builder.instruction();
-
-    // invoke_signed(
-    //     &create_metadata_accounts_v3(
-    //         token_metadata_program_key,
-    //         // metadata_key,
-    //         mint_key,
-    //         *owner_key, // mint_authority_key,
-    //         payer_key,
-    //         // payer_key,
-    //         *owner_key,
-    //         name.clone(),         // name
-    //         symbol.clone(),       // symbol
-    //         offchain_url.clone(), // uri
-    //         creators.to_owned(),
-    //         royalties_basis_points,
-    //         true,
-    //         true,
-    //         None,
-    //         None,
-    //         None,
-    //     ),
-    //     metadata_infos.as_slice(),
-    //     &[&authority_seeds],
-    // )?;
 
     // only create master edition and verify creators if decimals is 0 (i.e. we
     // have an NFT)
@@ -260,21 +189,7 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
 
                 let ix = create_master_edition_builder.instruction();
 
-                invoke_signed(
-                    &ix,
-                    // &create_master_edition_v3(
-                    //     metadata_program.key(),
-                    //     x.key(),
-                    //     mint.key(),
-                    //     owner.key(),
-                    //     owner.key(),
-                    //     metadata.key(),
-                    //     payer.key(),
-                    //     max_supply, // Some(candy_machine.data.max_supply),
-                    // ),
-                    master_edition_infos.as_slice(),
-                    &[authority_seeds],
-                )?;
+                invoke_signed(&ix, master_edition_infos.as_slice(), &[authority_seeds])?;
 
                 match &creators {
                     None => {}
@@ -286,19 +201,12 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
                             ];
                             let mut sign_metadata_builder = SignMetadataBuilder::new();
 
-                            let ix = sign_metadata_builder.metadata(metadata.key())
-                            .creator(verified_creator.key()).instruction();
+                            let ix = sign_metadata_builder
+                                .metadata(metadata.key())
+                                .creator(verified_creator.key())
+                                .instruction();
 
-                            invoke_signed(
-                                &ix,
-                                // &sign_metadata(
-                                //     metadata_program.key(),
-                                //     metadata.key(),
-                                //     verified_creator.key(),
-                                // ),
-                                &sign_metadata_infos,
-                                &[authority_seeds],
-                            )?;
+                            invoke_signed(&ix, &sign_metadata_infos, &[authority_seeds])?;
                         }
                         false => {}
                     },
@@ -312,34 +220,3 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
 
     Ok(())
 }
-
-// #[allow(clippy::too_many_arguments)]
-// pub fn create_master_edition_v2(
-//     program_id: Pubkey,
-//     edition: Pubkey,
-//     mint: Pubkey,
-//     update_authority: Pubkey,
-//     mint_authority: Pubkey,
-//     metadata: Pubkey,
-//     payer: Pubkey,
-//     max_supply: Option<u64>,
-// ) -> Instruction {
-//     let accounts = vec![
-//         AccountMeta::new(edition, false),
-//         AccountMeta::new(mint, false),
-//         AccountMeta::new_readonly(update_authority, true),
-//         AccountMeta::new_readonly(mint_authority, true),
-//         AccountMeta::new(payer, true),
-//         AccountMeta::new(metadata, false),
-//         AccountMeta::new_readonly(spl_token::id(), false),
-//         AccountMeta::new_readonly(solana_program::system_program::id(), false),
-//     ];
-
-//     Instruction {
-//         program_id,
-//         accounts,
-//         data: MetadataInstruction::CreateMasterEdition(CreateMasterEditionArgs { max_supply })
-//             .try_to_vec()
-//             .unwrap(),
-//     }
-// }

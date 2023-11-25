@@ -6,10 +6,10 @@ use libreplex_inscriptions::{
     cpi::accounts::MakeInscriptionImmutable,
     cpi::accounts::ResizeInscription,
     cpi::accounts::WriteToInscription,
-    instructions::{SignerType, WriteToInscriptionInput}, InscriptionSummary, Inscription, InscriptionV3,
+    instructions::{SignerType, WriteToInscriptionInput}, InscriptionSummary,
 };
 
-use crate::{TokenDeployment, TICKER_LIMIT, errors::Spl20Error, ROOT_TYPE_LIMIT};
+use crate::{TokenDeployment, TICKER_LIMIT, errors::Src20Error};
 
 
 pub mod sysvar_instructions_program {
@@ -22,8 +22,8 @@ pub mod sysvar_instructions_program {
 #[instruction(input: DeployInput)]
 pub struct DeployCtx<'info>  {
     #[account(init, payer = payer, space = 8 + TokenDeployment::INIT_SPACE, 
-        seeds = ["spl20".as_ref(), input.ticker.as_ref()], bump)]
-    pub token_deployment: Account<'info, TokenDeployment>,
+        seeds = ["deployment".as_ref(), input.ticker.as_ref()], bump)]
+    pub deployment: Account<'info, TokenDeployment>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -32,42 +32,41 @@ pub struct DeployCtx<'info>  {
         init,
         payer = payer,
         mint::decimals = input.decimals,
-        mint::authority = payer,
+        mint::authority = deployment, // this is important
     )]
-    pub mint: Account<'info, Mint>,
+    pub fungible_mint: Account<'info, Mint>,
 
     #[account(
         init,
         payer = payer,
-        token::mint = mint,
-        token::authority = escrow,
+        mint::decimals = 0,
+        mint::authority = payer,
     )]
-    pub token_account_escrow: Account<'info, TokenAccount>,
+    pub non_fungible_mint: Account<'info, Mint>,
 
 
-    #[account(mut,
-        seeds = ["escrow".as_ref(), token_deployment.key().as_ref()], bump)]
-    pub escrow: UncheckedAccount<'info>,
+    #[account(
+        init,
+        payer = payer,
+        token::mint = fungible_mint,
+        token::authority = deployment,
+    )]
+    pub fungible_escrow_token_account: Account<'info, TokenAccount>,
 
     #[account(mut)]
     pub inscription_summary: Account<'info, InscriptionSummary>,
 
-    // CHECK: passed in via CPI to libreplex_inscriptions program
+    /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
-    pub inscription: Account<'info, Inscription>,
+    pub inscription: UncheckedAccount<'info>,
 
+    /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
-    pub inscription_v3: Account<'info, InscriptionV3>,
+    pub inscription_v3: UncheckedAccount<'info>,
+    
 
-    /// CHECK: Passed in via CPI
+      /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
-    pub inscription_ranks_current_page: UncheckedAccount<'info>,
-
-    /// CHECK: Passed in via CPI
-    #[account(mut)]
-    pub inscription_ranks_next_page: UncheckedAccount<'info>,
-
-    #[account()]
     pub inscription_data: UncheckedAccount<'info>,
 
     #[account()]
@@ -76,7 +75,7 @@ pub struct DeployCtx<'info>  {
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// CHECK: Passed in via CPI
+    /// CHECK: ID checked via constraint
     #[account(
         constraint = inscriptions_program.key() == libreplex_inscriptions::ID
     )]
@@ -85,7 +84,7 @@ pub struct DeployCtx<'info>  {
     #[account()]
     pub system_program: Program<'info, System>,
 
-    
+    /// CHECK: ID checked via constraint
     #[account(
         constraint = sysvar_instructions.key() == sysvar_instructions_program::ID
     )]
@@ -93,50 +92,45 @@ pub struct DeployCtx<'info>  {
 
 }
 
-#[derive(AnchorDeserialize, AnchorSerialize)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct DeployInput {
-    pub creator: Pubkey,
     pub limit_per_mint: u64, // this number of SPL tokens are issued into the escrow when an op: 'mint' comes in 
     pub max_number_of_tokens: u64, // this is the max *number* of tokens
-    pub collection_mint: Pubkey,
     pub ticker: String,
     pub image_: String,
-    pub root_type: String,
     pub decimals: u8,
     pub deployment_template: String,
     pub mint_template: String,
+    pub offchain_url: String
 }
 
 pub fn deploy(ctx: Context<DeployCtx>, input: DeployInput) -> Result<()> {
-    let deployment = &mut ctx.accounts.token_deployment;
-
-    if input.ticker.len() > TICKER_LIMIT {
-        return Err(Spl20Error::TickerTooLong.into());
-    }
-
-    if input.root_type.len() > ROOT_TYPE_LIMIT {
-        return Err(Spl20Error::RootTypeTooLong.into())
-    }
-    
-    // create 
-    deployment.creator = input.creator;
-    deployment.limit_per_mint = input.limit_per_mint;
-    deployment.max_number_of_tokens = input.max_number_of_tokens;
-    deployment.collection_mint = input.collection_mint;
-    deployment.ticker = input.ticker;
-    deployment.root_type = input.root_type;
-    deployment.number_of_tokens_issued = 0;
-    deployment.deployment_template = input.deployment_template;
-    deployment.mint_template = input.mint_template;
-
+    let deployment = &mut ctx.accounts.deployment;
     let system_program = &ctx.accounts.system_program;
     let payer = &ctx.accounts.payer;
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_summary = &ctx.accounts.inscription_summary;
-    let mint = &ctx.accounts.mint;
+    let mint = &ctx.accounts.fungible_mint;
     let inscription = &ctx.accounts.inscription;
     let inscription_v3 = &ctx.accounts.inscription_v3;
     let inscription_data = &ctx.accounts.inscription_data;
+    
+
+    if input.ticker.len() > TICKER_LIMIT {
+        return Err(Src20Error::TickerTooLong.into());
+    }
+
+    
+    // create 
+    deployment.creator = payer.key();
+    deployment.limit_per_mint = input.limit_per_mint;
+    deployment.max_number_of_tokens = input.max_number_of_tokens;
+    deployment.ticker = input.ticker;
+    deployment.number_of_tokens_issued = 0;
+    deployment.deployment_template = input.deployment_template;
+    deployment.mint_template = input.mint_template;
+
+
     
     // STEP 1 - create inscription
     libreplex_inscriptions::cpi::create_inscription_v2(
@@ -161,7 +155,9 @@ pub fn deploy(ctx: Context<DeployCtx>, input: DeployInput) -> Result<()> {
             },
         ),
         libreplex_inscriptions::instructions::CreateInscriptionInput {
-            authority: Some(payer.key()), // this includes update auth / holder, hence
+            // the authority here doesn't matter because we will make this immutable at the
+            // end of the transaction
+            authority: Some(payer.key()),
             current_rank_page: 0,
             signer_type: SignerType::Root,
             validation_hash: None,
@@ -213,6 +209,7 @@ pub fn deploy(ctx: Context<DeployCtx>, input: DeployInput) -> Result<()> {
         },
     )?;
 
+    // set update auth to 1111111111111111
     libreplex_inscriptions::cpi::make_inscription_immutable(CpiContext::new(
         inscriptions_program.to_account_info(),
         MakeInscriptionImmutable {

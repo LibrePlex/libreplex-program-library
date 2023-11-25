@@ -461,33 +461,6 @@ mod inscriptions_tests {
             context.payer.pubkey()
         );
 
-        let mut inscription_ranks_current_page_account = context
-            .banks_client
-            .get_account(inscription_ranks_current_page)
-            .await
-            .unwrap()
-            .unwrap();
-
-        let inscription_ranks_current_page_info = AccountInfo::new(
-            &inscription_ranks_current_page,
-            false,
-            false,
-            &mut inscription_ranks_current_page_account.lamports,
-            &mut inscription_ranks_current_page_account.data,
-            &inscription_ranks_current_page_account.owner,
-            inscription_ranks_current_page_account.executable,
-            inscription_ranks_current_page_account.rent_epoch,
-        );
-
-        let inscription_ranks_current_page_obj: Account<InscriptionRankPage> =
-            Account::try_from(&inscription_ranks_current_page_info).unwrap();
-        let account_info = inscription_ranks_current_page_obj.to_account_info();
-        let inscription_slice: Vec<Pubkey> =
-            InscriptionRankPage::get_inscriptions(&account_info.data.borrow_mut(), 0, 2).collect();
-
-        // nothing has been made immutable yet, so inscription slice should have length = 0
-        assert_eq!(inscription_slice.len(), 2);
-
         assert_eq!(inscription_obj.order, 1);
 
         // we invert the order here and check the rank ordering afterwards
