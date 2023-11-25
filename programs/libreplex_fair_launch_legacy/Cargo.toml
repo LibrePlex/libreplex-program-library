@@ -8,7 +8,7 @@ repository = "https://github.com/LibrePlex/metadata"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "libreplex_legacy_src20"
+name = "libreplex_fair_launch_legacy"
 
 [features]
 no-entrypoint = []
