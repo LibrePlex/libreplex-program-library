@@ -1,5 +1,5 @@
 [package]
-name = "libreplex_legacy_spl20"
+name = "libreplex_fair_launch_legacy"
 version = "0.0.0"
 description = "Created with Anchor"
 edition = "2021"
@@ -22,7 +22,7 @@ idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build", "libreplex_inscrip
 anchor-lang = {version = "~0.29", features = ["init-if-needed"]}
 anchor-spl = {version = "~0.29"}
 libreplex_inscriptions = {version = "*", path="../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
-libreplex_src20 = {version = "*", path="../libreplex_src20", features =["cpi", "no-entrypoint"]}
+libreplex_fair_launch = {version = "*", path="../libreplex_fair_launch", features =["cpi", "no-entrypoint"]}
 libreplex_shared = {version = "*", path="../libreplex_shared", features =["cpi", "no-entrypoint"]}
 spl-associated-token-account = "2.2.0"
 solana-program = {version = "~1.16"}

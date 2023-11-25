@@ -4,7 +4,7 @@ use anchor_spl::token::TokenAccount;
 
 use libreplex_inscriptions::InscriptionSummary;
 use libreplex_shared::create_metadata_and_masteredition;
-use libreplex_src20::DeployInput;
+use libreplex_fair_launch::DeployInput;
 use mpl_token_metadata::types::Creator;
 
 
@@ -104,7 +104,7 @@ pub struct DeployLegacyCtx<'info>  {
     sysvar_instructions: UncheckedAccount<'info>,
 
     #[account(
-        constraint = libreplex_src20_program.key() == libreplex_src20::ID
+        constraint = libreplex_src20_program.key() == libreplex_fair_launch::ID
     )]
     libreplex_src20_program: UncheckedAccount<'info>
 
@@ -137,10 +137,10 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>, input: &DeployInput) -> Result<()> 
    let sysvar_instructions = &ctx.accounts.sysvar_instructions;
    let metadata_program = &ctx.accounts.metadata_program;
 
-    libreplex_src20::cpi::deploy(
+    libreplex_fair_launch::cpi::deploy(
         CpiContext::new(
             libreplex_src20_program.to_account_info(),
-            libreplex_src20::cpi::accounts::DeployCtx {
+            libreplex_fair_launch::cpi::accounts::DeployCtx {
                 deployment: deployment.to_account_info(),
                 payer: payer.to_account_info(),
                 fungible_mint: fungible_mint.to_account_info(),

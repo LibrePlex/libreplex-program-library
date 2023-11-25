@@ -4,7 +4,7 @@ use anchor_spl::{
     token::{mint_to, Mint, MintTo, Token, TokenAccount},
 };
 use libreplex_inscriptions::InscriptionSummary;
-use libreplex_shared::sysvar_instructions_program;
+// use libreplex_shared::sysvar_instructions_program;
 
 use libreplex_inscriptions::{
     cpi::accounts::CreateInscriptionV2,
@@ -14,7 +14,7 @@ use libreplex_inscriptions::{
     instructions::{SignerType, WriteToInscriptionInput},
 };
 
-use crate::{errors::Src20Error, TokenDeployment};
+use crate::{errors::Src20Error, TokenDeployment, swap_to_fungible::sysvar_instructions_program};
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct MintInput {

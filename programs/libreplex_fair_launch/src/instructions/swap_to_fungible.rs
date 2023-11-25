@@ -18,7 +18,7 @@ pub mod sysvar_instructions_program {
 */
 
 #[derive(Accounts)]
-pub struct SwapToNonFungibleCtx<'info> {
+pub struct SwapToFungibleCtx<'info> {
     #[account(
         constraint = deployment.collection_mint == non_fungible_mint.key(),
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump
@@ -32,18 +32,18 @@ pub struct SwapToNonFungibleCtx<'info> {
     #[account(mut)]
     pub fungible_mint: Account<'info, Mint>,
 
-    /* FUNGIBLE GOES INTO THE ESCROW */
+    // already exists & already holds sufficient quantity of fungible tokens
     #[account(
         mut,
         token::mint = fungible_mint,
-        token::authority = deployment, // escrow is always owned by deployment
+        token::authority = deployment,
     )]
     pub fungible_escrow: Account<'info, TokenAccount>,
 
     #[account(
         mut,
         token::mint = fungible_mint,
-        token::authority = payer, // coimes out of the payer account
+        token::authority = deployment,
     )]
     pub fungible_source_token_account: Account<'info, TokenAccount>,
 
@@ -51,34 +51,34 @@ pub struct SwapToNonFungibleCtx<'info> {
         init_if_needed,
         payer = payer,
         token::mint = fungible_mint,
-        token::authority = deployment, // and into the escrow
+        token::authority = payer,
     )]
     pub fungible_target_token_account: Account<'info, TokenAccount>,
 
-    /* NON-FUNGIBLE COMES OUT OF THE ESCROW */
+    /* non-fungible accounts */
     #[account(mut)]
     pub non_fungible_mint: Account<'info, Mint>,
 
     #[account(
         init_if_needed,
         payer = payer,
-        token::mint = fungible_mint,
-        token::authority = deployment, // escrow is always owned by the deployment
+        token::mint = non_fungible_mint,
+        token::authority = deployment,
     )]
     pub non_fungible_escrow: Account<'info, TokenAccount>,
 
     #[account(
         mut,
         token::mint = non_fungible_mint,
-        token::authority = deployment, // comes out of the escrow account
+        token::authority = payer,
     )]
     pub non_fungible_source_token_account: Account<'info, TokenAccount>,
 
     #[account(
         init_if_needed,
         payer = payer,
-        token::mint = fungible_mint,
-        token::authority = payer, // and to the payer
+        token::mint = non_fungible_mint,
+        token::authority = deployment,
     )]
     pub non_fungible_target_token_account: Account<'info, TokenAccount>,
 
@@ -97,14 +97,14 @@ pub struct SwapToNonFungibleCtx<'info> {
     #[account()]
     pub system_program: Program<'info, System>,
 
-   /// CHECK: Checked in constraint
+    /// CHECK: Checked in constraint
     #[account(
         constraint = sysvar_instructions.key() == sysvar_instructions_program::ID
     )]
     sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
+pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
 
     let payer = &ctx.accounts.payer;
@@ -122,7 +122,7 @@ pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
     let system_program = &ctx.accounts.system_program;
 
     // simples. two steps:
-    // 1) move the non_fungible out of the escrow
+    // 1) move the non_fungible into the escrow
 
     transfer_non_pnft(
         &token_program.to_account_info(),
@@ -145,7 +145,7 @@ pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
         &[ctx.bumps.deployment],
     ];
 
-    // 2) move the fungible_mint into the escrow
+    // // 2) move the fungible_mint out of the escrow
     transfer_non_pnft(
         &token_program.to_account_info(),
         &fungible_source_token_account.to_account_info(),

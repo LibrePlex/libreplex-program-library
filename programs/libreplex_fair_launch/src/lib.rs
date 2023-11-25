@@ -10,7 +10,7 @@ pub mod errors;
 pub use state::*;
 
 #[program]
-pub mod libreplex_src20 {
+pub mod libreplex_fair_launch {
 
     use super::*;
 
