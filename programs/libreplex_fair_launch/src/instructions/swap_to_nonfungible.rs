@@ -6,7 +6,7 @@ use anchor_spl::{
 use libreplex_shared::operations::transfer_non_pnft;
 // use libreplex_shared::operations::transfer_non_pnft;
 
-use crate::TokenDeployment;
+use crate::Deployment;
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -21,10 +21,10 @@ pub mod sysvar_instructions_program {
 #[derive(Accounts)]
 pub struct SwapToNonFungibleCtx<'info> {
     #[account(
-        constraint = deployment.collection_mint == non_fungible_mint.key(),
+        constraint = deployment.fungible_mint == non_fungible_mint.key(),
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump
     )]
-    pub deployment: Account<'info, TokenDeployment>,
+    pub deployment: Account<'info, Deployment>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -66,14 +66,14 @@ pub struct SwapToNonFungibleCtx<'info> {
         token::mint = fungible_mint,
         token::authority = deployment, // escrow is always owned by the deployment
     )]
-    pub non_fungible_escrow: Account<'info, TokenAccount>,
+    pub non_fungible_token_acount_escrow: Account<'info, TokenAccount>,
 
     #[account(
         mut,
         token::mint = non_fungible_mint,
         token::authority = deployment, // comes out of the escrow account
     )]
-    pub non_fungible_source_token_account: Account<'info, TokenAccount>,
+    pub non_fungible_token_account_escrow: Account<'info, TokenAccount>,
 
     #[account(
         init_if_needed,
@@ -109,7 +109,7 @@ pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
 
     let payer = &ctx.accounts.payer;
-    let non_fungible_source_token_account = &ctx.accounts.non_fungible_source_token_account;
+    let non_fungible_source_token_account = &ctx.accounts.non_fungible_token_account_escrow;
     let non_fungible_target_token_account = &ctx.accounts.non_fungible_target_token_account;
     let non_fungible_mint = &ctx.accounts.non_fungible_mint;
 
@@ -118,7 +118,7 @@ pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
     let fungible_target_token_account = &ctx.accounts.fungible_target_token_account;
     let fungible_mint = &ctx.accounts.fungible_mint;
 
-    let deployment = &ctx.accounts.deployment;
+    let deployment = &mut ctx.accounts.deployment;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
 
@@ -160,6 +160,23 @@ pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
         &payer.to_account_info(),
         deployment.limit_per_mint,
     )?;
+
+
+    // mark one of the non fungibles as moving out of the contract
+    deployment.escrow_non_fungible_count -= 1;
+
+    if (deployment.number_of_tokens_issued - deployment.escrow_non_fungible_count)
+        * deployment.limit_per_mint
+        - fungible_target_token_account.amount != 0 
+    {   
+        // Like with swap-to-fungible, this would indicates somebody
+        // is trying to do something naughty, so we put in a bookkeeping check
+        // that ensures the *amount* of non-fungibles
+        // outside of the contract always matches the amount of fungible inside
+        // the contract
+        panic!("Post-tx balances would not be 0. Aborting.")
+         
+    }
 
     // We have crossed the NFT / Defi barrier. As a side effect have a splittable SPL 20
 

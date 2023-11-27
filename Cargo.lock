@@ -2124,30 +2124,13 @@ dependencies = [
  "anchor-spl",
  "libreplex_inscriptions",
  "libreplex_shared",
- "solana-program",
-]
-
-[[package]]
-name = "libreplex_fair_launch_legacy"
-version = "0.0.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "libreplex_fair_launch",
- "libreplex_inscriptions",
- "libreplex_shared",
- "mocha",
  "mpl-token-metadata",
  "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-associated-token-account",
 ]
 
 [[package]]
 name = "libreplex_inscriptions"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "anchor-attribute-event",
  "anchor-derive-accounts",
@@ -2161,7 +2144,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_legacy"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

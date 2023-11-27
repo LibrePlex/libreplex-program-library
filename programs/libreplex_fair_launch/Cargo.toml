@@ -23,3 +23,4 @@ anchor-spl = {version = "~0.29"}
 libreplex_inscriptions = {version="*", path = "../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
 solana-program = {version = "~1.16"}
 libreplex_shared = {version= "*", path = "../libreplex_shared", features=["no-entrypoint"] }
+mpl-token-metadata = { version="~3" }

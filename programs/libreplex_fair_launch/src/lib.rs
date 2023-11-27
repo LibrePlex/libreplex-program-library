@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("insFmVukT9LYVygNbdpSjbxPy4FtQ6WgcuChnxDLbAm");
+declare_id!("8bvPnYE5Pvz2Z9dE6RAqWr1rzLknTndZ9hwvRE6kPDXP");
 
 pub mod state;
 pub mod errors;
@@ -15,23 +15,29 @@ pub mod libreplex_fair_launch {
     use super::*;
 
 
-   pub fn deploy(
-        ctx: Context<DeployCtx>,
-        input: DeployInput
+   pub fn deploy_legacy(
+        ctx: Context<DeployLegacyCtx>,
     ) -> Result<()> {
-        instructions::deploy::deploy(
+        instructions::deploy_legacy::deploy(
+            ctx
+        )
+    }   
+
+    pub fn initialise(
+        ctx: Context<InitialiseCtx>,
+        input: InitialiseInput
+    ) -> Result<()> {
+        instructions::initialise::initialise(
             ctx,
             input
         )
     }   
 
-    pub fn mint(
-        ctx: Context<MintCtx>,
-        input: MintInput
+    pub fn mint_legacy(
+        ctx: Context<MintLegacyCtx>,
     ) -> Result<()> {
-        instructions::mint::mint(
-            ctx,
-            input
+        instructions::mint_legacy::mint_legacy(
+            ctx
         )
     }   
 
