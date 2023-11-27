@@ -42,7 +42,7 @@ pub struct ResizeLegacyInscriptionAsUauth<'info> {
     pub mint: Box<Account<'info, Mint>>,
 
     /// CHECK: Checked in logic
-    #[account(owner = mpl_token_metadata::ID)]
+    #[account()]
     pub legacy_metadata: UncheckedAccount<'info>,
 
     #[account(mut)]
@@ -146,6 +146,10 @@ pub fn check_metadata_uauth(
     authority: Pubkey,
     authority_type: AuthorityType,
 ) -> Result<Metadata> {
+    if metaplex_metadata.owner != &mpl_token_metadata::ID {
+        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
+    }
+    
     let mai = metaplex_metadata.to_account_info().clone();
     let mut data: &[u8] = &mai.try_borrow_data()?[..];
     let metadata_obj = Metadata::deserialize(&mut data)?;
