@@ -42,7 +42,7 @@ pub struct ResizeLegacyInscriptionAsUauth<'info> {
     pub mint: Box<Account<'info, Mint>>,
 
     /// CHECK: Checked in logic
-    #[account()]
+    #[account(owner = mpl_token_metadata::ID)]
     pub legacy_metadata: UncheckedAccount<'info>,
 
     #[account(mut)]
