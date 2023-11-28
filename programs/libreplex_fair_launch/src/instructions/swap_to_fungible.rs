@@ -20,79 +20,53 @@ pub mod sysvar_instructions_program {
 #[derive(Accounts)]
 pub struct SwapToFungibleCtx<'info> {
     #[account(
-        constraint = deployment.fungible_mint == non_fungible_mint.key(),
+        mut,
+        constraint = deployment.fungible_mint == fungible_mint.key(),
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump
     )]
-    pub deployment: Account<'info, Deployment>,
+    pub deployment: Box<Account<'info, Deployment>>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
 
     /* fungible accounts */
     #[account(mut)]
-    pub fungible_mint: Account<'info, Mint>,
-
-    // already exists & already holds sufficient quantity of fungible tokens
-    #[account(
-        mut,
-        token::mint = fungible_mint,
-        token::authority = deployment,
-    )]
-    pub fungible_escrow: Account<'info, TokenAccount>,
+    pub fungible_mint: Box<Account<'info, Mint>>,
 
     #[account(
         mut,
         token::mint = fungible_mint,
         token::authority = deployment,
     )]
-    pub fungible_token_account_escrow: Account<'info, TokenAccount>,
+    pub fungible_token_account_escrow: Box<Account<'info, TokenAccount>>,
 
+    /// CHECK: derivation checked in Logic
     #[account(
-        init_if_needed,
-        payer = payer,
-        token::mint = fungible_mint,
-        token::authority = payer,
+        mut
     )]
-    pub fungible_target_token_account: Account<'info, TokenAccount>,
+    pub fungible_target_token_account: UncheckedAccount<'info>,
 
     /* non-fungible accounts */
     #[account(mut)]
-    pub non_fungible_mint: Account<'info, Mint>,
-
-    #[account(
-        init_if_needed,
-        payer = payer,
-        token::mint = non_fungible_mint,
-        token::authority = deployment,
-    )]
-    pub non_fungible_escrow: Account<'info, TokenAccount>,
+    pub non_fungible_mint: Box<Account<'info, Mint>>,
 
     #[account(
         mut,
         token::mint = non_fungible_mint,
         token::authority = payer,
     )]
-    pub non_fungible_source_token_account: Account<'info, TokenAccount>,
+    pub non_fungible_source_token_account: Box<Account<'info, TokenAccount>>,
 
-    #[account(
-        init_if_needed,
-        payer = payer,
-        token::mint = non_fungible_mint,
-        token::authority = deployment,
+    /// CHECK: derivation checked in Logic
+    #[account(mut
     )]
-    pub non_fungible_target_token_account: Account<'info, TokenAccount>,
+    pub non_fungible_target_token_account: UncheckedAccount<'info>,
 
     #[account()]
     pub token_program: Program<'info, Token>,
 
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
-
-    /// CHECK: Passed in via CPI
-    #[account(
-        constraint = inscriptions_program.key() == libreplex_inscriptions::ID
-    )]
-    pub inscriptions_program: UncheckedAccount<'info>,
 
     #[account()]
     pub system_program: Program<'info, System>,
@@ -138,9 +112,8 @@ pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
         1,
     )?;
 
-    let deployment_key = deployment.key();
     let authority_seeds = &[
-        deployment_key.as_ref(),
+        "deployment".as_bytes(),
         deployment.ticker.as_ref(),
         &[ctx.bumps.deployment],
     ];
@@ -160,20 +133,8 @@ pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
         deployment.limit_per_mint,
     )?;
 
+
     deployment.escrow_non_fungible_count += 1;
-
-    if (deployment.number_of_tokens_issued - deployment.escrow_non_fungible_count)
-        * deployment.limit_per_mint
-        - fungible_source_token_account.amount != 0 
-    {   
-        // This indicates somebody is trying to do something naughty.
-        // this is a bookkeeping check that ensures the *amount* of non-fungibles
-        // outside of the contract always matches the amount of fungible inside
-        // the contract
-        panic!("Post-tx balances would not be 0. Aborting.")
-         
-    }
-
     // We have crossed the NFT / Defi barrier. As a side effect have a splittable SPL 20
 
     Ok(())

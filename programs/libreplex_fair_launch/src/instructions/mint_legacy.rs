@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{mint_to, Mint, MintTo, Token, TokenAccount},
+    token::{mint_to, Mint, MintTo, Token},
 };
 use libreplex_inscriptions::InscriptionSummary;
 // use libreplex_shared::sysvar_instructions_program;
@@ -13,8 +13,8 @@ use libreplex_inscriptions::{
     cpi::accounts::WriteToInscription,
     instructions::{SignerType, WriteToInscriptionInput},
 };
-use libreplex_shared::create_metadata_and_masteredition;
-use mpl_token_metadata::types::Creator;
+use libreplex_shared::{SharedError, create_mint_metadata_and_masteredition::create_mint_with_metadata_and_masteredition, MintAccounts};
+use mpl_token_metadata::types::{Creator, TokenStandard};
 
 use crate::{
     errors::FairLaunchError, swap_to_fungible::sysvar_instructions_program, Deployment, Hashlist, MintAndOrder,
@@ -27,7 +27,7 @@ pub struct MintLegacyCtx<'info> {
     pub deployment: Account<'info, Deployment>,
 
     #[account(mut, 
-        realloc = (8 + 4 + (deployment.number_of_tokens_issued + 1)*36 )as usize,
+        realloc = (8 + 32 + 4 + (deployment.number_of_tokens_issued + 1)* (32 + 8) )as usize,
         realloc::payer = payer,
         realloc::zero = false,
         seeds = ["hashlist".as_bytes(), 
@@ -45,14 +45,11 @@ pub struct MintLegacyCtx<'info> {
     #[account(mut)]
     pub fungible_mint: Account<'info, Mint>,
 
-    // when we create an "op" operation, we mint the corresponding amount of
-    // spl tokens into this token account
+    /// CHECK: Checked in logic, created as necessary
     #[account(
         mut,
-        constraint = fungible_token_account_escrow.owner == deployment.key(),
-        constraint = fungible_token_account_escrow.mint == fungible_mint.key()
     )]
-    pub fungible_token_account_escrow: Account<'info, TokenAccount>,
+    pub fungible_token_account_escrow: UncheckedAccount<'info>,
 
     // legacy - TokenKeg
     // libre - Token22
@@ -60,25 +57,22 @@ pub struct MintLegacyCtx<'info> {
         init,
         payer = payer,
         mint::decimals = 0,
-        mint::authority = payer, // will be a non
+        mint::freeze_authority = deployment,
+        mint::authority = deployment // will be a non
     )]
     pub non_fungible_mint: Account<'info, Mint>,
 
-    #[account(
-        mut,
-        token::mint = non_fungible_mint,
-        token::authority = inscriber,
-    )]
-    pub non_fungible_token_account: Account<'info, TokenAccount>,
-
-    
+    /// CHECK: passed in via CPI to mpl_token_metadata program
+    #[account(mut)]
+    pub non_fungible_token_account: UncheckedAccount<'info>,
     
     /// CHECK: passed in via CPI to mpl_token_metadata program
+    #[account(mut)]
     pub non_fungible_metadata: UncheckedAccount<'info>,
 
     /// CHECK: passed in via CPI to mpl_token_metadata program
+    #[account(mut)]
     pub non_fungible_masteredition: UncheckedAccount<'info>,
-
 
     #[account(mut)]
     pub inscription_summary: Account<'info, InscriptionSummary>,
@@ -92,7 +86,7 @@ pub struct MintLegacyCtx<'info> {
     pub inscription_v3: UncheckedAccount<'info>,
 
     /// CHECK: sent via CPI to libreplex_inscriptions_program
-    #[account()]
+    #[account(mut)]
     pub inscription_data: UncheckedAccount<'info>,
 
 
@@ -144,17 +138,19 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     let non_fungible_metadata =  &ctx.accounts.non_fungible_metadata;
     let non_fungible_masteredition = &ctx.accounts.non_fungible_masteredition;
     
-
+    let non_fungible_token_account = &ctx.accounts.non_fungible_token_account;
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let non_fungible_mint = &ctx.accounts.non_fungible_mint;
     let inscription = &ctx.accounts.inscription;
     let inscription_v3 = &ctx.accounts.inscription_v3;
     let inscription_data = &ctx.accounts.inscription_data;
-    let token_account_escrow = &ctx.accounts.fungible_token_account_escrow;
+    let fungible_token_account_escrow = &ctx.accounts.fungible_token_account_escrow;
     let token_program = &ctx.accounts.token_program;
     let system_program = &ctx.accounts.system_program;
     let metadata_program = &ctx.accounts.metadata_program;
-   
+    let inscriber = &ctx.accounts.inscriber;
+    let associated_token_program = &ctx.accounts.associated_token_program;
+    let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
 
     deployment.number_of_tokens_issued += 1;
     if deployment.number_of_tokens_issued == deployment.max_number_of_tokens {
@@ -268,6 +264,52 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
         &[ctx.bumps.deployment],
     ];
 
+    let expected_token_account = anchor_spl::associated_token::get_associated_token_address(
+        &deployment.key(), &fungible_mint.key());
+
+    if expected_token_account != fungible_token_account_escrow.key() {
+        return Err(SharedError::InvalidTokenAccount.into());
+    }   
+
+    if fungible_token_account_escrow.to_account_info().data_is_empty() {
+
+        // msg!("{}",payer.key() );
+        anchor_spl::associated_token::create(CpiContext::new(
+            associated_token_program.to_account_info(),
+            anchor_spl::associated_token::Create {
+                payer: payer.to_account_info(),
+                associated_token: fungible_token_account_escrow.to_account_info(),
+                authority: deployment.to_account_info(),
+                mint: fungible_mint.to_account_info(),
+                system_program: system_program.to_account_info(),
+                token_program: token_program.to_account_info(),
+            },
+        ))?;
+    }
+
+    let expected_non_fungible_token_account = anchor_spl::associated_token::get_associated_token_address(
+        &inscriber.key(), &non_fungible_mint.key());
+
+    if expected_non_fungible_token_account != non_fungible_token_account.key() {
+        return Err(SharedError::InvalidTokenAccount.into());
+    }   
+
+    if non_fungible_token_account.to_account_info().data_is_empty() {
+
+        // msg!("{}",payer.key() );
+        anchor_spl::associated_token::create(CpiContext::new(
+            associated_token_program.to_account_info(),
+            anchor_spl::associated_token::Create {
+                payer: payer.to_account_info(),
+                associated_token: non_fungible_token_account.to_account_info(),
+                authority: inscriber.to_account_info(),
+                mint: non_fungible_mint.to_account_info(),
+                system_program: system_program.to_account_info(),
+                token_program: token_program.to_account_info(),
+            },
+        ))?;
+    }
+
 
     // mint fungible only
     // minting 
@@ -277,7 +319,7 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
             MintTo {
                 mint: fungible_mint.to_account_info(),
                 // always mint spl tokens to the program escrow
-                to: token_account_escrow.to_account_info(),
+                to: fungible_token_account_escrow.to_account_info(),
                 authority: deployment.to_account_info(),
             },
             &[deployment_seeds],
@@ -288,21 +330,28 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     let deployment_seeds = &["deployment".as_bytes(), deployment.ticker.as_ref(), &[ctx.bumps.deployment]];
 
     // create non-fungible metadata for the "MINT" instruction
-    create_metadata_and_masteredition(
-        &payer.to_account_info(),
-        &deployment.to_account_info(),
-        &non_fungible_mint.to_account_info(),
-        &non_fungible_metadata.to_account_info(),
-        Some(non_fungible_masteredition),
-        &token_program.to_account_info(),
-        &metadata_program.to_account_info(),
-        &system_program.to_account_info(),
-        None,
+    create_mint_with_metadata_and_masteredition(
+        MintAccounts {
+            authority_pda: deployment.to_account_info(),
+            payer: payer.to_account_info(),
+            nft_owner: inscriber.to_account_info(),
+            nft_mint: non_fungible_mint.to_account_info(),
+            nft_mint_authority: deployment.to_account_info(),
+            nft_metadata: non_fungible_metadata.to_account_info(),
+            nft_master_edition: Some(non_fungible_masteredition.to_account_info()),
+            token: Some(non_fungible_token_account.to_account_info()), // do not mint anything
+            token_metadata_program: metadata_program.to_account_info(),
+            spl_token_program: token_program.to_account_info(),
+            spl_ata_program: associated_token_program.to_account_info(),
+            system_program: system_program.to_account_info(),
+            sysvar_instructions: sysvar_instructions_program.to_account_info(),
+        },
+        deployment_seeds,
         // rent.to_account_into(),
         deployment.ticker.clone(),
         deployment.ticker.clone(),
-        deployment.offchain_url.clone(),
         0,
+        deployment.offchain_url.clone(),
         Some(
             [Creator {
                 address: deployment.key(),
@@ -311,9 +360,10 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
             }]
             .to_vec(),
         ),
-        None, // this is the supply of the editions. always 0
-        Some(deployment_seeds),
-        false,
+        0,
+        false, // this is the supply of the editions. always 0
+        1,
+        TokenStandard::NonFungible,
     )?;
 
 
@@ -321,7 +371,7 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     // update hashlist
 
     hashlist.issues.push(MintAndOrder {
-        mint: fungible_mint.key(),
+        mint: non_fungible_mint.key(),
         order: inscription_summary.inscription_count_total
     });
 

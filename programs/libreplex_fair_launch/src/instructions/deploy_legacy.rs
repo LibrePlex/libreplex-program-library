@@ -1,9 +1,5 @@
-
 use anchor_lang::prelude::*;
-use anchor_spl::{
-    associated_token::AssociatedToken,
-    token::Token,
-};
+use anchor_spl::{associated_token::AssociatedToken, token::Token};
 
 use libreplex_inscriptions::{
     cpi::accounts::CreateInscriptionV2,
@@ -122,8 +118,8 @@ pub struct DeployLegacyCtx<'info> {
     #[account()]
     pub metadata_program: UncheckedAccount<'info>,
 
-      /// CHECK: Id checked in constraint
-      #[account(
+    /// CHECK: Id checked in constraint
+    #[account(
         constraint = sysvar_instructions.key() == sysvar_instructions_program::ID
     )]
     #[account()]
@@ -155,15 +151,17 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
     let metadata_program = &ctx.accounts.metadata_program;
     let associated_token_program = &ctx.accounts.associated_token_program;
-   let fungible_escrow_token_account = &ctx.accounts.fungible_escrow_token_account;
+    let fungible_escrow_token_account = &ctx.accounts.fungible_escrow_token_account;
 
     deployment.deployed = true;
-
+    deployment.fungible_mint = fungible_mint.key();
+    
     let deployment_seeds: &[&[u8]] = &[
         "deployment".as_bytes(),
         deployment.ticker.as_ref(),
         &[ctx.bumps.deployment],
     ];
+
 
     create_mint_with_metadata_and_masteredition(
         MintAccounts {
@@ -179,7 +177,7 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
             spl_token_program: token_program.to_account_info(),
             spl_ata_program: associated_token_program.to_account_info(),
             system_program: system_program.to_account_info(),
-            sysvar_instructions: sysvar_instructions.to_account_info()
+            sysvar_instructions: sysvar_instructions.to_account_info(),
         },
         deployment_seeds,
         deployment.ticker.clone(),
@@ -187,10 +185,10 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
         0,
         deployment.offchain_url.clone(),
         None,
-        0,
+        0, //deployment.max_number_of_tokens * deployment.limit_per_mint,
         false,
-        0, // mint one, just for good times,
-        TokenStandard::Fungible
+        0, 
+        TokenStandard::Fungible,
     )?;
 
     create_mint_with_metadata_and_masteredition(
@@ -207,7 +205,7 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
             spl_token_program: token_program.to_account_info(),
             spl_ata_program: associated_token_program.to_account_info(),
             system_program: system_program.to_account_info(),
-            sysvar_instructions: sysvar_instructions.to_account_info()
+            sysvar_instructions: sysvar_instructions.to_account_info(),
         },
         deployment_seeds,
         deployment.ticker.clone(),
@@ -218,10 +216,8 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
         0,
         false,
         1, // only minted when mint instructions appear
-        TokenStandard::NonFungible
+        TokenStandard::NonFungible,
     )?;
-
-   
 
     // create non-fungible metadata for the "DEPLOY" instruction
     // create_mint_with_metadata_and_masteredition(

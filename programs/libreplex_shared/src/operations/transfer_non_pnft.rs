@@ -17,10 +17,7 @@ pub fn transfer_non_pnft<'info>(
     payer: &AccountInfo<'info>,
     amount: u64
 ) -> Result<()> {
-    // simple. move the token from source token account to the target token account
-
-    // simple. move the token from source token account to the target token account
-
+    
     let expected_token_account = anchor_spl::associated_token::get_associated_token_address(
         &target_wallet.key(), &mint.key());
 

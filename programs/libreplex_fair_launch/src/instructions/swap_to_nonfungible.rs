@@ -21,6 +21,7 @@ pub mod sysvar_instructions_program {
 #[derive(Accounts)]
 pub struct SwapToNonFungibleCtx<'info> {
     #[account(
+        mut,
         constraint = deployment.fungible_mint == non_fungible_mint.key(),
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump
     )]
@@ -48,33 +49,24 @@ pub struct SwapToNonFungibleCtx<'info> {
     )]
     pub fungible_source_token_account: Account<'info, TokenAccount>,
 
+    /// CHECK: Checked in transfer logic
     #[account(
-        init_if_needed,
-        payer = payer,
-        token::mint = fungible_mint,
-        token::authority = deployment, // and into the escrow
+       mut
     )]
-    pub fungible_target_token_account: Account<'info, TokenAccount>,
+    pub fungible_target_token_account: UncheckedAccount<'info>,
 
     /* NON-FUNGIBLE COMES OUT OF THE ESCROW */
     #[account(mut)]
     pub non_fungible_mint: Account<'info, Mint>,
 
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         token::mint = fungible_mint,
         token::authority = deployment, // escrow is always owned by the deployment
     )]
-    pub non_fungible_token_acount_escrow: Account<'info, TokenAccount>,
+    pub non_fungible_source_acount_escrow: Account<'info, TokenAccount>,
 
-    #[account(
-        mut,
-        token::mint = non_fungible_mint,
-        token::authority = deployment, // comes out of the escrow account
-    )]
-    pub non_fungible_token_account_escrow: Account<'info, TokenAccount>,
-
+    /// CHECK: Checked in transfer logic
     #[account(
         init_if_needed,
         payer = payer,
@@ -109,7 +101,7 @@ pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
 
     let payer = &ctx.accounts.payer;
-    let non_fungible_source_token_account = &ctx.accounts.non_fungible_token_account_escrow;
+    let non_fungible_source_token_account = &ctx.accounts.non_fungible_source_acount_escrow;
     let non_fungible_target_token_account = &ctx.accounts.non_fungible_target_token_account;
     let non_fungible_mint = &ctx.accounts.non_fungible_mint;
 
@@ -164,19 +156,6 @@ pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
 
     // mark one of the non fungibles as moving out of the contract
     deployment.escrow_non_fungible_count -= 1;
-
-    if (deployment.number_of_tokens_issued - deployment.escrow_non_fungible_count)
-        * deployment.limit_per_mint
-        - fungible_target_token_account.amount != 0 
-    {   
-        // Like with swap-to-fungible, this would indicates somebody
-        // is trying to do something naughty, so we put in a bookkeeping check
-        // that ensures the *amount* of non-fungibles
-        // outside of the contract always matches the amount of fungible inside
-        // the contract
-        panic!("Post-tx balances would not be 0. Aborting.")
-         
-    }
 
     // We have crossed the NFT / Defi barrier. As a side effect have a splittable SPL 20
 

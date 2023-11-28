@@ -109,44 +109,45 @@ pub fn create_mint_with_metadata_and_masteredition(
 
     let spl_ata_program_info = accounts.spl_ata_program.as_ref();
 
-    let mut mint_builder = MintV1Builder::new();
-    mint_builder
-        .token(token_info.key())
-        .token_owner(Some(accounts.nft_owner.key()))
-        .metadata(accounts.nft_metadata.key())
-        .master_edition(match &master_edition {
-            Some(x) => Some(x.key()),
-            None => None,
-        })
-        .mint(accounts.nft_mint.key())
-        .payer(accounts.payer.key())
-        .authority(accounts.authority_pda.key())
-        .amount(mint_amount);
+    if mint_amount > 0 {
+        let mut mint_builder = MintV1Builder::new();
+        mint_builder
+            .token(token_info.key())
+            .token_owner(Some(accounts.nft_owner.key()))
+            .metadata(accounts.nft_metadata.key())
+            .master_edition(match &master_edition {
+                Some(x) => Some(x.key()),
+                None => None,
+            })
+            .mint(accounts.nft_mint.key())
+            .payer(accounts.payer.key())
+            .authority(accounts.authority_pda.key())
+            .amount(mint_amount);
 
-    let mut mint_infos = vec![
-        token_info.to_account_info(),
-        accounts.nft_owner.to_account_info(),
-        accounts.nft_metadata.to_account_info(),
-    ];
-    if let Some(x) = &master_edition {
-        mint_infos.push(x.to_account_info());
+        let mut mint_infos = vec![
+            token_info.to_account_info(),
+            accounts.nft_owner.to_account_info(),
+            accounts.nft_metadata.to_account_info(),
+        ];
+        if let Some(x) = &master_edition {
+            mint_infos.push(x.to_account_info());
+        }
+
+        let mut remaining_accounts = vec![
+            accounts.nft_mint.to_account_info(),
+            accounts.payer.to_account_info(),
+            accounts.authority_pda.to_account_info(),
+            accounts.system_program.to_account_info(),
+            sysvar_instructions_info.to_account_info(),
+            accounts.spl_token_program.to_account_info(),
+            spl_ata_program_info.to_account_info(),
+        ];
+        mint_infos.append(&mut remaining_accounts);
+
+        let mint_ix = mint_builder.amount(mint_amount).instruction();
+
+        invoke_signed(&mint_ix, &mint_infos, &[&authority_seeds])?;
     }
-
-    let mut remaining_accounts = vec![
-        accounts.nft_mint.to_account_info(),
-        accounts.payer.to_account_info(),
-        accounts.authority_pda.to_account_info(),
-        accounts.system_program.to_account_info(),
-        sysvar_instructions_info.to_account_info(),
-        accounts.spl_token_program.to_account_info(),
-        spl_ata_program_info.to_account_info(),
-    ];
-    mint_infos.append(&mut remaining_accounts);
-
-    let mint_ix = mint_builder.amount(1).instruction();
-
-    invoke_signed(&mint_ix, &mint_infos, &[&authority_seeds])?;
-
     // changes the update authority, primary sale happened, authorization rules
 
     // let mut update_args = UpdateArgs::V1 {
