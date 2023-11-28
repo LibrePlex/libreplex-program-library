@@ -75,7 +75,9 @@ pub struct InscribeLegacyMetadataAsUauth<'info> {
     // #[account()]
     // pub legacy_mint: UncheckedAccount<'info>,
     /// CHECK: Checked in logic
-    #[account()]
+    #[account(
+        constraint = legacy_metadata.owner.key() == mpl_token_metadata::ID
+    )]
     pub legacy_metadata: UncheckedAccount<'info>,
 
     /// CHECK: The token program

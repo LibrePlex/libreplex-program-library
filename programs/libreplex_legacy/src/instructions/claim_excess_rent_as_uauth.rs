@@ -25,7 +25,9 @@ pub struct ClaimExcessRentAsUauth<'info> {
     pub mint: Box<Account<'info, Mint>>,
 
     /// CHECK: Checked in logic
-    #[account()]
+    #[account(
+        constraint = legacy_metadata.owner.key() == mpl_token_metadata::ID
+    )]
     pub legacy_metadata: UncheckedAccount<'info>,
 
     #[account()]

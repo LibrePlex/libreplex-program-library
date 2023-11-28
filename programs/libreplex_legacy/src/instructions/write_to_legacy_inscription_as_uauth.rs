@@ -33,7 +33,9 @@ pub struct WriteToLegacyInscriptionAsUAuth<'info> {
     pub inscription_data: UncheckedAccount<'info>,
 
     /// CHECK: Checked in logic
-    #[account()]
+    #[account(
+        constraint = legacy_metadata.owner.key() == mpl_token_metadata::ID
+    )]
     pub legacy_metadata: UncheckedAccount<'info>,
 
     #[account(mut,

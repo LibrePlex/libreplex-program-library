@@ -26,7 +26,9 @@ pub struct SetValidationHash<'info> {
     pub inscription: UncheckedAccount<'info>,
 
     /// CHECK: Checked via a CPI call
-    #[account(mut)]
+    #[account(
+        constraint = legacy_metadata.owner.key() == mpl_token_metadata::ID
+    )]
     pub legacy_metadata: UncheckedAccount<'info>,
 
     #[account(mut,
