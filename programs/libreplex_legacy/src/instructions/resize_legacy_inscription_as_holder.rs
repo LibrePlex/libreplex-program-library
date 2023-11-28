@@ -10,7 +10,7 @@ use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
 
 use super::create_legacy_inscription_logic::AuthorityType;
 
-/
+
 // Adds a metadata to a group
 #[derive(Accounts)]
 pub struct ResizeLegacyInscriptionAsHolder<'info> {

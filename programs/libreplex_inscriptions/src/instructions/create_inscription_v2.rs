@@ -1,53 +1,19 @@
 use crate::errors::ErrorCode;
 
+use crate::instructions::{SignerType, InscriptionEventCreate};
 use crate::{
-    Inscription, InscriptionData, InscriptionRankPage,
+    Inscription, InscriptionData, 
     InscriptionSummary, MediaType, EncodingType, InscriptionEventData, InscriptionV3,
 };
 use anchor_lang::prelude::*;
 
+use super::CreateInscriptionInput;
 
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum SignerType {
-    Root,
-    LegacyMetadataSigner,
-}
-
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CreateInscriptionInput {
-    pub authority: Option<Pubkey>,
-    // each rank page holds a maximum of 320000 inscription ids.
-    // when this runs out, we move onto the next page
-    pub current_rank_page: u32,
-    pub signer_type: SignerType,
-    pub validation_hash: Option<String>
-}
-
-impl CreateInscriptionInput {
-    pub fn get_size(&self) -> usize {
-            1
-            + match self.authority {
-                Some(_) => 32,
-                None => 0,
-            } 
-            + 2 // default media type length
-            + 1 + match &self.validation_hash {
-                Some(x)=> x.len() + 4,
-                None => 0
-            }
-    }
-}
-
-#[event]
-pub struct InscriptionEventCreate {
-    pub id: Pubkey,
-    pub data: InscriptionEventData
-}
 
 const INITIAL_SIZE: usize = 8;
 #[derive(Accounts)]
 #[instruction(inscription_input: CreateInscriptionInput)]
-pub struct CreateInscription<'info> {
+pub struct CreateInscriptionV2<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -62,24 +28,6 @@ pub struct CreateInscription<'info> {
     #[account(init_if_needed, seeds = [b"inscription_summary"],
         bump, payer = payer, space = InscriptionSummary::BASE_SIZE)]
     pub inscription_summary: Box<Account<'info, InscriptionSummary>>,
-
-    #[account(mut,
-        // always leave 32 bytes spare at the end. new additions write to the last 32 bytes and add extra 32 bytes
-        // space = InscriptionRankPage::BASE_SIZE + 32, 
-        // payer = payer,
-        seeds = ["inscription_rank".as_bytes(), &inscription_input.current_rank_page.to_le_bytes()],
-        bump)]
-    pub inscription_ranks_current_page: Box<Account<'info, InscriptionRankPage>>,
-
-    // next page is needed in case the current inscription spills
-    // over. it's INSCRIPTIONS_PER_PAGE inscriptions per page so this will happen eventually
-    #[account(mut,
-        // always leave 32 bytes spare at the end. new additions write to the last 32 bytes and add extra 32 bytes
-        // space = InscriptionRankPage::BASE_SIZE,
-        // payer = payer,
-        seeds = ["inscription_rank".as_bytes(), &(inscription_input.current_rank_page +1).to_le_bytes()],
-        bump)]
-    pub inscription_ranks_next_page: Box<Account<'info, InscriptionRankPage>>,
 
     /*
         generated as a PDA to make sure that each chunk address
@@ -129,7 +77,7 @@ pub mod legacy_inscriber {
     declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
 }
 
-pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -> Result<()> {
+pub fn handler(ctx: Context<CreateInscriptionV2>, input: CreateInscriptionInput) -> Result<()> {
 
     let inscription = &mut ctx.accounts.inscription;
     let inscription_v2 = &mut ctx.accounts.inscription2;
@@ -192,25 +140,6 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
             }
         }
     }
-
-    // let page_to_update: &mut Box<Account<'_, InscriptionRankPage>>;
-    // // if inscription_summary.inscription_count_total > inscription_input.current_rank_page * INSCRIPTIONS_PER_PAGE  {
-    // if inscription_summary.inscription_count_total - 1
-    //     <= (input.current_rank_page as u64 + 1) * INSCRIPTIONS_PER_PAGE
-    // {
-    //     page_to_update = inscriptions_ranks_current_page;
-    // } else if inscription_summary.inscription_count_total - 1
-    //     <= (input.current_rank_page as u64 + 2) * INSCRIPTIONS_PER_PAGE
-    // {
-    //     page_to_update = inscriptions_ranks_next_page;
-    // } else {
-    //     return Err(ErrorCode::BadInscriptionRankPage.into());
-    // }
-
-    // let page_rank_accountinfo = &mut page_to_update.to_account_info();
-
-    // reallocate_rank_page(page_rank_accountinfo, payer, system_program, inscription_summary.inscription_count_total as usize)?;
-    // add_inscription_to_rank_page(page_to_update, inscription)?;
 
     // for now, only fire events for inscription v1
     emit!(InscriptionEventCreate {

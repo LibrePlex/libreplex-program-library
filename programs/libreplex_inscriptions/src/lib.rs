@@ -50,13 +50,15 @@ pub mod libreplex_inscriptions {
         )
     }
 
-    // pub fn delete_inscription(
-    //     ctx: Context<DeleteInscription>
-    // ) -> Result<()> {
-    //     instructions::delete_inscription::handler(
-    //         ctx
-    //     )
-    // }
+    pub fn create_inscription_v2(
+        ctx: Context<CreateInscriptionV2>,
+        inscription_input: CreateInscriptionInput,
+    ) -> Result<()> {
+        instructions::create_inscription_v2::handler(
+            ctx,
+            inscription_input
+        )
+    }
 
     pub fn resize_inscription(
         ctx: Context<ResizeInscription>,

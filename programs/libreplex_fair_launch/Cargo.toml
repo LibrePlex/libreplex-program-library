@@ -1,0 +1,26 @@
+[package]
+name = "libreplex_fair_launch"
+version = "0.0.1"
+description = "Created with Anchor"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/Libreplex/libreplex-program-library"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "libreplex_fair_launch"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = {version = "~0.29", features = ["init-if-needed"]}
+anchor-spl = {version = "~0.29"}
+libreplex_inscriptions = {version="*", path = "../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
+solana-program = {version = "~1.16"}
+libreplex_shared = {version= "*", path = "../libreplex_shared", features=["no-entrypoint"] }
+mpl-token-metadata = { version="~3" }

@@ -2,6 +2,8 @@ use anchor_lang::Result;
 
 use solana_program_test::*;
 
+const MINIMUM_INSCRIPTION_SIZE: u32 = 8;
+
 mod inscriptions_tests {
     use anchor_lang::{InstructionData, ToAccountInfo, ToAccountMetas};
 
@@ -110,7 +112,7 @@ mod inscriptions_tests {
         let inscription_obj: Account<Inscription> =
             Account::try_from(&inscription_account_info).unwrap();
 
-        assert_eq!(inscription_obj.size, 10000);
+        assert_eq!(inscription_obj.size, MINIMUM_INSCRIPTION_SIZE);
 
         // increase the size to 10MB max incrementally
         let mut applied_increases: u32 = 0;
@@ -124,8 +126,8 @@ mod inscriptions_tests {
                         data: libreplex_inscriptions::instruction::ResizeInscription {
                             input: ResizeInscriptionInput {
                                 change: 8192,
-                                expected_start_size: 10000 + 8192 * applied_increases,
-                                target_size: 10000 + 8192 * max_increases,
+                                expected_start_size: MINIMUM_INSCRIPTION_SIZE + 8192 * applied_increases,
+                                target_size: MINIMUM_INSCRIPTION_SIZE + 8192 * max_increases,
                             },
                         }
                         .data(),
@@ -168,13 +170,13 @@ mod inscriptions_tests {
             let inscription_obj: Account<Inscription> =
                 Account::try_from(&inscription_account_info).unwrap();
 
-            assert_eq!(inscription_obj.size, 10000 + 8192 * (applied_increases + 1));
+            assert_eq!(inscription_obj.size, MINIMUM_INSCRIPTION_SIZE + 8192 * (applied_increases + 1));
             assert_eq!(inscription_obj.size as usize, data_account_after_resize.data.len());
             assert_eq!(data_account_after_resize.lamports, context.banks_client.get_rent().await.unwrap().minimum_balance(inscription_obj.size as usize));
             applied_increases += 1;
         }
         let mut applied_decreases = 0;
-        let max_decreases = 11;
+        let max_decreases = 9;
         while applied_decreases < max_decreases {
             context
                 .banks_client
@@ -184,8 +186,8 @@ mod inscriptions_tests {
                         data: libreplex_inscriptions::instruction::ResizeInscription {
                             input: ResizeInscriptionInput {
                                 change: -8192,
-                                expected_start_size: 10000 + 8192 * applied_increases - 8192 * applied_decreases,
-                                target_size: 10000 + 8192 * max_increases - 8192 * max_decreases,
+                                expected_start_size: MINIMUM_INSCRIPTION_SIZE + 8192 * applied_increases - 8192 * applied_decreases,
+                                target_size: MINIMUM_INSCRIPTION_SIZE + 8192 * max_increases - 8192 * max_decreases,
                             },
                         }
                         .data(),
@@ -228,7 +230,7 @@ mod inscriptions_tests {
                 Account::try_from(&inscription_account_info).unwrap();
 
             let data_account_after_resize = context.banks_client.get_account(inscription_data).await.unwrap().unwrap();
-            assert_eq!(inscription_obj.size, 10000 + 8192 * applied_increases - 8192 * applied_decreases - 8192);
+            assert_eq!(inscription_obj.size, MINIMUM_INSCRIPTION_SIZE + 8192 * applied_increases - 8192 * applied_decreases - 8192);
             assert_eq!(inscription_obj.size as usize, data_account_after_resize.data.len());
             assert_eq!(data_account_after_resize.lamports,
                 std::cmp::max(constants::MINIMUM_INSCRIPTION_LAMPORTS,
@@ -254,8 +256,8 @@ mod inscriptions_tests {
                         data: libreplex_inscriptions::instruction::ResizeInscription {
                             input: ResizeInscriptionInput {
                                 change: 0,
-                                expected_start_size: 10000 + 8192 * applied_increases - 8192 * applied_decreases,
-                                target_size: 10000 + 8192 * max_increases - 8192 * max_decreases,
+                                expected_start_size: MINIMUM_INSCRIPTION_SIZE + 8192 * applied_increases - 8192 * applied_decreases,
+                                target_size: MINIMUM_INSCRIPTION_SIZE + 8192 * max_increases - 8192 * max_decreases,
                             },
                         }
                         .data(),
@@ -298,7 +300,7 @@ mod inscriptions_tests {
                 Account::try_from(&inscription_account_info).unwrap();
 
             let data_account_after_resize = context.banks_client.get_account(inscription_data).await.unwrap().unwrap();
-            assert_eq!(inscription_obj.size, 10000 + 8192 * applied_increases - 8192 * applied_decreases);
+            assert_eq!(inscription_obj.size, MINIMUM_INSCRIPTION_SIZE + 8192 * applied_increases - 8192 * applied_decreases);
             assert_eq!(inscription_obj.size as usize, data_account_after_resize.data.len());
             assert_eq!(data_account_after_resize.lamports,
                 std::cmp::max(constants::MINIMUM_INSCRIPTION_LAMPORTS,
@@ -458,33 +460,6 @@ mod inscriptions_tests {
             inscription_summary_obj.last_inscriber,
             context.payer.pubkey()
         );
-
-        let mut inscription_ranks_current_page_account = context
-            .banks_client
-            .get_account(inscription_ranks_current_page)
-            .await
-            .unwrap()
-            .unwrap();
-
-        let inscription_ranks_current_page_info = AccountInfo::new(
-            &inscription_ranks_current_page,
-            false,
-            false,
-            &mut inscription_ranks_current_page_account.lamports,
-            &mut inscription_ranks_current_page_account.data,
-            &inscription_ranks_current_page_account.owner,
-            inscription_ranks_current_page_account.executable,
-            inscription_ranks_current_page_account.rent_epoch,
-        );
-
-        let inscription_ranks_current_page_obj: Account<InscriptionRankPage> =
-            Account::try_from(&inscription_ranks_current_page_info).unwrap();
-        let account_info = inscription_ranks_current_page_obj.to_account_info();
-        let inscription_slice: Vec<Pubkey> =
-            InscriptionRankPage::get_inscriptions(&account_info.data.borrow_mut(), 0, 2).collect();
-
-        // nothing has been made immutable yet, so inscription slice should have length = 0
-        assert_eq!(inscription_slice.len(), 2);
 
         assert_eq!(inscription_obj.order, 1);
 
