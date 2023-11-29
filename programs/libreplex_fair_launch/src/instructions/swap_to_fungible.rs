@@ -28,7 +28,7 @@ pub struct SwapToFungibleCtx<'info> {
     #[account(mut)]
     pub fungible_mint: Box<Account<'info, Mint>>,
 
-    // verifies that the NFT coming out of the escrow has
+    // verifies that the NFT coming into the escrow has
     // been registered with the escrow, either via minting or importing
     // from legacy hashlist
     #[account(mut, 
