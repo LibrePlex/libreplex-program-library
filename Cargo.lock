@@ -2122,6 +2122,7 @@ version = "0.0.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
+ "arrayref",
  "libreplex_inscriptions",
  "libreplex_shared",
  "mpl-token-metadata",

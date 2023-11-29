@@ -33,6 +33,12 @@ pub struct Deployment {
 
     pub deployed: bool,
     pub minted_out: bool, 
+    pub allow_spl_conversion: bool,
+
+    // indicates whether this deployment was migrated from legacy validator
+    // true - from legacy
+    // false - created directly via libreplex fair launch
+    pub migrated_from_legacy: bool,
 
     // this is used to sanity check that
     // whenever swaps occur, to the maount
@@ -56,8 +62,30 @@ pub struct Deployment {
     pub offchain_url: String
 
     // pub padding: Vec<u8, EXCESS>
-    
 }  
+
+
+#[event]
+pub struct NewDeploymentEvent {
+    pub ticker: String, 
+    pub limit_per_mint: u64,
+    pub max_number_of_tokens: u64,
+    pub creator: Pubkey, 
+}
+
+#[event]
+pub struct MintEvent {
+    pub mint: Pubkey,
+    pub ticker: String,
+    pub tokens_minted: u64,
+    pub max_number_of_tokens: u64,
+}
+
+impl Deployment {
+    pub fn get_fungible_mint_amount (&self) -> u64 {
+        self.limit_per_mint.checked_mul(10_u64.checked_pow(self.decimals as u32).unwrap()).unwrap()
+    }
+}
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct MintAndOrder {
@@ -70,6 +98,23 @@ pub struct MintAndOrder {
 pub struct Hashlist {
     pub deployment: Pubkey,
     pub issues:Vec<MintAndOrder>
+}
+
+
+// Each mint can only be migrated once
+#[account]
+pub struct MigrationMarker {
+}
+
+// Tells you whether a mint belongs to a hashlist
+#[account]
+pub struct HashlistMarker {
+}
+
+#[account]
+pub struct MigrationCounter {
+    pub deployment: Pubkey,
+    pub migration_count: u64
 }
 
 

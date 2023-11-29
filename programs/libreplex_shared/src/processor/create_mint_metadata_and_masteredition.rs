@@ -47,6 +47,7 @@ pub fn create_mint_with_metadata_and_masteredition(
     // new_update_auth: Pubkey,
     is_mutable: bool,
     mint_amount: u64,
+    decimals: u8,
     token_standard: TokenStandard,
 ) -> Result<()> {
     let sysvar_instructions_info = accounts.sysvar_instructions;
@@ -69,7 +70,7 @@ pub fn create_mint_with_metadata_and_masteredition(
         .name(name)
         .symbol(symbol)
         .uri(uri)
-        .decimals(0)
+        .decimals(decimals)
         .token_standard(token_standard)
         .print_supply(if max_supply == 0 {
             PrintSupply::Zero

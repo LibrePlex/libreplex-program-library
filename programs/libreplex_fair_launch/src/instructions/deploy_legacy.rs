@@ -48,7 +48,9 @@ pub struct DeployLegacyCtx<'info> {
     bump, payer = payer, space = 8 + 32 + 4)]
     pub hashlist: Account<'info, Hashlist>,
 
-    #[account(mut)]
+    #[account(mut,
+        // constraint = payer.key().to_string() == "4aAifU9ck88koMhSK6fnUSQHMzpyuLzGa6q7nfvqA6vx".to_owned()
+    )]
     pub payer: Signer<'info>,
 
     /* INITIALISE FUNGIBLE ACCOUNTS */
@@ -155,13 +157,12 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
 
     deployment.deployed = true;
     deployment.fungible_mint = fungible_mint.key();
-    
+
     let deployment_seeds: &[&[u8]] = &[
         "deployment".as_bytes(),
         deployment.ticker.as_ref(),
         &[ctx.bumps.deployment],
     ];
-
 
     create_mint_with_metadata_and_masteredition(
         MintAccounts {
@@ -181,13 +182,14 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
         },
         deployment_seeds,
         deployment.ticker.clone(),
-        deployment.ticker.clone(),
+        "".to_owned(),
         0,
         deployment.offchain_url.clone(),
         None,
         0, //deployment.max_number_of_tokens * deployment.limit_per_mint,
         false,
-        0, 
+        0,
+        deployment.decimals,
         TokenStandard::Fungible,
     )?;
 
@@ -209,44 +211,16 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
         },
         deployment_seeds,
         deployment.ticker.clone(),
-        deployment.ticker.clone(),
+        "".to_owned(),
         0,
         deployment.offchain_url.clone(),
         None,
         0,
         false,
         1, // only minted when mint instructions appear
+        0,
         TokenStandard::NonFungible,
     )?;
-
-    // create non-fungible metadata for the "DEPLOY" instruction
-    // create_mint_with_metadata_and_masteredition(
-    //     &payer.to_account_info(),
-    //     &deployment.to_account_info(),
-    //     &non_fungible_mint.to_account_info(),
-    //     &non_fungible_metadata.to_account_info(),
-    //     Some(&non_fungible_master_edition.to_account_info()),
-    //     &token_program.to_account_info(),
-    //     &metadata_program.to_account_info(),
-    //     &system_program.to_account_info(),
-    //     None,
-    //     // rent.to_account_into(),
-    //     deployment.ticker.clone(),
-    //     deployment.ticker.clone(),
-    //     deployment.offchain_url.clone(),
-    //     0,
-    //     Some(
-    //         [Creator {
-    //             address: deployment.key(),
-    //             verified: false,
-    //             share: 100,
-    //         }]
-    //         .to_vec(),
-    //     ),
-    //     None, // this is the supply of the editions. always 0
-    //     None,
-    //     false,
-    // )?;
 
     // Create the deploy inscription
     libreplex_inscriptions::cpi::create_inscription_v2(
@@ -337,6 +311,7 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
             system_program: system_program.to_account_info(),
         },
     ))?;
+
 
     Ok(())
 }

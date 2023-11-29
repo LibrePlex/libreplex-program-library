@@ -3,7 +3,7 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Mint, Token, TokenAccount},
 };
-use libreplex_shared::operations::transfer_non_pnft;
+use libreplex_shared::{operations::transfer_non_pnft, SharedError};
 
 use crate::Deployment;
 
@@ -11,11 +11,6 @@ pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
     declare_id!("Sysvar1nstructions1111111111111111111111111");
 }
-
-/*
-
-    Swaps a non
-*/
 
 #[derive(Accounts)]
 pub struct SwapToFungibleCtx<'info> {
@@ -95,6 +90,10 @@ pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
 
+    if !deployment.allow_spl_conversion {
+        return Err(SharedError::SplConversionNotAllowed.into());
+    }
+
     // simples. two steps:
     // 1) move the non_fungible into the escrow
 
@@ -130,7 +129,7 @@ pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
         &system_program.to_account_info(),
         Some(&[authority_seeds]),
         &payer.to_account_info(),
-        deployment.limit_per_mint,
+        deployment.get_fungible_mint_amount(),
     )?;
 
 

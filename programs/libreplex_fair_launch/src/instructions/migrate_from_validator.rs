@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 
-use crate::{Deployment, errors::FairLaunchError, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, NewDeploymentEvent};
+use crate::{Deployment, TICKER_LIMIT, errors::FairLaunchError, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, InitialiseInput};
 
 
 pub mod sysvar_instructions_program {
@@ -26,16 +26,14 @@ pub mod sysvar_instructions_program {
 */
 
 #[derive(Accounts)]
-#[instruction(input: InitialiseInput)]
-pub struct InitialiseCtx<'info>  {
+#[instruction(input: InitialiseInput, validated_token_count: u64)]
+pub struct MigrateFromValidatorCtx<'info>  {
     #[account(init, payer = payer, space = 8 + Deployment::INIT_SPACE, 
         seeds = ["deployment".as_ref(), input.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
 
-    #[account(mut
-        // ,
-        // constraint = payer.key().to_string() == "11111111111111111111111111111111".to_owned()
-    )]
+    #[account(mut,
+        constraint = payer.key().to_string() == *"11111111111111111111111111111111".to_owned())]
     pub payer: Signer<'info>,
 
     #[account()]
@@ -44,22 +42,10 @@ pub struct InitialiseCtx<'info>  {
 
 }
 
-#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
-pub struct InitialiseInput {
-    pub limit_per_mint: u64, // this number of SPL tokens are issued into the escrow when an op: 'mint' comes in 
-    pub max_number_of_tokens: u64, // this is the max *number* of tokens
-    pub decimals: u8,
-    pub ticker: String,
-    pub deployment_template: String,
-    pub mint_template: String,
-    pub offchain_url: String, // used both for the fungible and the non-fungible
-}
-
-pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
+pub fn migrate_from_validator(ctx: Context<MigrateFromValidatorCtx>, input: InitialiseInput, validated_token_count: u64) -> Result<()> {
     
 
-    // for now, we limit ticker sizes to 12 bytes 
-    if input.ticker.len() > 12 {
+    if input.ticker.len() > TICKER_LIMIT {
         return Err(FairLaunchError::TickerTooLong.into());
     }
 
@@ -81,23 +67,16 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     // create 
     deployment.creator = payer.key();
     deployment.limit_per_mint = input.limit_per_mint;
-    deployment.max_number_of_tokens = input.max_number_of_tokens;
-    deployment.number_of_tokens_issued = 0;
+    deployment.max_number_of_tokens = validated_token_count;
+    deployment.number_of_tokens_issued = validated_token_count;
     deployment.decimals = input.decimals;
     deployment.ticker = input.ticker;
-    deployment.deployment_template = input.deployment_template;
+    deployment.deployment_template = "".to_owned();
     deployment.mint_template = input.mint_template;
     deployment.offchain_url = input.offchain_url;
     deployment.escrow_non_fungible_count = 0;
-
-    deployment.migrated_from_legacy = false;
-
-    emit!(NewDeploymentEvent {
-        creator: deployment.creator,
-        limit_per_mint: deployment.limit_per_mint,
-        max_number_of_tokens: deployment.max_number_of_tokens,
-        ticker: deployment.ticker.clone(),
-    });
+    deployment.migrated_from_legacy = true;
+    deployment.deployed = true;
 
     Ok(())
 }

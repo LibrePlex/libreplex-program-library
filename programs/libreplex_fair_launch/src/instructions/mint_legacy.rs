@@ -1,3 +1,5 @@
+
+
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
@@ -13,27 +15,39 @@ use libreplex_inscriptions::{
     cpi::accounts::WriteToInscription,
     instructions::{SignerType, WriteToInscriptionInput},
 };
-use libreplex_shared::{SharedError, create_mint_metadata_and_masteredition::create_mint_with_metadata_and_masteredition, MintAccounts};
+use libreplex_shared::{SharedError, create_mint_metadata_and_masteredition::create_mint_with_metadata_and_masteredition, MintAccounts, sysvar_instructions_program};
 use mpl_token_metadata::types::{Creator, TokenStandard};
+use solana_program::{program::invoke, system_instruction};
 
 use crate::{
-    errors::FairLaunchError, swap_to_fungible::sysvar_instructions_program, Deployment, Hashlist, MintAndOrder,
+    errors::FairLaunchError, Deployment, HashlistMarker, MintEvent,
 };
 
 #[derive(Accounts)]
 pub struct MintLegacyCtx<'info> {
     #[account(mut,
+       
+
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
 
+    /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
+    
     #[account(mut, 
-        realloc = (8 + 32 + 4 + (deployment.number_of_tokens_issued + 1)* (32 + 8) )as usize,
-        realloc::payer = payer,
-        realloc::zero = false,
+        
         seeds = ["hashlist".as_bytes(), 
         deployment.key().as_ref()],
         bump,)]
-    pub hashlist: Account<'info, Hashlist>,
+    pub hashlist: UncheckedAccount<'info>,
+
+    #[account(init, 
+        space = 8,
+        payer = payer,
+        seeds = ["hashlist_marker".as_bytes(), 
+        deployment.key().as_ref(),
+        non_fungible_mint.key().as_ref()],
+        bump,)]
+    pub hashlist_marker: Account<'info, HashlistMarker>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -42,7 +56,8 @@ pub struct MintLegacyCtx<'info> {
     #[account(mut)]
     pub inscriber: UncheckedAccount<'info>,
 
-    #[account(mut)]
+    #[account(mut,
+        constraint = deployment.fungible_mint == fungible_mint.key())]
     pub fungible_mint: Account<'info, Mint>,
 
     /// CHECK: Checked in logic, created as necessary
@@ -129,6 +144,11 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
         return Err(FairLaunchError::MintedOut.into());
     }
 
+    if deployment.migrated_from_legacy {
+        return Err(FairLaunchError::LegacyMigrationsAreMintedOut.into());
+    }
+    
+
     let hashlist = &mut ctx.accounts.hashlist;
 
     let inscription_summary = &ctx.accounts.inscription_summary;
@@ -153,7 +173,7 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
 
     deployment.number_of_tokens_issued += 1;
-    if deployment.number_of_tokens_issued == deployment.max_number_of_tokens {
+    if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens {
         deployment.minted_out = true;
     }
 
@@ -324,10 +344,7 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
             },
             &[deployment_seeds],
         ),
-        deployment.limit_per_mint,
-    )?;
-
-    let deployment_seeds = &["deployment".as_bytes(), deployment.ticker.as_ref(), &[ctx.bumps.deployment]];
+        deployment.get_fungible_mint_amount()   )?;
 
     // create non-fungible metadata for the "MINT" instruction
     create_mint_with_metadata_and_masteredition(
@@ -349,7 +366,7 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
         deployment_seeds,
         // rent.to_account_into(),
         deployment.ticker.clone(),
-        deployment.ticker.clone(),
+        "".to_owned(),
         0,
         deployment.offchain_url.clone(),
         Some(
@@ -363,17 +380,62 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
         0,
         false, // this is the supply of the editions. always 0
         1,
+        0, 
         TokenStandard::NonFungible,
     )?;
+    
 
 
+    
+    add_to_hashlist(deployment.number_of_tokens_issued as u32, hashlist, payer, system_program, &non_fungible_mint.key(), 
+    inscription_summary.inscription_count_total)?;
 
-    // update hashlist
-
-    hashlist.issues.push(MintAndOrder {
+    emit!(MintEvent{
         mint: non_fungible_mint.key(),
-        order: inscription_summary.inscription_count_total
+        ticker: deployment.ticker.clone(),
+        tokens_minted: deployment.number_of_tokens_issued,
+        max_number_of_tokens: deployment.max_number_of_tokens,
     });
 
     Ok(())
+}
+
+pub fn add_to_hashlist<'a>(
+    new_number_of_mints: u32, 
+    hashlist: &mut UncheckedAccount<'a>, 
+    payer: &Signer<'a>, 
+    system_program: &Program<'a, System>, 
+    mint: &Pubkey, 
+    order_number: u64) -> Result<()> {
+    let new_size = 8 + 32 + 4 + (new_number_of_mints) * (32 + 8);
+    let rent = Rent::get()?;
+    let new_minimum_balance = rent.minimum_balance(new_size as usize);
+    let lamports_diff = new_minimum_balance.saturating_sub(hashlist.lamports());
+    if lamports_diff > 0 {
+        invoke(
+            &system_instruction::transfer(&payer.key(), hashlist.key, lamports_diff),
+            &[
+                payer.to_account_info(),
+                hashlist.to_account_info(),
+                system_program.to_account_info(),
+            ],
+        )?;
+    }
+    hashlist.realloc(new_size as usize, false)?;
+    let hashlist_account_info = hashlist.to_account_info();
+   
+    let mut hashlist_data = hashlist_account_info.data.borrow_mut();
+
+    hashlist_data[40..44].copy_from_slice(&new_number_of_mints.to_le_bytes());
+    let mint_start_pos:usize = (44+(new_number_of_mints-1)*40) as usize;
+    hashlist_data[
+        mint_start_pos..(mint_start_pos+32)
+        ].copy_from_slice(mint.key().as_ref());
+    hashlist_data[
+        mint_start_pos + 32..mint_start_pos + 40
+        ].copy_from_slice(&order_number.to_le_bytes());
+  
+
+    Ok(())
+
 }

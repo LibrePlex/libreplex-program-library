@@ -16,5 +16,10 @@ pub enum FairLaunchError {
     RootTypeTooLong,
 
     #[msg("Minted out")]
-    MintedOut
+    MintedOut,
+
+    #[msg("Legacy migrations are minted out")]
+    LegacyMigrationsAreMintedOut
+
+
 }

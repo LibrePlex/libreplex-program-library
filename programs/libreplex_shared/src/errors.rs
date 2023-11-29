@@ -77,5 +77,8 @@ pub enum SharedError {
 
 
      #[msg("Instruction builder failed")]
-     InstructionBuilderFailed
+     InstructionBuilderFailed,
+
+     #[msg("Spl conversion not allowed")]
+     SplConversionNotAllowed
 }
