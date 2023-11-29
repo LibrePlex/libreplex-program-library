@@ -5,7 +5,7 @@ use anchor_spl::{
 };
 use libreplex_shared::{operations::transfer_non_pnft, SharedError};
 
-use crate::Deployment;
+use crate::{Deployment, HashlistMarker};
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -27,6 +27,16 @@ pub struct SwapToFungibleCtx<'info> {
     /* fungible accounts */
     #[account(mut)]
     pub fungible_mint: Box<Account<'info, Mint>>,
+
+    // verifies that the NFT coming out of the escrow has
+    // been registered with the escrow, either via minting or importing
+    // from legacy hashlist
+    #[account(mut, 
+        seeds = ["hashlist_marker".as_bytes(), 
+        deployment.key().as_ref(),
+        non_fungible_mint.key().as_ref()],
+        bump,)]
+    pub hashlist_marker: Account<'info, HashlistMarker>,
 
     #[account(
         mut,
