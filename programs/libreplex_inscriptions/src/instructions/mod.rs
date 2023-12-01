@@ -1,6 +1,7 @@
 
 pub mod create_inscription;
 pub mod create_inscription_v2;
+pub mod v3;
 pub mod create_inscription_rank_page;
 pub mod resize_inscription;
 pub mod write_to_inscription;
@@ -17,6 +18,7 @@ pub use resize_inscription::*;
 pub use write_to_inscription::*;
 pub use create_inscription::*;
 pub use create_inscription_v2::*;
+pub use v3::*;
 pub use claim_excess_rent::*;
 pub use set_validation_hash::*;
 

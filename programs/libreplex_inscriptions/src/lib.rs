@@ -60,6 +60,8 @@ pub mod libreplex_inscriptions {
         )
     }
 
+  
+
     pub fn resize_inscription(
         ctx: Context<ResizeInscription>,
         input: ResizeInscriptionInput,
@@ -106,6 +108,49 @@ pub mod libreplex_inscriptions {
             validation_hash
         )
     }
+
+
+    /* V3 methods  */
+    pub fn create_inscription_v3(
+        ctx: Context<CreateInscriptionV3>,
+        inscription_input: CreateInscriptionInputV3,
+    ) -> Result<()> {
+        instructions::create_inscription_v3::handler(
+            ctx,
+            inscription_input
+        )
+    }
+
+    pub fn make_inscription_immutable_v3(
+        ctx: Context<MakeInscriptionImmutableV3>
+    ) -> Result<()> {
+        instructions::make_inscription_immutable_v3::handler(
+            ctx
+        )
+    }
+
+
+    pub fn resize_inscription_v3(
+        ctx: Context<ResizeInscriptionV3>,
+        input: ResizeInscriptionInput,
+    ) -> Result<()> {
+        instructions::resize_inscription_v3::handler(
+            ctx,
+            input
+        )
+    }
+
+    pub fn write_to_inscription_v3(
+        ctx: Context<WriteToInscriptionV3>,
+        input: WriteToInscriptionInput,
+    ) -> Result<()> {
+        instructions::write_to_inscription_v3::handler(
+            ctx,
+            input
+        )
+    }
+
+
 
 
 

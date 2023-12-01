@@ -253,6 +253,19 @@ pub struct InscriptionEventData {
     pub validation_hash: Option<String>,
 }
 
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct InscriptionV3EventData {
+    pub authority: Pubkey, // 8
+    pub root: Pubkey,      // 8 + 32 = 40
+    pub content_type: String,
+    pub encoding: String,
+    pub inscription_data: Pubkey,
+
+    pub order: u64, // 8 + 32 + 32 = 72
+    pub size: u32,  // 8 + 32 + 32 + 8 = 80
+    pub validation_hash: Option<String>,
+}
+
 // inscription v2 swaps order and size fields around to the middle for easier indexing.
 #[account]
 pub struct InscriptionV3 {
@@ -296,6 +309,24 @@ pub struct InscriptionV3 {
 }
  impl InscriptionV3 {
     pub const BASE_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 4 + 4 + 1;
+
+    pub fn write_data(
+        &self,
+        mut current_data: RefMut<&mut [u8]>,
+        data_to_add: &Vec<u8>,
+        start_pos: u32,
+    ) -> Result<()> {
+        if start_pos + data_to_add.len() as u32 > self.size {
+            return Err(ErrorCode::MaxSizeExceeded.into());
+        }
+
+        let current_index = start_pos as usize;
+        let data_slice: &mut [u8] =
+            &mut current_data[current_index..current_index + data_to_add.len()];
+        data_slice.copy_from_slice(data_to_add);
+
+        Ok(())
+    }
 
     pub fn get_new_size (&self, input: &WriteToInscriptionInput) -> usize {        
 
