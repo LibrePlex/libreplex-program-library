@@ -41,11 +41,6 @@ pub struct MigrateToV3<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub mod legacy_inscriber {
-    use super::*;
-    declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
-}
-
 pub fn handler(ctx: Context<MigrateToV3>) -> Result<()> {
     let inscription = &ctx.accounts.inscription;
     let inscription_v2 = &mut ctx.accounts.inscription2;

@@ -25,6 +25,9 @@ pub enum LegacyInscriptionErrorCode {
     NotSquadsMember,
 
     #[msg("Inscription V2 key mismatch")]
-    Inscription2KeyMismatch
+    Inscription2KeyMismatch,
+
+    #[msg("Inscription V3 key mismatch")]
+    InscriptionV3KeyMismatch
 
 }
