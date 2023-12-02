@@ -385,10 +385,18 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     )?;
     
 
+    // sets the max number of hashlist items to a nice round number
+    // this is to prevent insanely large hashlists from blowing up the 
+    // solana account size
+    // for very large hashlists, they can also be queried by gPA to
+    // first creator id or indexing hashlist_marker accounts.
 
-    
-    add_to_hashlist(deployment.number_of_tokens_issued as u32, hashlist, payer, system_program, &non_fungible_mint.key(), 
-    inscription_summary.inscription_count_total)?;
+    // this does NOT stop minting.
+
+    if deployment.number_of_tokens_issued <= 262144 {
+        add_to_hashlist(deployment.number_of_tokens_issued as u32, hashlist, payer, system_program, &non_fungible_mint.key(), 
+        inscription_summary.inscription_count_total)?;
+    }
 
     emit!(MintEvent{
         mint: non_fungible_mint.key(),

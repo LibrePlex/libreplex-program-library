@@ -3,6 +3,7 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Mint, Token, TokenAccount},
 };
+use crate::HashlistMarker;
 use libreplex_shared::{operations::transfer_non_pnft, SharedError};
 // use libreplex_shared::operations::transfer_non_pnft;
 
@@ -60,6 +61,17 @@ pub struct SwapToNonFungibleCtx<'info> {
         token::authority = deployment, // escrow is always owned by the deployment
     )]
     pub non_fungible_source_acount_escrow: Account<'info, TokenAccount>,
+
+
+    // verifies that the NFT coming out of the escrow has
+    // been registered with the escrow, either via minting or importing
+    // from legacy hashlist
+    #[account(mut, 
+        seeds = ["hashlist_marker".as_bytes(), 
+        deployment.key().as_ref(),
+        non_fungible_mint.key().as_ref()],
+        bump,)]
+    pub hashlist_marker: Account<'info, HashlistMarker>,
 
     /// CHECK: Checked in transfer logic
     #[account(
