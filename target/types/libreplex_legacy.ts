@@ -447,12 +447,7 @@ export type LibreplexLegacy = {
           "isSigner": false
         },
         {
-          "name": "inscription",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV2",
+          "name": "inscriptionV3",
           "isMut": true,
           "isSigner": false
         },
@@ -592,6 +587,48 @@ export type LibreplexLegacy = {
           {
             "name": "size",
             "type": "u32"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "inscriptionV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "contentType",
+            "type": "string"
+          },
+          {
+            "name": "encoding",
+            "type": "string"
           },
           {
             "name": "validationHash",
@@ -1286,12 +1323,7 @@ export const IDL: LibreplexLegacy = {
           "isSigner": false
         },
         {
-          "name": "inscription",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV2",
+          "name": "inscriptionV3",
           "isMut": true,
           "isSigner": false
         },
@@ -1431,6 +1463,48 @@ export const IDL: LibreplexLegacy = {
           {
             "name": "size",
             "type": "u32"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "inscriptionV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "contentType",
+            "type": "string"
+          },
+          {
+            "name": "encoding",
+            "type": "string"
           },
           {
             "name": "validationHash",

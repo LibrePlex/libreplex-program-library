@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
-use libreplex_inscriptions::program::LibreplexInscriptions;
+use libreplex_inscriptions::{program::LibreplexInscriptions, InscriptionV3};
 
 use crate::{
     instructions::{check_metadata_uauth, ResizeLegacyInscriptionInput},
@@ -27,7 +27,7 @@ pub struct ResizeLegacyInscriptionAsUauthV3<'info> {
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
-    pub inscription_v3: UncheckedAccount<'info>,
+    pub inscription_v3: Account<'info, InscriptionV3>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]

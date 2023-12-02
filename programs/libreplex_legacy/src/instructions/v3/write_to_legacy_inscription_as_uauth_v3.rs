@@ -4,7 +4,7 @@ use libreplex_inscriptions::{ instructions::WriteToInscriptionInput,
     program::LibreplexInscriptions, InscriptionV3, cpi::accounts::WriteToInscriptionV3,
 };
 
-use crate::{legacy_inscription::LegacyInscription, instructions::check_metadata_uauth};
+use crate::{legacy_inscription::LegacyInscription, instructions::check_metadata_uauth, LegacyInscriptionErrorCode};
 
 
 
@@ -20,9 +20,9 @@ pub struct WriteToLegacyInscriptionAsUAuthV3<'info> {
     pub mint: Box<Account<'info, Mint>>,
 
     /// CHECK: Checked via a CPI call
-    #[account(mut,
-    seeds=["inscription_v3".as_bytes(), mint.key().as_ref()], bump)]
+    #[account(mut)]
     pub inscription_v3: Account<'info, InscriptionV3>,
+  
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
@@ -60,6 +60,17 @@ pub fn handler(
     let authority = &ctx.accounts.authority;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
 
+    let mint_key = mint.key();
+    let inscription_v3_seeds: &[&[u8]] = &["inscription_v3".as_bytes(), mint_key.as_ref()];
+
+    let expected_inscription_v3_key =
+        Pubkey::find_program_address(inscription_v3_seeds, &libreplex_inscriptions::id()).0;
+
+    if expected_inscription_v3_key != inscription_v3.key() {
+        return Err(LegacyInscriptionErrorCode::InscriptionV3KeyMismatch.into());
+    }
+
+
     // make sure we are dealing with the correct metadata object.
     // this is to ensure that the mint in question is in fact a legacy
     // metadata object
@@ -76,6 +87,8 @@ pub fn handler(
         authority.key(),
         legacy_inscription.authority_type,
     )?;
+
+    
 
     libreplex_inscriptions::cpi::write_to_inscription_v3(
         CpiContext::new_with_signer(
