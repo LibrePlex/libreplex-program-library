@@ -20,7 +20,7 @@ use mpl_token_metadata::types::{Creator, TokenStandard};
 use solana_program::{program::invoke, system_instruction};
 
 use crate::{
-    errors::FairLaunchError, Deployment, HashlistMarker, MintEvent,
+    errors::FairLaunchError, Deployment, HashlistMarker, MintEvent, HashlistEvent,
 };
 
 #[derive(Accounts)]
@@ -394,8 +394,13 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     // this does NOT stop minting.
 
     if deployment.number_of_tokens_issued <= 262144 {
-        add_to_hashlist(deployment.number_of_tokens_issued as u32, hashlist, payer, system_program, &non_fungible_mint.key(), 
-        inscription_summary.inscription_count_total)?;
+        add_to_hashlist(deployment.number_of_tokens_issued as u32, hashlist, 
+            payer, 
+            system_program, 
+            &non_fungible_mint.key(), 
+            &deployment.key(),
+            inscription_summary.inscription_count_total
+        )?;
     }
 
     emit!(MintEvent{
@@ -414,6 +419,7 @@ pub fn add_to_hashlist<'a>(
     payer: &Signer<'a>, 
     system_program: &Program<'a, System>, 
     mint: &Pubkey, 
+    deployment: &Pubkey,
     order_number: u64) -> Result<()> {
     let new_size = 8 + 32 + 4 + (new_number_of_mints) * (32 + 8);
     let rent = Rent::get()?;
@@ -443,6 +449,11 @@ pub fn add_to_hashlist<'a>(
         mint_start_pos + 32..mint_start_pos + 40
         ].copy_from_slice(&order_number.to_le_bytes());
   
+    emit!(HashlistEvent {
+        mint: mint.key(),
+        deployment: deployment.key()
+    });
+    
 
     Ok(())
 

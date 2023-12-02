@@ -35,7 +35,7 @@ pub struct DeployMigratedCtx<'info> {
     )]
     pub deployment: Account<'info, Deployment>,
 
-    #[account(init, seeds = ["hashlist".as_bytes(), 
+    #[account(init_if_needed, seeds = ["hashlist".as_bytes(), 
     deployment.key().as_ref()],
     bump, payer = payer, space = 8 + 32 + 4)]
     pub hashlist: Account<'info, Hashlist>,
@@ -149,7 +149,7 @@ pub fn deploy_migrated(ctx: Context<DeployMigratedCtx>) -> Result<()> {
         0,
         deployment.offchain_url.clone(),
         None,
-        0, //deployment.max_number_of_tokens * deployment.limit_per_mint,
+        0,
         false,
         0,
         deployment.decimals,

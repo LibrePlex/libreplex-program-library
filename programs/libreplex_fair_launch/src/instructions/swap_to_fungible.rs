@@ -38,6 +38,7 @@ pub struct SwapToFungibleCtx<'info> {
         bump,)]
     pub hashlist_marker: Account<'info, HashlistMarker>,
 
+    /// this always exists so we can specify the account type explicitly
     #[account(
         mut,
         token::mint = fungible_mint,
@@ -45,7 +46,7 @@ pub struct SwapToFungibleCtx<'info> {
     )]
     pub fungible_token_account_escrow: Box<Account<'info, TokenAccount>>,
 
-    /// CHECK: derivation checked in Logic
+    /// CHECK: derivation checked in Logic. May not exist so created as required.
     #[account(
         mut
     )]
@@ -55,6 +56,8 @@ pub struct SwapToFungibleCtx<'info> {
     #[account(mut)]
     pub non_fungible_mint: Box<Account<'info, Mint>>,
 
+    /// this always exists (otherwise we couldn't swap), so we can specify the account 
+    /// type explicitly
     #[account(
         mut,
         token::mint = non_fungible_mint,
@@ -62,7 +65,7 @@ pub struct SwapToFungibleCtx<'info> {
     )]
     pub non_fungible_source_token_account: Box<Account<'info, TokenAccount>>,
 
-    /// CHECK: derivation checked in Logic
+    /// CHECK: derivation checked in Logic. Will be created as needed
     #[account(mut
     )]
     pub non_fungible_target_token_account: UncheckedAccount<'info>,

@@ -7,6 +7,11 @@ use libreplex_shared::SharedError;
 
 use crate::{Deployment, MigrationMarker, HashlistMarker, add_to_hashlist, MigrationCounter};
 
+#[event]
+pub struct HashlistEvent {
+    pub mint: Pubkey,
+    pub deployment: Pubkey
+}
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -185,9 +190,11 @@ pub fn migrate_to_hashlist(ctx: Context<MigrateToHashlistCtx>) -> Result<()> {
         payer, 
         system_program, 
         &mint.key(), 
+        &deployment.key(),
         inscription_v3.order
     )?;
 
+    
 
 
     Ok(())
