@@ -1,16 +1,12 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
-use libreplex_inscriptions::{
-    cpi::accounts::ResizeInscriptionV3,
-    program::LibreplexInscriptions,
+use libreplex_inscriptions::program::LibreplexInscriptions;
+
+use crate::{
+    instructions::{check_metadata_uauth, ResizeLegacyInscriptionInput},
+    legacy_inscription::LegacyInscription,
+    LegacyInscriptionErrorCode,
 };
-
-
-use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
-
-use super::{resize_legacy_inscription_as_uauth::check_metadata_uauth, ResizeLegacyInscriptionInput};
-
-
 
 // Adds a metadata to a group
 #[derive(Accounts)]
@@ -83,12 +79,10 @@ pub fn handler(
         &[ctx.bumps.legacy_inscription],
     ];
 
-    let inscription_v3_seeds: &[&[u8]] = &[
-        "inscription_v3".as_bytes(),
-        mint_key.as_ref()
-    ];
+    let inscription_v3_seeds: &[&[u8]] = &["inscription_v3".as_bytes(), mint_key.as_ref()];
 
-    let expected_inscription_v3_key = Pubkey::find_program_address(inscription_v3_seeds, &libreplex_inscriptions::id()).0;
+    let expected_inscription_v3_key =
+        Pubkey::find_program_address(inscription_v3_seeds, &libreplex_inscriptions::id()).0;
 
     if expected_inscription_v3_key != inscription_v3.key() {
         return Err(LegacyInscriptionErrorCode::InscriptionV3KeyMismatch.into());
@@ -97,7 +91,7 @@ pub fn handler(
     libreplex_inscriptions::cpi::resize_inscription_v3(
         CpiContext::new_with_signer(
             inscriptions_program.to_account_info(),
-            ResizeInscriptionV3 {
+            libreplex_inscriptions::cpi::accounts::ResizeInscriptionV3 {
                 payer: payer.to_account_info(),
                 authority: legacy_inscription.to_account_info(),
                 inscription_v3: inscription_v3.to_account_info(),

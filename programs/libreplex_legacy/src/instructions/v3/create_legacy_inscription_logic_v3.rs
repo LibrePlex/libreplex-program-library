@@ -1,13 +1,17 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
-    cpi::accounts::CreateInscriptionV3, instructions::SignerType, program::LibreplexInscriptions,
+     instructions::SignerType, program::LibreplexInscriptions,
+};
+
+use libreplex_inscriptions::{
+    cpi::accounts::CreateInscriptionV3, 
 };
 
 
-use crate::{legacy_inscription::LegacyInscription, LegacyType};
+use crate::{legacy_inscription::LegacyInscription, LegacyType, instructions::AuthorityType};
 
-use super::create_legacy_inscription_logic::AuthorityType;
+
 
 pub fn create_legacy_inscription_logic_v3<'a>(
     mint: &Account<'a, Mint>,

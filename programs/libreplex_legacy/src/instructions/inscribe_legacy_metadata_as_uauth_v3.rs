@@ -10,8 +10,7 @@ use libreplex_inscriptions::{
 use crate::legacy_inscription::LegacyInscription;
 
 
-use super::check_metadata_uauth;
-use super::create_legacy_inscription_logic_v3::create_legacy_inscription_logic_v3;
+use super::{check_metadata_uauth, create_legacy_inscription_logic_v3};
 use super::create_legacy_inscription_logic::AuthorityType;
 
 
