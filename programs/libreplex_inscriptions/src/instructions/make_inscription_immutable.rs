@@ -63,11 +63,6 @@ pub fn handler(ctx: Context<MakeInscriptionImmutable>) -> Result<()> {
     inscription.authority = system_program::ID;
 
     inscription_summary.inscription_count_immutables += 1;
-    let clock = Clock::get()?;
-
-    inscription_summary.last_inscription_create_time = clock.unix_timestamp;
-    inscription_summary.last_inscription = inscription.key();
-    inscription_summary.last_inscriber = ctx.accounts.payer.key();
 
     emit!(InscriptionEventUpdate {
         id: inscription.key(),
