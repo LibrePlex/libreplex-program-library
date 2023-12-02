@@ -23,6 +23,8 @@ mod inscriptions_tests {
         Inscription,
     };
     use solana_program::account_info::AccountInfo;
+    use solana_program::clock::Clock;
+    use solana_program::sysvar::Sysvar;
     use solana_program::{instruction::Instruction, pubkey::Pubkey, system_program};
 
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
@@ -56,7 +58,6 @@ mod inscriptions_tests {
 
         let mut context: ProgramTestContext = program.start_with_context().await;
 
-        // let slot = Clock::get().unwrap().slot;
 
         // resize tests take a while so we need to advance slots in order to
         // avoid RpcError(DeadlineExceeded) on test execution
@@ -344,6 +345,8 @@ mod inscriptions_tests {
 
             system_program: system_program::id(),
         };
+
+        // context.warp_to_slot(first_normal_slot + 300).unwrap();
 
         let write_to_inscription_input: libreplex_inscriptions::instruction::WriteToInscription =
             libreplex_inscriptions::instruction::WriteToInscription {
