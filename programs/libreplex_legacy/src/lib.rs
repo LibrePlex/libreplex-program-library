@@ -17,9 +17,6 @@ pub use state::*;
 #[program]
 pub mod libreplex_legacy {
 
-    
-    
-
     use super::*;
 
     pub fn claim_excess_rent_as_uauth(
@@ -44,25 +41,6 @@ pub mod libreplex_legacy {
         )
     }
 
-    // pub fn inscribe_legacy_metadata_as_holder(
-    //     ctx: Context<InscribeLegacyMetadataAsHolder>,
-    //     // not optional - for legacy metadata we need to have some validation hash
-    //     // so we can verify the inscription once it's fully written
-    //     validation_hash: String,
-    // ) -> Result<()> {
-    //     instructions::inscribe_legacy_metadata_as_holder::handler(
-    //         ctx,
-    //         validation_hash,
-    //     )
-    // }
-
-    // pub fn write_to_legacy_inscription_as_holder(
-    //     ctx: Context<WriteToLegacyInscriptionAsHolder>,
-    //     input: libreplex_inscriptions::instructions::WriteToInscriptionInput,
-    // ) -> Result<()> {
-    //     instructions::write_to_legacy_inscription_as_holder::handler(ctx, input)
-    // }
-
     pub fn write_to_legacy_inscription_as_uauth(
         ctx: Context<WriteToLegacyInscriptionAsUAuth>,
         input: libreplex_inscriptions::instructions::WriteToInscriptionInput,
@@ -77,13 +55,6 @@ pub mod libreplex_legacy {
         instructions::resize_legacy_inscription_as_uauth::handler(ctx, input)
     }
 
-    // pub fn resize_legacy_inscription_as_holder(
-    //     ctx: Context<ResizeLegacyInscriptionAsHolder>,
-    //     input: ResizeLegacyInscriptionInput,
-    // ) -> Result<()> {
-    //     instructions::resize_legacy_inscription_as_holder::handler(ctx, input)
-    // }
-
     pub fn make_immutable(ctx: Context<MakeImmutable>) -> Result<()> {
         instructions::make_immutable::handler(ctx)
     }
@@ -94,4 +65,34 @@ pub mod libreplex_legacy {
     ) -> Result<()> {
         instructions::set_validation_hash::handler(ctx, validation_hash)
     }
+
+    /* v3 methods */
+
+    pub fn inscribe_legacy_metadata_as_uauth_v3(
+        ctx: Context<InscribeLegacyMetadataAsUauthV3>,
+        // not optional - for legacy metadata we need to have some validation hash
+        // so we can verify the inscription once it's fully written
+        validation_hash: String,
+    ) -> Result<()> {
+        instructions::inscribe_legacy_metadata_as_uauth_v3::handler(
+            ctx,
+            validation_hash,
+        )
+    }
+
+    pub fn write_to_legacy_inscription_as_uauth_v3(
+        ctx: Context<WriteToLegacyInscriptionAsUAuthV3>,
+        input: libreplex_inscriptions::instructions::WriteToInscriptionInput,
+    ) -> Result<()> {
+        instructions::write_to_legacy_inscription_as_uauth_v3::handler(ctx, input)
+    }
+
+    pub fn resize_legacy_inscription_as_uauth_v3(
+        ctx: Context<ResizeLegacyInscriptionAsUauthV3>,
+        input: ResizeLegacyInscriptionInput,
+    ) -> Result<()> {
+        instructions::resize_legacy_inscription_as_uauth_v3::handler(ctx, input)
+    }
+
+
 }

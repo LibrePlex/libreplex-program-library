@@ -1,6 +1,6 @@
 use crate::errors::ErrorCode;
 
-use crate::instructions::{SignerType, InscriptionEventCreate};
+use crate::instructions::{SignerType, InscriptionEventCreate, legacy_inscriber};
 use crate::{
     Inscription, InscriptionData, 
     InscriptionSummary, MediaType, EncodingType, InscriptionEventData, InscriptionV3,
@@ -72,10 +72,6 @@ pub struct CreateInscriptionV2<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub mod legacy_inscriber {
-    use super::*;
-    declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
-}
 
 pub fn handler(ctx: Context<CreateInscriptionV2>, input: CreateInscriptionInput) -> Result<()> {
 

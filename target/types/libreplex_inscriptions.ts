@@ -370,6 +370,161 @@ export type LibreplexInscriptions = {
           }
         }
       ]
+    },
+    {
+      "name": "createInscriptionV3",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "root",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "CreateInscriptionInputV3"
+          }
+        }
+      ]
+    },
+    {
+      "name": "makeInscriptionImmutableV3",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resizeInscriptionV3",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "ResizeInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "writeToInscriptionV3",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "WriteToInscriptionInput"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -609,6 +764,32 @@ export type LibreplexInscriptions = {
       }
     },
     {
+      "name": "CreateInscriptionInputV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "signerType",
+            "type": {
+              "defined": "SignerType"
+            }
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "WriteToInscriptionInput",
       "type": {
         "kind": "struct",
@@ -674,6 +855,48 @@ export type LibreplexInscriptions = {
             "type": {
               "defined": "EncodingType"
             }
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InscriptionV3EventData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "contentType",
+            "type": "string"
+          },
+          {
+            "name": "encoding",
+            "type": "string"
           },
           {
             "name": "inscriptionData",
@@ -822,6 +1045,65 @@ export type LibreplexInscriptions = {
         {
           "name": "size",
           "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionV3EventCreate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionV3EventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionV3EventUpdate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionV3EventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionWriteEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
           "index": false
         }
       ]
@@ -1248,6 +1530,161 @@ export const IDL: LibreplexInscriptions = {
           }
         }
       ]
+    },
+    {
+      "name": "createInscriptionV3",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "root",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "CreateInscriptionInputV3"
+          }
+        }
+      ]
+    },
+    {
+      "name": "makeInscriptionImmutableV3",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resizeInscriptionV3",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "ResizeInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "writeToInscriptionV3",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "WriteToInscriptionInput"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -1487,6 +1924,32 @@ export const IDL: LibreplexInscriptions = {
       }
     },
     {
+      "name": "CreateInscriptionInputV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "signerType",
+            "type": {
+              "defined": "SignerType"
+            }
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "WriteToInscriptionInput",
       "type": {
         "kind": "struct",
@@ -1552,6 +2015,48 @@ export const IDL: LibreplexInscriptions = {
             "type": {
               "defined": "EncodingType"
             }
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InscriptionV3EventData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "contentType",
+            "type": "string"
+          },
+          {
+            "name": "encoding",
+            "type": "string"
           },
           {
             "name": "inscriptionData",
@@ -1700,6 +2205,65 @@ export const IDL: LibreplexInscriptions = {
         {
           "name": "size",
           "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionV3EventCreate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionV3EventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionV3EventUpdate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionV3EventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionWriteEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
           "index": false
         }
       ]
