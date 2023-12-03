@@ -186,7 +186,7 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
         0,
         deployment.offchain_url.clone(),
         None,
-        0, //deployment.max_number_of_tokens * deployment.limit_per_mint,
+        0,  // number of print editions. always 0.
         false,
         0,
         deployment.decimals,
@@ -215,9 +215,10 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
         0,
         deployment.offchain_url.clone(),
         None,
-        0,
+        0, // number of print editions. always 0.
         false,
-        1, // only minted when mint instructions appear
+        1, // this is the deployment mint. once mint + inscription made when
+                        // a deployment is deployed.
         0,
         TokenStandard::NonFungible,
     )?;

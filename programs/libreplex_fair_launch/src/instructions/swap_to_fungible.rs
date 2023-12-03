@@ -3,7 +3,7 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Mint, Token, TokenAccount},
 };
-use libreplex_shared::{operations::transfer_non_pnft, SharedError};
+use libreplex_shared::operations::transfer_non_pnft;
 
 use crate::{Deployment, HashlistMarker};
 
@@ -21,6 +21,7 @@ pub struct SwapToFungibleCtx<'info> {
     )]
     pub deployment: Box<Account<'info, Deployment>>,
 
+    
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -28,11 +29,10 @@ pub struct SwapToFungibleCtx<'info> {
     #[account(mut)]
     pub fungible_mint: Box<Account<'info, Mint>>,
 
-    // verifies that the NFT coming into the escrow has
+    // verifies that the NFT coming out of the escrow has
     // been registered with the escrow, either via minting or importing
     // from legacy hashlist
-    #[account(mut, 
-        seeds = ["hashlist_marker".as_bytes(), 
+    #[account(seeds = ["hashlist_marker".as_bytes(), 
         deployment.key().as_ref(),
         non_fungible_mint.key().as_ref()],
         bump,)]
@@ -44,7 +44,7 @@ pub struct SwapToFungibleCtx<'info> {
         token::mint = fungible_mint,
         token::authority = deployment,
     )]
-    pub fungible_token_account_escrow: Box<Account<'info, TokenAccount>>,
+    pub fungible_source_token_account: Box<Account<'info, TokenAccount>>,
 
     /// CHECK: derivation checked in Logic. May not exist so created as required.
     #[account(
@@ -94,18 +94,13 @@ pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
     let non_fungible_target_token_account = &ctx.accounts.non_fungible_target_token_account;
     let non_fungible_mint = &ctx.accounts.non_fungible_mint;
 
-    let source_wallet = &ctx.accounts.payer;
-    let fungible_source_token_account = &ctx.accounts.fungible_token_account_escrow;
+    let fungible_source_token_account = &ctx.accounts.fungible_source_token_account;
     let fungible_target_token_account = &ctx.accounts.fungible_target_token_account;
     let fungible_mint = &ctx.accounts.fungible_mint;
 
     let deployment = &mut ctx.accounts.deployment;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
-
-    if !deployment.allow_spl_conversion {
-        return Err(SharedError::SplConversionNotAllowed.into());
-    }
 
     // simples. two steps:
     // 1) move the non_fungible into the escrow
@@ -114,7 +109,7 @@ pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
         &token_program.to_account_info(),
         &non_fungible_source_token_account.to_account_info(),
         &non_fungible_target_token_account.to_account_info(),
-        &source_wallet.to_account_info(),
+        &payer.to_account_info(),
         &non_fungible_mint.to_account_info(),
         &deployment.to_account_info(),
         &associated_token_program.to_account_info(),
@@ -137,7 +132,7 @@ pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
         &fungible_target_token_account.to_account_info(),
         &deployment.to_account_info(),
         &fungible_mint.to_account_info(),
-        &source_wallet.to_account_info(),
+        &payer.to_account_info(),
         &associated_token_program.to_account_info(),
         &system_program.to_account_info(),
         Some(&[authority_seeds]),
