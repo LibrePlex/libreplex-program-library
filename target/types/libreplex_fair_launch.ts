@@ -766,7 +766,7 @@ export type LibreplexFairLaunch = {
         },
         {
           "name": "hashlistMarker",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -1879,7 +1879,7 @@ export const IDL: LibreplexFairLaunch = {
         },
         {
           "name": "hashlistMarker",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false,
           "pda": {
             "seeds": [
