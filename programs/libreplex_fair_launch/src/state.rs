@@ -1,5 +1,5 @@
+use anchor_lang::prelude::*;
 use solana_program::pubkey::Pubkey;
-use anchor_lang::prelude::{*};
 
 pub const TICKER_LIMIT: usize = 200;
 pub const TEMPLATE_LIMIT: usize = 1200;
@@ -9,7 +9,7 @@ pub const OFFCHAIN_URL_LIMIT: usize = 1200;
 pub enum DeploymentStatus {
     Initialised,
     Deployed,
-    MintedOut
+    MintedOut,
 }
 
 #[account]
@@ -17,22 +17,20 @@ pub enum DeploymentStatus {
 pub struct Deployment {
     // creates has two purposes - one for historical record
     // but also to link initialise and deploy endpoints together
-    // deployment must be performed by the same wallet that initialises 
+    // deployment must be performed by the same wallet that initialises
     // the launch
-
-    pub creator: Pubkey, 
+    pub creator: Pubkey,
 
     pub limit_per_mint: u64,
     pub max_number_of_tokens: u64,
-   
+
     pub number_of_tokens_issued: u64,
     pub decimals: u8,
 
     // if a ticker is not deployed within 1 hour of initialisation, it becomes
     // available for deletion and reclaim
-
     pub deployed: bool,
-    pub minted_out: bool, 
+    pub minted_out: bool,
     pub allow_spl_conversion: bool,
 
     // indicates whether this deployment was migrated from legacy validator
@@ -42,35 +40,32 @@ pub struct Deployment {
 
     // this is used to sanity check that
     // whenever swaps occur, to the maount
-    // of fungible and non-fungible in the 
+    // of fungible and non-fungible in the
     // escrow always remains equal to the total
     // supply.
     pub escrow_non_fungible_count: u64,
 
     #[max_len(TICKER_LIMIT)]
-    pub ticker: String, 
+    pub ticker: String,
 
     #[max_len(TEMPLATE_LIMIT)]
     pub deployment_template: String,
-    
+
     #[max_len(TEMPLATE_LIMIT)]
     pub mint_template: String,
 
     pub fungible_mint: Pubkey, // starts as 111111111111...
-    
+
     #[max_len(OFFCHAIN_URL_LIMIT)]
-    pub offchain_url: String
-
-    // pub padding: Vec<u8, EXCESS>
-}  
-
+    pub offchain_url: String, // pub padding: Vec<u8, EXCESS>
+}
 
 #[event]
 pub struct NewDeploymentEvent {
-    pub ticker: String, 
+    pub ticker: String,
     pub limit_per_mint: u64,
     pub max_number_of_tokens: u64,
-    pub creator: Pubkey, 
+    pub creator: Pubkey,
 }
 
 #[event]
@@ -82,43 +77,44 @@ pub struct MintEvent {
 }
 
 impl Deployment {
-    pub fn get_fungible_mint_amount (&self) -> u64 {
-        self.limit_per_mint.checked_mul(10_u64.checked_pow(self.decimals as u32).unwrap()).unwrap()
+    pub fn get_fungible_mint_amount(&self) -> u64 {
+        self.limit_per_mint
+            .checked_mul(10_u64.checked_pow(self.decimals as u32).unwrap())
+            .unwrap()
+    }
+
+    pub fn get_max_fungible_mint_amount(&self) -> u64 {
+        self.max_number_of_tokens
+            .checked_mul(self.limit_per_mint)
+            .unwrap()
+            .checked_mul(10_u64.checked_pow(self.decimals as u32).unwrap())
+            .unwrap()
     }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct MintAndOrder {
     pub mint: Pubkey,
-    pub order: u64
+    pub order: u64,
 }
 
 // this is a genuine hashlist for the launch
 #[account]
 pub struct Hashlist {
     pub deployment: Pubkey,
-    pub issues:Vec<MintAndOrder>
+    pub issues: Vec<MintAndOrder>,
 }
-
 
 // Each mint can only be migrated once
 #[account]
-pub struct MigrationMarker {
-}
+pub struct MigrationMarker {}
 
 // Tells you whether a mint belongs to a hashlist
 #[account]
-pub struct HashlistMarker {
-}
+pub struct HashlistMarker {}
 
 #[account]
 pub struct MigrationCounter {
     pub deployment: Pubkey,
-    pub migration_count: u64
+    pub migration_count: u64,
 }
-
-
-
-
-
-

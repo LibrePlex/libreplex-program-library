@@ -3,7 +3,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{mint_to, Mint, MintTo, Token},
+    token::{mint_to, Mint, MintTo, Token, set_authority, SetAuthority, spl_token::instruction::AuthorityType},
 };
 use libreplex_inscriptions::InscriptionSummary;
 // use libreplex_shared::sysvar_instructions_program;
@@ -385,13 +385,40 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     )?;
     
 
-    // sets the max number of hashlist items to a nice round number
-    // this is to prevent insanely large hashlists from blowing up the 
-    // solana account size
-    // for very large hashlists, they can also be queried by gPA to
-    // first creator id or indexing hashlist_marker accounts.
+  
+    // if we're at max tokens, remove freeze auth and mint auth
 
-    // this does NOT stop minting.
+    if deployment.number_of_tokens_issued == deployment.max_number_of_tokens {
+        if fungible_mint.freeze_authority.is_some() {
+            // ok we are at max mint
+            set_authority(CpiContext::new_with_signer(
+                token_program.to_account_info(),
+                SetAuthority {
+                    current_authority: deployment.to_account_info(),
+                    account_or_mint: fungible_mint.to_account_info(),
+                },
+                &[deployment_seeds]
+            ),
+            AuthorityType::FreezeAccount,
+            None
+            )?;
+        }
+
+        if fungible_mint.mint_authority.is_some() {
+            // ok we are at max mint
+            set_authority(CpiContext::new_with_signer(
+                token_program.to_account_info(),
+                SetAuthority {
+                    current_authority: deployment.to_account_info(),
+                    account_or_mint: fungible_mint.to_account_info(),
+                },
+                &[deployment_seeds]
+            ),
+            AuthorityType::MintTokens,
+            None
+            )?;
+        }
+    }
 
     if deployment.number_of_tokens_issued <= 262144 {
         add_to_hashlist(deployment.number_of_tokens_issued as u32, hashlist, 
@@ -402,6 +429,14 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
             inscription_summary.inscription_count_total
         )?;
     }
+
+    // sets the max number of hashlist items to a nice round number
+    // this is to prevent insanely large hashlists from blowing up the 
+    // solana account size
+    // for very large hashlists, they can also be queried by gPA to
+    // first creator id or indexing hashlist_marker accounts.
+
+    // this does NOT stop minting.
 
     emit!(MintEvent{
         mint: non_fungible_mint.key(),

@@ -1,5 +1,6 @@
+
 use anchor_lang::prelude::*;
-use anchor_spl::{token::{mint_to, Mint, MintTo, Token}, associated_token::AssociatedToken};
+use anchor_spl::{token::{mint_to, Mint, MintTo, Token, TokenAccount, set_authority, SetAuthority, spl_token::instruction::AuthorityType}, associated_token::AssociatedToken};
 use libreplex_inscriptions::InscriptionV3;
 use libreplex_shared::SharedError;
 
@@ -93,8 +94,11 @@ pub struct MigrateToHashlistCtx<'info>  {
 
 
      /// CHECK: Id checked in constraint
-    #[account(mut)]
-    pub fungible_token_account_escrow: UncheckedAccount<'info>,
+    #[account(mut,
+        token::authority = deployment.key(),
+        token::mint = fungible_mint.key()
+    )]
+    pub fungible_token_account_escrow: Account<'info, TokenAccount>,
 
 
     #[account()]
@@ -119,7 +123,7 @@ pub fn migrate_to_hashlist(ctx: Context<MigrateToHashlistCtx>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
     let fungible_mint = &ctx.accounts.fungible_mint;
     let fungible_token_account_escrow = &ctx.accounts.fungible_token_account_escrow;
-    let associated_token_program = &ctx.accounts.associated_token_program;
+    // let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
     let payer = &ctx.accounts.payer;
     let migration_counter = &mut ctx.accounts.migration_counter;
@@ -145,44 +149,68 @@ pub fn migrate_to_hashlist(ctx: Context<MigrateToHashlistCtx>) -> Result<()> {
         return Err(SharedError::InvalidTokenAccount.into());
     }   
 
-    if fungible_token_account_escrow.to_account_info().data_is_empty() {
 
-        // msg!("{}",payer.key() );
-        anchor_spl::associated_token::create(CpiContext::new(
-            associated_token_program.to_account_info(),
-            anchor_spl::associated_token::Create {
-                payer: payer.to_account_info(),
-                associated_token: fungible_token_account_escrow.to_account_info(),
-                authority: deployment.to_account_info(),
-                mint: fungible_mint.to_account_info(),
-                system_program: system_program.to_account_info(),
-                token_program: token_program.to_account_info(),
-            },
-        ))?;
-    }
+    let current_mint_amount = fungible_mint.supply;
+
+    let final_mint_amount = deployment.get_max_fungible_mint_amount();
 
 
- 
-    // mint new stuff into the escrow 
-    mint_to(
-        CpiContext::new_with_signer(
-            token_program.to_account_info(),
-            MintTo {
-                mint: fungible_mint.to_account_info(),
-                // always mint spl tokens to the program escrow
-                to: fungible_token_account_escrow.to_account_info(),
-                authority: deployment.to_account_info(),
-            },
-            &[deployment_seeds],
-        ),
-        deployment.get_fungible_mint_amount()   )?;
+    // if we're not minted out on the fungible, max out the mint 
+    // and remove freeze + mint authorities
+    if current_mint_amount < final_mint_amount {
+        msg!("current_mint_amount {}",current_mint_amount);
+        msg!("final_mint_amount {}",final_mint_amount);
+        mint_to(
+            CpiContext::new_with_signer(
+                token_program.to_account_info(),
+                MintTo {
+                    mint: fungible_mint.to_account_info(),
+                    // always mint spl tokens to the program escrow
+                    to: fungible_token_account_escrow.to_account_info(),
+                    authority: deployment.to_account_info(),
+                },
+                &[deployment_seeds],
+            ),
 
+            final_mint_amount - current_mint_amount  
+        )?;
 
+        if fungible_mint.freeze_authority.is_some() {
+            // ok we are at max mint
+            set_authority(CpiContext::new_with_signer(
+                token_program.to_account_info(),
+                SetAuthority {
+                    current_authority: deployment.to_account_info(),
+                    account_or_mint: fungible_mint.to_account_info(),
+                },
+                &[deployment_seeds]
+            ),
+            AuthorityType::FreezeAccount,
+            None
+            )?;
+        }
 
+        if fungible_mint.mint_authority.is_some() {
+            // ok we are at max mint
+            set_authority(CpiContext::new_with_signer(
+                token_program.to_account_info(),
+                SetAuthority {
+                    current_authority: deployment.to_account_info(),
+                    account_or_mint: fungible_mint.to_account_info(),
+                },
+                &[deployment_seeds]
+            ),
+            AuthorityType::MintTokens,
+            None
+            )?;
+        }
+
+        
+        
+    } 
     // we cannot use the number of tokens issued because for migrations
     // number of tokens issues is usually equal to the max supply. So we
     // need to work off the migration counter.
-
    
     add_to_hashlist(
         migration_counter.migration_count as u32, // already pre-incremented

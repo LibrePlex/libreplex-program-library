@@ -1027,6 +1027,21 @@ export type LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "HashlistEvent",
+      "fields": [
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "deployment",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "NewDeploymentEvent",
       "fields": [
         {
@@ -2124,6 +2139,21 @@ export const IDL: LibreplexFairLaunch = {
     }
   ],
   "events": [
+    {
+      "name": "HashlistEvent",
+      "fields": [
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "deployment",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "HashlistEvent",
       "fields": [
