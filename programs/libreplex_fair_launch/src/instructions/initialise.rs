@@ -92,6 +92,13 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
 
     deployment.migrated_from_legacy = false;
 
+
+    // test that total amount of mints fits within u64
+    (input.limit_per_mint).checked_mul(input.max_number_of_tokens).unwrap().checked_mul(
+        (10_u64).checked_pow(input.decimals as u32).unwrap()).unwrap();
+    
+
+
     emit!(NewDeploymentEvent {
         creator: deployment.creator,
         limit_per_mint: deployment.limit_per_mint,
