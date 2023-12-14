@@ -1,10 +1,12 @@
 use anchor_lang::prelude::*;
-use anchor_spl::{associated_token::AssociatedToken, token::Token};
-
+use anchor_spl::{
+    associated_token::AssociatedToken,
+    token::Token,
+};
 
 use libreplex_shared::{
     create_mint_metadata_and_masteredition::create_mint_with_metadata_and_masteredition,
-    MintAccounts,
+    MintAccounts, SharedError,
 };
 use mpl_token_metadata::types::TokenStandard;
 
@@ -41,11 +43,11 @@ pub struct DeployMigratedCtx<'info> {
     pub hashlist: Account<'info, Hashlist>,
 
     /*
-        These keys are needed while the original hashlists are imported from old validator systems.
-        Will be removed once migrations are complete as they really do not belong here.
+       These keys are needed while the original hashlists are imported from old validator systems.
+       Will be removed once migrations are complete as they really do not belong here.
 
-        However 
-     */
+       However
+    */
     #[account(mut,
         constraint = payer.key().to_string() == *"4aAifU9ck88koMhSK6fnUSQHMzpyuLzGa6q7nfvqA6vx".to_owned())]
     pub payer: Signer<'info>,
@@ -62,12 +64,12 @@ pub struct DeployMigratedCtx<'info> {
     #[account(mut)]
     pub fungible_metadata: UncheckedAccount<'info>,
 
-    /* 
+    /*
         We do not need any non-fungible token stuff.
         Deployed a migrated deployment does not generate
         any new inscriptions or mints
      */
-  
+
     /* BOILERPLATE PROGRAM ACCOUNTS */
     #[account()]
     pub token_program: Program<'info, Token>,
@@ -120,12 +122,22 @@ pub fn deploy_migrated(ctx: Context<DeployMigratedCtx>) -> Result<()> {
     deployment.deployed = true;
     deployment.fungible_mint = fungible_mint.key();
 
+
     let deployment_seeds: &[&[u8]] = &[
         "deployment".as_bytes(),
         deployment.ticker.as_ref(),
         &[ctx.bumps.deployment],
     ];
 
+    let expected_token_account = anchor_spl::associated_token::get_associated_token_address(
+        &deployment.key(), &fungible_mint.key());
+
+    if expected_token_account != fungible_escrow_token_account.key() {
+        return Err(SharedError::InvalidTokenAccount.into());
+    }   
+
+
+  
     /* create the fungible mint and escrow token account */
     create_mint_with_metadata_and_masteredition(
         MintAccounts {
@@ -155,6 +167,27 @@ pub fn deploy_migrated(ctx: Context<DeployMigratedCtx>) -> Result<()> {
         deployment.decimals,
         TokenStandard::Fungible,
     )?;
+
+    // we make the escrow token account as well if needed
+
+    if fungible_escrow_token_account.to_account_info().data_is_empty() {
+
+        // msg!("{}",payer.key() );
+        anchor_spl::associated_token::create(CpiContext::new(
+            associated_token_program.to_account_info(),
+            anchor_spl::associated_token::Create {
+                payer: payer.to_account_info(),
+                associated_token: fungible_escrow_token_account.to_account_info(),
+                authority: deployment.to_account_info(),
+                mint: fungible_mint.to_account_info(),
+                system_program: system_program.to_account_info(),
+                token_program: token_program.to_account_info(),
+            },
+        ))?;
+    } else {
+        panic!("Fungible escrow token account not empty.")
+    }
+
 
     Ok(())
 }
