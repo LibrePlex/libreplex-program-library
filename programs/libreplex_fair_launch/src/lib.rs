@@ -73,11 +73,6 @@ pub mod libreplex_fair_launch {
         )
     }   
 
-
-    /*
-         Disable all swaps
-    */
-
     pub fn swap_to_fungible(
         ctx: Context<SwapToFungibleCtx>
     ) -> Result<()> {
