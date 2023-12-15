@@ -3,7 +3,8 @@ use std::fmt;
 use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-use crate::instructions::create_legacy_inscription_logic::AuthorityType;
+use crate::instructions::AuthorityType;
+
 
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, Debug)]

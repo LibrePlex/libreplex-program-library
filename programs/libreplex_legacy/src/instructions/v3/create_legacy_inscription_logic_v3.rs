@@ -4,13 +4,44 @@ use libreplex_inscriptions::{
      instructions::SignerType, program::LibreplexInscriptions,
 };
 
-use libreplex_inscriptions::{
-    cpi::accounts::CreateInscriptionV3, 
-};
+use libreplex_inscriptions::cpi::accounts::CreateInscriptionV3;
 
 
-use crate::{legacy_inscription::LegacyInscription, LegacyType, instructions::AuthorityType};
+use crate::{legacy_inscription::LegacyInscription, LegacyType};
 
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize, PartialEq, Copy)]
+pub enum AuthorityType {
+    /*
+       Holder-created inscription. Update authority holder
+       can not touch the inscription. However they can
+       remove the mint from their collection and airdrop
+       a new mint with inscription to the holder in case
+       they want to have a collection-wide inscription
+       owned by the update authority.
+
+       For mutable inscriptions, holder can resize / update
+       if the underlying offchain image changes. holder can
+       also close the inscription and reclaim the rent.
+
+       For immutable inscriptions, nothing can be done to it.
+       Rent from ommutable inscriptions CANNOT BE RECLAIMED.
+    */
+    Holder,
+
+    /*
+       Update-authority created inscription. If it is immutable,
+       it is forever. If it is mutable, the update authority can
+       resize / update the inscription.
+
+       Holder cannot create a new inscription of a mint that
+       already has an update authority inscription on it.
+
+       For immutable inscriptions, nothing can be done to it.
+       Rent from ommutable inscriptions CANNOT BE RECLAIMED.
+    */
+    UpdateAuthority,
+}
 
 
 pub fn create_legacy_inscription_logic_v3<'a>(

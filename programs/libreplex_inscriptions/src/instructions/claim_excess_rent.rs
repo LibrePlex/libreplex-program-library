@@ -1,6 +1,6 @@
 use std::cmp;
 
-use crate::{Inscription, MINIMUM_INSCRIPTION_LAMPORTS};
+use crate::{MINIMUM_INSCRIPTION_LAMPORTS, InscriptionV3};
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
@@ -13,15 +13,15 @@ pub struct ClaimExcessRent<'info> {
 
     /// CHECK: validated in logic
     #[account(
-        constraint = inscription.authority == authority.key())]
-    pub inscription: Account<'info, Inscription>,
+        constraint = inscription_v3.authority == authority.key())]
+    pub inscription_v3: Account<'info, InscriptionV3>,
 
     /// CHECK: validated in logic
     #[account(
         mut,
     seeds=[
         "inscription_data".as_bytes(),
-        inscription.root.as_ref()
+        inscription_v3.root.as_ref()
     ],bump)]
     pub inscription_data: UncheckedAccount<'info>,
 
@@ -29,7 +29,7 @@ pub struct ClaimExcessRent<'info> {
 }
 
 pub fn handler(ctx: Context<ClaimExcessRent>) -> Result<()> {
-    let inscription = &mut ctx.accounts.inscription;
+    let inscription = &mut ctx.accounts.inscription_v3;
 
     let inscription_data = &mut ctx.accounts.inscription_data;
 

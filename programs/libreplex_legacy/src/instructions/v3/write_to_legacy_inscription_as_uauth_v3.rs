@@ -4,7 +4,9 @@ use libreplex_inscriptions::{ instructions::WriteToInscriptionInput,
     program::LibreplexInscriptions, InscriptionV3, cpi::accounts::WriteToInscriptionV3,
 };
 
-use crate::{legacy_inscription::LegacyInscription, instructions::check_metadata_uauth, LegacyInscriptionErrorCode};
+use crate::{legacy_inscription::LegacyInscription, LegacyInscriptionErrorCode};
+
+use super::check_metadata_uauth;
 
 
 

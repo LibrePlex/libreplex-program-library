@@ -2118,7 +2118,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_fair_launch"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -2131,7 +2131,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_inscriptions"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anchor-attribute-event",
  "anchor-derive-accounts",
@@ -2145,7 +2145,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_legacy"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

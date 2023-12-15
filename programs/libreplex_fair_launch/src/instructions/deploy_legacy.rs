@@ -2,10 +2,10 @@ use anchor_lang::prelude::*;
 use anchor_spl::{associated_token::AssociatedToken, token::Token};
 
 use libreplex_inscriptions::{
-    cpi::accounts::CreateInscriptionV2,
-    cpi::accounts::MakeInscriptionImmutable,
-    cpi::accounts::ResizeInscription,
-    cpi::accounts::WriteToInscription,
+    cpi::accounts::CreateInscriptionV3,
+    cpi::accounts::MakeInscriptionImmutableV3,
+    cpi::accounts::ResizeInscriptionV3,
+    cpi::accounts::WriteToInscriptionV3,
     instructions::{SignerType, WriteToInscriptionInput},
     InscriptionSummary,
 };
@@ -85,6 +85,10 @@ pub struct DeployLegacyCtx<'info> {
     #[account(mut)]
     pub inscription_summary: Account<'info, InscriptionSummary>,
 
+    // leaving this account here to avoid breaking the fair launch api. 
+    // however seeing that everything uses pure v3 endpoints under the hood, 
+    // it can be removed when ready
+
     /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
     pub inscription: UncheckedAccount<'info>,
@@ -140,7 +144,6 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
     let payer = &ctx.accounts.payer;
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_summary = &ctx.accounts.inscription_summary;
-    let inscription = &ctx.accounts.inscription;
     let inscription_v3 = &ctx.accounts.inscription_v3;
     let inscription_data = &ctx.accounts.inscription_data;
     let fungible_mint = &ctx.accounts.fungible_mint;
@@ -224,10 +227,10 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
     )?;
 
     // Create the deploy inscription
-    libreplex_inscriptions::cpi::create_inscription_v2(
+    libreplex_inscriptions::cpi::create_inscription_v3(
         CpiContext::new(
             inscriptions_program.to_account_info(),
-            CreateInscriptionV2 {
+            CreateInscriptionV3 {
                 /* the inscription root is set to metaplex
                     inscription object.
                 */
@@ -237,19 +240,17 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
                 /// since root in this case can sign (we are creating a brand new mint),
                 /// it will sign
                 signer: non_fungible_mint.to_account_info(),
-                inscription: inscription.to_account_info(),
-                inscription2: inscription_v3.to_account_info(),
+                inscription_v3: inscription_v3.to_account_info(),
 
                 system_program: system_program.to_account_info(),
                 payer: payer.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),
             },
         ),
-        libreplex_inscriptions::instructions::CreateInscriptionInput {
+        libreplex_inscriptions::instructions::CreateInscriptionInputV3 {
             // the authority here doesn't matter because we will make this immutable at the
             // end of the transaction
             authority: Some(payer.key()),
-            current_rank_page: 0,
             signer_type: SignerType::Root,
             validation_hash: None,
         },
@@ -257,20 +258,19 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
 
     let data_bytes = deployment.deployment_template.clone().into_bytes();
 
-    libreplex_inscriptions::cpi::resize_inscription(
+    libreplex_inscriptions::cpi::resize_inscription_v3(
         CpiContext::new(
             inscriptions_program.to_account_info(),
-            ResizeInscription {
+            ResizeInscriptionV3 {
                 /* the inscription root is set to metaplex
                  inscription object.
                 */
                 authority: payer.to_account_info(),
 
-                inscription: inscription.to_account_info(),
                 system_program: system_program.to_account_info(),
                 payer: payer.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),
-                inscription2: Some(inscription_v3.to_account_info()),
+                inscription_v3: inscription_v3.to_account_info(),
             },
         ),
         libreplex_inscriptions::instructions::ResizeInscriptionInput {
@@ -280,14 +280,13 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
         },
     )?;
 
-    libreplex_inscriptions::cpi::write_to_inscription(
+    libreplex_inscriptions::cpi::write_to_inscription_v3(
         CpiContext::new(
             inscriptions_program.to_account_info(),
-            WriteToInscription {
+            WriteToInscriptionV3 {
                 authority: payer.to_account_info(),
                 payer: payer.to_account_info(),
-                inscription: inscription.to_account_info(),
-                inscription2: Some(inscription_v3.to_account_info()),
+                inscription_v3: inscription_v3.to_account_info(),
                 system_program: system_program.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),
             },
@@ -301,14 +300,13 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
     )?;
 
     // set update auth to 1111111111111111
-    libreplex_inscriptions::cpi::make_inscription_immutable(CpiContext::new(
+    libreplex_inscriptions::cpi::make_inscription_immutable_v3(CpiContext::new(
         inscriptions_program.to_account_info(),
-        MakeInscriptionImmutable {
+        MakeInscriptionImmutableV3 {
             payer: payer.to_account_info(),
             authority: payer.to_account_info(),
             inscription_summary: inscription_summary.to_account_info(),
-            inscription: inscription.to_account_info(),
-            inscription2: Some(inscription_v3.to_account_info()),
+            inscription_v3: inscription_v3.to_account_info(),
             system_program: system_program.to_account_info(),
         },
     ))?;

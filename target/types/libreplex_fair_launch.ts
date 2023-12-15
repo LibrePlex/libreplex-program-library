@@ -1,5 +1,5 @@
 export type LibreplexFairLaunch = {
-  "version": "0.0.1",
+  "version": "0.1.0",
   "name": "libreplex_fair_launch",
   "instructions": [
     {
@@ -1011,21 +1011,6 @@ export type LibreplexFairLaunch = {
     }
   ],
   "events": [
-    {
-      "name": "HashlistEvent",
-      "fields": [
-        {
-          "name": "mint",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "deployment",
-          "type": "publicKey",
-          "index": false
-        }
-      ]
-    },
     {
       "name": "HashlistEvent",
       "fields": [
@@ -1127,7 +1112,7 @@ export type LibreplexFairLaunch = {
 };
 
 export const IDL: LibreplexFairLaunch = {
-  "version": "0.0.1",
+  "version": "0.1.0",
   "name": "libreplex_fair_launch",
   "instructions": [
     {
@@ -2139,21 +2124,6 @@ export const IDL: LibreplexFairLaunch = {
     }
   ],
   "events": [
-    {
-      "name": "HashlistEvent",
-      "fields": [
-        {
-          "name": "mint",
-          "type": "publicKey",
-          "index": false
-        },
-        {
-          "name": "deployment",
-          "type": "publicKey",
-          "index": false
-        }
-      ]
-    },
     {
       "name": "HashlistEvent",
       "fields": [

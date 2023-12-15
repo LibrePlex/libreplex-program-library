@@ -2,9 +2,7 @@ use crate::state::Metadata;
 use crate::{Asset, MetadataEvent, MetadataEventType, MetadataExtension};
 use anchor_lang::prelude::*;
 
-
-use libreplex_inscriptions::cpi::accounts::CreateInscription;
-
+use libreplex_inscriptions::cpi::accounts::CreateInscriptionV3;
 use libreplex_inscriptions::instructions::SignerType;
 use libreplex_inscriptions::program::LibreplexInscriptions;
 
@@ -69,13 +67,9 @@ pub struct CreateInscriptionMetadata<'info> {
     #[account(mut)]
     pub mint: Signer<'info>,
 
-    /// CHECK: checked via CPI
-    #[account(mut)]
-    pub inscription: UncheckedAccount<'info>,
-
     /// CHECK: Checked via CPI
     #[account(mut)]
-    pub inscription_v2: UncheckedAccount<'info>,
+    pub inscription_v3: UncheckedAccount<'info>,
 
     /// CHECK: checked via CPI
     #[account(mut)]
@@ -103,25 +97,22 @@ pub fn handler(
     input: CreateMetadataInscriptionInput
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
-    let inscription = &mut ctx.accounts.inscription;
-    let inscription_v2 = &mut ctx.accounts.inscription_v2;
+    let inscription_v3 = &mut ctx.accounts.inscription_v3;
     let inscription_data = &mut ctx.accounts.inscription_data;
 
     let inscription_summary = &mut ctx.accounts.inscription_summary;
     
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let system_program = &ctx.accounts.system_program;
-    let inscription_ranks_current_page = &ctx.accounts.inscription_ranks_current_page;
-    let inscription_ranks_next_page = &ctx.accounts.inscription_ranks_next_page;
     
     let signer = &ctx.accounts.signer;
 
     let mint = &ctx.accounts.mint;
     
-    libreplex_inscriptions::cpi::create_inscription(
+    libreplex_inscriptions::cpi::create_inscription_v3(
         CpiContext::new(
             inscriptions_program.to_account_info(),
-            CreateInscription {
+            CreateInscriptionV3 {
                 inscription_summary: inscription_summary.to_account_info(),
                
                 /* the inscription root is set to metadata
@@ -134,18 +125,14 @@ pub fn handler(
                 */
                 root: mint.to_account_info(),
                 signer: mint.to_account_info(),
-                inscription_ranks_current_page: inscription_ranks_current_page.to_account_info(),
-                inscription_ranks_next_page: inscription_ranks_next_page.to_account_info(),
-                inscription: inscription.to_account_info(),
-                inscription2: inscription_v2.to_account_info(),
+                inscription_v3: inscription_v3.to_account_info(),
                 inscription_data: inscription_data.to_account_info(),
                 system_program: system_program.to_account_info(),
                 payer: signer.to_account_info(),
             }
         ),
-        libreplex_inscriptions::instructions::CreateInscriptionInput {
+        libreplex_inscriptions::instructions::CreateInscriptionInputV3 {
             authority: Some(signer.key()),
-            current_rank_page: 0,
             signer_type: SignerType::Root,
             validation_hash: input.validation_hash
         },
@@ -158,7 +145,7 @@ pub fn handler(
     metadata.name = input.name.clone();
     metadata.update_authority = input.update_authority;
     metadata.asset = Asset::Inscription {
-        inscription_id: ctx.accounts.inscription.key(),
+        inscription_id: ctx.accounts.inscription_v3.key(),
         base_data_account_id: ctx.accounts.inscription_data.key(),
         data_type: input.data_type,
         description: input.description,

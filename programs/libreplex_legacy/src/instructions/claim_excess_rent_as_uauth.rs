@@ -2,13 +2,14 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
     cpi::accounts::ClaimExcessRent,
-    program::LibreplexInscriptions, Inscription,
+    program::LibreplexInscriptions, InscriptionV3,
 };
 
 
 use crate::legacy_inscription::LegacyInscription;
 
-use super::resize_legacy_inscription_as_uauth::check_metadata_uauth;
+use super::check_metadata_uauth;
+
 
 
 
@@ -31,7 +32,7 @@ pub struct ClaimExcessRentAsUauth<'info> {
     pub legacy_metadata: UncheckedAccount<'info>,
 
     #[account()]
-    pub inscription: Account<'info, Inscription>,
+    pub inscription_v3: Account<'info, InscriptionV3>,
 
     /// CHECK: Checked via a CPI call
     #[account(mut)]
@@ -54,7 +55,7 @@ pub fn handler(
     ctx: Context<ClaimExcessRentAsUauth>
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
-    let inscription = &mut ctx.accounts.inscription;
+    let inscription_v3 = &mut ctx.accounts.inscription_v3;
     let inscription_data = &mut ctx.accounts.inscription_data;
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
@@ -82,7 +83,7 @@ pub fn handler(
         ClaimExcessRent {
             payer: payer.to_account_info(),
             authority: legacy_inscription.to_account_info(),
-            inscription: inscription.to_account_info(),
+            inscription_v3: inscription_v3.to_account_info(),
             system_program: system_program.to_account_info(),
             inscription_data: inscription_data.to_account_info(),
         },

@@ -39,9 +39,9 @@ pub struct WriteToInscription<'info> {
 
     /// CHECK: Authority checked in logic
     #[account(mut,
-        constraint = inscription.authority == authority.key(),
-        constraint = inscription.inscription_data == inscription_data.key())]
-    pub inscription2: Option<Account<'info, InscriptionV3>>,
+        constraint = inscription2.authority == authority.key(),
+        constraint = inscription2.inscription_data == inscription_data.key())]
+    pub inscription2: Account<'info, InscriptionV3>,
 
     /// CHECK: we never want anchor to handle this. It's just a data blob
     #[account(mut)]
@@ -75,52 +75,37 @@ pub fn handler(
         return Err(ErrorCode::IncorrectInscriptionDataAccount.into());
     }
 
-    match inscription_v2 {
-        Some(x) => {
-            let new_length = InscriptionV3::get_new_size(x, &inscription_input);
-            msg!("new length {}", new_length);
-            let rent = Rent::get()?;
-            let new_minimum_balance = rent.minimum_balance(new_length);
-            let lamports_diff = new_minimum_balance.saturating_sub(x.to_account_info().lamports());
+    let new_length = InscriptionV3::get_new_size(inscription_v2, &inscription_input);
+    msg!("new length {}", new_length);
+    let rent = Rent::get()?;
+    let new_minimum_balance = rent.minimum_balance(new_length);
+    let lamports_diff = new_minimum_balance.saturating_sub(inscription_v2.to_account_info().lamports());
 
-            if lamports_diff > 0 {
-                system_program::transfer(
-                    CpiContext::new(
-                        system_program.to_account_info(),
-                        system_program::Transfer {
-                            from: payer.to_account_info(),
-                            to: x.to_account_info(),
-                        },
-                    ),
-                    lamports_diff,
-                )?;
-            }
-
-            x.to_account_info().realloc(new_length, true)?;
-        }
-        None => {}
+    if lamports_diff > 0 {
+        system_program::transfer(
+            CpiContext::new(
+                system_program.to_account_info(),
+                system_program::Transfer {
+                    from: payer.to_account_info(),
+                    to: inscription_v2.to_account_info(),
+                },
+            ),
+            lamports_diff,
+        )?;
     }
+
+    inscription_v2.to_account_info().realloc(new_length, true)?;
 
     if let Some(x) = inscription_input.media_type {
         inscription.media_type = MediaType::Custom {
             media_type: x.to_owned(),
         };
-        match inscription_v2 {
-            Some(y) => {
-                y.content_type = x.clone();
-            }
-            None => {}
-        }
+        inscription_v2.content_type = x.clone();
     }
 
     if let Some(x) = inscription_input.encoding_type {
         inscription.encoding_type = EncodingType::Base64;
-        match inscription_v2 {
-            Some(y) => {
-                y.encoding = x.clone();
-            }
-            None => {}
-        }
+        inscription_v2.encoding = x.clone();
     }
     if !inscription_input.data.is_empty() {
         inscription.write_data(

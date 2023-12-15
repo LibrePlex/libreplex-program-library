@@ -57,8 +57,8 @@ pub struct ResizeInscription<'info> {
     pub inscription: Account<'info, Inscription>,
     /// CHECK: validated in logic
     #[account(mut,
-        constraint = inscription.authority == authority.key())]
-    pub inscription2: Option<Account<'info, InscriptionV3>>,
+        constraint = inscription2.authority == authority.key())]
+    pub inscription2: Account<'info, InscriptionV3>,
 
     /// CHECK: validated in logic
     #[account(
@@ -96,14 +96,7 @@ pub fn handler(
         ),
         Ordering::Equal => inscription.size,
     };
-    match inscription_v2 {
-        Some(x) => {
-            x.size = inscription.size;
-        },
-        None => {
-
-        }
-    }
+    inscription_v2.size = inscription.size;
     let size_new = inscription.size;
 
     let rent = Rent::get()?;

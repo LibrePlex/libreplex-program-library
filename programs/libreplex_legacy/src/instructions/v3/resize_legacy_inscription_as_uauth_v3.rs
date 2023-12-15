@@ -3,10 +3,29 @@ use anchor_spl::token::Mint;
 use libreplex_inscriptions::{program::LibreplexInscriptions, InscriptionV3};
 
 use crate::{
-    instructions::{check_metadata_uauth, ResizeLegacyInscriptionInput},
     legacy_inscription::LegacyInscription,
     LegacyInscriptionErrorCode,
 };
+
+use super::check_metadata_uauth;
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct ResizeLegacyInscriptionInput {
+    pub change: i32,
+    /*
+        This only exists to show solana
+        that each of the resize inputs is
+        in fact a separate transaction
+    */
+    pub expected_start_size: u32,
+    /*
+        target size is specified
+        to make sure that multiple resizes
+        executed concurrently never increase / decrease
+        the size beyond target size
+    */
+    pub target_size: u32,
+}
 
 // Adds a metadata to a group
 #[derive(Accounts)]

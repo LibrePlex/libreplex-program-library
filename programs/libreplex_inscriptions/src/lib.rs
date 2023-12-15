@@ -40,38 +40,7 @@ pub mod libreplex_inscriptions {
         )
     }
 
-    pub fn create_inscription(
-        ctx: Context<CreateInscription>,
-        inscription_input: CreateInscriptionInput,
-    ) -> Result<()> {
-        instructions::create_inscription::handler(
-            ctx,
-            inscription_input
-        )
-    }
-
-    pub fn create_inscription_v2(
-        ctx: Context<CreateInscriptionV2>,
-        inscription_input: CreateInscriptionInput,
-    ) -> Result<()> {
-        instructions::create_inscription_v2::handler(
-            ctx,
-            inscription_input
-        )
-    }
-
-  
-
-    pub fn resize_inscription(
-        ctx: Context<ResizeInscription>,
-        input: ResizeInscriptionInput,
-    ) -> Result<()> {
-        instructions::resize_inscription::handler(
-            ctx,
-            input
-        )
-    }
-
+   
     pub fn claim_excess_rent(
         ctx: Context<ClaimExcessRent>,
     ) -> Result<()> {
@@ -80,16 +49,6 @@ pub mod libreplex_inscriptions {
         )
     }
 
-
-    pub fn write_to_inscription(
-        ctx: Context<WriteToInscription>,
-        input: WriteToInscriptionInput,
-    ) -> Result<()> {
-        instructions::write_to_inscription::handler(
-            ctx,
-            input
-        )
-    }
 
     pub fn migrate_to_v3(
         ctx: Context<MigrateToV3>,

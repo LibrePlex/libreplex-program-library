@@ -67,7 +67,7 @@ pub struct CreateInscriptionV2<'info> {
         ],
         bump,
         payer = payer)]
-    pub inscription2: Account<'info, InscriptionV3>,
+    pub inscription_v3: Account<'info, InscriptionV3>,
 
     pub system_program: Program<'info, System>,
 }
@@ -76,7 +76,7 @@ pub struct CreateInscriptionV2<'info> {
 pub fn handler(ctx: Context<CreateInscriptionV2>, input: CreateInscriptionInput) -> Result<()> {
 
     let inscription = &mut ctx.accounts.inscription;
-    let inscription_v2 = &mut ctx.accounts.inscription2;
+    let inscription_v2 = &mut ctx.accounts.inscription_v3;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
 
     let authority = match input.authority {

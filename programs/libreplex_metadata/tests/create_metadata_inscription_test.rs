@@ -87,13 +87,8 @@ mod permissions {
         )
         .0;
 
-        let inscription = Pubkey::find_program_address(
-            &["inscription".as_bytes(), mint.pubkey().as_ref()],
-            &libreplex_inscriptions::ID,
-        )
-        .0;
-
-        let inscription_v2 = Pubkey::find_program_address(
+        
+        let inscription_v3 = Pubkey::find_program_address(
             &["inscription_v3".as_bytes(), mint.pubkey().as_ref()],
             &libreplex_inscriptions::ID,
         )
@@ -138,8 +133,7 @@ mod permissions {
                         inscription_summary,
                         inscription_ranks_current_page,
                         inscription_ranks_next_page,
-                        inscription,
-                        inscription_v2,
+                        inscription_v3,
                         inscription_data,
                         inscriptions_program: libreplex_inscriptions::ID,
                         system_program: system_program::ID,
@@ -184,7 +178,7 @@ mod permissions {
                 ..
             } => {
                 assert_eq!(base_data_account_id, inscription_data);
-                assert_eq!(inscription_id, inscription);
+                assert_eq!(inscription_id, inscription_v3);
             }
             _ => {
                 assert_eq!(true, false);
