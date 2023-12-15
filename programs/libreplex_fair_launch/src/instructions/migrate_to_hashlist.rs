@@ -160,20 +160,27 @@ pub fn migrate_to_hashlist(ctx: Context<MigrateToHashlistCtx>) -> Result<()> {
     if current_mint_amount < final_mint_amount {
         msg!("current_mint_amount {}",current_mint_amount);
         msg!("final_mint_amount {}",final_mint_amount);
-        mint_to(
-            CpiContext::new_with_signer(
-                token_program.to_account_info(),
-                MintTo {
-                    mint: fungible_mint.to_account_info(),
-                    // always mint spl tokens to the program escrow
-                    to: fungible_token_account_escrow.to_account_info(),
-                    authority: deployment.to_account_info(),
-                },
-                &[deployment_seeds],
-            ),
 
-            final_mint_amount - current_mint_amount  
-        )?;
+        // it is possible that the current mint amount is smaller than the final mint amount
+        // this can happen when a part of the total supply has been burned after scribing out
+        // so we put this check here. In any case there's no point trying to mint anything 
+        // if there is no mint authority.
+        if fungible_mint.mint_authority.is_some()  {
+            mint_to(
+                CpiContext::new_with_signer(
+                    token_program.to_account_info(),
+                    MintTo {
+                        mint: fungible_mint.to_account_info(),
+                        // always mint spl tokens to the program escrow
+                        to: fungible_token_account_escrow.to_account_info(),
+                        authority: deployment.to_account_info(),
+                    },
+                    &[deployment_seeds],
+                ),
+
+                final_mint_amount - current_mint_amount  
+            )?;
+        }
 
         if fungible_mint.freeze_authority.is_some() {
             // ok we are at max mint
