@@ -1,9 +1,9 @@
 use crate::errors::ErrorCode;
 
 use crate::instructions::create_inscription::legacy_inscriber;
-use crate::instructions::SignerType;
+use crate::instructions::{SignerType, InscriptionEventCreate};
 use crate::{
-    Inscription, InscriptionData, InscriptionSummary, InscriptionV3, InscriptionV3EventData,
+    Inscription, InscriptionData, InscriptionSummary, InscriptionV3, InscriptionV3EventData, InscriptionEventData,
 };
 
 #[event]
@@ -155,7 +155,6 @@ pub fn handler(ctx: Context<CreateInscriptionV3>, input: CreateInscriptionInputV
         }
     }
 
-    // for now, only fire events for inscription v1
     emit!(InscriptionV3EventCreate {
         id: inscription_v3.key(),
         data: InscriptionV3EventData {
@@ -169,6 +168,26 @@ pub fn handler(ctx: Context<CreateInscriptionV3>, input: CreateInscriptionInputV
             validation_hash: inscription_v3.validation_hash.clone()
         }
     });
+
+    // generate backwards compatible events
+    let inscription_v1_id = Pubkey::find_program_address(
+        &["inscription".as_bytes(), inscription_v3.root.as_ref()]
+        , &crate::id()).0;
+
+    emit!(InscriptionEventCreate {
+        id: inscription_v1_id.key(),
+        data: InscriptionEventData { 
+            authority: inscription_v3.authority, 
+            root: inscription_v3.root, 
+            media_type: crate::MediaType::Custom { media_type: inscription_v3.content_type.clone()},
+            encoding_type: crate::EncodingType::None,
+            inscription_data: inscription_v3.inscription_data,
+            order: inscription_v3.order,
+            size: inscription_v3.size,
+            validation_hash: inscription_v3.validation_hash.clone()
+        }
+    });
+
 
     Ok(())
 }

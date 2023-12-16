@@ -106,7 +106,8 @@ pub fn deploy_migrated(ctx: Context<DeployMigratedCtx>) -> Result<()> {
     let hashlist = &mut ctx.accounts.hashlist;
 
     hashlist.deployment = deployment.key();
-    deployment.deployed = true;
+    deployment.require_creator_cosign = false;
+    deployment.use_inscriptions = true;
 
     let deployment = &mut ctx.accounts.deployment;
     let system_program = &ctx.accounts.system_program;
@@ -119,7 +120,6 @@ pub fn deploy_migrated(ctx: Context<DeployMigratedCtx>) -> Result<()> {
     let associated_token_program = &ctx.accounts.associated_token_program;
     let fungible_escrow_token_account = &ctx.accounts.fungible_escrow_token_account;
 
-    deployment.deployed = true;
     deployment.fungible_mint = fungible_mint.key();
 
 

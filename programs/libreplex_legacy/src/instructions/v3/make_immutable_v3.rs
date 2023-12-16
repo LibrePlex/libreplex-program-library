@@ -11,7 +11,7 @@ use super::check_metadata_uauth;
 
 // Adds a metadata to a group
 #[derive(Accounts)]
-pub struct MakeImmutable<'info> {
+pub struct MakeImmutableV3<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
@@ -42,7 +42,7 @@ pub struct MakeImmutable<'info> {
     pub inscriptions_program: Program<'info, LibreplexInscriptions>,
 }
 
-pub fn handler(ctx: Context<MakeImmutable>) -> Result<()> {
+pub fn make_immutable_v3(ctx: Context<MakeImmutableV3>) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_v3 = &mut ctx.accounts.inscription_v3;
     let system_program = &ctx.accounts.system_program;
