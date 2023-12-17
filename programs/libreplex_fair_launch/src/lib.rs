@@ -14,6 +14,17 @@ pub mod libreplex_fair_launch {
 
     use super::*;
 
+   // v2 endpoints. Prefer these over the original ones
+
+   pub fn deploy_legacy_v2(
+    ctx: Context<DeployLegacyV2Ctx>,
+    input: DeployLegacyV2Input
+    ) -> Result<()> {
+        instructions::deploy_legacy_v2::deploy_legacy_v2(
+            ctx,
+            input
+        )
+   }   
 
    pub fn deploy_legacy(
         ctx: Context<DeployLegacyCtx>,
@@ -22,6 +33,7 @@ pub mod libreplex_fair_launch {
             ctx
         )
     }   
+    
 
     pub fn initialise(
         ctx: Context<InitialiseCtx>,
