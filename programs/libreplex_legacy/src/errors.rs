@@ -28,6 +28,9 @@ pub enum LegacyInscriptionErrorCode {
     Inscription2KeyMismatch,
 
     #[msg("Inscription V3 key mismatch")]
-    InscriptionV3KeyMismatch
+    InscriptionV3KeyMismatch,
+
+    #[msg("Metadata data missmatch")]
+    DataHashMismatch,
 
 }

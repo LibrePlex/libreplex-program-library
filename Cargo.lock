@@ -1029,7 +1029,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bubblegum_proxy"
+name = "bubblegum-proxy"
 version = "0.1.0"
 dependencies = [
  "anchor-gen",
@@ -2421,7 +2421,7 @@ dependencies = [
  "anchor-lang 0.29.0",
  "anchor-spl 0.29.0",
  "assert_matches",
- "bubblegum_proxy",
+ "bubblegum-proxy",
  "libreplex_inscriptions",
  "mocha",
  "mpl-bubblegum",
@@ -2431,6 +2431,7 @@ dependencies = [
  "solana-sdk",
  "spl-account-compression",
  "spl-associated-token-account 2.2.0",
+ "spl-compression-proxy",
 ]
 
 [[package]]
@@ -5172,6 +5173,14 @@ dependencies = [
  "spl-token 4.0.0",
  "spl-token-2022 0.9.0",
  "thiserror",
+]
+
+[[package]]
+name = "spl-compression-proxy"
+version = "0.1.0"
+dependencies = [
+ "anchor-gen",
+ "anchor-lang 0.29.0",
 ]
 
 [[package]]

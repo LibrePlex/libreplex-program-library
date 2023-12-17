@@ -9,8 +9,7 @@ pub use check_metadata_type::*;
 
 pub mod check_metadata_type;
 
-pub mod inscribe_cnft_as_collection_auth;
-
+pub mod inscribe_cnft;
 
 
 

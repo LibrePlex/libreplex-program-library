@@ -4,13 +4,20 @@ use anchor_spl::token::Mint;
 use libreplex_inscriptions::{
     instructions::SignerType, program::LibreplexInscriptions,
 };
-use bubblegum_proxy::{state::TreeConfig, MetadataArgs};
+use bubblegum_proxy::{state::TreeConfig};
+
+use mpl_bubblegum::hash_metadata;
+use mpl_bubblegum::state::leaf_schema::LeafSchema;
+
 use mpl_bubblegum::utils::get_asset_id;
 use mpl_token_metadata::accounts::Metadata;
 // use mpl_token_metadata::types::TokenStandard;
 use crate::LegacyInscriptionErrorCode;
 use crate::{legacy_inscription::LegacyInscription, instructions::AuthorityType};
 
+pub use bubblegum_proxy::MetadataArgs;
+
+use mpl_bubblegum::state::metaplex_adapter::MetadataArgs as BMetadataArgs;
 
 use super::{check_metadata_uauth, create_legacy_inscription_logic_v3};
 
@@ -23,7 +30,7 @@ use super::{check_metadata_uauth, create_legacy_inscription_logic_v3};
     creator_hash: [u8; 32],
     nonce: u64,
     index: u32,
-    metadata_args: MetadataArgs,   
+    metadata_args: BMetadataArgs,   
     leaf_delegate: Pubkey,
     leaf_owner: Pubkey)]
 pub struct InscribeCNFT<'info> {
@@ -90,16 +97,20 @@ pub struct InscribeCNFT<'info> {
     pub compression_program: UncheckedAccount<'info>,
 }
 
-pub fn handler(
-    ctx: Context<InscribeCNFT>,
+pub struct InscribeCNFTInput {
     root: [u8; 32],
     data_hash: [u8; 32],
     creator_hash: [u8; 32],
     nonce: u64,
     index: u32,
-    metadata_args: Box<MetadataArgs>,
+    metadata_args: BMetadataArgs,
     leaf_delegate: Pubkey,
     leaf_owner: Pubkey,
+}
+
+pub fn inscribe_cnft(
+    ctx: Context<InscribeCNFT>,
+    input: Box<InscribeCNFTInput>
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
@@ -121,45 +132,18 @@ pub fn handler(
 
     let expected_bump = ctx.bumps.legacy_signer;
 
-    let verify_leaf_ctx = CpiContext::new(
-        ctx.accounts.compression_program.to_account_info(),
-        spl_account_compression::cpi::accounts::VerifyLeaf {
-            merkle_tree: ctx.accounts.merkle_tree.to_account_info(),
-        },
-    )
-    .with_remaining_accounts(ctx.remaining_accounts.to_vec());
 
-    let asset_id = ctx.accounts.asset_id.key();
-    let leaf_schema = LeafSchema::new_v0(
-        asset_id,
-        ctx.accounts.leaf_owner.key(),
-        ctx.accounts.leaf_owner.key(),
-        nonce,
-        data_hash,
-        creator_hash,
-    );
-
-    spl_account_compression::cpi::verify_leaf(
-        verify_leaf_ctx,
-        root,
-        leaf_schema.to_node(),
-        index,
-    )?;
-
-    if let Some(collection_details) = metadata_args.collection {
-        let provided_collecton_metadata = ctx.accounts.collection_metadata
-            .as_ref().ok_or(LegacyInscriptionErrorCode::BadAuthority)?;
-
-        let collection_metadata = Metadata::from_bytes(&provided_collecton_metadata.try_borrow_data()?[..])?;
-
-        if collection_metadata.mint !=  collection_details.key || 
-            &collection_metadata.update_authority != authority.key {
-            return Err(LegacyInscriptionErrorCode::BadAuthority.into());
-        }
-    }
-    else if leaf_owner != authority.key() {
-        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
-    }
+    assert_can_inscribe_cnft(&input, &CNFTCheckAccounts {
+        compression_program: &ctx.accounts.compression_program,
+        merkle_tree: &ctx.accounts.merkle_tree,
+        asset_id: &ctx.accounts.asset_id,
+        collection_metadata: ctx.accounts.collection_metadata.as_ref().map(|a| {
+            a.as_ref()
+        }) ,
+        authority: &ctx.accounts.authority,
+        remaining_accounts: ctx.remaining_accounts,
+    })?;
+    
 
     create_legacy_inscription_logic_v3(
         &ctx.accounts.asset_id,
@@ -180,4 +164,74 @@ pub fn handler(
     Ok(())
 }
 
+pub struct CNFTCheckAccounts<'a, 'info> {
+    compression_program: & 'a AccountInfo<'info>,
+    merkle_tree: & 'a AccountInfo<'info>,
+    asset_id: & 'a AccountInfo<'info>,
+    collection_metadata: Option<& 'a AccountInfo<'info>>,
+    authority: & 'a AccountInfo<'info>,
+    remaining_accounts: &'a [AccountInfo<'info>],
+}
+
+
+pub fn assert_can_inscribe_cnft(input: &InscribeCNFTInput, accounts: &CNFTCheckAccounts) -> Result<()> {
+    let InscribeCNFTInput { root, data_hash, creator_hash, 
+        nonce, index, metadata_args,
+         leaf_delegate, leaf_owner } = input;
+
+    let CNFTCheckAccounts { compression_program, merkle_tree,
+         asset_id, collection_metadata, 
+         authority, remaining_accounts } = accounts;
+
+    let verify_leaf_ctx = CpiContext::new(
+        compression_program.to_account_info(),
+        spl_compression_proxy::cpi::accounts::VerifyLeaf {
+            merkle_tree: merkle_tree.to_account_info(),
+        },
+    )
+    .with_remaining_accounts(remaining_accounts.to_vec());
+
+    let asset_id = asset_id.key();
+    let leaf_schema = LeafSchema::new_v0(
+        asset_id,
+        leaf_owner.clone(),
+        leaf_delegate.clone(),
+        *nonce,
+        data_hash.clone(),
+        creator_hash.clone(),
+    );
+
+    spl_compression_proxy::cpi::verify_leaf(
+        verify_leaf_ctx,
+        root.clone(),
+        leaf_schema.to_node(),
+        *index,
+    )?;
+
+    let incoming_data_hash = hash_metadata(metadata_args).expect("Can hash metadata");
+
+    if data_hash != &incoming_data_hash {
+        return Err(LegacyInscriptionErrorCode::DataHashMismatch.into());
+    }
+
+    if let Some(collection_details) = metadata_args.collection {
+        let provided_collecton_metadata = collection_metadata
+            .as_ref().ok_or(LegacyInscriptionErrorCode::BadAuthority)?;
+
+        let collection_metadata = Metadata::from_bytes(&provided_collecton_metadata.try_borrow_data()?[..])?;
+
+        if collection_metadata.mint !=  collection_details.key || 
+            &collection_metadata.update_authority != authority.key {
+            return Err(LegacyInscriptionErrorCode::BadAuthority.into());
+        }
+
+        return Ok(())
+    }
+
+    if leaf_owner != authority.key {
+        return Err(LegacyInscriptionErrorCode::BadAuthority.into());
+    }
+
+    return Ok(());
+}
 
