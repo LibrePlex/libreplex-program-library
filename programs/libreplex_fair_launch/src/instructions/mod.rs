@@ -29,6 +29,10 @@ pub mod mint_legacy;
 pub use mint_legacy::*;
 
 
+pub mod mint_compressed;
+pub use mint_compressed::*;
+
+
 /*
     Swap to nonfungible - currently disabled
 

@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use instructions::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
+use libreplex_inscriptions::instructions::WriteToInscriptionInput;
 
 declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
 
@@ -64,6 +65,25 @@ pub mod libreplex_legacy {
         input: ResizeLegacyInscriptionInput,
     ) -> Result<()> {
         instructions::resize_legacy_inscription_as_uauth_v3::handler(ctx, input)
+    }
+
+
+    pub fn inscribe_cnft(
+        ctx: Context<InscribeCNFT>, 
+        input: Box<cnft::InscribeCNFTInput>) -> Result<()> {
+        instructions::cnft::inscribe(ctx, input)
+    }
+
+    pub fn resize_cnft_inscription(ctx: Context<ResizeCNFT>, 
+        compression_input: Box<cnft::InscribeCNFTInput>,
+        input: ResizeLegacyInscriptionInput) -> Result<()> {
+        instructions::cnft::resize(ctx, compression_input,input)
+    }
+
+    pub fn write_cnft_inscription(ctx: Context<WriteCNFT>,  
+        compression_input: Box<cnft::InscribeCNFTInput>, 
+        write_input: WriteToInscriptionInput) -> Result<()> {
+            instructions::cnft::write(ctx, compression_input, write_input)
     }
 
 

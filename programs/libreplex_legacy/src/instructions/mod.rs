@@ -9,7 +9,9 @@ pub use check_metadata_type::*;
 
 pub mod check_metadata_type;
 
-pub mod inscribe_cnft;
+pub mod cnft;
+
+pub use cnft::*;
 
 
 

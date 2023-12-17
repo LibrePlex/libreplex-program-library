@@ -45,7 +45,7 @@ pub enum AuthorityType {
 
 
 pub fn create_legacy_inscription_logic_v3<'a>(
-    mint: &AccountInfo<'a>,
+    mint: &Pubkey,
     legacy_inscription: &mut Account<'a, LegacyInscription>,
     authority_type: AuthorityType,
     inscription_v3: &mut UncheckedAccount<'a>,
@@ -59,7 +59,7 @@ pub fn create_legacy_inscription_logic_v3<'a>(
     validation_hash: String,
     signer_type: SignerType,
 ) -> Result<()> {
-    let mint_key = mint.key();
+
     legacy_inscription.authority_type = authority_type;
     legacy_inscription.mint = mint.key();
     
