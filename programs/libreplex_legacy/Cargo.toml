@@ -25,6 +25,10 @@ libreplex_inscriptions = {version = "*", path="../libreplex_inscriptions", featu
 spl-associated-token-account = "2.2.0"
 solana-program = {version = "~1.16"}
 mpl-token-metadata = { version="~3" }
+mpl-bubblegum = {version = "0.11.0", features = ["cpi", "no-entrypoint"]}
+bubblegum_proxy = {path = "../../utils/bubblegum_proxy", features = ["cpi", "no-entrypoint"]}
+spl-account-compression = { version="0.2.0", features = ["cpi", "no-entrypoint"] }
+
 
 [dev-dependencies]
 mocha = "0.1.1"

@@ -45,7 +45,7 @@ pub enum AuthorityType {
 
 
 pub fn create_legacy_inscription_logic_v3<'a>(
-    mint: &Account<'a, Mint>,
+    mint: &AccountInfo<'a>,
     legacy_inscription: &mut Account<'a, LegacyInscription>,
     authority_type: AuthorityType,
     inscription_v3: &mut UncheckedAccount<'a>,
