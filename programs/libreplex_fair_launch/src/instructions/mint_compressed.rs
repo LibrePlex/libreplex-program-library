@@ -10,18 +10,15 @@ use libreplex_inscriptions::InscriptionSummary;
 use mpl_bubblegum::utils::get_asset_id;
 
 use libreplex_inscriptions::{
-    cpi::accounts::CreateInscriptionV3,
     cpi::accounts::MakeInscriptionImmutableV3,
     cpi::accounts::ResizeInscriptionV3,
     cpi::accounts::WriteToInscriptionV3,
     instructions::{SignerType, WriteToInscriptionInput},
 };
-use libreplex_shared::{SharedError, create_mint_metadata_and_masteredition::create_mint_with_metadata_and_masteredition, MintAccounts, sysvar_instructions_program};
-use mpl_token_metadata::types::{Creator, TokenStandard};
-use solana_program::{program::invoke, system_instruction};
+use libreplex_shared::{SharedError, sysvar_instructions_program};
 
 use crate::{
-    errors::FairLaunchError, Deployment, HashlistMarker, MintEvent, HashlistEvent,
+    errors::FairLaunchError, Deployment, HashlistMarker, MintEvent, add_to_hashlist,
 };
 
 #[derive(Accounts)]
@@ -46,6 +43,13 @@ pub struct MintLegacyCtx<'info> {
         get_asset_id(merkle_tree.key, tree_authority.num_minted).as_ref()],
         bump,)]
     pub hashlist_marker: Account<'info, HashlistMarker>,
+
+    /// CHECK: Checked by address
+    #[account(
+        seeds = 
+        [get_asset_id(merkle_tree.key, tree_authority.num_minted).as_ref()], 
+        bump)]
+    pub ghost_root_signer: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -124,7 +128,7 @@ pub struct MintLegacyCtx<'info> {
     bubblegum_program: AccountInfo<'info>,
 }
 
-pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
+pub fn mint_c_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     let deployment = &mut ctx.accounts.deployment;
 
     // to be discussed w/ everybody and feedback. Not strictly in line with BRC 20 thinking
@@ -169,16 +173,22 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     ];
 
 
+    let tree_authority = &ctx.accounts.tree_authority;
+    let merkle_tree = &ctx.accounts.merkle_tree;
+    let asset_id = get_asset_id(merkle_tree.key, tree_authority.num_minted);
+    
+    let ghost_root_signer = &ctx.accounts.ghost_root_signer;
+    let ghost_root_seeds: &[&[u8]] = &[asset_id.as_ref(), &[ctx.bumps.ghost_root_signer]];
 
     let mint_compressed_accounts = bubblegum_proxy::cpi::accounts::MintV1 {
-        compression_program: ctx.accounts.account_compression_program,
+        compression_program: ctx.accounts.account_compression_program.to_account_info(),
         tree_authority: ctx.accounts.tree_authority.to_account_info(),
         leaf_owner: payer.to_account_info(),
         leaf_delegate: payer.to_account_info(),
-        merkle_tree: ctx.accounts.merkle_tree.to_account_info(),
+        merkle_tree: merkle_tree.to_account_info(),
         payer: payer.to_account_info(),
         tree_delegate: deployment.to_account_info(),
-        log_wrapper: ctx.accounts.noop_program,
+        log_wrapper: ctx.accounts.noop_program.to_account_info(),
         system_program: system_program.to_account_info(),
     };
 
@@ -206,8 +216,82 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
         mint_compressed_accounts, &[deployment_seeds]), 
         metadata_args)?;
 
-    
 
+    libreplex_inscriptions::cpi::create_ghost_root_inscription(
+        CpiContext::new_with_signer(
+            inscriptions_program.to_account_info(), 
+            libreplex_inscriptions::cpi::accounts::CreateGhostRootInscription {
+                /* the inscription root is set to metaplex
+                inscription object.
+                */
+                inscription_summary: inscription_summary.to_account_info(),
+                signer: ghost_root_signer.to_account_info(),
+                inscription_v3: inscription_v3.to_account_info(),
+                system_program: system_program.to_account_info(),
+                payer: payer.to_account_info(),
+                inscription_data: inscription_data.to_account_info(),
+            }, 
+            &[ghost_root_seeds]), 
+        libreplex_inscriptions::instructions::CreateGhostRootInscriptionInput {
+            authority: Some(payer.key()), // this includes update auth / holder, hence
+            signer_type: SignerType::FairLaunchGhostRootSigner,
+            validation_hash: None,
+            root: asset_id,
+        })?;
+    
+    let data_bytes = deployment.mint_template.clone().into_bytes();
+
+
+    libreplex_inscriptions::cpi::resize_inscription_v3(
+        CpiContext::new(
+            inscriptions_program.to_account_info(),
+            ResizeInscriptionV3 {
+                /* the inscription root is set to metaplex
+                 inscription object.
+                */
+                authority: payer.to_account_info(),
+                system_program: system_program.to_account_info(),
+                payer: payer.to_account_info(),
+                inscription_data: inscription_data.to_account_info(),
+                inscription_v3: inscription_v3.to_account_info(),
+            },
+        ),
+        libreplex_inscriptions::instructions::ResizeInscriptionInput {
+            change: data_bytes.len() as i32 - 8,
+            expected_start_size: 8,
+            target_size: data_bytes.len() as u32,
+        },
+    )?;
+
+    libreplex_inscriptions::cpi::write_to_inscription_v3(
+        CpiContext::new(
+            inscriptions_program.to_account_info(),
+            WriteToInscriptionV3 {
+                authority: payer.to_account_info(),
+                payer: payer.to_account_info(),
+                inscription_v3: inscription_v3.to_account_info(),
+                system_program: system_program.to_account_info(),
+                inscription_data: inscription_data.to_account_info(),
+            },
+        ),
+        WriteToInscriptionInput {
+            data: data_bytes,
+            start_pos: 0,
+            media_type: Some("text/plain".to_owned()),
+            encoding_type: Some("ascii".to_owned()),
+        },
+    )?;
+
+    libreplex_inscriptions::cpi::make_inscription_immutable_v3(CpiContext::new(
+        inscriptions_program.to_account_info(),
+        MakeInscriptionImmutableV3 {
+            payer: payer.to_account_info(),
+            authority: payer.to_account_info(),
+            inscription_summary: inscription_summary.to_account_info(),
+            inscription_v3: inscription_v3.to_account_info(),
+            system_program: system_program.to_account_info(),
+        },
+    ))?;
     
     /*
         Step 2: this the solana way where we meet brc 20 type thinking:
@@ -296,7 +380,7 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
         add_to_hashlist(deployment.number_of_tokens_issued as u32, hashlist, 
             payer, 
             system_program, 
-            &non_fungible_mint.key(), 
+            &asset_id, 
             &deployment.key(),
             inscription_summary.inscription_count_total
         )?;
@@ -311,57 +395,11 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     // this does NOT stop minting.
 
     emit!(MintEvent{
-        mint: non_fungible_mint.key(),
+        mint: asset_id,
         ticker: deployment.ticker.clone(),
         tokens_minted: deployment.number_of_tokens_issued,
         max_number_of_tokens: deployment.max_number_of_tokens,
     });
 
     Ok(())
-}
-
-pub fn add_to_hashlist<'a>(
-    new_number_of_mints: u32, 
-    hashlist: &mut UncheckedAccount<'a>, 
-    payer: &Signer<'a>, 
-    system_program: &Program<'a, System>, 
-    mint: &Pubkey, 
-    deployment: &Pubkey,
-    order_number: u64) -> Result<()> {
-    let new_size = 8 + 32 + 4 + (new_number_of_mints) * (32 + 8);
-    let rent = Rent::get()?;
-    let new_minimum_balance = rent.minimum_balance(new_size as usize);
-    let lamports_diff = new_minimum_balance.saturating_sub(hashlist.lamports());
-    if lamports_diff > 0 {
-        invoke(
-            &system_instruction::transfer(&payer.key(), hashlist.key, lamports_diff),
-            &[
-                payer.to_account_info(),
-                hashlist.to_account_info(),
-                system_program.to_account_info(),
-            ],
-        )?;
-    }
-    hashlist.realloc(new_size as usize, false)?;
-    let hashlist_account_info = hashlist.to_account_info();
-   
-    let mut hashlist_data = hashlist_account_info.data.borrow_mut();
-
-    hashlist_data[40..44].copy_from_slice(&new_number_of_mints.to_le_bytes());
-    let mint_start_pos:usize = (44+(new_number_of_mints-1)*40) as usize;
-    hashlist_data[
-        mint_start_pos..(mint_start_pos+32)
-        ].copy_from_slice(mint.key().as_ref());
-    hashlist_data[
-        mint_start_pos + 32..mint_start_pos + 40
-        ].copy_from_slice(&order_number.to_le_bytes());
-  
-    emit!(HashlistEvent {
-        mint: mint.key(),
-        deployment: deployment.key()
-    });
-    
-
-    Ok(())
-
 }
