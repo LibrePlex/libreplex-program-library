@@ -8,6 +8,11 @@ use crate::{
 
 use anchor_lang::prelude::*;
 
+mod fair_launch_inscriber {
+    use super::*;
+    declare_id!("8bvPnYE5Pvz2Z9dE6RAqWr1rzLknTndZ9hwvRE6kPDXP");
+}
+
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateGhostRootInscriptionInput{
     pub authority: Option<Pubkey>,
@@ -130,11 +135,21 @@ pub fn handler(ctx: Context<CreateGhostRootInscription>, input: CreateGhostRootI
         }
         SignerType::LegacyMetadataSigner => {
             let expected_signer =
-                Pubkey::find_program_address(&[root_key.as_ref()], &legacy_inscriber::id()).0;
+                Pubkey::find_program_address(&[root_key.as_ref()], 
+                &legacy_inscriber::id()).0;
             if expected_signer != signer {
                 return Err(ErrorCode::LegacyMetadataSignerMismatch.into());
             }
         }
+        SignerType::FairLaunchGhostRootSigner => {
+            let expected_signer =
+                Pubkey::find_program_address(&[root_key.as_ref()], 
+                &fair_launch_inscriber::id()).0;
+
+            if expected_signer != signer {
+                return Err(ErrorCode::LegacyMetadataSignerMismatch.into());
+            }
+        },
     }
 
     // for now, only fire events for inscription v1

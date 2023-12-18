@@ -135,6 +135,9 @@ pub fn handler(ctx: Context<CreateInscriptionV2>, input: CreateInscriptionInput)
                 return Err(ErrorCode::LegacyMetadataSignerMismatch.into());
             }
         }
+        SignerType::FairLaunchGhostRootSigner => {
+            return Err(ErrorCode::RootSignerMismatch.into());
+        }
     }
 
     // for now, only fire events for inscription v1
