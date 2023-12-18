@@ -513,12 +513,7 @@ export type LibreplexMetadata = {
           "isSigner": true
         },
         {
-          "name": "inscription",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV2",
+          "name": "inscriptionV3",
           "isMut": true,
           "isSigner": false
         },
@@ -2814,12 +2809,7 @@ export const IDL: LibreplexMetadata = {
           "isSigner": true
         },
         {
-          "name": "inscription",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV2",
+          "name": "inscriptionV3",
           "isMut": true,
           "isSigner": false
         },

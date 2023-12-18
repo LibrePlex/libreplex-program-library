@@ -1,21 +1,11 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{associated_token::AssociatedToken, token::Token};
 
-use libreplex_inscriptions::{
-    cpi::accounts::CreateInscriptionV3,
-    cpi::accounts::MakeInscriptionImmutableV3,
-    cpi::accounts::ResizeInscriptionV3,
-    cpi::accounts::WriteToInscriptionV3,
-    instructions::{SignerType, WriteToInscriptionInput},
-    InscriptionSummary,
-};
-use libreplex_shared::{
-    create_mint_metadata_and_masteredition::create_mint_with_metadata_and_masteredition,
-    MintAccounts,
-};
-use mpl_token_metadata::types::TokenStandard;
+use libreplex_inscriptions::InscriptionSummary;
 
-use crate::{Deployment, Hashlist};
+
+
+use crate::{Deployment, Hashlist, deploy_legacy_logic, deploy_legacy_inscriptions};
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -56,10 +46,12 @@ pub struct DeployLegacyV2Ctx<'info> {
     bump, payer = payer, space = 8 + 32 + 4)]
     pub hashlist: Account<'info, Hashlist>,
 
-    #[account(mut,
-        // constraint = payer.key().to_string() == "4aAifU9ck88koMhSK6fnUSQHMzpyuLzGa6q7nfvqA6vx".to_owned()
-    )]
+    #[account(mut)]
     pub payer: Signer<'info>,
+
+    // can be different from the payer. typically used with PDA
+    #[account(mut)]
+    pub creator: Signer<'info>,
 
     /* INITIALISE FUNGIBLE ACCOUNTS */
     #[account(mut)]
@@ -132,14 +124,12 @@ pub struct DeployLegacyV2Ctx<'info> {
     pub sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn deploy_legacy_v2(ctx: Context<DeployLegacyV2Ctx>, input: DeployLegacyV2Input) -> Result<()> {
+pub fn deploy_legacy_v2(ctx: Context<DeployLegacyV2Ctx>) -> Result<()> {
     let deployment = &mut ctx.accounts.deployment;
     let hashlist = &mut ctx.accounts.hashlist;
 
     hashlist.deployment = deployment.key();
-    deployment.require_creator_cosign = input.require_creator_cosign;
-    deployment.use_inscriptions = input.use_inscriptions;
-
+    
     let deployment = &mut ctx.accounts.deployment;
     let system_program = &ctx.accounts.system_program;
     let payer = &ctx.accounts.payer;
@@ -159,157 +149,36 @@ pub fn deploy_legacy_v2(ctx: Context<DeployLegacyV2Ctx>, input: DeployLegacyV2In
     let associated_token_program = &ctx.accounts.associated_token_program;
     let fungible_escrow_token_account = &ctx.accounts.fungible_escrow_token_account;
 
-    deployment.fungible_mint = fungible_mint.key();
-
-    let deployment_seeds: &[&[u8]] = &[
-        "deployment".as_bytes(),
-        deployment.ticker.as_ref(),
-        &[ctx.bumps.deployment],
-    ];
-
-    create_mint_with_metadata_and_masteredition(
-        MintAccounts {
-            authority_pda: deployment.to_account_info(),
-            payer: payer.to_account_info(),
-            nft_owner: deployment.to_account_info(),
-            nft_mint: fungible_mint.to_account_info(),
-            nft_mint_authority: deployment.to_account_info(),
-            nft_metadata: fungible_metadata.to_account_info(),
-            nft_master_edition: None,
-            token: Some(fungible_escrow_token_account.to_account_info()), // do not mint anything
-            token_metadata_program: metadata_program.to_account_info(),
-            spl_token_program: token_program.to_account_info(),
-            spl_ata_program: associated_token_program.to_account_info(),
-            system_program: system_program.to_account_info(),
-            sysvar_instructions: sysvar_instructions.to_account_info(),
-        },
-        deployment_seeds,
-        deployment.ticker.clone(),
-        "".to_owned(),
-        0,
-        deployment.offchain_url.clone(),
-        None,
-        0,  // number of print editions. always 0.
-        false,
-        0,
-        deployment.decimals,
-        TokenStandard::Fungible,
+    deploy_legacy_logic(
+        hashlist,
+        deployment,
+        fungible_mint,
+        payer,
+        fungible_metadata,
+        fungible_escrow_token_account,
+        metadata_program,
+        token_program,
+        associated_token_program,
+        system_program,
+        sysvar_instructions,
+        non_fungible_mint,
+        non_fungible_metadata,
+        non_fungible_master_edition,
+        non_fungible_token_account,
+        ctx.bumps.deployment
     )?;
 
-    create_mint_with_metadata_and_masteredition(
-        MintAccounts {
-            authority_pda: deployment.to_account_info(),
-            payer: payer.to_account_info(),
-            nft_owner: deployment.to_account_info(),
-            nft_mint: non_fungible_mint.to_account_info(),
-            nft_mint_authority: deployment.to_account_info(),
-            nft_metadata: non_fungible_metadata.to_account_info(),
-            nft_master_edition: Some(non_fungible_master_edition.to_account_info()),
-            token: Some(non_fungible_token_account.to_account_info()), // do not mint anything
-            token_metadata_program: metadata_program.to_account_info(),
-            spl_token_program: token_program.to_account_info(),
-            spl_ata_program: associated_token_program.to_account_info(),
-            system_program: system_program.to_account_info(),
-            sysvar_instructions: sysvar_instructions.to_account_info(),
-        },
-        deployment_seeds,
-        deployment.ticker.clone(),
-        "".to_owned(),
-        0,
-        deployment.offchain_url.clone(),
-        None,
-        0, // number of print editions. always 0.
-        false,
-        1, // this is the deployment mint. once mint + inscription made when
-                        // a deployment is deployed.
-        0,
-        TokenStandard::NonFungible,
+    deploy_legacy_inscriptions(
+        inscriptions_program,
+        inscription_summary,
+        non_fungible_mint,
+        inscription_v3,
+        system_program,
+        payer,
+        inscription_data,
+        deployment,
     )?;
 
-    // Create the deploy inscription
-    libreplex_inscriptions::cpi::create_inscription_v3(
-        CpiContext::new(
-            inscriptions_program.to_account_info(),
-            CreateInscriptionV3 {
-                /* the inscription root is set to metaplex
-                    inscription object.
-                */
-                inscription_summary: inscription_summary.to_account_info(),
-
-                root: non_fungible_mint.to_account_info(),
-                /// since root in this case can sign (we are creating a brand new mint),
-                /// it will sign
-                signer: non_fungible_mint.to_account_info(),
-                inscription_v3: inscription_v3.to_account_info(),
-
-                system_program: system_program.to_account_info(),
-                payer: payer.to_account_info(),
-                inscription_data: inscription_data.to_account_info(),
-            },
-        ),
-        libreplex_inscriptions::instructions::CreateInscriptionInputV3 {
-            // the authority here doesn't matter because we will make this immutable at the
-            // end of the transaction
-            authority: Some(payer.key()),
-            signer_type: SignerType::Root,
-            validation_hash: None,
-        },
-    )?;
-
-    let data_bytes = deployment.deployment_template.clone().into_bytes();
-
-    libreplex_inscriptions::cpi::resize_inscription_v3(
-        CpiContext::new(
-            inscriptions_program.to_account_info(),
-            ResizeInscriptionV3 {
-                /* the inscription root is set to metaplex
-                 inscription object.
-                */
-                authority: payer.to_account_info(),
-
-                system_program: system_program.to_account_info(),
-                payer: payer.to_account_info(),
-                inscription_data: inscription_data.to_account_info(),
-                inscription_v3: inscription_v3.to_account_info(),
-            },
-        ),
-        libreplex_inscriptions::instructions::ResizeInscriptionInput {
-            change: data_bytes.len() as i32 - 8,
-            expected_start_size: 8,
-            target_size: data_bytes.len() as u32,
-        },
-    )?;
-
-    libreplex_inscriptions::cpi::write_to_inscription_v3(
-        CpiContext::new(
-            inscriptions_program.to_account_info(),
-            WriteToInscriptionV3 {
-                authority: payer.to_account_info(),
-                payer: payer.to_account_info(),
-                inscription_v3: inscription_v3.to_account_info(),
-                system_program: system_program.to_account_info(),
-                inscription_data: inscription_data.to_account_info(),
-            },
-        ),
-        WriteToInscriptionInput {
-            data: data_bytes,
-            start_pos: 0,
-            media_type: Some("text/plain".to_owned()),
-            encoding_type: Some("ascii".to_owned()),
-        },
-    )?;
-
-    // set update auth to 1111111111111111
-    libreplex_inscriptions::cpi::make_inscription_immutable_v3(CpiContext::new(
-        inscriptions_program.to_account_info(),
-        MakeInscriptionImmutableV3 {
-            payer: payer.to_account_info(),
-            authority: payer.to_account_info(),
-            inscription_summary: inscription_summary.to_account_info(),
-            inscription_v3: inscription_v3.to_account_info(),
-            system_program: system_program.to_account_info(),
-        },
-    ))?;
 
 
     Ok(())

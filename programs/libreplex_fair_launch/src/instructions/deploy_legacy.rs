@@ -85,10 +85,9 @@ pub struct DeployLegacyCtx<'info> {
     #[account(mut)]
     pub inscription_summary: Account<'info, InscriptionSummary>,
 
-    // leaving this account here to avoid breaking the fair launch api. 
-    // however seeing that everything uses pure v3 endpoints under the hood, 
+    // leaving this account here to avoid breaking the fair launch api.
+    // however seeing that everything uses pure v3 endpoints under the hood,
     // it can be removed when ready
-
     /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
     pub inscription: UncheckedAccount<'info>,
@@ -132,13 +131,8 @@ pub struct DeployLegacyCtx<'info> {
     pub sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
-    let deployment = &mut ctx.accounts.deployment;
+pub fn deploy<'f>(ctx: Context<'_,'_,'_,'f,DeployLegacyCtx<'f>>) -> Result<()> {
     let hashlist = &mut ctx.accounts.hashlist;
-
-    hashlist.deployment = deployment.key();
-    deployment.require_creator_cosign = false;
-    deployment.use_inscriptions = true;
 
     let deployment = &mut ctx.accounts.deployment;
     let system_program = &ctx.accounts.system_program;
@@ -159,74 +153,49 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
     let associated_token_program = &ctx.accounts.associated_token_program;
     let fungible_escrow_token_account = &ctx.accounts.fungible_escrow_token_account;
 
-    deployment.fungible_mint = fungible_mint.key();
-
-    let deployment_seeds: &[&[u8]] = &[
-        "deployment".as_bytes(),
-        deployment.ticker.as_ref(),
-        &[ctx.bumps.deployment],
-    ];
-
-    create_mint_with_metadata_and_masteredition(
-        MintAccounts {
-            authority_pda: deployment.to_account_info(),
-            payer: payer.to_account_info(),
-            nft_owner: deployment.to_account_info(),
-            nft_mint: fungible_mint.to_account_info(),
-            nft_mint_authority: deployment.to_account_info(),
-            nft_metadata: fungible_metadata.to_account_info(),
-            nft_master_edition: None,
-            token: Some(fungible_escrow_token_account.to_account_info()), // do not mint anything
-            token_metadata_program: metadata_program.to_account_info(),
-            spl_token_program: token_program.to_account_info(),
-            spl_ata_program: associated_token_program.to_account_info(),
-            system_program: system_program.to_account_info(),
-            sysvar_instructions: sysvar_instructions.to_account_info(),
-        },
-        deployment_seeds,
-        deployment.ticker.clone(),
-        "".to_owned(),
-        0,
-        deployment.offchain_url.clone(),
-        None,
-        0,  // number of print editions. always 0.
-        false,
-        0,
-        deployment.decimals,
-        TokenStandard::Fungible,
+    deploy_legacy_logic(
+        hashlist,
+        deployment,
+        fungible_mint,
+        payer,
+        fungible_metadata,
+        fungible_escrow_token_account,
+        metadata_program,
+        token_program,
+        associated_token_program,
+        system_program,
+        sysvar_instructions,
+        non_fungible_mint,
+        non_fungible_metadata,
+        non_fungible_master_edition,
+        non_fungible_token_account,
+        ctx.bumps.deployment
     )?;
 
-    create_mint_with_metadata_and_masteredition(
-        MintAccounts {
-            authority_pda: deployment.to_account_info(),
-            payer: payer.to_account_info(),
-            nft_owner: deployment.to_account_info(),
-            nft_mint: non_fungible_mint.to_account_info(),
-            nft_mint_authority: deployment.to_account_info(),
-            nft_metadata: non_fungible_metadata.to_account_info(),
-            nft_master_edition: Some(non_fungible_master_edition.to_account_info()),
-            token: Some(non_fungible_token_account.to_account_info()), // do not mint anything
-            token_metadata_program: metadata_program.to_account_info(),
-            spl_token_program: token_program.to_account_info(),
-            spl_ata_program: associated_token_program.to_account_info(),
-            system_program: system_program.to_account_info(),
-            sysvar_instructions: sysvar_instructions.to_account_info(),
-        },
-        deployment_seeds,
-        deployment.ticker.clone(),
-        "".to_owned(),
-        0,
-        deployment.offchain_url.clone(),
-        None,
-        0, // number of print editions. always 0.
-        false,
-        1, // this is the deployment mint. once mint + inscription made when
-                        // a deployment is deployed.
-        0,
-        TokenStandard::NonFungible,
+    deploy_legacy_inscriptions(
+        inscriptions_program,
+        inscription_summary,
+        non_fungible_mint,
+        inscription_v3,
+        system_program,
+        payer,
+        inscription_data,
+        deployment,
     )?;
 
-    // Create the deploy inscription
+    Ok(())
+}
+
+pub fn deploy_legacy_inscriptions<'f>(
+    inscriptions_program: &UncheckedAccount<'f>,
+    inscription_summary: &Account<'f, InscriptionSummary>,
+    non_fungible_mint: &Signer<'f>,
+    inscription_v3: &UncheckedAccount<'f>,
+    system_program: &Program<'f, System>,
+    payer: &Signer<'f>,
+    inscription_data: &UncheckedAccount<'f>,
+    deployment: &mut Account<'f, Deployment>,
+) -> Result<()> {
     libreplex_inscriptions::cpi::create_inscription_v3(
         CpiContext::new(
             inscriptions_program.to_account_info(),
@@ -255,9 +224,7 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
             validation_hash: None,
         },
     )?;
-
     let data_bytes = deployment.deployment_template.clone().into_bytes();
-
     libreplex_inscriptions::cpi::resize_inscription_v3(
         CpiContext::new(
             inscriptions_program.to_account_info(),
@@ -279,7 +246,6 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
             target_size: data_bytes.len() as u32,
         },
     )?;
-
     libreplex_inscriptions::cpi::write_to_inscription_v3(
         CpiContext::new(
             inscriptions_program.to_account_info(),
@@ -298,8 +264,6 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
             encoding_type: Some("ascii".to_owned()),
         },
     )?;
-
-    // set update auth to 1111111111111111
     libreplex_inscriptions::cpi::make_inscription_immutable_v3(CpiContext::new(
         inscriptions_program.to_account_info(),
         MakeInscriptionImmutableV3 {
@@ -310,7 +274,92 @@ pub fn deploy(ctx: Context<DeployLegacyCtx>) -> Result<()> {
             system_program: system_program.to_account_info(),
         },
     ))?;
+    Ok(())
+}
 
-
+pub fn deploy_legacy_logic<'f>(
+    hashlist: &mut Account<'f, Hashlist>,
+    deployment: &mut Account<'f, Deployment>,
+    fungible_mint: &Signer<'f>,
+    payer: &Signer<'f>,
+    fungible_metadata: &UncheckedAccount<'f>,
+    fungible_escrow_token_account: &UncheckedAccount<'f>,
+    metadata_program: &UncheckedAccount<'f>,
+    token_program: &Program<'f, Token>,
+    associated_token_program: &Program<'f, AssociatedToken>,
+    system_program: &Program<'f, System>,
+    sysvar_instructions: &UncheckedAccount<'f>,
+    non_fungible_mint: &Signer<'f>,
+    non_fungible_metadata: &UncheckedAccount<'f>,
+    non_fungible_master_edition: &UncheckedAccount<'f>,
+    non_fungible_token_account: &UncheckedAccount<'f>,
+    deployment_bump: u8
+) -> Result<()> {
+    hashlist.deployment = deployment.key();
+    deployment.require_creator_cosign = false;
+    deployment.use_inscriptions = true;
+    deployment.fungible_mint = fungible_mint.key();
+    let deployment_seeds: &[&[u8]] = &[
+        "deployment".as_bytes(),
+        deployment.ticker.as_ref(),
+        &[deployment_bump],
+    ];
+    create_mint_with_metadata_and_masteredition(
+        MintAccounts {
+            authority_pda: deployment.to_account_info(),
+            payer: payer.to_account_info(),
+            nft_owner: deployment.to_account_info(),
+            nft_mint: fungible_mint.to_account_info(),
+            nft_mint_authority: deployment.to_account_info(),
+            nft_metadata: fungible_metadata.to_account_info(),
+            nft_master_edition: None,
+            token: Some(fungible_escrow_token_account.to_account_info()), // do not mint anything
+            token_metadata_program: metadata_program.to_account_info(),
+            spl_token_program: token_program.to_account_info(),
+            spl_ata_program: associated_token_program.to_account_info(),
+            system_program: system_program.to_account_info(),
+            sysvar_instructions: sysvar_instructions.to_account_info(),
+        },
+        deployment_seeds,
+        deployment.ticker.clone(),
+        "".to_owned(),
+        0,
+        deployment.offchain_url.clone(),
+        None,
+        0, // number of print editions. always 0.
+        false,
+        0,
+        deployment.decimals,
+        TokenStandard::Fungible,
+    )?;
+    create_mint_with_metadata_and_masteredition(
+        MintAccounts {
+            authority_pda: deployment.to_account_info(),
+            payer: payer.to_account_info(),
+            nft_owner: deployment.to_account_info(),
+            nft_mint: non_fungible_mint.to_account_info(),
+            nft_mint_authority: deployment.to_account_info(),
+            nft_metadata: non_fungible_metadata.to_account_info(),
+            nft_master_edition: Some(non_fungible_master_edition.to_account_info()),
+            token: Some(non_fungible_token_account.to_account_info()), // do not mint anything
+            token_metadata_program: metadata_program.to_account_info(),
+            spl_token_program: token_program.to_account_info(),
+            spl_ata_program: associated_token_program.to_account_info(),
+            system_program: system_program.to_account_info(),
+            sysvar_instructions: sysvar_instructions.to_account_info(),
+        },
+        deployment_seeds,
+        deployment.ticker.clone(),
+        "".to_owned(),
+        0,
+        deployment.offchain_url.clone(),
+        None,
+        0, // number of print editions. always 0.
+        false,
+        1, // this is the deployment mint. once mint + inscription made when
+        // a deployment is deployed.
+        0,
+        TokenStandard::NonFungible,
+    )?;
     Ok(())
 }
