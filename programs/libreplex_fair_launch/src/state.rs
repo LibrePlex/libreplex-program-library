@@ -15,10 +15,13 @@ pub enum DeploymentStatus {
 #[account]
 #[derive(InitSpace)]
 pub struct Deployment {
-    // creates has two purposes - one for historical record
-    // but also to link initialise and deploy endpoints together
-    // deployment must be performed by the same wallet that initialises
+    // creator has two purposes: 
+    // 1) to deploy: deployment must be performed by the same wallet that initialises
     // the launch
+    // 2) (optionally) to allow for a third party
+    // service to add their own logic on top of fair 
+    // launch by co-signing
+    
     pub creator: Pubkey,
 
     pub limit_per_mint: u64,
@@ -27,11 +30,11 @@ pub struct Deployment {
     pub number_of_tokens_issued: u64,
     pub decimals: u8,
 
-    // if a ticker is not deployed within 1 hour of initialisation, it becomes
-    // available for deletion and reclaim
-    pub deployed: bool,
+
+    pub use_inscriptions: bool,
     pub minted_out: bool,
-    pub allow_spl_conversion: bool,
+    // to allow modular custom logic around this contract
+    pub require_creator_cosign: bool,
 
     // indicates whether this deployment was migrated from legacy validator
     // true - from legacy

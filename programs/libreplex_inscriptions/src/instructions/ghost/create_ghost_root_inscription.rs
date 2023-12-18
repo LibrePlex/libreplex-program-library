@@ -1,30 +1,25 @@
 use crate::errors::ErrorCode;
 
 use crate::instructions::create_inscription::legacy_inscriber;
-use crate::instructions::{SignerType, InscriptionEventCreate};
+use crate::instructions::{SignerType, InscriptionV3EventCreate};
 use crate::{
-    Inscription, InscriptionData, InscriptionSummary, InscriptionV3, InscriptionV3EventData, InscriptionEventData,
+    Inscription, InscriptionData, InscriptionSummary, InscriptionV3, InscriptionV3EventData,
 };
-
-#[event]
-pub struct InscriptionV3EventCreate {
-    pub id: Pubkey,
-    pub data: InscriptionV3EventData,
-}
 
 use anchor_lang::prelude::*;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CreateInscriptionInputV3 {
+pub struct CreateGhostRootInscriptionInput{
     pub authority: Option<Pubkey>,
     // each rank page holds a maximum of 320000 inscription ids.
     // when this runs out, we move onto the next page
     pub signer_type: SignerType,
-    pub validation_hash: Option<String>
+    pub validation_hash: Option<String>,
+    pub root: Pubkey,
 }
 
 
-impl CreateInscriptionInputV3 {
+impl CreateGhostRootInscriptionInput {
     pub fn get_size(&self) -> usize {
             1
             + match self.authority {
@@ -40,25 +35,17 @@ impl CreateInscriptionInputV3 {
 }
 
 /*
-   This endpoint generates an inscription with v3 config only.
-   It does not use page_rank accounts either as those
-   are no longer populated.
-   v1 and v2 endpoints will be retained for backwards
-   compatibility. However anybody using v1 / v2 endpoints
-   should migrate to this endpoint as the historical v1/v2
-   inscription configs are no longer needed or used.
+   This endpoint is identical to v3 create.
+   However it only accepts LegacyMetadataSigners
+   and the root is passed in as an argument.
 
-   the reason we moved to v3 inscription configs is ease
-   of indexability compared with the original field ordering.
-
-   none of this touches inscription data as that as always
-   been stored in a separate account.
+   This is for roots that cannot exist as accounts on chain.
 */
 
 const INITIAL_SIZE: usize = 8;
 #[derive(Accounts)]
-#[instruction(inscription_input: CreateInscriptionInputV3)]
-pub struct CreateInscriptionV3<'info> {
+#[instruction(inscription_input: CreateGhostRootInscriptionInput)]
+pub struct CreateGhostRootInscription<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -66,9 +53,6 @@ pub struct CreateInscriptionV3<'info> {
     // that is accepted as a proxy
     #[account(mut)]
     pub signer: Signer<'info>,
-
-    /// CHECK: Checked in logic
-    pub root: UncheckedAccount<'info>,
 
     #[account(init_if_needed, seeds = [b"inscription_summary"],
         bump, payer = payer, space = InscriptionSummary::BASE_SIZE)]
@@ -87,7 +71,7 @@ pub struct CreateInscriptionV3<'info> {
         space = INITIAL_SIZE, // set a base rent for now, reduce later
         seeds=[
             "inscription_data".as_bytes(),
-            root.key().as_ref()
+            inscription_input.root.as_ref()
         ],
         bump)]
     pub inscription_data: Account<'info, InscriptionData>,
@@ -97,7 +81,7 @@ pub struct CreateInscriptionV3<'info> {
         space = Inscription::BASE_SIZE + inscription_input.get_size(),
         seeds=[
             "inscription_v3".as_bytes(),
-            root.key().as_ref()
+            inscription_input.root.as_ref()
         ],
         bump,
         payer = payer)]
@@ -106,7 +90,7 @@ pub struct CreateInscriptionV3<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateInscriptionV3>, input: CreateInscriptionInputV3) -> Result<()> {
+pub fn handler(ctx: Context<CreateGhostRootInscription>, input: CreateGhostRootInscriptionInput) -> Result<()> {
     let inscription_v3 = &mut ctx.accounts.inscription_v3;
     let inscription_summary = &mut ctx.accounts.inscription_summary;
 
@@ -127,7 +111,7 @@ pub fn handler(ctx: Context<CreateInscriptionV3>, input: CreateInscriptionInputV
     inscription_v3.authority = authority;
     inscription_v3.size = INITIAL_SIZE as u32;
     inscription_v3.inscription_data = inscription_data.key();
-    inscription_v3.root = ctx.accounts.root.key();
+    inscription_v3.root = input.root.clone();
     inscription_v3.content_type = "".to_owned();
     inscription_v3.encoding = "".to_owned();
     inscription_v3.validation_hash = input.validation_hash.clone();
@@ -142,9 +126,7 @@ pub fn handler(ctx: Context<CreateInscriptionV3>, input: CreateInscriptionInputV
     // is the signer an authorised PDA?
     match input.signer_type {
         SignerType::Root => {
-            if signer != inscription_v3.root {
-                return Err(ErrorCode::RootSignerMismatch.into());
-            }
+            return Err(ErrorCode::LegacyMetadataSignerMismatch.into());
         }
         SignerType::LegacyMetadataSigner => {
             let expected_signer =
@@ -155,6 +137,7 @@ pub fn handler(ctx: Context<CreateInscriptionV3>, input: CreateInscriptionInputV
         }
     }
 
+    // for now, only fire events for inscription v1
     emit!(InscriptionV3EventCreate {
         id: inscription_v3.key(),
         data: InscriptionV3EventData {
@@ -168,26 +151,6 @@ pub fn handler(ctx: Context<CreateInscriptionV3>, input: CreateInscriptionInputV
             validation_hash: inscription_v3.validation_hash.clone()
         }
     });
-
-    // generate backwards compatible events
-    let inscription_v1_id = Pubkey::find_program_address(
-        &["inscription".as_bytes(), inscription_v3.root.as_ref()]
-        , &crate::id()).0;
-
-    emit!(InscriptionEventCreate {
-        id: inscription_v1_id.key(),
-        data: InscriptionEventData { 
-            authority: inscription_v3.authority, 
-            root: inscription_v3.root, 
-            media_type: crate::MediaType::Custom { media_type: inscription_v3.content_type.clone()},
-            encoding_type: crate::EncodingType::None,
-            inscription_data: inscription_v3.inscription_data,
-            order: inscription_v3.order,
-            size: inscription_v3.size,
-            validation_hash: inscription_v3.validation_hash.clone()
-        }
-    });
-
 
     Ok(())
 }

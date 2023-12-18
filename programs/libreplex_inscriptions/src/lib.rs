@@ -80,6 +80,16 @@ pub mod libreplex_inscriptions {
         )
     }
 
+    pub fn create_ghost_root_inscription(
+        ctx: Context<CreateGhostRootInscription>,
+        inscription_input: CreateGhostRootInscriptionInput,
+    ) -> Result<()> {
+        instructions::ghost::handler(
+            ctx,
+            inscription_input
+        )
+    }
+
     pub fn make_inscription_immutable_v3(
         ctx: Context<MakeInscriptionImmutableV3>
     ) -> Result<()> {

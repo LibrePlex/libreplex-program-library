@@ -9,6 +9,7 @@ pub mod make_inscription_immutable;
 pub mod set_validation_hash;
 pub mod claim_excess_rent;
 pub mod migrate_to_v3;
+pub mod ghost;
 
 
 pub use migrate_to_v3::*;
@@ -21,4 +22,5 @@ pub use create_inscription_v2::*;
 pub use v3::*;
 pub use claim_excess_rent::*;
 pub use set_validation_hash::*;
+pub use ghost::*;
 

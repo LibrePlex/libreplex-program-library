@@ -25,13 +25,9 @@ pub mod libreplex_legacy {
         // not optional - for legacy metadata we need to have some validation hash
         // so we can verify the inscription once it's fully written
     ) -> Result<()> {
-        instructions::claim_excess_rent_as_uauth::handler(
-            ctx
-        )
+        instructions::claim_excess_rent_as_uauth::handler(ctx)
     }
 
-
-    
     pub fn set_validation_hash(
         ctx: Context<SetValidationHash>,
         validation_hash: Option<String>,
@@ -47,10 +43,7 @@ pub mod libreplex_legacy {
         // so we can verify the inscription once it's fully written
         validation_hash: String,
     ) -> Result<()> {
-        instructions::inscribe_legacy_metadata_as_uauth_v3::handler(
-            ctx,
-            validation_hash,
-        )
+        instructions::inscribe_legacy_metadata_as_uauth_v3::handler(ctx, validation_hash)
     }
 
     pub fn write_to_legacy_inscription_as_uauth_v3(
@@ -87,4 +80,7 @@ pub mod libreplex_legacy {
     }
 
 
+    pub fn make_legacy_inscription_immutable_v3(ctx: Context<MakeImmutableV3>) -> Result<()> {
+        instructions::make_immutable_v3::make_immutable_v3(ctx)
+    }
 }
