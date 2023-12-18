@@ -5,7 +5,7 @@ use libreplex_inscriptions::{
 };
 use bubblegum_proxy::state::TreeConfig;
 use mpl_bubblegum::utils::get_asset_id;
-use crate::instructions::create_legacy_inscription_logic_v3;
+use crate::instructions::{create_legacy_inscription_logic_v3, RootType};
 use crate::{legacy_inscription::LegacyInscription, instructions::AuthorityType};
 pub use bubblegum_proxy::MetadataArgs;
 use super::{assert_can_inscribe_cnft, CNFTCheckAccounts, InscribeCNFTInput};
@@ -75,8 +75,8 @@ pub struct InscribeCNFT<'info> {
     pub compression_program: UncheckedAccount<'info>,
 }
 
-pub fn inscribe(
-    ctx: Context<InscribeCNFT>,
+pub fn inscribe<'a, 'b, 'c, 'info>(
+    ctx: Context<'a, 'b, 'c, 'info, InscribeCNFT<'info>>,
     input: Box<InscribeCNFTInput>
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
@@ -87,23 +87,22 @@ pub fn inscribe(
     let system_program = &ctx.accounts.system_program;
 
     let legacy_inscription = &mut ctx.accounts.legacy_inscription;
-    let payer_key = ctx.accounts.payer.key();
     // make sure we are dealing with the correct metadata object.
     // this is to ensure that the mint in question is in fact a legacy
     // metadata object
     let payer = &ctx.accounts.payer;
     let legacy_signer = &ctx.accounts.legacy_signer;
     let tree = &ctx.accounts.merkle_tree;
-
-    let authority = &ctx.accounts.authority;
-
     let expected_bump = ctx.bumps.legacy_signer;
+
+
+    let asset_id = get_asset_id(tree.key, input.nonce);
 
 
     assert_can_inscribe_cnft(&input, &CNFTCheckAccounts {
         compression_program: &ctx.accounts.compression_program,
         merkle_tree: &ctx.accounts.merkle_tree,
-        asset_id: &ctx.accounts.asset_id,
+        asset_id: &asset_id,
         collection_metadata: ctx.accounts.collection_metadata.as_ref().map(|a| {
             a.as_ref()
         }) ,
@@ -113,7 +112,7 @@ pub fn inscribe(
     
 
     create_legacy_inscription_logic_v3(
-        &ctx.accounts.asset_id,
+        RootType::Ghost(&asset_id),
         legacy_inscription,
         AuthorityType::UpdateAuthority,
         inscription_v3,

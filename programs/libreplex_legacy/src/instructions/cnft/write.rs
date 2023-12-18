@@ -3,7 +3,7 @@ use bubblegum_proxy::TreeConfig;
 use libreplex_inscriptions::{InscriptionV3, program::LibreplexInscriptions, instructions::WriteToInscriptionInput};
 use mpl_bubblegum::utils::get_asset_id;
 
-use crate::{LegacyInscription, instructions::ResizeLegacyInscriptionInput};
+use crate::LegacyInscription;
 
 use libreplex_inscriptions::cpi::accounts::WriteToInscriptionV3;
 use super::{InscribeCNFTInput, assert_can_inscribe_cnft, CNFTCheckAccounts};
@@ -67,24 +67,22 @@ pub struct WriteCNFT<'info> {
     pub compression_program: UncheckedAccount<'info>,
 }
 
-pub fn write(ctx: Context<WriteCNFT>, 
+pub fn write<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, WriteCNFT<'info>>, 
     compression_input: Box<InscribeCNFTInput>, 
     write_input: WriteToInscriptionInput) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_v3 = &mut ctx.accounts.inscription_v3;
     let inscription_data = &mut ctx.accounts.inscription_data;
     let system_program = &ctx.accounts.system_program;
-    let asset = &ctx.accounts.asset;
     let authority = &ctx.accounts.authority;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
-    let payer = &ctx.accounts.payer;
-
-    let metaplex_metadata = &ctx.accounts.legacy_metadata;
+    let tree = &ctx.accounts.merkle_tree;
+    let asset_id = get_asset_id(tree.key, compression_input.nonce);
 
     assert_can_inscribe_cnft(&compression_input, &CNFTCheckAccounts {
         compression_program: &ctx.accounts.compression_program,
         merkle_tree: &ctx.accounts.merkle_tree,
-        asset_id: &ctx.accounts.asset,
+        asset_id: &asset_id,
         collection_metadata: ctx.accounts.collection_metadata.as_ref().map(|a| {
             a.as_ref()
         }) ,
@@ -94,7 +92,7 @@ pub fn write(ctx: Context<WriteCNFT>,
 
     let inscription_auth_seeds: &[&[u8]] = &[
         "legacy_inscription".as_bytes(),
-        asset.key.as_ref(),
+        asset_id.as_ref(),
         &[ctx.bumps.legacy_inscription],
     ];
 

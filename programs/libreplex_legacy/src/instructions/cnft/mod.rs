@@ -1,11 +1,7 @@
 mod inscribe;
-use bubblegum_proxy::TreeConfig;
 pub use inscribe::*;
 
 mod resize;
-use libreplex_inscriptions::InscriptionV3;
-use libreplex_inscriptions::program::LibreplexInscriptions;
-use mpl_bubblegum::utils::get_asset_id;
 pub use resize::*;
 
 mod write;
@@ -16,80 +12,20 @@ pub use immutable::*;
 
 use solana_program::account_info::AccountInfo;
 use mpl_token_metadata::accounts::Metadata;
-use crate::{LegacyInscriptionErrorCode, LegacyInscription};
+use crate::LegacyInscriptionErrorCode;
 use mpl_bubblegum::hash_metadata;
 use mpl_bubblegum::state::leaf_schema::LeafSchema;
 use mpl_bubblegum::state::metaplex_adapter::MetadataArgs as BMetadataArgs;
 use anchor_lang::prelude::*;
 
-
-#[derive(Accounts)]
-#[instruction(compression_input: Box<InscribeCNFTInput>)]
-pub struct ModifyInscription<'info> {
-    #[account()]
-    pub authority: Signer<'info>,
-
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
-    /// CHECK: Checked by address
-    #[account(address = get_asset_id(merkle_tree.key, compression_input.nonce))]
-    pub asset: AccountInfo<'info>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut, seeds = [b"inscription_v3", 
-        asset.key.as_ref()], bump)]
-    pub inscription_v3: Account<'info, InscriptionV3>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription_data: UncheckedAccount<'info>,
-
-    /// CHECK: Checked by tree authority
-    #[account(mut)]
-    pub merkle_tree: UncheckedAccount<'info>,
-
-    #[account(seeds = [merkle_tree.key().as_ref()], seeds::program = mpl_bubblegum::ID, 
-        bump, owner = mpl_bubblegum::ID)]
-    pub tree_authority: Account<'info, TreeConfig>,
-
-    /// CHECK: Checked in logic
-    #[account(
-        owner = mpl_token_metadata::ID
-    )]
-    pub collection_metadata: Option<UncheckedAccount<'info>>,
-    
-
-    #[account(mut,
-        seeds=[
-            "legacy_inscription".as_bytes(),
-            asset.key().as_ref()
-        ], bump)]
-    pub legacy_inscription: Account<'info, LegacyInscription>,
-
-    pub system_program: Program<'info, System>,
-
-    pub inscriptions_program: Program<'info, LibreplexInscriptions>,
-
-    /// CHECK: Checked by address
-    #[account(address = spl_account_compression::ID)]
-    pub compression_program: UncheckedAccount<'info>,
-
-    /// CHECK: Checked via a CPI call
-    #[account(mut)]
-    pub inscription_summary: UncheckedAccount<'info>,
-}
-
 pub struct CNFTCheckAccounts<'a, 'info> {
     compression_program: & 'a AccountInfo<'info>,
     merkle_tree: & 'a AccountInfo<'info>,
-    asset_id: & 'a AccountInfo<'info>,
+    asset_id: & 'a Pubkey,
     collection_metadata: Option<& 'a AccountInfo<'info>>,
     authority: & 'a AccountInfo<'info>,
     remaining_accounts: &'a [AccountInfo<'info>],
 }
-
-
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, Debug)]
 pub struct InscribeCNFTInput {
@@ -144,7 +80,7 @@ pub fn assert_can_inscribe_cnft(input: &InscribeCNFTInput, accounts: &CNFTCheckA
         return Err(LegacyInscriptionErrorCode::DataHashMismatch.into());
     }
 
-    if let Some(collection_details) = metadata_args.collection {
+    if let Some(collection_details) = metadata_args.collection.as_ref() {
         let provided_collecton_metadata = collection_metadata
             .as_ref().ok_or(LegacyInscriptionErrorCode::BadAuthority)?;
 

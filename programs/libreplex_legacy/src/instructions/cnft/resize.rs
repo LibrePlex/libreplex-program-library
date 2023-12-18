@@ -23,13 +23,9 @@ pub struct ResizeCNFT<'info> {
     )]
     pub legacy_metadata: UncheckedAccount<'info>,
 
-    /// CHECK: Checked by address
-    #[account(address = get_asset_id(merkle_tree.key, compression_input.nonce))]
-    pub asset: AccountInfo<'info>,
-
     /// CHECK: Checked via a CPI call
     #[account(mut, seeds = [b"inscription_v3", 
-        asset.key.as_ref()], bump)]
+        get_asset_id(merkle_tree.key, compression_input.nonce).as_ref()], bump)]
     pub inscription_v3: Account<'info, InscriptionV3>,
 
     /// CHECK: Checked via a CPI call
@@ -54,7 +50,7 @@ pub struct ResizeCNFT<'info> {
     #[account(mut,
         seeds=[
             "legacy_inscription".as_bytes(),
-            asset.key().as_ref()
+            get_asset_id(merkle_tree.key, compression_input.nonce).as_ref()
         ], bump)]
     pub legacy_inscription: Account<'info, LegacyInscription>,
 
@@ -67,24 +63,24 @@ pub struct ResizeCNFT<'info> {
     pub compression_program: UncheckedAccount<'info>,
 }
 
-pub fn resize(ctx: Context<ResizeCNFT>, 
+pub fn resize<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, ResizeCNFT<'info>>, 
     compression_input: Box<InscribeCNFTInput>, 
     resize_input: ResizeLegacyInscriptionInput) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_v3 = &mut ctx.accounts.inscription_v3;
     let inscription_data = &mut ctx.accounts.inscription_data;
     let system_program = &ctx.accounts.system_program;
-    let asset = &ctx.accounts.asset;
-    let authority = &ctx.accounts.authority;
     let legacy_inscription = &ctx.accounts.legacy_inscription;
     let payer = &ctx.accounts.payer;
 
-    let metaplex_metadata = &ctx.accounts.legacy_metadata;
+    let tree = &ctx.accounts.merkle_tree;
+
+    let asset_id = get_asset_id(tree.key, compression_input.nonce);
 
     assert_can_inscribe_cnft(&compression_input, &CNFTCheckAccounts {
         compression_program: &ctx.accounts.compression_program,
         merkle_tree: &ctx.accounts.merkle_tree,
-        asset_id: &ctx.accounts.asset,
+        asset_id: &asset_id,
         collection_metadata: ctx.accounts.collection_metadata.as_ref().map(|a| {
             a.as_ref()
         }) ,
@@ -94,7 +90,7 @@ pub fn resize(ctx: Context<ResizeCNFT>,
 
     let inscription_auth_seeds: &[&[u8]] = &[
         "legacy_inscription".as_bytes(),
-        asset.key.as_ref(),
+        asset_id.as_ref(),
         &[ctx.bumps.legacy_inscription],
     ];
 

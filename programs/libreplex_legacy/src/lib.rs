@@ -1,8 +1,4 @@
 use anchor_lang::prelude::*;
-use instructions::*;
-
-use anchor_lang::{AnchorDeserialize, AnchorSerialize};
-use libreplex_inscriptions::instructions::WriteToInscriptionInput;
 
 declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
 
@@ -14,10 +10,10 @@ pub use errors::*;
 
 pub use constants::*;
 pub use state::*;
+pub use instructions::*;
 
 #[program]
 pub mod libreplex_legacy {
-
     use super::*;
 
     pub fn claim_excess_rent_as_uauth(
@@ -61,22 +57,30 @@ pub mod libreplex_legacy {
     }
 
 
-    pub fn inscribe_cnft(
-        ctx: Context<InscribeCNFT>, 
+    pub fn inscribe_cnft<'a, 'b, 'c, 'info>(
+        ctx: Context<'a, 'b, 'c, 'info, InscribeCNFT<'info>>, 
         input: Box<cnft::InscribeCNFTInput>) -> Result<()> {
         instructions::cnft::inscribe(ctx, input)
     }
 
-    pub fn resize_cnft_inscription(ctx: Context<ResizeCNFT>, 
+    pub fn resize_cnft_inscription<'a, 'b, 'c, 'info>(
+        ctx: Context<'a, 'b, 'c, 'info, ResizeCNFT<'info>>, 
         compression_input: Box<cnft::InscribeCNFTInput>,
         input: ResizeLegacyInscriptionInput) -> Result<()> {
         instructions::cnft::resize(ctx, compression_input,input)
     }
 
-    pub fn write_cnft_inscription(ctx: Context<WriteCNFT>,  
+    pub fn write_cnft_inscription<'a, 'b, 'c, 'info>(
+        ctx: Context<'a, 'b, 'c, 'info, WriteCNFT<'info>>,  
         compression_input: Box<cnft::InscribeCNFTInput>, 
-        write_input: WriteToInscriptionInput) -> Result<()> {
+        write_input: libreplex_inscriptions::instructions::WriteToInscriptionInput) -> Result<()> {
             instructions::cnft::write(ctx, compression_input, write_input)
+    }
+
+    pub fn make_cnft_inscription_immutable<'a, 'b, 'c, 'info>(
+        ctx: Context<'a, 'b, 'c, 'info, MakeImmutableCNFT<'info>>, 
+        compression_input: Box<cnft::InscribeCNFTInput>, )  -> Result<()>  {
+            instructions::cnft::make_immutable(ctx, compression_input)
     }
 
 
