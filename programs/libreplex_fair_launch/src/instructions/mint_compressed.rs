@@ -4,7 +4,7 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{mint_to, Mint, MintTo, Token, set_authority, SetAuthority, spl_token::instruction::AuthorityType},
 };
-use bubblegum_proxy::TreeConfig;
+use bubblegum_proxy::{TreeConfig, MetadataArgs};
 use libreplex_inscriptions::InscriptionSummary;
 // use libreplex_shared::sysvar_instructions_program;
 use mpl_bubblegum::utils::get_asset_id;
@@ -47,14 +47,6 @@ pub struct MintLegacyCtx<'info> {
         bump,)]
     pub hashlist_marker: Account<'info, HashlistMarker>,
 
-    /// CHECK: Checked by tree authority
-    #[account(mut)]
-    pub merkle_tree: UncheckedAccount<'info>,
-
-    #[account(seeds = [merkle_tree.key().as_ref()], seeds::program = bubblegum_proxy::ID, 
-        bump, owner = bubblegum_proxy::ID)]
-    pub tree_authority: Account<'info, TreeConfig>,
-
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -87,8 +79,6 @@ pub struct MintLegacyCtx<'info> {
     #[account(mut)]
     pub inscription_data: UncheckedAccount<'info>,
 
-
-
     /* BOILERPLATE PROGRAM ACCOUNTS */
     #[account()]
     pub token_program: Program<'info, Token>,
@@ -116,6 +106,22 @@ pub struct MintLegacyCtx<'info> {
     #[account(address = mpl_token_metadata::ID)]
     pub metadata_program: UncheckedAccount<'info>,
 
+    /// CHECK: checked in cpi
+    account_compression_program: AccountInfo<'info>,
+
+    /// CHECK: checked in cpi
+    noop_program: AccountInfo<'info>,
+
+    /// CHECK: Checked in cpi
+    #[account(mut)]
+    pub merkle_tree: UncheckedAccount<'info>,
+
+    #[account(mut)]
+    pub tree_authority: Account<'info, TreeConfig>,
+
+    /// CHECK: checked by address
+    #[account(address = mpl_bubblegum::id())]
+    bubblegum_program: AccountInfo<'info>,
 }
 
 pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
@@ -149,98 +155,60 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     let inscriber = &ctx.accounts.inscriber;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
+    
 
     deployment.number_of_tokens_issued += 1;
     if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens {
         deployment.minted_out = true;
     }
 
-    // mint X number of tokens into escrow token account
+    let deployment_seeds: &[&[u8]] = &[
+        "deployment".as_bytes(),
+        deployment.ticker.as_ref(),
+        &[ctx.bumps.deployment],
+    ];
 
-    // issue the NFT + inscription to the signer
 
-    // STEP 1 - create inscription
-    libreplex_legacy::cpi::inscribe_cnft(
-        CpiContext::new(
-            inscriptions_program.to_account_info(),
-            CreateInscriptionV3 {
-                /* the inscription root is set to metaplex
-                    inscription object.
-                */
-                inscription_summary: inscription_summary.to_account_info(),
 
-                root: non_fungible_mint.to_account_info(),
-                /// since root in this case can sign (we are creating a brand new mint),
-                /// it will sign
-                signer: non_fungible_mint.to_account_info(),
-                inscription_v3: inscription_v3.to_account_info(),
+    let mint_compressed_accounts = bubblegum_proxy::cpi::accounts::MintV1 {
+        compression_program: ctx.accounts.account_compression_program,
+        tree_authority: ctx.accounts.tree_authority.to_account_info(),
+        leaf_owner: payer.to_account_info(),
+        leaf_delegate: payer.to_account_info(),
+        merkle_tree: ctx.accounts.merkle_tree.to_account_info(),
+        payer: payer.to_account_info(),
+        tree_delegate: deployment.to_account_info(),
+        log_wrapper: ctx.accounts.noop_program,
+        system_program: system_program.to_account_info(),
+    };
 
-                system_program: system_program.to_account_info(),
-                payer: payer.to_account_info(),
-                inscription_data: inscription_data.to_account_info(),
-            },
-        ),
-        libreplex_inscriptions::instructions::CreateInscriptionInputV3 {
-            authority: Some(payer.key()), // this includes update auth / holder, hence
-            signer_type: SignerType::Root,
-            validation_hash: None,
-        },
-    )?;
+    let metadata_args = MetadataArgs {
+        name: deployment.ticker.clone(),
+        symbol: "".to_string(),
+        uri: deployment.offchain_url.clone(),
+        seller_fee_basis_points: 0,
+        primary_sale_happened: true,
+        is_mutable: false,
+        edition_nonce: None,
+        token_standard: Some(bubblegum_proxy::TokenStandard::NonFungible),
+        collection: None,
+        uses: None,
+        token_program_version: bubblegum_proxy::TokenProgramVersion::Original,
+        creators: vec![bubblegum_proxy::Creator { 
+            address: deployment.key(), 
+            verified: true, 
+            share: 100
+        }],
+    };
 
-    let data_bytes = deployment.mint_template.clone().into_bytes();
+    bubblegum_proxy::cpi::mint_v1(
+        CpiContext::new_with_signer(ctx.accounts.bubblegum_program.to_account_info(), 
+        mint_compressed_accounts, &[deployment_seeds]), 
+        metadata_args)?;
 
-    libreplex_inscriptions::cpi::resize_inscription_v3(
-        CpiContext::new(
-            inscriptions_program.to_account_info(),
-            ResizeInscriptionV3 {
-                /* the inscription root is set to metaplex
-                 inscription object.
-                */
-                authority: payer.to_account_info(),
+    
 
-                system_program: system_program.to_account_info(),
-                payer: payer.to_account_info(),
-                inscription_data: inscription_data.to_account_info(),
-                inscription_v3: inscription_v3.to_account_info(),
-            },
-        ),
-        libreplex_inscriptions::instructions::ResizeInscriptionInput {
-            change: data_bytes.len() as i32 - 8,
-            expected_start_size: 8,
-            target_size: data_bytes.len() as u32,
-        },
-    )?;
-
-    libreplex_inscriptions::cpi::write_to_inscription_v3(
-        CpiContext::new(
-            inscriptions_program.to_account_info(),
-            WriteToInscriptionV3 {
-                authority: payer.to_account_info(),
-                payer: payer.to_account_info(),
-                inscription_v3: inscription_v3.to_account_info(),
-                system_program: system_program.to_account_info(),
-                inscription_data: inscription_data.to_account_info(),
-            },
-        ),
-        WriteToInscriptionInput {
-            data: data_bytes,
-            start_pos: 0,
-            media_type: Some("text/plain".to_owned()),
-            encoding_type: Some("ascii".to_owned()),
-        },
-    )?;
-
-    libreplex_inscriptions::cpi::make_inscription_immutable_v3(CpiContext::new(
-        inscriptions_program.to_account_info(),
-        MakeInscriptionImmutableV3 {
-            payer: payer.to_account_info(),
-            authority: payer.to_account_info(),
-            inscription_summary: inscription_summary.to_account_info(),
-            inscription_v3: inscription_v3.to_account_info(),
-            system_program: system_program.to_account_info(),
-        },
-    ))?;
-
+    
     /*
         Step 2: this the solana way where we meet brc 20 type thinking:
 
@@ -251,11 +219,6 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
         amount of traditional SPL token AND vice versa.
     */
 
-    let deployment_seeds: &[&[u8]] = &[
-        "deployment".as_bytes(),
-        deployment.ticker.as_ref(),
-        &[ctx.bumps.deployment],
-    ];
 
     let expected_token_account = anchor_spl::associated_token::get_associated_token_address(
         &deployment.key(), &fungible_mint.key());
@@ -280,30 +243,6 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
         ))?;
     }
 
-    let expected_non_fungible_token_account = anchor_spl::associated_token::get_associated_token_address(
-        &inscriber.key(), &non_fungible_mint.key());
-
-    if expected_non_fungible_token_account != non_fungible_token_account.key() {
-        return Err(SharedError::InvalidTokenAccount.into());
-    }   
-
-    if non_fungible_token_account.to_account_info().data_is_empty() {
-
-        // msg!("{}",payer.key() );
-        anchor_spl::associated_token::create(CpiContext::new(
-            associated_token_program.to_account_info(),
-            anchor_spl::associated_token::Create {
-                payer: payer.to_account_info(),
-                associated_token: non_fungible_token_account.to_account_info(),
-                authority: inscriber.to_account_info(),
-                mint: non_fungible_mint.to_account_info(),
-                system_program: system_program.to_account_info(),
-                token_program: token_program.to_account_info(),
-            },
-        ))?;
-    }
-
-
     // mint fungible only
     // minting 
     mint_to(
@@ -319,46 +258,6 @@ pub fn mint_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
         ),
         deployment.get_fungible_mint_amount()   )?;
 
-    // create non-fungible metadata for the "MINT" instruction
-    create_mint_with_metadata_and_masteredition(
-        MintAccounts {
-            authority_pda: deployment.to_account_info(),
-            payer: payer.to_account_info(),
-            nft_owner: inscriber.to_account_info(),
-            nft_mint: non_fungible_mint.to_account_info(),
-            nft_mint_authority: deployment.to_account_info(),
-            nft_metadata: non_fungible_metadata.to_account_info(),
-            nft_master_edition: Some(non_fungible_masteredition.to_account_info()),
-            token: Some(non_fungible_token_account.to_account_info()), // do not mint anything
-            token_metadata_program: metadata_program.to_account_info(),
-            spl_token_program: token_program.to_account_info(),
-            spl_ata_program: associated_token_program.to_account_info(),
-            system_program: system_program.to_account_info(),
-            sysvar_instructions: sysvar_instructions_program.to_account_info(),
-        },
-        deployment_seeds,
-        // rent.to_account_into(),
-        deployment.ticker.clone(),
-        "".to_owned(),
-        0,
-        deployment.offchain_url.clone(),
-        Some(
-            [Creator {
-                address: deployment.key(),
-                verified: true,
-                share: 100,
-            }]
-            .to_vec(),
-        ),
-        0,
-        false, // this is the supply of the editions. always 0
-        1,
-        0, 
-        TokenStandard::NonFungible,
-    )?;
-    
-
-  
     // if we're at max tokens, remove freeze auth and mint auth
 
     if deployment.number_of_tokens_issued == deployment.max_number_of_tokens {
