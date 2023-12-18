@@ -134,7 +134,16 @@ pub struct DeployLegacyCtx<'info> {
 pub fn deploy<'f>(ctx: Context<'_,'_,'_,'f,DeployLegacyCtx<'f>>) -> Result<()> {
     let hashlist = &mut ctx.accounts.hashlist;
 
+    
+
     let deployment = &mut ctx.accounts.deployment;
+
+
+    if deployment.require_creator_cosign {
+        panic!("Only launches without creator cosign can currently use v1 methods")
+    }
+
+
     let system_program = &ctx.accounts.system_program;
     let payer = &ctx.accounts.payer;
     let inscriptions_program = &ctx.accounts.inscriptions_program;

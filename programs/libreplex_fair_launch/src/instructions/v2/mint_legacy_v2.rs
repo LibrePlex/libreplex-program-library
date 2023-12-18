@@ -137,6 +137,10 @@ pub struct MintLegacyV2Ctx<'info> {
 pub fn mint_legacy_v2(ctx: Context<MintLegacyV2Ctx>) -> Result<()> {
     let deployment = &mut ctx.accounts.deployment;
 
+    if !deployment.require_creator_cosign {
+        panic!("Only creator cosign can currently use v2 methods")
+    }
+
     // to be discussed w/ everybody and feedback. Not strictly in line with BRC 20 thinking
     // but seems pointless to issue tokens if they can never be valid
     if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens || deployment.minted_out {
@@ -172,10 +176,7 @@ pub fn mint_legacy_v2(ctx: Context<MintLegacyV2Ctx>) -> Result<()> {
     let associated_token_program = &ctx.accounts.associated_token_program;
     let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
 
-    if !deployment.require_creator_cosign  {
-        // temporary message until we're confident that this works for trad deployments as well (without require_creator_cosign)
-        panic!("Only called with require_creator_cosign")
-    }
+   
 
 
     if deployment.require_creator_cosign && !signer.key().eq(&payer.key()) {

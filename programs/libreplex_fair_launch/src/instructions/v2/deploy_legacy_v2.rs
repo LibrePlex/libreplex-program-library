@@ -125,7 +125,16 @@ pub struct DeployLegacyV2Ctx<'info> {
 }
 
 pub fn deploy_legacy_v2(ctx: Context<DeployLegacyV2Ctx>) -> Result<()> {
+
+
+
     let deployment = &mut ctx.accounts.deployment;
+
+
+    if !deployment.require_creator_cosign {
+        panic!("Only creator cosign can currently use v2 methods")
+    }
+
     let hashlist = &mut ctx.accounts.hashlist;
 
     hashlist.deployment = deployment.key();

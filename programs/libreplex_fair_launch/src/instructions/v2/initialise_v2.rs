@@ -56,6 +56,9 @@ pub struct InitialiseV2Ctx<'info>  {
 pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) -> Result<()> {
     
     let deployment = &mut ctx.accounts.deployment;
+
+    
+
     let creator = &ctx.accounts.creator;
 
     let InitialiseInputV2 { 
@@ -69,13 +72,14 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
         require_creator_cosign, 
         use_inscriptions} = input;
 
+    if require_creator_cosign {
+        panic!("Only creator cosign can currently use v2 methods")
+    }
+
     deployment.require_creator_cosign = require_creator_cosign;
     deployment.use_inscriptions = use_inscriptions;
 
-    if !deployment.require_creator_cosign  {
-        // temporary message until we're confident that this works for trad deployments as well (without require_creator_cosign)
-        panic!("Only called with require_creator_cosign")
-    }
+    
 
     initialise_logic(InitialiseInput {
         limit_per_mint, max_number_of_tokens, decimals, ticker, deployment_template, mint_template, offchain_url
