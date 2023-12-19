@@ -23,7 +23,7 @@ use crate::{
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum TreeDelegateType {
-    Glogbal,
+    Global,
     Deployment,
 }
 
@@ -187,7 +187,7 @@ pub fn mint_c_legacy(ctx: Context<MintCompressedCtx>, input: MintCompressedInput
     = &[b"global_tree_delegate", &[ctx.bumps.global_tree_delegate]];
 
 
-    let (tree_delegate_seeds, tree_delegate_info) = if let TreeDelegateType::Glogbal  = input.tree_delegate_type {
+    let (tree_delegate_seeds, tree_delegate_info) = if let TreeDelegateType::Global  = input.tree_delegate_type {
         (global_tree_delegate_seeds, ctx.accounts.global_tree_delegate
             .as_ref().ok_or(FairLaunchError::MissingGlobalTreeDelegate)?.to_account_info())
     } else {
