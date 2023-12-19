@@ -42,6 +42,10 @@ pub mod libreplex_fair_launch {
     }   
 
 
+    pub fn mint_compressed(ctx: Context<MintCompressedCtx>, input: MintCompressedInput) -> Result<()> {
+        instructions::mint_c_legacy(ctx, input)
+    }
+
     /* 
         Migration methods - to be deactivated once old validation migrations are complete
      */

@@ -345,6 +345,169 @@ export type LibreplexFairLaunch = {
       "args": []
     },
     {
+      "name": "mintCompressed",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ghostRootSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriber",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleTokenAccountEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "accountCompressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "noopProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalTreeDelegate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "global_tree_delegate"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintCompressedInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "deployMigrated",
       "accounts": [
         {
@@ -846,7 +1009,7 @@ export type LibreplexFairLaunch = {
             "type": "u8"
           },
           {
-            "name": "deployed",
+            "name": "useInscriptions",
             "type": "bool"
           },
           {
@@ -854,7 +1017,7 @@ export type LibreplexFairLaunch = {
             "type": "bool"
           },
           {
-            "name": "allowSplConversion",
+            "name": "requireCreatorCosign",
             "type": "bool"
           },
           {
@@ -977,6 +1140,20 @@ export type LibreplexFairLaunch = {
       }
     },
     {
+      "name": "MintCompressedInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "treeDelegateType",
+            "type": {
+              "defined": "TreeDelegateType"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "MintAndOrder",
       "type": {
         "kind": "struct",
@@ -988,6 +1165,20 @@ export type LibreplexFairLaunch = {
           {
             "name": "order",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TreeDelegateType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Glogbal"
+          },
+          {
+            "name": "Deployment"
           }
         ]
       }
@@ -1458,6 +1649,169 @@ export const IDL: LibreplexFairLaunch = {
       "args": []
     },
     {
+      "name": "mintCompressed",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ghostRootSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriber",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleTokenAccountEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "accountCompressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "noopProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalTreeDelegate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "global_tree_delegate"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintCompressedInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "deployMigrated",
       "accounts": [
         {
@@ -1959,7 +2313,7 @@ export const IDL: LibreplexFairLaunch = {
             "type": "u8"
           },
           {
-            "name": "deployed",
+            "name": "useInscriptions",
             "type": "bool"
           },
           {
@@ -1967,7 +2321,7 @@ export const IDL: LibreplexFairLaunch = {
             "type": "bool"
           },
           {
-            "name": "allowSplConversion",
+            "name": "requireCreatorCosign",
             "type": "bool"
           },
           {
@@ -2090,6 +2444,20 @@ export const IDL: LibreplexFairLaunch = {
       }
     },
     {
+      "name": "MintCompressedInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "treeDelegateType",
+            "type": {
+              "defined": "TreeDelegateType"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "MintAndOrder",
       "type": {
         "kind": "struct",
@@ -2101,6 +2469,20 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "order",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TreeDelegateType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Glogbal"
+          },
+          {
+            "name": "Deployment"
           }
         ]
       }

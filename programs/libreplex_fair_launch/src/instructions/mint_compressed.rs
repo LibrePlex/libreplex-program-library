@@ -15,14 +15,26 @@ use libreplex_inscriptions::{
     cpi::accounts::WriteToInscriptionV3,
     instructions::{SignerType, WriteToInscriptionInput},
 };
-use libreplex_shared::{SharedError, sysvar_instructions_program};
+use libreplex_shared::SharedError;
 
 use crate::{
     errors::FairLaunchError, Deployment, HashlistMarker, MintEvent, add_to_hashlist,
 };
 
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub enum TreeDelegateType {
+    Glogbal,
+    Deployment,
+}
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct MintCompressedInput {
+    pub tree_delegate_type: TreeDelegateType
+}
+
 #[derive(Accounts)]
-pub struct MintLegacyCtx<'info> {
+#[instruction(input: MintCompressedInput)]
+pub struct MintCompressedCtx<'info> {
     #[account(mut,
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
@@ -46,8 +58,7 @@ pub struct MintLegacyCtx<'info> {
 
     /// CHECK: Checked by address
     #[account(
-        seeds = 
-        [get_asset_id(merkle_tree.key, tree_authority.num_minted).as_ref()], 
+        seeds = [get_asset_id(merkle_tree.key, tree_authority.num_minted).as_ref()], 
         bump)]
     pub ghost_root_signer: UncheckedAccount<'info>,
 
@@ -99,17 +110,6 @@ pub struct MintLegacyCtx<'info> {
     #[account()]
     pub system_program: Program<'info, System>,
 
-    /// CHECK: Checked in constraint
-    #[account(
-        constraint = sysvar_instructions.key() == sysvar_instructions_program::ID
-    )]
-    sysvar_instructions: UncheckedAccount<'info>,
-
-    
-    /// CHECK: address checked
-    #[account(address = mpl_token_metadata::ID)]
-    pub metadata_program: UncheckedAccount<'info>,
-
     /// CHECK: checked in cpi
     account_compression_program: AccountInfo<'info>,
 
@@ -123,12 +123,16 @@ pub struct MintLegacyCtx<'info> {
     #[account(mut)]
     pub tree_authority: Account<'info, TreeConfig>,
 
+    /// CHECK: Checked by address has no data
+    #[account(seeds = [b"global_tree_delegate"], bump)]
+    pub global_tree_delegate: Option<UncheckedAccount<'info>>,
+
     /// CHECK: checked by address
     #[account(address = mpl_bubblegum::id())]
     bubblegum_program: AccountInfo<'info>,
 }
 
-pub fn mint_c_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
+pub fn mint_c_legacy(ctx: Context<MintCompressedCtx>, input: MintCompressedInput) -> Result<()> {
     let deployment = &mut ctx.accounts.deployment;
 
     // to be discussed w/ everybody and feedback. Not strictly in line with BRC 20 thinking
@@ -155,22 +159,15 @@ pub fn mint_c_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     let fungible_token_account_escrow = &ctx.accounts.fungible_token_account_escrow;
     let token_program = &ctx.accounts.token_program;
     let system_program = &ctx.accounts.system_program;
-    let metadata_program = &ctx.accounts.metadata_program;
     let inscriber = &ctx.accounts.inscriber;
     let associated_token_program = &ctx.accounts.associated_token_program;
-    let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
-    
 
     deployment.number_of_tokens_issued += 1;
     if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens {
         deployment.minted_out = true;
     }
 
-    let deployment_seeds: &[&[u8]] = &[
-        "deployment".as_bytes(),
-        deployment.ticker.as_ref(),
-        &[ctx.bumps.deployment],
-    ];
+ 
 
 
     let tree_authority = &ctx.accounts.tree_authority;
@@ -180,11 +177,27 @@ pub fn mint_c_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
     let ghost_root_signer = &ctx.accounts.ghost_root_signer;
     let ghost_root_seeds: &[&[u8]] = &[asset_id.as_ref(), &[ctx.bumps.ghost_root_signer]];
 
+    let deployment_seeds: &[&[u8]] = &[
+        "deployment".as_bytes(),
+        deployment.ticker.as_ref(),
+        &[ctx.bumps.deployment],
+    ];
+
+    let global_tree_delegate_seeds: &[&[u8]] 
+    = &[b"global_tree_delegate", &[ctx.bumps.global_tree_delegate]];
+
+
+    let tree_delegate_seeds = if let TreeDelegateType::Glogbal  = input.tree_delegate_type {
+        global_tree_delegate_seeds
+    } else {
+        deployment_seeds
+    };
+
     let mint_compressed_accounts = bubblegum_proxy::cpi::accounts::MintV1 {
         compression_program: ctx.accounts.account_compression_program.to_account_info(),
         tree_authority: ctx.accounts.tree_authority.to_account_info(),
-        leaf_owner: payer.to_account_info(),
-        leaf_delegate: payer.to_account_info(),
+        leaf_owner: inscriber.to_account_info(),
+        leaf_delegate: inscriber.to_account_info(),
         merkle_tree: merkle_tree.to_account_info(),
         payer: payer.to_account_info(),
         tree_delegate: deployment.to_account_info(),
@@ -213,7 +226,7 @@ pub fn mint_c_legacy(ctx: Context<MintLegacyCtx>) -> Result<()> {
 
     bubblegum_proxy::cpi::mint_v1(
         CpiContext::new_with_signer(ctx.accounts.bubblegum_program.to_account_info(), 
-        mint_compressed_accounts, &[deployment_seeds]), 
+        mint_compressed_accounts, &[tree_delegate_seeds]), 
         metadata_args)?;
 
 

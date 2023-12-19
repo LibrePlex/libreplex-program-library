@@ -10,12 +10,10 @@ pub use write::*;
 mod immutable;
 pub use immutable::*;
 
-use solana_program::account_info::AccountInfo;
+use solana_program::{account_info::AccountInfo, keccak};
 use mpl_token_metadata::accounts::Metadata;
 use crate::LegacyInscriptionErrorCode;
-use mpl_bubblegum::hash_metadata;
 use mpl_bubblegum::state::leaf_schema::LeafSchema;
-use mpl_bubblegum::state::metaplex_adapter::MetadataArgs as BMetadataArgs;
 use anchor_lang::prelude::*;
 
 pub struct CNFTCheckAccounts<'a, 'info> {
@@ -34,7 +32,7 @@ pub struct InscribeCNFTInput {
     creator_hash: [u8; 32],
     nonce: u64,
     index: u32,
-    metadata_args: BMetadataArgs,
+    metadata_args: MetadataArgs,
     leaf_delegate: Pubkey,
     leaf_owner: Pubkey,
 }
@@ -99,4 +97,14 @@ pub fn assert_can_inscribe_cnft(input: &InscribeCNFTInput, accounts: &CNFTCheckA
     }
 
     return Ok(());
+}
+
+pub fn hash_metadata(metadata: &MetadataArgs) -> Result<[u8; 32]> {
+    let metadata_args_hash = keccak::hashv(&[metadata.try_to_vec()?.as_slice()]);
+    // Calculate new data hash.
+    Ok(keccak::hashv(&[
+        &metadata_args_hash.to_bytes(),
+        &metadata.seller_fee_basis_points.to_le_bytes(),
+    ])
+    .to_bytes())
 }

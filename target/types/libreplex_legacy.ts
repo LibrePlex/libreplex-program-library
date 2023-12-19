@@ -292,6 +292,324 @@ export type LibreplexLegacy = {
       ]
     },
     {
+      "name": "inscribeCnft",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "legacySigner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "legacyInscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InscribeCNFTInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "resizeCnftInscription",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "legacyMetadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "legacyInscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "compressionInput",
+          "type": {
+            "defined": "InscribeCNFTInput"
+          }
+        },
+        {
+          "name": "input",
+          "type": {
+            "defined": "ResizeLegacyInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "writeCnftInscription",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "legacyMetadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "legacyInscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "compressionInput",
+          "type": {
+            "defined": "InscribeCNFTInput"
+          }
+        },
+        {
+          "name": "writeInput",
+          "type": {
+            "defined": "WriteToInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "makeCnftInscriptionImmutable",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "asset",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "legacyInscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "compressionInput",
+          "type": {
+            "defined": "InscribeCNFTInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "makeLegacyInscriptionImmutableV3",
       "accounts": [
         {
@@ -339,6 +657,43 @@ export type LibreplexLegacy = {
     }
   ],
   "accounts": [
+    {
+      "name": "treeConfig",
+      "docs": [
+        "Account: TreeConfig"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "treeCreator",
+            "type": "publicKey"
+          },
+          {
+            "name": "treeDelegate",
+            "type": "publicKey"
+          },
+          {
+            "name": "totalMintCapacity",
+            "type": "u64"
+          },
+          {
+            "name": "numMinted",
+            "type": "u64"
+          },
+          {
+            "name": "isPublic",
+            "type": "bool"
+          },
+          {
+            "name": "isDecompressible",
+            "type": {
+              "defined": "DecompressibleState"
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "inscriptionV3",
       "type": {
@@ -412,6 +767,205 @@ export type LibreplexLegacy = {
   ],
   "types": [
     {
+      "name": "Collection",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "verified",
+            "type": "bool"
+          },
+          {
+            "name": "key",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Creator",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "verified",
+            "type": "bool"
+          },
+          {
+            "name": "share",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DecompressibleState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Enabled"
+          },
+          {
+            "name": "Disabled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "sellerFeeBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "primarySaleHappened",
+            "type": "bool"
+          },
+          {
+            "name": "isMutable",
+            "type": "bool"
+          },
+          {
+            "name": "editionNonce",
+            "type": {
+              "option": "u8"
+            }
+          },
+          {
+            "name": "tokenStandard",
+            "type": {
+              "option": {
+                "defined": "TokenStandard"
+              }
+            }
+          },
+          {
+            "name": "collection",
+            "type": {
+              "option": {
+                "defined": "Collection"
+              }
+            }
+          },
+          {
+            "name": "uses",
+            "type": {
+              "option": {
+                "defined": "Uses"
+              }
+            }
+          },
+          {
+            "name": "tokenProgramVersion",
+            "type": {
+              "defined": "TokenProgramVersion"
+            }
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": "Creator"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenProgramVersion",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Original"
+          },
+          {
+            "name": "Token2022"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenStandard",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NonFungible"
+          },
+          {
+            "name": "FungibleAsset"
+          },
+          {
+            "name": "Fungible"
+          },
+          {
+            "name": "NonFungibleEdition"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UseMethod",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Burn"
+          },
+          {
+            "name": "Multiple"
+          },
+          {
+            "name": "Single"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Uses",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "useMethod",
+            "type": {
+              "defined": "UseMethod"
+            }
+          },
+          {
+            "name": "remaining",
+            "type": "u64"
+          },
+          {
+            "name": "total",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "WriteToInscriptionInput",
       "type": {
         "kind": "struct",
@@ -435,6 +989,63 @@ export type LibreplexLegacy = {
             "type": {
               "option": "string"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InscribeCNFTInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "dataHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "creatorHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "index",
+            "type": "u32"
+          },
+          {
+            "name": "metadataArgs",
+            "type": {
+              "defined": "MetadataArgs"
+            }
+          },
+          {
+            "name": "leafDelegate",
+            "type": "publicKey"
+          },
+          {
+            "name": "leafOwner",
+            "type": "publicKey"
           }
         ]
       }
@@ -530,6 +1141,11 @@ export type LibreplexLegacy = {
       "code": 6008,
       "name": "InscriptionV3KeyMismatch",
       "msg": "Inscription V3 key mismatch"
+    },
+    {
+      "code": 6009,
+      "name": "DataHashMismatch",
+      "msg": "Metadata data missmatch"
     }
   ]
 };
@@ -828,6 +1444,324 @@ export const IDL: LibreplexLegacy = {
       ]
     },
     {
+      "name": "inscribeCnft",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "legacySigner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "legacyInscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InscribeCNFTInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "resizeCnftInscription",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "legacyMetadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "legacyInscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "compressionInput",
+          "type": {
+            "defined": "InscribeCNFTInput"
+          }
+        },
+        {
+          "name": "input",
+          "type": {
+            "defined": "ResizeLegacyInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "writeCnftInscription",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "legacyMetadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "legacyInscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "compressionInput",
+          "type": {
+            "defined": "InscribeCNFTInput"
+          }
+        },
+        {
+          "name": "writeInput",
+          "type": {
+            "defined": "WriteToInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "makeCnftInscriptionImmutable",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "asset",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "legacyInscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "compressionInput",
+          "type": {
+            "defined": "InscribeCNFTInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "makeLegacyInscriptionImmutableV3",
       "accounts": [
         {
@@ -875,6 +1809,43 @@ export const IDL: LibreplexLegacy = {
     }
   ],
   "accounts": [
+    {
+      "name": "treeConfig",
+      "docs": [
+        "Account: TreeConfig"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "treeCreator",
+            "type": "publicKey"
+          },
+          {
+            "name": "treeDelegate",
+            "type": "publicKey"
+          },
+          {
+            "name": "totalMintCapacity",
+            "type": "u64"
+          },
+          {
+            "name": "numMinted",
+            "type": "u64"
+          },
+          {
+            "name": "isPublic",
+            "type": "bool"
+          },
+          {
+            "name": "isDecompressible",
+            "type": {
+              "defined": "DecompressibleState"
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "inscriptionV3",
       "type": {
@@ -948,6 +1919,205 @@ export const IDL: LibreplexLegacy = {
   ],
   "types": [
     {
+      "name": "Collection",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "verified",
+            "type": "bool"
+          },
+          {
+            "name": "key",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Creator",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "verified",
+            "type": "bool"
+          },
+          {
+            "name": "share",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DecompressibleState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Enabled"
+          },
+          {
+            "name": "Disabled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "sellerFeeBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "primarySaleHappened",
+            "type": "bool"
+          },
+          {
+            "name": "isMutable",
+            "type": "bool"
+          },
+          {
+            "name": "editionNonce",
+            "type": {
+              "option": "u8"
+            }
+          },
+          {
+            "name": "tokenStandard",
+            "type": {
+              "option": {
+                "defined": "TokenStandard"
+              }
+            }
+          },
+          {
+            "name": "collection",
+            "type": {
+              "option": {
+                "defined": "Collection"
+              }
+            }
+          },
+          {
+            "name": "uses",
+            "type": {
+              "option": {
+                "defined": "Uses"
+              }
+            }
+          },
+          {
+            "name": "tokenProgramVersion",
+            "type": {
+              "defined": "TokenProgramVersion"
+            }
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": "Creator"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenProgramVersion",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Original"
+          },
+          {
+            "name": "Token2022"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenStandard",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NonFungible"
+          },
+          {
+            "name": "FungibleAsset"
+          },
+          {
+            "name": "Fungible"
+          },
+          {
+            "name": "NonFungibleEdition"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UseMethod",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Burn"
+          },
+          {
+            "name": "Multiple"
+          },
+          {
+            "name": "Single"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Uses",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "useMethod",
+            "type": {
+              "defined": "UseMethod"
+            }
+          },
+          {
+            "name": "remaining",
+            "type": "u64"
+          },
+          {
+            "name": "total",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "WriteToInscriptionInput",
       "type": {
         "kind": "struct",
@@ -971,6 +2141,63 @@ export const IDL: LibreplexLegacy = {
             "type": {
               "option": "string"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InscribeCNFTInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "dataHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "creatorHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "index",
+            "type": "u32"
+          },
+          {
+            "name": "metadataArgs",
+            "type": {
+              "defined": "MetadataArgs"
+            }
+          },
+          {
+            "name": "leafDelegate",
+            "type": "publicKey"
+          },
+          {
+            "name": "leafOwner",
+            "type": "publicKey"
           }
         ]
       }
@@ -1066,6 +2293,11 @@ export const IDL: LibreplexLegacy = {
       "code": 6008,
       "name": "InscriptionV3KeyMismatch",
       "msg": "Inscription V3 key mismatch"
+    },
+    {
+      "code": 6009,
+      "name": "DataHashMismatch",
+      "msg": "Metadata data missmatch"
     }
   ]
 };

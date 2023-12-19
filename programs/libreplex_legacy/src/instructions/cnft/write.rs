@@ -24,13 +24,9 @@ pub struct WriteCNFT<'info> {
     )]
     pub legacy_metadata: UncheckedAccount<'info>,
 
-    /// CHECK: Checked by address
-    #[account(address = get_asset_id(merkle_tree.key, compression_input.nonce))]
-    pub asset: AccountInfo<'info>,
-
     /// CHECK: Checked via a CPI call
     #[account(mut, seeds = [b"inscription_v3", 
-        asset.key.as_ref()], bump)]
+        get_asset_id(merkle_tree.key, compression_input.nonce).as_ref()], bump)]
     pub inscription_v3: Account<'info, InscriptionV3>,
 
     /// CHECK: Checked via a CPI call
@@ -54,7 +50,7 @@ pub struct WriteCNFT<'info> {
     #[account(mut,
         seeds=[
             "legacy_inscription".as_bytes(),
-            asset.key().as_ref()
+            get_asset_id(merkle_tree.key, compression_input.nonce).as_ref()
         ], bump)]
     pub legacy_inscription: Account<'info, LegacyInscription>,
 
