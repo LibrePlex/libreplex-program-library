@@ -19,7 +19,9 @@ pub enum FairLaunchError {
     MintedOut,
 
     #[msg("Legacy migrations are minted out")]
-    LegacyMigrationsAreMintedOut
+    LegacyMigrationsAreMintedOut,
 
+    #[msg("Global tree delegate is missing")]
+    MissingGlobalTreeDelegate,
 
 }

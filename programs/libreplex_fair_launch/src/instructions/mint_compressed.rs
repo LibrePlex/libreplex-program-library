@@ -187,11 +187,13 @@ pub fn mint_c_legacy(ctx: Context<MintCompressedCtx>, input: MintCompressedInput
     = &[b"global_tree_delegate", &[ctx.bumps.global_tree_delegate]];
 
 
-    let tree_delegate_seeds = if let TreeDelegateType::Glogbal  = input.tree_delegate_type {
-        global_tree_delegate_seeds
+    let (tree_delegate_seeds, tree_delegate_info) = if let TreeDelegateType::Glogbal  = input.tree_delegate_type {
+        (global_tree_delegate_seeds, ctx.accounts.global_tree_delegate
+            .as_ref().ok_or(FairLaunchError::MissingGlobalTreeDelegate)?.to_account_info())
     } else {
-        deployment_seeds
+        (deployment_seeds, deployment.to_account_info())
     };
+
 
     let mint_compressed_accounts = bubblegum_proxy::cpi::accounts::MintV1 {
         compression_program: ctx.accounts.account_compression_program.to_account_info(),
@@ -200,7 +202,7 @@ pub fn mint_c_legacy(ctx: Context<MintCompressedCtx>, input: MintCompressedInput
         leaf_delegate: inscriber.to_account_info(),
         merkle_tree: merkle_tree.to_account_info(),
         payer: payer.to_account_info(),
-        tree_delegate: deployment.to_account_info(),
+        tree_delegate: tree_delegate_info,
         log_wrapper: ctx.accounts.noop_program.to_account_info(),
         system_program: system_program.to_account_info(),
     };

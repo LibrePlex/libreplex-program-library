@@ -1298,6 +1298,11 @@ export type LibreplexFairLaunch = {
       "code": 6005,
       "name": "LegacyMigrationsAreMintedOut",
       "msg": "Legacy migrations are minted out"
+    },
+    {
+      "code": 6006,
+      "name": "MissingGlobalTreeDelegate",
+      "msg": "Global tree delegate is missing"
     }
   ]
 };
@@ -2602,6 +2607,11 @@ export const IDL: LibreplexFairLaunch = {
       "code": 6005,
       "name": "LegacyMigrationsAreMintedOut",
       "msg": "Legacy migrations are minted out"
+    },
+    {
+      "code": 6006,
+      "name": "MissingGlobalTreeDelegate",
+      "msg": "Global tree delegate is missing"
     }
   ]
 };
