@@ -40,6 +40,11 @@ pub use mint_compressed::*;
 pub mod swap_to_nonfungible;
 pub use swap_to_nonfungible::*;
 
+pub mod swap_compressed_to_fungible;
+pub use swap_compressed_to_fungible::*;
+
+pub mod swap_fungible_to_compressed;
+pub use swap_fungible_to_compressed::*;
 
 
 /*

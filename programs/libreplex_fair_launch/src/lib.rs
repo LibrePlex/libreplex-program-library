@@ -12,6 +12,8 @@ pub use state::*;
 #[program]
 pub mod libreplex_fair_launch {
 
+    use crate::instruction::SwapFungibleToCompressed;
+
     use super::*;
 
 
@@ -93,6 +95,26 @@ pub mod libreplex_fair_launch {
             ctx
         )
     }   
+
+    pub fn swap_fungible_to_compressed<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, SwapFungibleToCompressedCtx<'info>>, 
+        root: [u8; 32],
+        data_hash: [u8; 32],
+        creator_hash: [u8; 32],
+        nonce: u64,
+        index: u32
+    ) -> Result<()> {
+        instructions::swap_fungible_to_compressed(ctx, root, data_hash, creator_hash, nonce, index)
+    }
+
+    pub fn swap_compressed_to_fungible<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, SwapCompressedToFungibleCtx<'info>>, 
+        root: [u8; 32],
+        data_hash: [u8; 32],
+        creator_hash: [u8; 32],
+        nonce: u64,
+        index: u32
+    ) -> Result<()> {
+            instructions::swap_compressed_to_fungible(ctx, root, data_hash, creator_hash, nonce, index)
+    }
 
 
 
