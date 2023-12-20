@@ -117,6 +117,11 @@ export type LibreplexShared = {
       "code": 6022,
       "name": "SplConversionNotAllowed",
       "msg": "Spl conversion not allowed"
+    },
+    {
+      "code": 6023,
+      "name": "InvalidCreatorCosigner",
+      "msg": "This deployment requires the creator to co-sign"
     }
   ]
 };
@@ -240,6 +245,11 @@ export const IDL: LibreplexShared = {
       "code": 6022,
       "name": "SplConversionNotAllowed",
       "msg": "Spl conversion not allowed"
+    },
+    {
+      "code": 6023,
+      "name": "InvalidCreatorCosigner",
+      "msg": "This deployment requires the creator to co-sign"
     }
   ]
 };

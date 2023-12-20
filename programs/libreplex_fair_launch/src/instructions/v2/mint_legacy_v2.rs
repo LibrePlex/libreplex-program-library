@@ -9,7 +9,7 @@ use libreplex_inscriptions::InscriptionSummary;
 // use libreplex_shared::sysvar_instructions_program;
 
 
-use libreplex_shared::sysvar_instructions_program;
+use libreplex_shared::{SharedError, sysvar_instructions_program};
 
 
 
@@ -18,7 +18,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-pub struct MintLegacyCtx<'info> {
+pub struct MintLegacyV2Ctx<'info> {
     #[account(mut,
        
 
@@ -45,6 +45,11 @@ pub struct MintLegacyCtx<'info> {
 
     #[account(mut)]
     pub payer: Signer<'info>,
+
+    // when deployment.require_creator_cosign is true, this must be equal to the creator
+    // of the deployment otherwise, can be any signer account
+    #[account(mut)]
+    pub signer: Signer<'info>,
 
     /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
     #[account(mut)]
@@ -129,11 +134,11 @@ pub struct MintLegacyCtx<'info> {
 
 }
 
-pub fn mint_legacy<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyCtx<'info>>) -> Result<()> {
+pub fn mint_legacy_v2(ctx: Context<MintLegacyV2Ctx>) -> Result<()> {
     let deployment = &mut ctx.accounts.deployment;
 
-    if deployment.require_creator_cosign {
-        panic!("Only launches without creator cosign can currently use v1 methods")
+    if !deployment.require_creator_cosign {
+        panic!("Only creator cosign can currently use v2 methods")
     }
 
     // to be discussed w/ everybody and feedback. Not strictly in line with BRC 20 thinking
@@ -146,12 +151,14 @@ pub fn mint_legacy<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyCtx<'info>>)
         return Err(FairLaunchError::LegacyMigrationsAreMintedOut.into());
     }
     
+    
 
     let hashlist = &mut ctx.accounts.hashlist;
 
     let inscription_summary = &ctx.accounts.inscription_summary;
 
     let payer = &ctx.accounts.payer;
+    let signer = &ctx.accounts.signer;
     let fungible_mint = &ctx.accounts.fungible_mint;
     let non_fungible_metadata =  &ctx.accounts.non_fungible_metadata;
     let non_fungible_masteredition = &ctx.accounts.non_fungible_masteredition;
@@ -169,9 +176,35 @@ pub fn mint_legacy<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyCtx<'info>>)
     let associated_token_program = &ctx.accounts.associated_token_program;
     let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
 
-    mint_legacy_logic(deployment, inscriptions_program, inscription_summary, non_fungible_mint, inscription_v3, system_program, payer, inscription_data, 
-        fungible_mint, fungible_token_account_escrow, associated_token_program, token_program, inscriber, non_fungible_token_account, non_fungible_metadata, non_fungible_masteredition, metadata_program, sysvar_instructions_program, hashlist,
+   
+
+
+    if deployment.require_creator_cosign && !signer.key().eq(&payer.key()) {
+        return Err(SharedError::InvalidCreatorCosigner.into());
+    }
+
+    mint_legacy_logic(
+        deployment, 
+        inscriptions_program, 
+        inscription_summary, 
+        non_fungible_mint, 
+        inscription_v3, 
+        system_program, 
+        payer, 
+        inscription_data, 
+        fungible_mint, 
+        fungible_token_account_escrow, 
+        associated_token_program, 
+        token_program, 
+        inscriber, 
+        non_fungible_token_account, 
+        non_fungible_metadata, 
+        non_fungible_masteredition, 
+        metadata_program, 
+        sysvar_instructions_program, 
+        hashlist,
     ctx.bumps.deployment)?;
 
+    
     Ok(())
 }

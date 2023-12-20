@@ -16,14 +16,40 @@ pub mod libreplex_fair_launch {
 
     use super::*;
 
+   // v2 endpoints. Prefer these over the original ones. they allow setting of optional creator co-signer 
+   // and toggling inscriptions on and off.
+   pub fn deploy_legacy_v2(
+    ctx: Context<DeployLegacyV2Ctx>
+    ) -> Result<()> {
+        instructions::deploy_legacy_v2::deploy_legacy_v2(
+            ctx
+        )
+   }   
 
-   pub fn deploy_legacy(
-        ctx: Context<DeployLegacyCtx>,
+   pub fn mint_legacy_v2<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyV2Ctx<'info>>) -> Result<()> {
+    instructions::mint_legacy_v2::mint_legacy_v2(
+        ctx
+    )
+    }  
+
+    pub fn initialise_v2(
+        ctx: Context<InitialiseV2Ctx>,
+        input: InitialiseInputV2
+    ) -> Result<()> {
+        instructions::initialise_v2::initialise_v2(
+            ctx,
+            input
+        )
+    }   
+
+   pub fn deploy_legacy<'f>(
+        ctx: Context<'_,'_,'_,'f,DeployLegacyCtx<'f>>,
     ) -> Result<()> {
         instructions::deploy_legacy::deploy(
             ctx
         )
     }   
+    
 
     pub fn initialise(
         ctx: Context<InitialiseCtx>,
@@ -35,9 +61,7 @@ pub mod libreplex_fair_launch {
         )
     }   
 
-    pub fn mint_legacy(
-        ctx: Context<MintLegacyCtx>,
-    ) -> Result<()> {
+    pub fn mint_legacy<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyCtx<'info>>) -> Result<()> {
         instructions::mint_legacy::mint_legacy(
             ctx
         )

@@ -32,7 +32,7 @@ pub struct Deployment {
 
 
     pub use_inscriptions: bool,
-    pub minted_out: bool,
+    pub deployment_type: u8,
     // to allow modular custom logic around this contract
     pub require_creator_cosign: bool,
 

@@ -137,7 +137,7 @@ pub fn mint_c_legacy(ctx: Context<MintCompressedCtx>, input: MintCompressedInput
 
     // to be discussed w/ everybody and feedback. Not strictly in line with BRC 20 thinking
     // but seems pointless to issue tokens if they can never be valid
-    if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens || deployment.minted_out {
+    if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens {
         return Err(FairLaunchError::MintedOut.into());
     }
 
@@ -163,12 +163,6 @@ pub fn mint_c_legacy(ctx: Context<MintCompressedCtx>, input: MintCompressedInput
     let associated_token_program = &ctx.accounts.associated_token_program;
 
     deployment.number_of_tokens_issued += 1;
-    if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens {
-        deployment.minted_out = true;
-    }
-
- 
-
 
     let tree_authority = &ctx.accounts.tree_authority;
     let merkle_tree = &ctx.accounts.merkle_tree;

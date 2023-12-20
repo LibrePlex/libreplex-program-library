@@ -80,5 +80,8 @@ pub enum SharedError {
      InstructionBuilderFailed,
 
      #[msg("Spl conversion not allowed")]
-     SplConversionNotAllowed
+     SplConversionNotAllowed,
+
+     #[msg("This deployment requires the creator to co-sign")]
+     InvalidCreatorCosigner
 }
