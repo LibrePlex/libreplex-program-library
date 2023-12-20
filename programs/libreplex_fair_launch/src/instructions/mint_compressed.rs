@@ -18,7 +18,7 @@ use libreplex_inscriptions::{
 use libreplex_shared::SharedError;
 
 use crate::{
-    errors::FairLaunchError, Deployment, HashlistMarker, MintEvent, add_to_hashlist,
+    errors::FairLaunchError, Deployment, HashlistMarker, MintEvent, add_to_hashlist, COMPRESSED_DEPLOYMENT_TYPE,
 };
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -31,6 +31,8 @@ pub enum TreeDelegateType {
 pub struct MintCompressedInput {
     pub tree_delegate_type: TreeDelegateType
 }
+
+
 
 #[derive(Accounts)]
 #[instruction(input: MintCompressedInput)]
@@ -143,6 +145,10 @@ pub fn mint_c_legacy(ctx: Context<MintCompressedCtx>, input: MintCompressedInput
 
     if deployment.migrated_from_legacy {
         return Err(FairLaunchError::LegacyMigrationsAreMintedOut.into());
+    }
+
+    if deployment.deployment_type != COMPRESSED_DEPLOYMENT_TYPE {
+        return Err(FairLaunchError::IncorrectMintType.into())
     }
     
 

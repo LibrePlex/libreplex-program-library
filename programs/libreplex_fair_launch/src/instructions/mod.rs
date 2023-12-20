@@ -72,3 +72,6 @@ pub use add_to_hashlist::*;
 pub mod v2;
 pub use v2::*;
 
+
+pub const COMPRESSED_DEPLOYMENT_TYPE: u8 = 2;
+pub const STANDARD_DEPLOYMENT_TYPE: u8 = 0;
