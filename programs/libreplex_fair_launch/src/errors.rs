@@ -24,4 +24,6 @@ pub enum FairLaunchError {
     #[msg("Global tree delegate is missing")]
     MissingGlobalTreeDelegate,
 
+    #[msg("Incorrect mint type")]
+    IncorrectMintType,
 }

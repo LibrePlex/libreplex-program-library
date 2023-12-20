@@ -1769,6 +1769,10 @@ export type LibreplexFairLaunch = {
           {
             "name": "offchainUrl",
             "type": "string"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
           }
         ]
       }
@@ -1843,6 +1847,10 @@ export type LibreplexFairLaunch = {
           {
             "name": "useInscriptions",
             "type": "bool"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
           }
         ]
       }
@@ -1997,6 +2005,11 @@ export type LibreplexFairLaunch = {
       "code": 6006,
       "name": "MissingGlobalTreeDelegate",
       "msg": "Global tree delegate is missing"
+    },
+    {
+      "code": 6007,
+      "name": "IncorrectMintType",
+      "msg": "Incorrect mint type"
     }
   ]
 };
@@ -3772,6 +3785,10 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "offchainUrl",
             "type": "string"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
           }
         ]
       }
@@ -3846,6 +3863,10 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "useInscriptions",
             "type": "bool"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
           }
         ]
       }
@@ -4000,6 +4021,11 @@ export const IDL: LibreplexFairLaunch = {
       "code": 6006,
       "name": "MissingGlobalTreeDelegate",
       "msg": "Global tree delegate is missing"
+    },
+    {
+      "code": 6007,
+      "name": "IncorrectMintType",
+      "msg": "Incorrect mint type"
     }
   ]
 };
