@@ -16,9 +16,6 @@ pub use deploy_legacy::*;
 
 
 
-
-
-
 /* 
     mints from a legacy metadata-based deployment.
     This generates a non-fungible into the minter's wallet
@@ -27,6 +24,9 @@ pub use deploy_legacy::*;
  */
 pub mod mint_legacy;
 pub use mint_legacy::*;
+
+pub mod mint_legacy_logic;
+pub use mint_legacy_logic::*;
 
 
 /*
@@ -57,5 +57,9 @@ pub use deploy_migrated::*;
 pub mod migrate_to_hashlist;
 pub use migrate_to_hashlist::*;
 
+pub mod add_to_hashlist;
+pub use add_to_hashlist::*;
 
+pub mod v2;
+pub use v2::*;
 
