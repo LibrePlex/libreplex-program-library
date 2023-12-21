@@ -26,4 +26,7 @@ pub enum FairLaunchError {
 
     #[msg("Incorrect mint type")]
     IncorrectMintType,
+
+    #[msg("Invalid Metadata")]
+    InvalidMetadata,
 }

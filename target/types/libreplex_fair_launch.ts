@@ -720,6 +720,104 @@ export type LibreplexFairLaunch = {
           }
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "redeem",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "nftReceiver",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "accountCompressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "noopProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalTreeDelegate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "global_tree_delegate"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintCompressedInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "inscribeCompressed",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "hashlist",
           "isMut": true,
           "isSigner": false,
@@ -740,24 +838,53 @@ export type LibreplexFairLaunch = {
           }
         },
         {
+          "name": "redeemable",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
+        },
+        {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist_marker"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Redeemable",
+                "path": "redeemable.asset"
+              }
+            ]
+          }
         },
         {
           "name": "ghostRootSigner",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "inscriber",
-          "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Redeemable",
+                "path": "redeemable.asset"
+              }
+            ]
+          }
         },
         {
           "name": "fungibleMint",
@@ -808,56 +935,9 @@ export type LibreplexFairLaunch = {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "accountCompressionProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "noopProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "merkleTree",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "treeAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "globalTreeDelegate",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "global_tree_delegate"
-              }
-            ]
-          }
-        },
-        {
-          "name": "bubblegumProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "MintCompressedInput"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "deployMigrated",
@@ -1734,6 +1814,22 @@ export type LibreplexFairLaunch = {
           }
         ]
       }
+    },
+    {
+      "name": "redeemable",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "publicKey"
+          },
+          {
+            "name": "deployment",
+            "type": "publicKey"
+          }
+        ]
+      }
     }
   ],
   "types": [
@@ -2010,6 +2106,11 @@ export type LibreplexFairLaunch = {
       "code": 6007,
       "name": "IncorrectMintType",
       "msg": "Incorrect mint type"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidMetadata",
+      "msg": "Invalid Metadata"
     }
   ]
 };
@@ -2736,6 +2837,104 @@ export const IDL: LibreplexFairLaunch = {
           }
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "redeem",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "nftReceiver",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "accountCompressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "noopProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalTreeDelegate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "global_tree_delegate"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintCompressedInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "inscribeCompressed",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "hashlist",
           "isMut": true,
           "isSigner": false,
@@ -2756,24 +2955,53 @@ export const IDL: LibreplexFairLaunch = {
           }
         },
         {
+          "name": "redeemable",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
+        },
+        {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist_marker"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Redeemable",
+                "path": "redeemable.asset"
+              }
+            ]
+          }
         },
         {
           "name": "ghostRootSigner",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "inscriber",
-          "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Redeemable",
+                "path": "redeemable.asset"
+              }
+            ]
+          }
         },
         {
           "name": "fungibleMint",
@@ -2824,56 +3052,9 @@ export const IDL: LibreplexFairLaunch = {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "accountCompressionProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "noopProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "merkleTree",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "treeAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "globalTreeDelegate",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "global_tree_delegate"
-              }
-            ]
-          }
-        },
-        {
-          "name": "bubblegumProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "MintCompressedInput"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "deployMigrated",
@@ -3750,6 +3931,22 @@ export const IDL: LibreplexFairLaunch = {
           }
         ]
       }
+    },
+    {
+      "name": "redeemable",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "publicKey"
+          },
+          {
+            "name": "deployment",
+            "type": "publicKey"
+          }
+        ]
+      }
     }
   ],
   "types": [
@@ -4026,6 +4223,11 @@ export const IDL: LibreplexFairLaunch = {
       "code": 6007,
       "name": "IncorrectMintType",
       "msg": "Incorrect mint type"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidMetadata",
+      "msg": "Invalid Metadata"
     }
   ]
 };

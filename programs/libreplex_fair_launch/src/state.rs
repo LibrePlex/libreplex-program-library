@@ -127,3 +127,10 @@ pub struct MigrationCounter {
     pub deployment: Pubkey,
     pub migration_count: u64,
 }
+
+#[account]
+#[derive(InitSpace)]
+pub struct Redeemable {
+    pub asset: Pubkey,
+    pub deployment: Pubkey,
+}
