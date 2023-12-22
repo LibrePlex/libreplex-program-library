@@ -47,10 +47,7 @@ pub fn mint_legacy_logic<'info>(
         bump_deployment: u8) ->
  Result<()> {
     deployment.number_of_tokens_issued += 1;
-    if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens {
-        deployment.minted_out = true;
-    }
-
+ 
     if deployment.use_inscriptions {
         libreplex_inscriptions::cpi::create_inscription_v3(
             CpiContext::new(

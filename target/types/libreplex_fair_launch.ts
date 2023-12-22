@@ -1202,8 +1202,8 @@ export type LibreplexFairLaunch = {
             "type": "bool"
           },
           {
-            "name": "mintedOut",
-            "type": "bool"
+            "name": "deploymentType",
+            "type": "u8"
           },
           {
             "name": "requireCreatorCosign",
@@ -2727,8 +2727,8 @@ export const IDL: LibreplexFairLaunch = {
             "type": "bool"
           },
           {
-            "name": "mintedOut",
-            "type": "bool"
+            "name": "deploymentType",
+            "type": "u8"
           },
           {
             "name": "requireCreatorCosign",

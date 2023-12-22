@@ -143,7 +143,7 @@ pub fn mint_legacy_v2(ctx: Context<MintLegacyV2Ctx>) -> Result<()> {
 
     // to be discussed w/ everybody and feedback. Not strictly in line with BRC 20 thinking
     // but seems pointless to issue tokens if they can never be valid
-    if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens || deployment.minted_out {
+    if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens {
         return Err(FairLaunchError::MintedOut.into());
     }
 
