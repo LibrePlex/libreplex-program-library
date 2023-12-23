@@ -7,7 +7,7 @@ use libreplex_inscriptions::{
 // use mpl_token_metadata::types::TokenStandard;
 
 
-use crate::{legacy_inscription::LegacyInscription, instructions::AuthorityType};
+use crate::{legacy_inscription::LegacyInscription, instructions::{AuthorityType, RootType}};
 
 
 use super::{check_metadata_uauth, create_legacy_inscription_logic_v3};
@@ -103,7 +103,7 @@ pub fn handler(
     check_metadata_uauth(legacy_metadata, mint.key(), payer_key, AuthorityType::UpdateAuthority)?;
 
     create_legacy_inscription_logic_v3(
-        mint,
+        RootType::Mint(mint),
         legacy_inscription,
         AuthorityType::UpdateAuthority,
         inscription_v3,

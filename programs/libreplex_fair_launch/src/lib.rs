@@ -9,8 +9,11 @@ pub mod errors;
 
 pub use state::*;
 
+use bubblegum_proxy::MetadataArgs;
+
 #[program]
 pub mod libreplex_fair_launch {
+    use crate::instruction::InscribeCompressed;
 
     use super::*;
 
@@ -65,6 +68,16 @@ pub mod libreplex_fair_launch {
         )
     }   
 
+
+    pub fn mint_compressed<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, MintCompressedCtx<'info>>, 
+        input: MintCompressedInput) -> Result<()> {
+        instructions::mint_compressed(ctx, input)
+    }
+
+    pub fn inscribe_compressed<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, InscribeCompressedCtx>) -> Result<()> {
+        instructions::inscribe_compressed(ctx)
+    }
+
     /* 
         Migration methods - to be deactivated once old validation migrations are complete
      */
@@ -112,6 +125,26 @@ pub mod libreplex_fair_launch {
             ctx
         )
     }   
+
+    pub fn swap_fungible_to_compressed<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, SwapFungibleToCompressedCtx<'info>>, 
+        root: [u8; 32],
+        data_hash: [u8; 32],
+        creator_hash: [u8; 32],
+        nonce: u64,
+        index: u32,
+    ) -> Result<()> {
+        instructions::swap_fungible_to_compressed(ctx, root, data_hash, creator_hash, nonce, index)
+    }
+
+    pub fn swap_compressed_to_fungible<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, SwapCompressedToFungibleCtx<'info>>, 
+        root: [u8; 32],
+        data_hash: [u8; 32],
+        creator_hash: [u8; 32],
+        nonce: u64,
+        index: u32,
+    ) -> Result<()> {
+            instructions::swap_compressed_to_fungible(ctx, root, data_hash, creator_hash, nonce, index)
+    }
 
 
 

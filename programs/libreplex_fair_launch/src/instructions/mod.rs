@@ -29,6 +29,10 @@ pub mod mint_legacy_logic;
 pub use mint_legacy_logic::*;
 
 
+pub mod mint_compressed;
+pub use mint_compressed::*;
+
+
 /*
     Swap to nonfungible - currently disabled
 
@@ -36,6 +40,11 @@ pub use mint_legacy_logic::*;
 pub mod swap_to_nonfungible;
 pub use swap_to_nonfungible::*;
 
+pub mod swap_compressed_to_fungible;
+pub use swap_compressed_to_fungible::*;
+
+pub mod swap_fungible_to_compressed;
+pub use swap_fungible_to_compressed::*;
 
 
 /*
@@ -63,3 +72,6 @@ pub use add_to_hashlist::*;
 pub mod v2;
 pub use v2::*;
 
+
+pub const COMPRESSED_DEPLOYMENT_TYPE: u8 = 2;
+pub const STANDARD_DEPLOYMENT_TYPE: u8 = 0;

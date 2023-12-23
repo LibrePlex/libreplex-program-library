@@ -11,6 +11,7 @@ use anchor_lang::prelude::*;
 pub enum SignerType {
     Root,
     LegacyMetadataSigner,
+    FairLaunchGhostRootSigner,
 }
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
@@ -129,6 +130,7 @@ pub mod legacy_inscriber {
     declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
 }
 
+
 pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -> Result<()> {
 
     let inscription = &mut ctx.accounts.inscription;
@@ -190,6 +192,9 @@ pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -
             if expected_signer != signer {
                 return Err(ErrorCode::LegacyMetadataSignerMismatch.into());
             }
+        },
+        SignerType::FairLaunchGhostRootSigner => {
+            return Err(ErrorCode::RootSignerMismatch.into());
         }
     }
 

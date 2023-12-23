@@ -53,6 +53,7 @@ pub struct InitialiseInput {
     pub deployment_template: String,
     pub mint_template: String,
     pub offchain_url: String, // used both for the fungible and the non-fungible
+    pub deployment_type: u8,
 }
 
 pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
@@ -64,6 +65,7 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     // set default values - v2 endpoint allows the setting of these
     deployment.require_creator_cosign = false;
     deployment.use_inscriptions = true;
+    deployment.deployment_type = input.deployment_type;
 
     // setting creator equal to payer - use v2 endpoints to control this and override as desired
     initialise_logic(input, deployment, payer.key())
@@ -87,7 +89,7 @@ pub fn initialise_logic(input: InitialiseInput, deployment: &mut Account<'_, Dep
 
     deployment.require_creator_cosign = false;
     deployment.use_inscriptions = true;
-
+    deployment.deployment_type = input.deployment_type;
     deployment.creator = creator;
     deployment.limit_per_mint = input.limit_per_mint;
     deployment.max_number_of_tokens = input.max_number_of_tokens;

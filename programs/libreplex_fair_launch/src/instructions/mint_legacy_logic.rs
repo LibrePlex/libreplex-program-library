@@ -20,7 +20,7 @@ use mpl_token_metadata::types::{Creator, TokenStandard};
 
 
 use crate::{
-    Deployment, MintEvent, add_to_hashlist,
+    Deployment, MintEvent, add_to_hashlist, STANDARD_DEPLOYMENT_TYPE, errors::FairLaunchError,
 };
 
 
@@ -46,6 +46,10 @@ pub fn mint_legacy_logic<'info>(
        hashlist: &mut UncheckedAccount<'info>,
         bump_deployment: u8) ->
  Result<()> {
+    if deployment.deployment_type != STANDARD_DEPLOYMENT_TYPE {
+        return Err(FairLaunchError::IncorrectMintType.into())
+    }
+
     deployment.number_of_tokens_issued += 1;
  
     if deployment.use_inscriptions {

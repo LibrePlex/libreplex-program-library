@@ -16,7 +16,8 @@ pub struct InitialiseInputV2 {
     pub mint_template: String,
     pub offchain_url: String, // used both for the fungible and the non-fungible
     pub require_creator_cosign: bool,
-    pub use_inscriptions: bool
+    pub use_inscriptions: bool,
+    pub deployment_type: u8
 }
 
 /*
@@ -70,7 +71,7 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
         mint_template, 
         offchain_url, 
         require_creator_cosign, 
-        use_inscriptions} = input;
+        use_inscriptions, deployment_type } = input;
 
     if require_creator_cosign {
         panic!("Only creator cosign can currently use v2 methods")
@@ -82,7 +83,8 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
     
 
     initialise_logic(InitialiseInput {
-        limit_per_mint, max_number_of_tokens, decimals, ticker, deployment_template, mint_template, offchain_url
+        limit_per_mint, 
+        max_number_of_tokens, decimals, ticker, deployment_template, mint_template, offchain_url, deployment_type
     }, deployment, creator.key())
 
 }

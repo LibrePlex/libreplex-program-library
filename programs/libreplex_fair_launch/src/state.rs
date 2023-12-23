@@ -63,6 +63,12 @@ pub struct Deployment {
     pub offchain_url: String, // pub padding: Vec<u8, EXCESS>
 }
 
+impl Deployment {
+    pub fn do_thing() -> u64 {
+        return 0
+    }
+}
+
 #[event]
 pub struct NewDeploymentEvent {
     pub ticker: String,
@@ -120,4 +126,11 @@ pub struct HashlistMarker {}
 pub struct MigrationCounter {
     pub deployment: Pubkey,
     pub migration_count: u64,
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct Redeemable {
+    pub asset: Pubkey,
+    pub deployment: Pubkey,
 }
