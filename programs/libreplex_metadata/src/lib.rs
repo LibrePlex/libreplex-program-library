@@ -4,7 +4,8 @@ use instructions::*;
 
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-declare_id!("LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p");
+// replace with vanity address when available
+declare_id!("LimezkueDBjU8mJGt7ctwXgE3h1vmJ89ebyCriYBLU7");
 
 pub mod instructions;
 pub mod state;
@@ -28,7 +29,7 @@ pub mod libreplex_metadata {
 
     pub fn create_collection(
         ctx: Context<CreateCollection>,
-        collection_input: CollectionInput,
+        collection_input: CreateCollectionInput,
     ) -> Result<()> {
         msg!("creating collection data");
         instructions::create_collection::handler(
@@ -38,8 +39,8 @@ pub mod libreplex_metadata {
     }
 
     pub fn update_collection(
-        ctx: Context<UpdateGroup>,
-        collection_input: CollectionInput,
+        ctx: Context<UpdateCollectionCtx>,
+        collection_input: CreateCollectionInput,
     ) -> Result<()> {
         instructions::update_collection::handler(
             ctx,
@@ -54,9 +55,9 @@ pub mod libreplex_metadata {
         )
     }
 
-    pub fn update_metadata(ctx: Context<UpdateMetadata>, input: UpdateMetadataInput) -> Result<()> {
-        msg!("Update metadata");
-
+    pub fn update_metadata(ctx: Context<UpdateMetadata>, 
+        // shares input with create metadata
+        input: UpdateMetadataInput) -> Result<()> {
         instructions::update_metadata::handler(ctx, input)
     }
 
@@ -64,7 +65,7 @@ pub mod libreplex_metadata {
         instructions::add_metadata_to_collection::handler(ctx)
     }
 
-    pub fn remove_metadata_from_collection(ctx: Context<GroupRemove>) -> Result<()> {
+    pub fn remove_metadata_from_collection(ctx: Context<RemoveFromCollectionCtx>) -> Result<()> {
         instructions::remove_metadata_from_collection::handler(ctx)
     }
 
@@ -82,23 +83,11 @@ pub mod libreplex_metadata {
     }
 
     pub fn create_metadata(
-        ctx: Context<CreateMetadata>,
+        ctx: Context<CreateMetadataCtx>,
         metadata_input: CreateMetadataInput,
     ) -> Result<()> {
         msg!("creating metadata");
         instructions::create_metadata::handler(
-            ctx,
-            metadata_input
-        )
-    }
-
-
-    pub fn create_metadata_update_summary(
-        ctx: Context<CreateMetadataUpdateSummary>,
-        metadata_input: CreateMetadataInput,
-    ) -> Result<()> {
-        msg!("creating metadata");
-        instructions::create_metadata_update_summary::handler(
             ctx,
             metadata_input
         )
@@ -115,15 +104,6 @@ pub mod libreplex_metadata {
         )
     }
 
-    pub fn delete_group(
-        ctx: Context<DeleteGroup>
-    ) -> Result<()> {
-        msg!("delete group");
-        instructions::delete_group::handler(
-            ctx
-        )
-    }
-
     pub fn delete_collection(
         ctx: Context<DeleteCollection>
     ) -> Result<()> {
@@ -133,36 +113,6 @@ pub mod libreplex_metadata {
         )
     }
 
- 
-    pub fn create_inscription_metadata(
-        ctx: Context<CreateInscriptionMetadata>,
-        metadata_input: CreateMetadataInscriptionInput
-    ) -> Result<()> {
-        msg!("creating metadata");
-        instructions::create_metadata_inscription::handler(
-            ctx,
-            metadata_input,
-        )
-    }
-
-    pub fn update_inscription_datatype(
-        ctx: Context<UpdateInscriptionDataType>,
-        inscription_input: UpdateInscriptionDataTypeInput
-    ) -> Result<()> {
-        msg!("update inscription datatype");
-        instructions::update_inscription_datatype::handler(
-            ctx,
-            inscription_input,
-        )
-    }
-
-    pub fn delete_metadata_inscription(
-        ctx: Context<DeleteMetadataInscription>
-    ) -> Result<()> {
-        instructions::delete_metadata_inscription::handler(
-            ctx
-        )
-    }
 
     pub fn delete_permissions(
         ctx: Context<DeletePermissions>,

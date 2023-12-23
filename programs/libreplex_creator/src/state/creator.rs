@@ -26,7 +26,7 @@ pub struct Creator {
     pub seed: Pubkey,
     pub supply: u32,
     pub symbol: String,
-    pub asset_url: AssetUrl,
+    pub asset_url: String,
     pub minted: u32,
     pub collection: Pubkey, // has available attributes as well if appropriate
     pub bump: u8,

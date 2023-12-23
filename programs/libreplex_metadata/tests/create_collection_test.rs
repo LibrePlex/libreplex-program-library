@@ -13,7 +13,7 @@ const COLOR_RED: &str = "red";
 mod permissions {
   
     use anchor_lang::{system_program, ToAccountMetas, prelude::Account, InstructionData};
-    use libreplex_metadata::{AttributeType, AttributeValue, CollectionInput, Collection, COLLECTION};
+    use libreplex_metadata::{Collection, COLLECTION, instructions::CreateCollectionInput};
     use solana_program::{instruction::Instruction, pubkey::Pubkey, account_info::AccountInfo};
     use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 
@@ -38,33 +38,10 @@ mod permissions {
      
         let _aa = vec![1,2,3];
 
-        let permitted_values = vec![
-            AttributeValue::Word {
-                value: COLOR_GREEN.to_string(),
-            },
-            AttributeValue::Word {
-                value: COLOR_RED.to_string(),
-            },
-            AttributeValue::U32 { value: 3200000000 },
-        ];
-
-        let attribute_types = vec![ AttributeType {
-            name: COLOR.to_string(),
-            permitted_values,
-            deleted: false,
-            continued_at_index: None,
-            continued_from_index: None,
-        }];
-
-
         let create_group_instruction = libreplex_metadata::instruction::CreateCollection {
-            collection_input: CollectionInput {
+            collection_input: CreateCollectionInput {
                 name: GROUP_NAME.to_string(),
-                url: GROUP_URL.to_owned(),
                 symbol: GROUP_SYMBOL.to_string(),
-                attribute_types,
-                royalties: None,
-                permitted_signers: vec![],
                 description: GROUP_DESCRIPTION.to_string(),
             },
         };
@@ -114,39 +91,31 @@ mod permissions {
 
 
         
-        let group: Account<Collection> = Account::try_from(&group_account_info).unwrap();
+        let collection: Account<Collection> = Account::try_from(&group_account_info).unwrap();
 
         assert_eq!(
-            group.description,
+            collection.description,
             GROUP_DESCRIPTION
         );
 
         assert_eq!(
-            group.name,
+            collection.name,
             GROUP_NAME
         );
 
         assert_eq!(
-            group.symbol,
+            collection.symbol,
             GROUP_SYMBOL
         );
 
 
+        
         assert_eq!(
-            group.url,
-            GROUP_URL
-        );
-
-        assert_eq!(
-            group.name,
+            collection.name,
             GROUP_NAME
         );
 
 
-        assert_eq!(
-            group.attribute_types[0].name,
-            COLOR
-        );
         
 
     }

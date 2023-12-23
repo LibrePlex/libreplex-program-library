@@ -1,11 +1,17 @@
-use crate::state::{Metadata};
-use crate::{ CreateMetadataInput, MetadataEvent, MetadataEventType, assert_pda_derivation::assert_pda_derivation};
+use crate::MetadataEvent;
+use crate::MetadataEventType;
+use crate::assert_pda_derivation;
+use crate::state::Metadata;
+use crate::CreateMetadataInput;
+use crate::MetadataSummary;
 use anchor_lang::prelude::*;
+use anchor_lang::system_program;
 use solana_program::program_option::COption;
-use spl_token_2022::extension::metadata_pointer::MetadataPointer;
-use spl_token_2022::extension::{StateWithExtensions, BaseStateWithExtensions};
-use crate::errors::ErrorCode;
 use spl_token_2022::ID as TOKEN_2022_PROGRAM_ID;
+use spl_token_2022::extension::BaseStateWithExtensions;
+use spl_token_2022::extension::StateWithExtensions;
+use spl_token_2022::extension::metadata_pointer::MetadataPointer;
+use crate::errors::ErrorCode;
 
 // whitelisted signer programs
 
@@ -14,10 +20,9 @@ pub mod migrator_lite {
     declare_id!("migr1m1An7f3X75nKuuUn9mm3844miK62ZohpqRfQHp");
 }
 
-
 #[derive(Accounts)]
 #[instruction(metadata_input: CreateMetadataInput)]
-pub struct CreateMetadata<'info> {
+pub struct CreateMetadataCtx<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -25,6 +30,9 @@ pub struct CreateMetadata<'info> {
               bump, payer = payer, space = Metadata::BASE_SIZE + metadata_input.get_size())]
     pub metadata: Box<Account<'info, Metadata>>,
 
+    #[account(init_if_needed, seeds = [b"metadata_summary"],
+              bump, payer = payer, space = MetadataSummary::BASE_SIZE)]
+    pub metadata_summary: Box<Account<'info, MetadataSummary>>,
 
     /// CHECK: Checked against ID constraint
     #[account(
@@ -40,25 +48,42 @@ pub struct CreateMetadata<'info> {
     pub system_program: Program<'info, System>,
 
     /*
-     only to be supplied if the migration is invoked by a whitelisted 
+     only to be supplied if the migration is invoked by a whitelisted
      migrator program.
 
      if a migrator program is invoked, then the signer account must be
      a PDA derived by the migrator program from seed [mint].
     */
-    pub invoked_migrator_program: Option<UncheckedAccount<'info>> 
+    pub invoked_migrator_program: Option<UncheckedAccount<'info>>,
 }
 
-pub fn handler(ctx: Context<CreateMetadata>, metadata_input: CreateMetadataInput) -> Result<()> {
+pub fn handler(
+    ctx: Context<CreateMetadataCtx>,
+    metadata_input: CreateMetadataInput,
+) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     let mint_info = &mut ctx.accounts.mint;
     let authority = &ctx.accounts.authority;
     let invoked_migrator_program = &ctx.accounts.invoked_migrator_program;
+    let payer = &mut ctx.accounts.payer;
 
-    handle_create_metadata(mint_info, authority, invoked_migrator_program, metadata, metadata_input)?;
+    let metadata_summary = &mut ctx.accounts.metadata_summary;
 
-    Ok(())
+    let clock = Clock::get()?;
+    metadata_summary.metadata_count_total += 1;
+    metadata_summary.last_metadata_mint = mint_info.key();
+    metadata_summary.last_metadata_creator = payer.key();
+    metadata_summary.last_metadata_create_time = clock.unix_timestamp;
+
+    handle_create_metadata(
+        mint_info,
+        authority,
+        invoked_migrator_program,
+        metadata,
+        metadata_input,
+    )
 }
+
 
 pub fn handle_create_metadata(mint_info: &mut UncheckedAccount<'_>, authority: &Signer<'_>, invoked_migrator_program: &Option<UncheckedAccount<'_>>, metadata: &mut Box<Account<'_, Metadata>>, metadata_input: CreateMetadataInput) -> Result<()> {
     let mint_data = mint_info.try_borrow_data()?;
@@ -78,14 +103,10 @@ pub fn handle_create_metadata(mint_info: &mut UncheckedAccount<'_>, authority: &
         }
     };
     metadata.mint = mint_info.key();
-    metadata.is_mutable = true;
     metadata.symbol = metadata_input.symbol.clone();
     metadata.name = metadata_input.name.clone();
-    metadata.creator = authority.key();
-    metadata.asset = metadata_input.asset;
     metadata.update_authority = metadata_input.update_authority;
-    metadata.extensions = metadata_input.extensions;
-    metadata.collection = None;
+    metadata.collection = system_program::ID;
     msg!(
         "metadata created for mint with pubkey {}",
         mint_info.key()

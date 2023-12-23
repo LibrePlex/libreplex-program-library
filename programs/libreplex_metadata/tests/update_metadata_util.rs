@@ -1,35 +1,33 @@
 use anchor_lang::{system_program, InstructionData, Key, ToAccountMetas};
 
+use libreplex_metadata::instructions::UpdateMetadataInput;
 use solana_program::{instruction::Instruction, pubkey::Pubkey};
 use solana_program_test::*;
 use solana_sdk::{ signer::Signer, transaction::Transaction};
 
-use libreplex_metadata::{Asset, UpdateMetadataInput};
-
 pub async fn update_metadata_util(
     context: &mut ProgramTestContext,
     metadata: Pubkey,
-    name: String,
-    asset: Asset,
-    symbol: String,
+    name: Option<String>,
+    url_json: Option<String>,
+    symbol: Option<String>,
 ) -> Pubkey {
     let collection_authority = context.payer.pubkey();
 
     let create_metadata_accounts = libreplex_metadata::accounts::UpdateMetadata {
-        editor: context.payer.pubkey(),
+        payer: context.payer.pubkey(),
         metadata: metadata.key(),
         system_program: system_program::ID,
-        delegated_metadata_specific_permissions: None,
-        delegated_group_wide_permissions: None,
-        collection: None
+        update_authority: context.payer.pubkey(),
     }
     .to_account_metas(None);
 
     let update_metadata_input = libreplex_metadata::instruction::UpdateMetadata {
         input: UpdateMetadataInput {
             name,
-            asset,
+            url_json,
             symbol,
+            update_authority: None
         },
     };
 

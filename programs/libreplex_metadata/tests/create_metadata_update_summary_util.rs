@@ -1,16 +1,16 @@
 use anchor_lang::{system_program, InstructionData, Key, ToAccountMetas};
-use anchor_spl::token::Mint as SplMint;
+
 use solana_program::{instruction::Instruction, pubkey::Pubkey, system_instruction};
 use solana_program_test::*;
 use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 use spl_token_2022::{ID, extension::ExtensionType, state::Mint};
 
-use libreplex_metadata::{Asset, CreateMetadataInput};
+use libreplex_metadata::{CreateMetadataInput};
 
 pub async fn create_metadata_update_summary_util(
     context: &mut ProgramTestContext,
     name: String,
-    asset: Asset,
+    url_json: String,
     symbol: String
 ) -> (Pubkey, Pubkey) {
     let collection_authority = context.payer.pubkey();
@@ -80,7 +80,7 @@ pub async fn create_metadata_update_summary_util(
     
   
 
-    let create_metadata_accounts = libreplex_metadata::accounts::CreateMetadataUpdateSummary {
+    let create_metadata_accounts = libreplex_metadata::accounts::CreateMetadataCtx {
         payer: collection_authority,
         authority: collection_authority,
         metadata: metadata.key(),
@@ -91,13 +91,12 @@ pub async fn create_metadata_update_summary_util(
     }
     .to_account_metas(None);
 
-    let create_metadata = libreplex_metadata::instruction::CreateMetadataUpdateSummary {
+    let create_metadata = libreplex_metadata::instruction::CreateMetadata {
         metadata_input: CreateMetadataInput {
             name,
-            asset,
+            url_json,
             update_authority: collection_authority,
-            symbol,
-            extensions: vec![],
+            symbol
         },
     };
 

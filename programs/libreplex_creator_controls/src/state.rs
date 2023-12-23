@@ -69,6 +69,8 @@ pub struct Accounts<'b, 'info> {
     
     pub mint_wrapper: AccountInfo<'info>,
 
+    pub metadata_summary: AccountInfo<'info>,
+
     pub metadata: AccountInfo<'info>,
     pub collection: AccountInfo<'info>,
     pub collection_permissions: AccountInfo<'info>,

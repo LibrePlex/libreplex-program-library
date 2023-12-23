@@ -23,6 +23,7 @@ solana-program = "1.16.3"
 winnow="=0.4.1"
 libreplex_metadata = {path='../libreplex_metadata',  features = ["cpi"]}
 libreplex_nft = {path='../libreplex_nft',  features = ["cpi"]}
+libreplex_inscriptions = {path='../libreplex_inscriptions',  features = ["cpi"]}
 arrayref = "0.3.7"
 mocha = "0.1.1"
 

@@ -2073,6 +2073,7 @@ dependencies = [
  "arrayref",
  "assert_matches",
  "bincode",
+ "libreplex_inscriptions",
  "libreplex_metadata",
  "libreplex_nft",
  "mocha",

@@ -1,6 +1,8 @@
-use anchor_lang::prelude::*;
 
-use crate::{Metadata, DelegatePermissions, PermissionType, Asset};
+
+use anchor_lang::{prelude::*, system_program};
+
+use crate::{Metadata, DelegatePermissions, PermissionType};
 
 use crate::errors::ErrorCode;
 
@@ -39,18 +41,12 @@ pub fn handler(ctx: Context<DeleteMetadata>
 
     let metadata = &mut ctx.accounts.metadata;
 
-    if let Asset::Inscription {
-                  ..
-                 } = &metadata.asset {
-                 return Err(ErrorCode::InvokeDeleteInscriptionMetadata.into())    
-    };
     
-
-    if metadata.collection.is_some() {
+    if !metadata.collection.key().eq(&system_program::ID) {
         return Err(ErrorCode::MetadataBelongsToCollection.into())
     }
 
-    if !metadata.is_mutable {
+    if metadata.update_authority.eq(&system_program::ID) {
         return Err(ErrorCode::MetadataIsNotMutable.into())
     }
 

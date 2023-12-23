@@ -1,4 +1,4 @@
-use solana_program_test::{processor, tokio, ProgramTest};
+use solana_program_test::{tokio, ProgramTest};
 
 const METADATA_NAME: &str = "MD1";
 
@@ -9,10 +9,10 @@ mod create_metadata_update_summary_test {
     use std::borrow::BorrowMut;
 
     use anchor_lang::prelude::Account;
-    use libreplex_metadata::{Asset, Metadata, MetadataSummary};
+    use libreplex_metadata::{Metadata, MetadataSummary};
     use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
     use solana_sdk::signer::Signer;
-    use spl_token_2022::ID;
+    
 
     use super::*;
     #[tokio::test]
@@ -30,9 +30,7 @@ mod create_metadata_update_summary_test {
         let (metadata, mint) = create_metadata_update_summary_util(
             context.borrow_mut(),
             METADATA_NAME.to_string(),
-            Asset::Json {
-                url: "https://collection-url.com".to_owned(),
-            },
+            "https://collection-url.com".to_owned(),
             "COOL".to_string(),
         )
         .await;

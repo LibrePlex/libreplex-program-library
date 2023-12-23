@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use libreplex_metadata::MetadataSummary;
 
 use crate::state::{Phase, CreatorController, Accounts, RemainingAccountsCtx, ArgCtx};
 use crate::controls::Control;
@@ -58,6 +59,13 @@ pub struct MintCtx<'info> {
     pub system_program: Program<'info, System>,
 
 
+    #[account(mut, seeds = [b"metadata_summary"],
+    seeds::program = libreplex_metadata::ID,
+    bump)]
+    pub metadata_summary: Box<Account<'info, MetadataSummary>>,
+
+
+
     /// CHECK: Just checking address
     #[account(address = libreplex_metadata::id())]
     pub libreplex_metadata_program: AccountInfo<'info>,
@@ -103,7 +111,9 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>, input: Mi
         libreplex_metadata_program: ctx.accounts.libreplex_metadata_program.to_account_info(),
         recent_slothashes: ctx.accounts.recent_slothashes.to_account_info(),
         attribute_config: ctx.accounts.attribute_config.as_ref().map(|c| c.to_account_info()),
+        metadata_summary: ctx.accounts.metadata_summary.to_account_info(),
         remaining_accounts: RemainingAccountsCtx { accounts: ctx.remaining_accounts, current: 0 },
+        
     };
 
     let clock = Clock::get()?;
@@ -150,6 +160,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>, input: Mi
 
     let signer_seeds = [controller_seeds.as_slice()];
 
+
     
     let mint_accounts = libreplex_creator::cpi::accounts::Mint {
         mint_wrapper: accounts.mint_wrapper.to_account_info(),
@@ -170,6 +181,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>, input: Mi
         libreplex_metadata_program: accounts.libreplex_metadata_program.to_account_info(),
         recent_slothashes: accounts.recent_slothashes.to_account_info(),
         attribute_config: accounts.attribute_config.as_ref().map(|a| {a.to_account_info()}),
+        metadata_summary: accounts.metadata_summary.to_account_info(),
     };
 
     let mint_ctx = CpiContext::new_with_signer(ctx.accounts.libreplex_creator_program.to_account_info(), mint_accounts, &signer_seeds);

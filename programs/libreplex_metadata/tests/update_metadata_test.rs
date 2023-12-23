@@ -11,8 +11,8 @@ const METADATA_SYMBOL_NEW: &str = "SYMBOL2";
 
 
 
-pub mod create_metadata_util;
-use create_metadata_util::*;
+pub mod create_metadata_update_summary_util;
+use create_metadata_update_summary_util::*;
 pub mod update_metadata_util;
 use update_metadata_util::*;
 
@@ -21,7 +21,7 @@ mod create_metadata_test {
     use std::borrow::BorrowMut;
    
     use anchor_lang::prelude::Account;
-    use libreplex_metadata::{ Asset, Metadata};
+    use libreplex_metadata::Metadata;
     use solana_program::account_info::AccountInfo;
     use solana_sdk::signer::Signer;
    
@@ -39,24 +39,22 @@ mod create_metadata_test {
         let mut context = program.start_with_context().await;
         let _collection_authority = context.payer.pubkey();
 
-        let metadata = create_metadata_util(
+        let metadata = create_metadata_update_summary_util(
             context.borrow_mut(),
             METADATA_NAME.to_string(),
-            Asset::Json {
-                url: "https://collection-url.com".to_owned(),
-            },
+            "https://collection-url.com".to_owned(),
             "COOL".to_string(),
         )
-        .await;
+        .await.0;
 
         // update metadata
 
         update_metadata_util(
             context.borrow_mut(),
             metadata,
-            METADATA_NAME_NEW.to_string(),
-            Asset::Image { url: "bla".to_string(), description: Some("zugululu".to_string()) },
-            METADATA_SYMBOL_NEW.to_string()
+            Some(METADATA_NAME_NEW.to_string()),
+            Some( "bla".to_string()),
+            Some(METADATA_SYMBOL_NEW.to_string())
         ).await;
 
 

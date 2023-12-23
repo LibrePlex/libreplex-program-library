@@ -1,14 +1,14 @@
 use anchor_lang::prelude::*;
 
 
-use crate::{AccountEvent, Creator, AccountEventType, AssetUrl, MintNumbers, errors::ErrorCode, MINT_NUMBERS_START};
+use crate::{AccountEvent, Creator, AccountEventType, MintNumbers, errors::ErrorCode, MINT_NUMBERS_START};
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateCreatorInput {
     pub max_mints: u32,
     pub seed: Pubkey,
     pub symbol: String,
-    pub asset_url: AssetUrl,
+    pub asset_url: String,
     pub collection: Pubkey,
     pub description: Option<String>,
     pub attribute_mappings: Option<Pubkey>,

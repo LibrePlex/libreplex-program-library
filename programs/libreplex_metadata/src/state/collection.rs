@@ -1,8 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
-use crate::Royalties;
-
 #[account]
 pub struct Collection {
     // Seed address used to generate unique account PDA address
@@ -10,12 +8,8 @@ pub struct Collection {
 
     pub update_authority: Pubkey,
 
-    // Creator does not convey any privileges
-    pub creator: Pubkey,
-
     // the number of items in collection
     pub item_count: u32,
-
 
     /* variable length fields = match 1-1 with CollectionInput */
     // name and symbol of the collection
@@ -23,19 +17,19 @@ pub struct Collection {
 
     pub symbol: String,
 
-    pub url: String,
-
+    // yes this could be a little bit expensive but it's only 
+    // done once for each collection. better to keep this on the chain
     pub description: String,
+    // and forget about messing around with off-chain jsons
 
-    pub royalties: Option<Royalties>,
-    
-    pub permitted_signers: Vec<Pubkey>,
+    /* 
+        why no url?? because collection is not a mint 
+        and it does not need to be ERC 721 compliant.
 
-    pub attribute_types: Vec<AttributeType>,
-    
+        collections are never traded, nor should they 
+        be accidentally burned
+    */
 }
-
-
 
 impl Collection {
 
@@ -45,175 +39,6 @@ impl Collection {
         Collection::BASE_SIZE
         + 4 + self.name.len() // name
         + 4 + self.symbol.len() // symbol
-        + 4 + self.url.len() // symbol
-        + 4 + self.description.len() // symbol
-        // + self.collection_render_mode.get_size()
-        + 1 + match &self.royalties {
-            Some(x)=>x.get_size(),
-            None=>0
-        }
-        + 4 + self.permitted_signers.len() * 32 
-        + 4 + self.attribute_types.iter().map(|x|x.get_size()).sum::<usize>()
+        + 4 + self.symbol.len() // symbol
     }
 }
-
-/*
-
-   Attribute type is the normalisation of attributes so
-   that individual items only contain vectors of indices
-   that point to the human-readable names on the collection.
-
-   The basic assumption is that
-   most attribute types will have no more than 256 permitted
-   values.
-
-   if an attribute type has more than 256 values,
-   then we add a new attribute type to the attribute type vector
-   on NftCollectionData *WITH THE SAME NAME* as the first attribute
-   type of the same kind.
-
-   This allows for virtually infinite number of values per
-   attribute type in those special cases that should require it.
-
-   If an attribute type is extended in this way, then the attribute
-   value index at position 255 points to the next index of the attribute
-   **TYPE** on the collection.
-
-   (The last point needs better documentation)
-
-*/
-
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum AttributeValue {
-    None,
-    Word {value: String},
-    U8 {value: u8},
-    U16 {value: u16},
-    U32 {value: u32},
-    U64 {value: u64},
-    I8 {value: i8},
-    I16 {value: i16},
-    I32 {value: i32},
-    I64 {value: i64},
-    
-    //HedgeHog{ value: HedgeHog} new custom types can be added as needed
-}
-
-impl AttributeValue {
-    pub fn get_size(&self) -> usize {
-        2 + match &self {
-            AttributeValue::None => 0,
-            AttributeValue::U8 {value: _}=> 1,
-            AttributeValue::I8 {value: _}=> 1,
-            AttributeValue::U16{value: _} => 2,
-            AttributeValue::I16 {value: _}=> 2,
-            AttributeValue::U32{value: _} => 4,
-            AttributeValue::I32 {value: _}=> 4,
-            AttributeValue::U64{value: _} => 8,
-            AttributeValue::I64 {value: _}=> 8,
-            AttributeValue::Word{value} => 4 + value.len()
-        }
-    }
-}
-
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct Hoo {
-    pub t: String
-}
-
-impl Hoo {
-    pub fn t(&self) {
-
-    }
-}
-
-/*
-    #0 BACKGROUND - "blue", "red", ...., "green"
-    #1 FACE - "angry", "sad",
-    #2 GLOVE - "metal", "riding"
-    #3 BACKGROUND - "yellow", "black"
-*/
-
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct AttributeType {
-    // royalty address and their share in basis points (0-10,000)
-    pub name: String,
-
-    pub permitted_values: Vec<AttributeValue>,
-
-    pub deleted: bool,
-
-    // pointer to the next attribute type in case of attribute value overflow (>255)
-    pub continued_at_index: Option<u32>,
-
-    // pointer to the previous attribute type in case of attribute value overflow (>255)
-    pub continued_from_index: Option<u32>,
-}
-
-impl AttributeType {
-
-    pub fn get_size(&self) -> usize {
-        let total_size: usize = self.permitted_values.iter().map(|x| 4 + x.get_size()).sum();
-
-        4 + 32  // name
-            +  4 + total_size 
-            + 1 // deleted
-            + 1 
-            + match self.continued_at_index { // continued_at_index
-                Some(_)=>4,
-                None => 0
-            }
-            + match self.continued_from_index { // continued_at_index
-                Some(_)=>4,
-                None => 0
-            }
-    }
-}
-
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct BaseUrlConfiguration {
-    // royalty address and their share in basis points (0-10,000)
-    pub prefix: String,
-
-    pub suffix: String,
-}
-
-impl BaseUrlConfiguration {
-    pub fn get_size(&self) -> usize {
-        4 + self.prefix.len() + 4 + self.suffix.len()
-    }
-}
-
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CollectionInput {
-    pub name: String,
-    pub symbol: String,
-    pub url: String,
-    pub description: String,
-    pub royalties: Option<Royalties>,
-    pub attribute_types: Vec<AttributeType>,
-    pub permitted_signers: Vec<Pubkey>
-
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-impl CollectionInput {
-    pub fn get_size(&self) -> usize {
-        let size 
-            = 4 + self.name.len()
-            + 4 + self.symbol.len()
-            + 4 + self.url.len()
-            + 4 + self.description.len()
-            // + self.collection_render_mode.get_size()
-            + 1 + match self.royalties.as_ref() {
-                Some(data) => data.get_size(),
-                None => 0,
-            }
-            + 4 + self.attribute_types.iter().map(|x|x.get_size()).sum::<usize>()
-            + 4 + self.permitted_signers.len() * 32;
-
-        size
-    }
-}
-

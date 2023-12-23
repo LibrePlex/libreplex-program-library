@@ -1,23 +1,17 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 
 use crate::{Metadata, DelegatePermissions, PermissionType, Collection};
 
 use crate::errors::ErrorCode;
 
 
-// Adds a metadata to a group
+// removes metadata from collection
 #[derive(Accounts)]
-pub struct GroupRemove<'info> {
+pub struct RemoveFromCollectionCtx<'info> {
     #[account(mut)]
     pub collection_authority: Signer<'info>,
 
     #[account(mut,
-        realloc = metadata.get_size() - match &metadata.collection {
-            Some(_) => 32, // reduce the size as we no longer need the group
-            None => 0
-        },
-        realloc::payer = collection_authority,
-        realloc::zero = false
     )]
     pub metadata: Box<Account<'info, Metadata>>,
 
@@ -32,15 +26,15 @@ pub struct GroupRemove<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<GroupRemove>
+pub fn handler(ctx: Context<RemoveFromCollectionCtx>
 ) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
 
-    if metadata.collection.is_none() {
+    if metadata.collection.eq(&system_program::ID) {
         return Err(ErrorCode::MetadataDoesNotBelongToACollection.into())
     }
 
-    let collection = &ctx.accounts.collection;
+    let collection = &mut ctx.accounts.collection;
 
     
     let collection_authority = &ctx.accounts.collection_authority;
@@ -55,7 +49,9 @@ pub fn handler(ctx: Context<GroupRemove>
         return Err(ErrorCode::InvalidPermissions.into());
     }
 
-    metadata.collection = None;
+    collection.item_count -= 1;
+
+    metadata.collection = system_program::ID;
     // reassign authority to the authority instead of the group itself
     metadata.update_authority = collection_authority.key();
     
