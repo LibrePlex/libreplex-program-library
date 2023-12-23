@@ -63,7 +63,7 @@ pub struct WriteCNFT<'info> {
     pub compression_program: UncheckedAccount<'info>,
 }
 
-pub fn write<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, WriteCNFT<'info>>, 
+pub fn write<'info>(ctx: Context<'_, '_, '_, 'info, WriteCNFT<'info>>, 
     compression_input: Box<InscribeCNFTInput>, 
     write_input: WriteToInscriptionInput) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;

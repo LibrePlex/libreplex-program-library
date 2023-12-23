@@ -25,8 +25,6 @@ pub fn transfer_native<'info>(
     let minimum_rent = Rent::get()?.minimum_balance(TokenAccount::LEN);
     msg!("Transferring native token");
 
-    let tmp_token_account_info: AccountInfo<'info> = tmp_token_account.clone().to_account_info();
-
     let mut create_tmp_account = false;
     if tmp_token_account.data_is_empty() {
         create_tmp_account = true;

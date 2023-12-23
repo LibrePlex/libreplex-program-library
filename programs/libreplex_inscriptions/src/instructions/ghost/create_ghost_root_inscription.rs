@@ -116,7 +116,7 @@ pub fn handler(ctx: Context<CreateGhostRootInscription>, input: CreateGhostRootI
     inscription_v3.authority = authority;
     inscription_v3.size = INITIAL_SIZE as u32;
     inscription_v3.inscription_data = inscription_data.key();
-    inscription_v3.root = input.root.clone();
+    inscription_v3.root = input.root;
     inscription_v3.content_type = "".to_owned();
     inscription_v3.encoding = "".to_owned();
     inscription_v3.validation_hash = input.validation_hash.clone();

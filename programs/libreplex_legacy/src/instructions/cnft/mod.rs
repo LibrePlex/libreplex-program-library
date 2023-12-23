@@ -11,7 +11,7 @@ pub use write::*;
 mod immutable;
 pub use immutable::*;
 
-use solana_program::{account_info::AccountInfo, keccak};
+use solana_program::account_info::AccountInfo;
 use mpl_token_metadata::accounts::Metadata;
 use crate::LegacyInscriptionErrorCode;
 use mpl_bubblegum::state::leaf_schema::LeafSchema;
@@ -59,16 +59,16 @@ pub fn assert_can_inscribe_cnft(input: &InscribeCNFTInput, accounts: &CNFTCheckA
     let asset_id = asset_id.key();
     let leaf_schema = LeafSchema::new_v0(
         asset_id,
-        leaf_owner.clone(),
-        leaf_delegate.clone(),
+        *leaf_owner,
+        *leaf_delegate,
         *nonce,
-        data_hash.clone(),
-        creator_hash.clone(),
+        *data_hash,
+        *creator_hash,
     );
 
     spl_compression_proxy::cpi::verify_leaf(
         verify_leaf_ctx,
-        root.clone(),
+        *root,
         leaf_schema.to_node(),
         *index,
     )?;
@@ -93,9 +93,11 @@ pub fn assert_can_inscribe_cnft(input: &InscribeCNFTInput, accounts: &CNFTCheckA
         return Ok(())
     }
 
+    // if there is no collection, then use the leaf_owner to compare against
+
     if leaf_owner != authority.key {
         return Err(LegacyInscriptionErrorCode::BadAuthority.into());
     }
 
-    return Ok(());
+    Ok(())
 }

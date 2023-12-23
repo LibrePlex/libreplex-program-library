@@ -3,10 +3,10 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Mint, Token, TokenAccount},
 };
-use libreplex_shared::operations::transfer_non_pnft;
+
 use mpl_bubblegum::utils::get_asset_id;
 
-use crate::{Deployment, HashlistMarker, instruction};
+use crate::{move_fungible_out_of_escrow, Deployment, HashlistMarker};
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -37,7 +37,7 @@ pub struct SwapCompressedToFungibleCtx<'info> {
 
     /// CHECK: Just needs to match
     pub leaf_delegate: UncheckedAccount<'info>,
-    
+
     /// CHECK: Checked in cpi
     #[account(mut)]
     pub merkle_tree: UncheckedAccount<'info>,
@@ -77,9 +77,7 @@ pub struct SwapCompressedToFungibleCtx<'info> {
     pub fungible_source_token_account: Box<Account<'info, TokenAccount>>,
 
     /// CHECK: derivation checked in Logic. May not exist so created as required.
-    #[account(
-        mut
-    )]
+    #[account(mut)]
     pub fungible_target_token_account: UncheckedAccount<'info>,
 
     #[account()]
@@ -98,16 +96,18 @@ pub struct SwapCompressedToFungibleCtx<'info> {
     sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn swap_compressed_to_fungible<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, SwapCompressedToFungibleCtx<'info>>,   
+pub fn swap_compressed_to_fungible<'info>(
+    ctx: Context<'_, '_, '_, 'info, SwapCompressedToFungibleCtx<'info>>,
     root: [u8; 32],
     data_hash: [u8; 32],
     creator_hash: [u8; 32],
     nonce: u64,
-    index: u32,) -> Result<()> {
+    index: u32,
+) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
 
     let payer = &ctx.accounts.payer;
-    
+
     let fungible_source_token_account = &ctx.accounts.fungible_source_token_account;
     let fungible_target_token_account = &ctx.accounts.fungible_target_token_account;
     let fungible_mint = &ctx.accounts.fungible_mint;
@@ -122,12 +122,12 @@ pub fn swap_compressed_to_fungible<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, '
     let log_wrapper = &ctx.accounts.log_wrapper;
     let compression_program = &ctx.accounts.compression_program;
 
-
     // simples. two steps:
     // 1) move the compressed into the escrow
 
     bubblegum_proxy::cpi::transfer(
-        CpiContext::new(ctx.accounts.bubble_gum_program.to_account_info(), 
+        CpiContext::new(
+            ctx.accounts.bubble_gum_program.to_account_info(),
             bubblegum_proxy::cpi::accounts::Transfer {
                 tree_authority: tree_authority.to_account_info(),
                 leaf_owner: compressed_holder.to_account_info(),
@@ -138,33 +138,33 @@ pub fn swap_compressed_to_fungible<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, '
                 compression_program: compression_program.to_account_info(),
                 system_program: system_program.to_account_info(),
             },
-        ).with_remaining_accounts(ctx.remaining_accounts.to_vec()), 
-        root, data_hash, creator_hash, nonce, index)?;
+        )
+        .with_remaining_accounts(ctx.remaining_accounts.to_vec()),
+        root,
+        data_hash,
+        creator_hash,
+        nonce,
+        index,
+    )?;
 
+    let ticker = deployment.ticker.clone();
     let authority_seeds = &[
         "deployment".as_bytes(),
-        deployment.ticker.as_ref(),
+        ticker.as_ref(),
         &[ctx.bumps.deployment],
     ];
 
-    // // 2) move the fungible_mint out of the escrow
-    transfer_non_pnft(
-        &token_program.to_account_info(),
-        &fungible_source_token_account.to_account_info(),
-        &fungible_target_token_account.to_account_info(),
-        &deployment.to_account_info(),
-        &fungible_mint.to_account_info(),
-        &payer.to_account_info(),
-        &associated_token_program.to_account_info(),
-        &system_program.to_account_info(),
-        Some(&[authority_seeds]),
-        &payer.to_account_info(),
-        deployment.get_fungible_mint_amount(),
+    move_fungible_out_of_escrow(
+        token_program,
+        fungible_source_token_account,
+        fungible_target_token_account,
+        deployment,
+        fungible_mint,
+        payer,
+        associated_token_program,
+        system_program,
+        authority_seeds,
     )?;
-
-
-    deployment.escrow_non_fungible_count += 1;
-    // We have crossed the NFT / Defi barrier. As a side effect have a splittable SPL 20
 
     Ok(())
 }

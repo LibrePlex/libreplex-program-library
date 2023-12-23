@@ -14,7 +14,7 @@ pub mod sysvar_instructions_program {
 
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct DeployLegacyV2Input {
+pub struct DeployV2Input {
     pub require_creator_cosign: bool,
     pub use_inscriptions: bool
 }
@@ -30,7 +30,7 @@ pub struct DeployLegacyV2Input {
     launch lifecycle.
 */
 #[derive(Accounts)]
-#[instruction(input: DeployLegacyV2Input)]
+#[instruction(input: DeployV2Input)]
 pub struct DeployLegacyV2Ctx<'info> {
     #[account(
         mut,
@@ -124,7 +124,7 @@ pub struct DeployLegacyV2Ctx<'info> {
     pub sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn deploy_legacy_v2(ctx: Context<DeployLegacyV2Ctx>) -> Result<()> {
+pub fn deploy_v2(ctx: Context<DeployLegacyV2Ctx>) -> Result<()> {
 
 
 

@@ -63,7 +63,7 @@ pub struct ResizeCNFT<'info> {
     pub compression_program: UncheckedAccount<'info>,
 }
 
-pub fn resize<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, ResizeCNFT<'info>>, 
+pub fn resize<'info>(ctx: Context<'_, '_, '_, 'info, ResizeCNFT<'info>>, 
     compression_input: Box<InscribeCNFTInput>, 
     resize_input: ResizeLegacyInscriptionInput) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;

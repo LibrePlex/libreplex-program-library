@@ -29,29 +29,7 @@ pub mod mint_legacy_logic;
 pub use mint_legacy_logic::*;
 
 
-pub mod mint_compressed;
-pub use mint_compressed::*;
 
-
-/*
-    Swap to nonfungible - currently disabled
-
-*/
-pub mod swap_to_nonfungible;
-pub use swap_to_nonfungible::*;
-
-pub mod swap_compressed_to_fungible;
-pub use swap_compressed_to_fungible::*;
-
-pub mod swap_fungible_to_compressed;
-pub use swap_fungible_to_compressed::*;
-
-
-/*
-    Swap to fungible - currently disabled
-*/
-pub mod swap_to_fungible;
-pub use swap_to_fungible::*;
 
 
 /* 

@@ -65,7 +65,7 @@ pub struct Deployment {
 
 impl Deployment {
     pub fn do_thing() -> u64 {
-        return 0
+        0
     }
 }
 

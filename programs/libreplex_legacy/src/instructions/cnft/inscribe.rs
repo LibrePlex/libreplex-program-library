@@ -75,8 +75,8 @@ pub struct InscribeCNFT<'info> {
     pub compression_program: UncheckedAccount<'info>,
 }
 
-pub fn inscribe<'a, 'b, 'c, 'info>(
-    ctx: Context<'a, 'b, 'c, 'info, InscribeCNFT<'info>>,
+pub fn inscribe<'info>(
+    ctx: Context<'_, '_, '_, 'info, InscribeCNFT<'info>>,
     input: Box<InscribeCNFTInput>
 ) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;

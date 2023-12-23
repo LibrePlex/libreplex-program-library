@@ -64,8 +64,8 @@ pub struct MakeImmutableCNFT<'info> {
     pub inscription_summary: UncheckedAccount<'info>,
 }
 
-pub fn make_immutable<'a, 'b, 'c, 'info>(
-    ctx: Context<'a, 'b, 'c, 'info, MakeImmutableCNFT<'info>>, 
+pub fn make_immutable<'info>(
+    ctx: Context<'_, '_, '_, 'info, MakeImmutableCNFT<'info>>, 
     compression_input: Box<InscribeCNFTInput>) -> Result<()> {
     let inscriptions_program = &ctx.accounts.inscriptions_program;
     let inscription_v3 = &mut ctx.accounts.inscription_v3;

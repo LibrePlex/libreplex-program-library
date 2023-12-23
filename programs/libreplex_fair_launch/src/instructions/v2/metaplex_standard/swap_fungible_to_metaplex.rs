@@ -1,9 +1,9 @@
+use crate::{move_fungible_into_escrow, HashlistMarker};
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Mint, Token, TokenAccount},
 };
-use crate::HashlistMarker;
 use libreplex_shared::operations::transfer_non_pnft;
 // use libreplex_shared::operations::transfer_non_pnft;
 
@@ -15,7 +15,7 @@ pub mod sysvar_instructions_program {
 }
 
 #[derive(Accounts)]
-pub struct SwapToNonFungibleCtx<'info> {
+pub struct SwapFungibleToLegacyCtx<'info> {
     #[account(
         mut,
         constraint = deployment.fungible_mint == fungible_mint.key(),
@@ -38,9 +38,7 @@ pub struct SwapToNonFungibleCtx<'info> {
     pub fungible_source_token_account: Account<'info, TokenAccount>,
 
     /// CHECK: Checked in transfer logic
-    #[account(
-       mut
-    )]
+    #[account(mut)]
     pub fungible_target_token_account: UncheckedAccount<'info>,
 
     /* NON-FUNGIBLE COMES OUT OF THE ESCROW */
@@ -53,7 +51,6 @@ pub struct SwapToNonFungibleCtx<'info> {
         token::authority = deployment, // escrow is always owned by the deployment
     )]
     pub non_fungible_source_token_account: Account<'info, TokenAccount>,
-
 
     // verifies that the NFT coming out of the escrow has
     // been registered with the escrow, either via minting or importing
@@ -77,14 +74,14 @@ pub struct SwapToNonFungibleCtx<'info> {
     #[account()]
     pub system_program: Program<'info, System>,
 
-   /// CHECK: Checked in constraint
+    /// CHECK: Checked in constraint
     #[account(
         constraint = sysvar_instructions.key() == sysvar_instructions_program::ID
     )]
     sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
+pub fn swap_to_nonfungible(ctx: Context<SwapFungibleToLegacyCtx>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
 
     let payer = &ctx.accounts.payer;
@@ -103,21 +100,18 @@ pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
 
     // simples. two steps:
     // 1) move the fungible into the escrow
-    transfer_non_pnft(
-        &token_program.to_account_info(),
-        &fungible_source_token_account.to_account_info(),
-        &fungible_target_token_account.to_account_info(),
-        &source_wallet.to_account_info(),
-        &fungible_mint.to_account_info(),
-        &deployment.to_account_info(),
-        &associated_token_program.to_account_info(),
-        &system_program.to_account_info(),
-        None,
-        &payer.to_account_info(),
-        deployment.get_fungible_mint_amount(),
-    )?;
 
-    
+    move_fungible_into_escrow(
+        token_program,
+        fungible_source_token_account,
+        fungible_target_token_account,
+        source_wallet,
+        fungible_mint,
+        deployment,
+        associated_token_program,
+        system_program,
+        payer,
+    )?;
 
     let authority_seeds = &[
         "deployment".as_bytes(),
@@ -140,11 +134,6 @@ pub fn swap_to_nonfungible(ctx: Context<SwapToNonFungibleCtx>) -> Result<()> {
         &payer.to_account_info(),
         1,
     )?;
-    
-
-
-    // mark one of the non fungibles as moving out of the contract
-    deployment.escrow_non_fungible_count -= 1;
 
     // We have crossed the NFT / Defi barrier. As a side effect have a splittable SPL 20
 

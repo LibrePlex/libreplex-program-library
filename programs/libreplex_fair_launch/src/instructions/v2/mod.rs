@@ -1,8 +1,15 @@
-pub use deploy_legacy_v2::*;
-pub mod deploy_legacy_v2;
+pub mod metaplex_cnft;
+pub use metaplex_cnft::*;
 
-pub use initialise_v2::*;
-pub mod initialise_v2;
+pub mod metaplex_standard;
+pub use metaplex_standard::*;
 
-pub use mint_legacy_v2::*;
-pub mod mint_legacy_v2;
+pub use initialise::*;
+pub mod initialise;
+
+pub use deploy::*;
+pub mod deploy;
+
+pub use shared_logic::*;
+pub mod shared_logic;
+

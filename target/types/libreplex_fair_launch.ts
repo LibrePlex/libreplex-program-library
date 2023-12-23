@@ -3,7 +3,7 @@ export type LibreplexFairLaunch = {
   "name": "libreplex_fair_launch",
   "instructions": [
     {
-      "name": "deployLegacyV2",
+      "name": "deployV2",
       "accounts": [
         {
           "name": "deployment",
@@ -139,7 +139,56 @@ export type LibreplexFairLaunch = {
       "args": []
     },
     {
-      "name": "mintLegacyV2",
+      "name": "initialiseV2",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "arg",
+                "type": {
+                  "defined": "InitialiseInputV2"
+                },
+                "path": "input.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialiseInputV2"
+          }
+        }
+      ]
+    },
+    {
+      "name": "mintMetaplex",
       "accounts": [
         {
           "name": "deployment",
@@ -306,7 +355,7 @@ export type LibreplexFairLaunch = {
       "args": []
     },
     {
-      "name": "initialiseV2",
+      "name": "mintCompressed",
       "accounts": [
         {
           "name": "deployment",
@@ -320,11 +369,10 @@ export type LibreplexFairLaunch = {
                 "value": "deployment"
               },
               {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInputV2"
-                },
-                "path": "input.ticker"
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
               }
             ]
           }
@@ -335,9 +383,54 @@ export type LibreplexFairLaunch = {
           "isSigner": true
         },
         {
-          "name": "creator",
+          "name": "redeem",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "nftReceiver",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "accountCompressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "noopProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalTreeDelegate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "global_tree_delegate"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bubblegumProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -349,10 +442,165 @@ export type LibreplexFairLaunch = {
         {
           "name": "input",
           "type": {
-            "defined": "InitialiseInputV2"
+            "defined": "MintCompressedInput"
           }
         }
       ]
+    },
+    {
+      "name": "inscribeCompressed",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "redeemable",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist_marker"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Redeemable",
+                "path": "redeemable.asset"
+              }
+            ]
+          }
+        },
+        {
+          "name": "ghostRootSigner",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Redeemable",
+                "path": "redeemable.asset"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleTokenAccountEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "deployLegacy",
@@ -690,249 +938,6 @@ export type LibreplexFairLaunch = {
         },
         {
           "name": "metadataProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "mintCompressed",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "redeem",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "nftReceiver",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "accountCompressionProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "noopProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "merkleTree",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "treeAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "globalTreeDelegate",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "global_tree_delegate"
-              }
-            ]
-          }
-        },
-        {
-          "name": "bubblegumProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "MintCompressedInput"
-          }
-        }
-      ]
-    },
-    {
-      "name": "inscribeCompressed",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "hashlist",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "redeemable",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "deployment"
-          ]
-        },
-        {
-          "name": "hashlistMarker",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Redeemable",
-                "path": "redeemable.asset"
-              }
-            ]
-          }
-        },
-        {
-          "name": "ghostRootSigner",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Redeemable",
-                "path": "redeemable.asset"
-              }
-            ]
-          }
-        },
-        {
-          "name": "fungibleMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "fungibleTokenAccountEscrow",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionSummary",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscription",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV3",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionData",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1874,21 +1879,7 @@ export type LibreplexFairLaunch = {
       }
     },
     {
-      "name": "MintCompressedInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "treeDelegateType",
-            "type": {
-              "defined": "TreeDelegateType"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "DeployLegacyV2Input",
+      "name": "DeployV2Input",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1947,6 +1938,20 @@ export type LibreplexFairLaunch = {
           {
             "name": "deploymentType",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintCompressedInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "treeDelegateType",
+            "type": {
+              "defined": "TreeDelegateType"
+            }
           }
         ]
       }
@@ -2120,7 +2125,7 @@ export const IDL: LibreplexFairLaunch = {
   "name": "libreplex_fair_launch",
   "instructions": [
     {
-      "name": "deployLegacyV2",
+      "name": "deployV2",
       "accounts": [
         {
           "name": "deployment",
@@ -2256,7 +2261,56 @@ export const IDL: LibreplexFairLaunch = {
       "args": []
     },
     {
-      "name": "mintLegacyV2",
+      "name": "initialiseV2",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "arg",
+                "type": {
+                  "defined": "InitialiseInputV2"
+                },
+                "path": "input.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialiseInputV2"
+          }
+        }
+      ]
+    },
+    {
+      "name": "mintMetaplex",
       "accounts": [
         {
           "name": "deployment",
@@ -2423,7 +2477,7 @@ export const IDL: LibreplexFairLaunch = {
       "args": []
     },
     {
-      "name": "initialiseV2",
+      "name": "mintCompressed",
       "accounts": [
         {
           "name": "deployment",
@@ -2437,11 +2491,10 @@ export const IDL: LibreplexFairLaunch = {
                 "value": "deployment"
               },
               {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInputV2"
-                },
-                "path": "input.ticker"
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
               }
             ]
           }
@@ -2452,9 +2505,54 @@ export const IDL: LibreplexFairLaunch = {
           "isSigner": true
         },
         {
-          "name": "creator",
+          "name": "redeem",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "nftReceiver",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "accountCompressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "noopProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalTreeDelegate",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "global_tree_delegate"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bubblegumProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -2466,10 +2564,165 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "input",
           "type": {
-            "defined": "InitialiseInputV2"
+            "defined": "MintCompressedInput"
           }
         }
       ]
+    },
+    {
+      "name": "inscribeCompressed",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "redeemable",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist_marker"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Redeemable",
+                "path": "redeemable.asset"
+              }
+            ]
+          }
+        },
+        {
+          "name": "ghostRootSigner",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Redeemable",
+                "path": "redeemable.asset"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleTokenAccountEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionsProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "deployLegacy",
@@ -2807,249 +3060,6 @@ export const IDL: LibreplexFairLaunch = {
         },
         {
           "name": "metadataProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "mintCompressed",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "redeem",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "nftReceiver",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "accountCompressionProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "noopProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "merkleTree",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "treeAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "globalTreeDelegate",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "global_tree_delegate"
-              }
-            ]
-          }
-        },
-        {
-          "name": "bubblegumProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "MintCompressedInput"
-          }
-        }
-      ]
-    },
-    {
-      "name": "inscribeCompressed",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "hashlist",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "redeemable",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "deployment"
-          ]
-        },
-        {
-          "name": "hashlistMarker",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Redeemable",
-                "path": "redeemable.asset"
-              }
-            ]
-          }
-        },
-        {
-          "name": "ghostRootSigner",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Redeemable",
-                "path": "redeemable.asset"
-              }
-            ]
-          }
-        },
-        {
-          "name": "fungibleMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "fungibleTokenAccountEscrow",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionSummary",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscription",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV3",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionData",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -3991,21 +4001,7 @@ export const IDL: LibreplexFairLaunch = {
       }
     },
     {
-      "name": "MintCompressedInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "treeDelegateType",
-            "type": {
-              "defined": "TreeDelegateType"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "DeployLegacyV2Input",
+      "name": "DeployV2Input",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4064,6 +4060,20 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "deploymentType",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintCompressedInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "treeDelegateType",
+            "type": {
+              "defined": "TreeDelegateType"
+            }
           }
         ]
       }

@@ -50,8 +50,8 @@ pub enum RootType<'a, 'b> {
 }
 
 
-pub fn create_legacy_inscription_logic_v3<'a, 'b>(
-    root: RootType<'b, 'a>,
+pub fn create_legacy_inscription_logic_v3<'a>(
+    root: RootType<'_, 'a>,
     legacy_inscription: &mut Account<'a, LegacyInscription>,
     authority_type: AuthorityType,
     inscription_v3: &mut UncheckedAccount<'a>,

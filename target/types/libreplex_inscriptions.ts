@@ -215,6 +215,49 @@ export type LibreplexInscriptions = {
       ]
     },
     {
+      "name": "createGhostRootInscription",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "CreateGhostRootInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "makeInscriptionImmutableV3",
       "accounts": [
         {
@@ -492,6 +535,9 @@ export type LibreplexInscriptions = {
           },
           {
             "name": "LegacyMetadataSigner"
+          },
+          {
+            "name": "FairLaunchGhostRootSigner"
           }
         ]
       }
@@ -504,6 +550,36 @@ export type LibreplexInscriptions = {
           {
             "name": "pageIndex",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateGhostRootInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "signerType",
+            "type": {
+              "defined": "SignerType"
+            }
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
           }
         ]
       }
@@ -1140,6 +1216,49 @@ export const IDL: LibreplexInscriptions = {
       ]
     },
     {
+      "name": "createGhostRootInscription",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "CreateGhostRootInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "makeInscriptionImmutableV3",
       "accounts": [
         {
@@ -1417,6 +1536,9 @@ export const IDL: LibreplexInscriptions = {
           },
           {
             "name": "LegacyMetadataSigner"
+          },
+          {
+            "name": "FairLaunchGhostRootSigner"
           }
         ]
       }
@@ -1429,6 +1551,36 @@ export const IDL: LibreplexInscriptions = {
           {
             "name": "pageIndex",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateGhostRootInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "signerType",
+            "type": {
+              "defined": "SignerType"
+            }
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
           }
         ]
       }

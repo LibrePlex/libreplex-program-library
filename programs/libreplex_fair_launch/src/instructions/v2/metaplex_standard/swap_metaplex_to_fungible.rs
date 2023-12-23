@@ -5,7 +5,7 @@ use anchor_spl::{
 };
 use libreplex_shared::operations::transfer_non_pnft;
 
-use crate::{Deployment, HashlistMarker};
+use crate::{Deployment, HashlistMarker, move_fungible_out_of_escrow};
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -13,7 +13,7 @@ pub mod sysvar_instructions_program {
 }
 
 #[derive(Accounts)]
-pub struct SwapToFungibleCtx<'info> {
+pub struct SwapLegacyToFungibleCtx<'info> {
     #[account(
         mut,
         constraint = deployment.fungible_mint == fungible_mint.key(),
@@ -21,7 +21,6 @@ pub struct SwapToFungibleCtx<'info> {
     )]
     pub deployment: Box<Account<'info, Deployment>>,
 
-    
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -47,16 +46,14 @@ pub struct SwapToFungibleCtx<'info> {
     pub fungible_source_token_account: Box<Account<'info, TokenAccount>>,
 
     /// CHECK: derivation checked in Logic. May not exist so created as required.
-    #[account(
-        mut
-    )]
+    #[account(mut)]
     pub fungible_target_token_account: UncheckedAccount<'info>,
 
     /* non-fungible accounts */
     #[account(mut)]
     pub non_fungible_mint: Box<Account<'info, Mint>>,
 
-    /// this always exists (otherwise we couldn't swap), so we can specify the account 
+    /// this always exists (otherwise we couldn't swap), so we can specify the account
     /// type explicitly
     #[account(
         mut,
@@ -66,8 +63,7 @@ pub struct SwapToFungibleCtx<'info> {
     pub non_fungible_source_token_account: Box<Account<'info, TokenAccount>>,
 
     /// CHECK: derivation checked in Logic. Will be created as needed
-    #[account(mut
-    )]
+    #[account(mut)]
     pub non_fungible_target_token_account: UncheckedAccount<'info>,
 
     #[account()]
@@ -86,7 +82,7 @@ pub struct SwapToFungibleCtx<'info> {
     sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
+pub fn swap_metaplex_to_fungible(ctx: Context<SwapLegacyToFungibleCtx>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
 
     let payer = &ctx.accounts.payer;
@@ -119,30 +115,27 @@ pub fn swap_to_fungible(ctx: Context<SwapToFungibleCtx>) -> Result<()> {
         1,
     )?;
 
+    let ticker = deployment.ticker.clone();
+
     let authority_seeds = &[
         "deployment".as_bytes(),
-        deployment.ticker.as_ref(),
+        ticker.as_ref(),
         &[ctx.bumps.deployment],
     ];
 
     // // 2) move the fungible_mint out of the escrow
-    transfer_non_pnft(
-        &token_program.to_account_info(),
-        &fungible_source_token_account.to_account_info(),
-        &fungible_target_token_account.to_account_info(),
-        &deployment.to_account_info(),
-        &fungible_mint.to_account_info(),
-        &payer.to_account_info(),
-        &associated_token_program.to_account_info(),
-        &system_program.to_account_info(),
-        Some(&[authority_seeds]),
-        &payer.to_account_info(),
-        deployment.get_fungible_mint_amount(),
+
+    move_fungible_out_of_escrow(
+        token_program,
+        fungible_source_token_account,
+        fungible_target_token_account,
+        deployment,
+        fungible_mint,
+        payer,
+        associated_token_program,
+        system_program,
+        authority_seeds,
     )?;
-
-
-    deployment.escrow_non_fungible_count += 1;
-    // We have crossed the NFT / Defi barrier. As a side effect have a splittable SPL 20
 
     Ok(())
 }
