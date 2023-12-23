@@ -873,7 +873,7 @@ export type LibreplexFairLaunch = {
         },
         {
           "name": "ghostRootSigner",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "pda": {
             "seeds": [
@@ -2990,7 +2990,7 @@ export const IDL: LibreplexFairLaunch = {
         },
         {
           "name": "ghostRootSigner",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "pda": {
             "seeds": [

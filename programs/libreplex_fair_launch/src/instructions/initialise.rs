@@ -89,7 +89,7 @@ pub fn initialise_logic(input: InitialiseInput, deployment: &mut Account<'_, Dep
 
     deployment.require_creator_cosign = false;
     deployment.use_inscriptions = true;
-
+    deployment.deployment_type = input.deployment_type;
     deployment.creator = creator;
     deployment.limit_per_mint = input.limit_per_mint;
     deployment.max_number_of_tokens = input.max_number_of_tokens;

@@ -140,10 +140,17 @@ pub fn mint_compressed<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info,
         }],
     };
 
-    bubblegum_proxy::cpi::mint_v1(
-        CpiContext::new_with_signer(ctx.accounts.bubblegum_program.to_account_info(), 
-        mint_compressed_accounts, &[tree_delegate_seeds]), 
-        metadata_args)?;
+    {
+        let mut deployment_as_signer = deployment.to_account_info();
+        deployment_as_signer.is_signer = true;
+        bubblegum_proxy::cpi::mint_v1(
+            CpiContext::new_with_signer(ctx.accounts.bubblegum_program.to_account_info(), 
+            mint_compressed_accounts, &[tree_delegate_seeds, deployment_seeds])
+                .with_remaining_accounts(vec![deployment_as_signer]), 
+            metadata_args)?;
+
+    }
+
 
     let redeemable = &mut ctx.accounts.redeem;
     redeemable.deployment = deployment.key();
@@ -155,7 +162,6 @@ pub fn mint_compressed<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info,
 
 
 #[derive(Accounts)]
-#[instruction(input: MintCompressedInput)]
 pub struct InscribeCompressedCtx<'info> {
     #[account(mut,
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
@@ -165,6 +171,9 @@ pub struct InscribeCompressedCtx<'info> {
     
     #[account(mut)]
     pub payer: Signer<'info>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
 
     /// CHECK: Checked by seeds
     #[account(mut, 
@@ -187,6 +196,7 @@ pub struct InscribeCompressedCtx<'info> {
 
     /// CHECK: Checked by address
     #[account(
+        mut,
         seeds = [redeemable.asset.as_ref()], 
         bump)]
     pub ghost_root_signer: UncheckedAccount<'info>,
@@ -235,6 +245,12 @@ pub struct InscribeCompressedCtx<'info> {
 
 pub fn inscribe_compressed(ctx: Context<InscribeCompressedCtx>) -> Result<()> {
     let deployment = &mut ctx.accounts.deployment;
+    let signer = &ctx.accounts.signer;
+    let payer = &ctx.accounts.payer;
+
+    if deployment.require_creator_cosign && !signer.key().eq(&payer.key()) {
+        return Err(SharedError::InvalidCreatorCosigner.into());
+    }
 
     // to be discussed w/ everybody and feedback. Not strictly in line with BRC 20 thinking
     // but seems pointless to issue tokens if they can never be valid
@@ -246,7 +262,6 @@ pub fn inscribe_compressed(ctx: Context<InscribeCompressedCtx>) -> Result<()> {
 
     let inscription_summary = &ctx.accounts.inscription_summary;
 
-    let payer = &ctx.accounts.payer;
     let fungible_mint = &ctx.accounts.fungible_mint;
     let inscriptions_program = &ctx.accounts.inscriptions_program;
 
