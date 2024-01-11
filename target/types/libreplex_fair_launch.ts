@@ -1950,6 +1950,11 @@ export type LibreplexFairLaunch = {
       "code": 6008,
       "name": "InvalidMetadata",
       "msg": "Invalid Metadata"
+    },
+    {
+      "code": 6009,
+      "name": "CreatorFeeTooHigh",
+      "msg": "Creator fee too high"
     }
   ]
 };
@@ -3906,6 +3911,11 @@ export const IDL: LibreplexFairLaunch = {
       "code": 6008,
       "name": "InvalidMetadata",
       "msg": "Invalid Metadata"
+    },
+    {
+      "code": 6009,
+      "name": "CreatorFeeTooHigh",
+      "msg": "Creator fee too high"
     }
   ]
 };
