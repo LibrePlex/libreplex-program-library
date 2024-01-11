@@ -1,0 +1,33 @@
+[package]
+name = "libreplex_loop"
+version = "0.0.4"
+description = "Created with Anchor"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/distributor/distributor-program-library"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "libreplex_loop"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = {version = "~0.29", features = ["init-if-needed"]}
+anchorlang26 = {package="anchor-lang", version = "~0.26", features = ["init-if-needed"]}
+anchor-spl = {version = "~0.29"}
+solana-program = {version = "1.17.13"}
+libreplex_fair_launch = {version = "*", path = "../libreplex_fair_launch", features=["cpi"]}
+libreplex_inscriptions = {version = "*", path = "../libreplex_inscriptions", features=["cpi"]}
+mpl-token-metadata = { version="~3" }
+
+whirlpoolsftr = {version="0.3.1"}
+
+libreplex_shared = {version = "*", path = "../libreplex_shared", features=["cpi"]}
+
+

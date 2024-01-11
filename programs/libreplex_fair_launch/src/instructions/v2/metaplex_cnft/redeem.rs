@@ -1,10 +1,7 @@
 
 use anchor_lang::prelude::*;
-use anchor_spl::{
-    associated_token::AssociatedToken,
-    token::{Mint, Token},
-};
-use libreplex_inscriptions::InscriptionSummary;
+
+
 
 
 use libreplex_shared::SharedError;
@@ -53,18 +50,9 @@ pub struct InscribeCompressedCtx<'info> {
         bump)]
     pub ghost_root_signer: UncheckedAccount<'info>,
 
-    #[account(mut,
-        constraint = deployment.fungible_mint == fungible_mint.key())]
-    pub fungible_mint: Account<'info, Mint>,
-
-    /// CHECK: Checked in logic, created as necessary
-    #[account(
-        mut,
-    )]
-    pub fungible_token_account_escrow: UncheckedAccount<'info>,
-
+    /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
-    pub inscription_summary: Account<'info, InscriptionSummary>,
+    pub inscription_summary: UncheckedAccount<'info>,
 
     /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
@@ -78,13 +66,7 @@ pub struct InscribeCompressedCtx<'info> {
     #[account(mut)]
     pub inscription_data: UncheckedAccount<'info>,
 
-    /* BOILERPLATE PROGRAM ACCOUNTS */
-    #[account()]
-    pub token_program: Program<'info, Token>,
-
-    #[account()]
-    pub associated_token_program: Program<'info, AssociatedToken>,
-
+    
     /// CHECK: Checked in constraint
     #[account(
         constraint = inscriptions_program.key() == libreplex_inscriptions::ID
@@ -100,7 +82,7 @@ pub fn redeem(ctx: Context<InscribeCompressedCtx>) -> Result<()> {
     let signer = &ctx.accounts.signer;
     let payer = &ctx.accounts.payer;
 
-    if deployment.require_creator_cosign && !signer.key().eq(&payer.key()) {
+    if deployment.require_creator_cosign && !signer.key().eq(&deployment.creator.key()) {
         return Err(SharedError::InvalidCreatorCosigner.into());
     }
 
@@ -114,16 +96,12 @@ pub fn redeem(ctx: Context<InscribeCompressedCtx>) -> Result<()> {
 
     let inscription_summary = &ctx.accounts.inscription_summary;
 
-    let fungible_mint = &ctx.accounts.fungible_mint;
     let inscriptions_program = &ctx.accounts.inscriptions_program;
 
     let inscription_v3 = &ctx.accounts.inscription_v3;
     let inscription_data = &ctx.accounts.inscription_data;
-    let fungible_token_account_escrow = &ctx.accounts.fungible_token_account_escrow;
-    let token_program = &ctx.accounts.token_program;
     let system_program = &ctx.accounts.system_program;
-    let associated_token_program = &ctx.accounts.associated_token_program;
-
+    
     let asset_id = ctx.accounts.redeemable.asset;
 
     let ghost_root_signer = &ctx.accounts.ghost_root_signer;
@@ -137,15 +115,10 @@ pub fn redeem(ctx: Context<InscribeCompressedCtx>) -> Result<()> {
         system_program,
         payer,
         inscription_data,
-        fungible_mint,
-        fungible_token_account_escrow, 
-        associated_token_program, 
-        token_program, 
         ghost_root_signer,
         ghost_root_seeds,
         hashlist, 
         asset_id,
-        ctx.bumps.deployment
     )?;
 
     emit!(MintEvent{

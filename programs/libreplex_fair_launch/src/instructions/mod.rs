@@ -11,6 +11,7 @@ pub use initialise::*;
     deploys - i.e created mints, token accounts,
     and deploy inscription
  */
+
 pub mod deploy_legacy;
 pub use deploy_legacy::*;
 
@@ -37,9 +38,9 @@ pub use mint_legacy_logic::*;
 */
 // pub mod migrate_from_validator;
 // pub use migrate_from_validator::*;
-
-pub mod deploy_migrated;
-pub use deploy_migrated::*;
+// no more legacy validators will be deployed to fair launch
+// pub mod deploy_migrated;
+// pub use deploy_migrated::*;
 
 pub mod migrate_to_hashlist;
 pub use migrate_to_hashlist::*;
@@ -53,3 +54,4 @@ pub use v2::*;
 
 pub const COMPRESSED_DEPLOYMENT_TYPE: u8 = 2;
 pub const STANDARD_DEPLOYMENT_TYPE: u8 = 0;
+pub const TOKEN2022_DEPLOYMENT_TYPE: u8 = 3;

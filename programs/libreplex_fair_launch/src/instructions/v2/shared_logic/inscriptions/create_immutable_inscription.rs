@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use libreplex_inscriptions::InscriptionSummary;
+
 // use libreplex_shared::sysvar_instructions_program;
 
 use libreplex_inscriptions::{
@@ -19,7 +19,7 @@ pub fn create_immutable_inscription<'a>(
     system_program: &Program<'a, System>,
     inscription_data: &UncheckedAccount<'a>,
     inscription_v3: &UncheckedAccount<'a>,
-    inscription_summary: &Account<'a, InscriptionSummary>,
+    inscription_summary: &UncheckedAccount<'a>,
 ) -> Result<()> {
     let data_bytes = deployment.mint_template.clone().into_bytes();
     libreplex_inscriptions::cpi::resize_inscription_v3(

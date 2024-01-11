@@ -9,6 +9,10 @@ pub mod utils;
 pub use utils::*;
 
 
+pub mod create_token_2022_mint_and_metadata;
+
+pub use create_token_2022_mint_and_metadata::*;
+
 
 pub mod create_metadata_and_masteredition;
 

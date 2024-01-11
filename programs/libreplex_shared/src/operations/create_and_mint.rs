@@ -1,22 +1,18 @@
-use anchor_lang::{prelude::*, solana_program};
+use anchor_lang::prelude::*;
 
 use mpl_token_metadata::{
-    accounts::Metadata,
     instructions::{
         CreateV1Builder,
-        MintV1Builder,
-        UpdateV1Builder,
-        VerifyCollectionBuilder, // builders::{CreateBuilder, MintBuilder, UpdateBuilder, VerifyBuilder},
+        MintV1Builder, // builders::{CreateBuilder, MintBuilder, UpdateBuilder, VerifyBuilder},
                                  // create_master_edition_v3, create_metadata_accounts_v3, set_and_verify_collection,
                                  // set_and_verify_sized_collection_item, update_metadata_accounts_v2, CreateArgs,
                                  // InstructionBuilder, MintArgs, RuleSetToggle, UpdateArgs, VerificationArgs,
     },
-    types::{Collection, Creator, PrintSupply, RuleSetToggle, TokenStandard},
+    types::{Creator, PrintSupply, TokenStandard},
     // state::{AssetData, Collection, Metadata, PrintSupply, TokenMetadataAccount, TokenStandard},
 };
 use solana_program::program::invoke_signed;
 
-use crate::SharedError;
 
 /// Accounts to mint an NFT.
 pub struct MintAccounts<'info> {

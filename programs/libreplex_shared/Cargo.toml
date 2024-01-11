@@ -18,6 +18,11 @@ default = []
 [dependencies]
 anchor-lang = {version ="0.29.0", features = ["init-if-needed"]}
 anchor-spl = "0.29.0"
-solana-program = "^1.16"
-spl-token = { version = "3.5.0",  features = ["no-entrypoint"] }
-mpl-token-metadata = { version="=3.1.0" }
+solana-program = "1.17.13"
+spl-token = { version = "~4",  features = ["no-entrypoint"] }
+mpl-token-metadata = { version="~3" }
+spl-token-2022 = {version = "~1.0", features = ["no-entrypoint"]}
+spl-token-metadata-interface = {version = "0.2.0"}
+spl-token-group-interface = {version= "0.1.0"}
+spl-type-length-value = {version= "0.3.0"}
+spl-pod = {version= "0.1.0"}

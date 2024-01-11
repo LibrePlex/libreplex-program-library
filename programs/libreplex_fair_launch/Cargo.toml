@@ -1,6 +1,6 @@
 [package]
 name = "libreplex_fair_launch"
-version = "0.1.0"
+version = "0.2.0"
 description = "Created with Anchor"
 edition = "2021"
 license = "MIT"
@@ -23,11 +23,20 @@ anchor-spl = {version = "~0.29"}
 libreplex_inscriptions = {version="*", path = "../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
 libreplex_legacy = {version="*", path = "../libreplex_legacy", features =["cpi", "no-entrypoint"]}
 
-solana-program = {version = "~1.16"}
+solana-program = {version = "1.17.13"}
 arrayref = "0.3.7"
 libreplex_shared = {version= "*", path = "../libreplex_shared", features=["no-entrypoint"] }
 mpl-token-metadata = { version="~3" }
-bubblegum-proxy = {path = "../../utils/bubblegum-proxy", features = ["cpi", "no-entrypoint"]}
+bubblegum-proxy = {path = "../../utils/bubblegum-proxy", features = ["cpi"]}
 spl-compression-proxy = {path = "../../utils/spl-compression-proxy", features = ["cpi", "no-entrypoint"]}
-spl-account-compression = { version="0.2.0", features = ["cpi", "no-entrypoint"] }
-mpl-bubblegum = {version = "0.11.0", features = ["cpi", "no-entrypoint"]}
+spl-account-compression = { version="0.3.0", features = ["cpi", "no-entrypoint"] }
+bubblegum = {path = "../../../mpl-bubblegum/programs/bubblegum/program", features = []}
+spl-token-2022 = {version = "~1.0", features = ["no-entrypoint"]}
+spl-token-metadata-interface = {version= "0.2.0"}
+spl-token-group-interface = {version= "0.1.0"}
+spl-type-length-value = {version= "0.3.0"}
+spl-pod = {version= "0.1.0"}
+
+[dev-dependencies]
+solana-program-test = {version= "1.17.13"}
+solana-sdk= "1.17.13"

@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use bubblegum_proxy::TreeConfig;
 use libreplex_inscriptions::{InscriptionV3, program::LibreplexInscriptions, instructions::WriteToInscriptionInput};
-use mpl_bubblegum::utils::get_asset_id;
+use bubblegum::utils::get_asset_id;
 
 use crate::LegacyInscription;
 
@@ -37,8 +37,8 @@ pub struct WriteCNFT<'info> {
     #[account(mut)]
     pub merkle_tree: UncheckedAccount<'info>,
 
-    #[account(seeds = [merkle_tree.key().as_ref()], seeds::program = mpl_bubblegum::ID, 
-        bump, owner = mpl_bubblegum::ID)]
+    #[account(seeds = [merkle_tree.key().as_ref()], seeds::program = bubblegum::ID, 
+        bump, owner = bubblegum::ID)]
     pub tree_authority: Account<'info, TreeConfig>,
 
     /// CHECK: Checked in logic

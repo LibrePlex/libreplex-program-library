@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{Mint, Token, TokenAccount},
+    token::{Mint, TokenAccount},
 };
 
 use libreplex_shared::operations::transfer_non_pnft;
@@ -15,7 +15,7 @@ pub mod sysvar_instructions_program {
 }
 
 pub fn move_fungible_into_escrow<'a>(
-    token_program: &Program<'a, Token>,
+    token_program: &AccountInfo<'a>,
     fungible_source_token_account: &Account<'a, TokenAccount>,
     fungible_target_token_account: &UncheckedAccount<'a>,
     source_wallet: &Signer<'a>,

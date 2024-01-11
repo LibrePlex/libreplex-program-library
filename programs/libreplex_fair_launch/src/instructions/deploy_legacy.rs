@@ -7,7 +7,6 @@ use libreplex_inscriptions::{
     cpi::accounts::ResizeInscriptionV3,
     cpi::accounts::WriteToInscriptionV3,
     instructions::{SignerType, WriteToInscriptionInput},
-    InscriptionSummary,
 };
 use libreplex_shared::{
     create_mint_metadata_and_masteredition::create_mint_with_metadata_and_masteredition,
@@ -82,8 +81,9 @@ pub struct DeployLegacyCtx<'info> {
     pub non_fungible_token_account: UncheckedAccount<'info>,
 
     /* INTERACT WITH INSCRIPTIONS PROGRAM  */
+    /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
-    pub inscription_summary: Account<'info, InscriptionSummary>,
+    pub inscription_summary: UncheckedAccount<'info>,
 
     // leaving this account here to avoid breaking the fair launch api.
     // however seeing that everything uses pure v3 endpoints under the hood,
@@ -197,7 +197,7 @@ pub fn deploy<'f>(ctx: Context<'_,'_,'_,'f,DeployLegacyCtx<'f>>) -> Result<()> {
 
 pub fn deploy_legacy_inscriptions<'f>(
     inscriptions_program: &UncheckedAccount<'f>,
-    inscription_summary: &Account<'f, InscriptionSummary>,
+    inscription_summary: &UncheckedAccount<'f>,
     non_fungible_mint: &Signer<'f>,
     inscription_v3: &UncheckedAccount<'f>,
     system_program: &Program<'f, System>,
