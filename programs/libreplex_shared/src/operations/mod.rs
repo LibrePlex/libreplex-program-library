@@ -20,6 +20,9 @@ pub use transfer_pnft::*;
 pub mod transfer_non_pnft;
 pub use transfer_non_pnft::*;
 
+pub mod transfer_generic_spl;
+pub use transfer_generic_spl::*;
+
 
 
 pub mod burn_pnft;

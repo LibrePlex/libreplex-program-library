@@ -1,22 +1,19 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{associated_token::AssociatedToken, token::Token};
 
-use libreplex_inscriptions::InscriptionSummary;
 
 
-
-use crate::{Deployment, Hashlist, deploy_legacy_logic, deploy_legacy_inscriptions};
+use crate::{deploy_legacy_inscriptions, deploy_legacy_logic, Deployment, Hashlist};
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
     declare_id!("Sysvar1nstructions1111111111111111111111111");
 }
 
-
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct DeployV2Input {
     pub require_creator_cosign: bool,
-    pub use_inscriptions: bool
+    pub use_inscriptions: bool,
 }
 
 /*
@@ -30,7 +27,6 @@ pub struct DeployV2Input {
     launch lifecycle.
 */
 #[derive(Accounts)]
-#[instruction(input: DeployV2Input)]
 pub struct DeployLegacyV2Ctx<'info> {
     #[account(
         mut,
@@ -82,8 +78,9 @@ pub struct DeployLegacyV2Ctx<'info> {
     pub non_fungible_token_account: UncheckedAccount<'info>,
 
     /* INTERACT WITH INSCRIPTIONS PROGRAM  */
+     /// CHECK: gets created, passed into libreplex_fair_launch via  CPI
     #[account(mut)]
-    pub inscription_summary: Account<'info, InscriptionSummary>,
+    pub inscription_summary: UncheckedAccount<'info>,
 
     /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
@@ -125,11 +122,7 @@ pub struct DeployLegacyV2Ctx<'info> {
 }
 
 pub fn deploy_v2(ctx: Context<DeployLegacyV2Ctx>) -> Result<()> {
-
-
-
     let deployment = &mut ctx.accounts.deployment;
-
 
     if !deployment.require_creator_cosign {
         panic!("Only creator cosign can currently use v2 methods")
@@ -138,7 +131,7 @@ pub fn deploy_v2(ctx: Context<DeployLegacyV2Ctx>) -> Result<()> {
     let hashlist = &mut ctx.accounts.hashlist;
 
     hashlist.deployment = deployment.key();
-    
+
     let deployment = &mut ctx.accounts.deployment;
     let system_program = &ctx.accounts.system_program;
     let payer = &ctx.accounts.payer;
@@ -174,21 +167,21 @@ pub fn deploy_v2(ctx: Context<DeployLegacyV2Ctx>) -> Result<()> {
         non_fungible_metadata,
         non_fungible_master_edition,
         non_fungible_token_account,
-        ctx.bumps.deployment
+        ctx.bumps.deployment,
     )?;
 
-    deploy_legacy_inscriptions(
-        inscriptions_program,
-        inscription_summary,
-        non_fungible_mint,
-        inscription_v3,
-        system_program,
-        payer,
-        inscription_data,
-        deployment,
-    )?;
-
-
+    if deployment.use_inscriptions {
+        deploy_legacy_inscriptions(
+            inscriptions_program,
+            inscription_summary,
+            non_fungible_mint,
+            inscription_v3,
+            system_program,
+            payer,
+            inscription_data,
+            deployment,
+        )?;
+    }
 
     Ok(())
 }

@@ -1,9 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{
-        Mint, Token,
-    },
+    token::Mint,
 };
 // use libreplex_shared::sysvar_instructions_program;
 
@@ -17,12 +15,14 @@ pub fn create_non_fungible_token_account<'a>(
     associated_token_program: &Program<'a, AssociatedToken>,
     payer: &Signer<'a>,
     system_program: &Program<'a, System>,
-    token_program: &Program<'a, Token>,
+    token_program: &UncheckedAccount<'a>,
 ) -> Result<()> {
     let expected_non_fungible_token_account =
-        anchor_spl::associated_token::get_associated_token_address(
+        anchor_spl::associated_token::get_associated_token_address_with_program_id(
             &inscriber.key(),
             &non_fungible_mint.key(),
+            &token_program.key()
+
         );
     if expected_non_fungible_token_account != non_fungible_token_account.key() {
         return Err(SharedError::InvalidTokenAccount.into());

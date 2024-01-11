@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 
-use crate::{Deployment, initialise_logic, InitialiseInput};
+use crate::{Deployment, initialise_logic, InitialiseInput, TOKEN2022_DEPLOYMENT_TYPE, DeploymentConfig};
 
 
 
@@ -17,7 +17,9 @@ pub struct InitialiseInputV2 {
     pub offchain_url: String, // used both for the fungible and the non-fungible
     pub require_creator_cosign: bool,
     pub use_inscriptions: bool,
-    pub deployment_type: u8
+    pub deployment_type: u8,
+    pub creator_fee_treasury: Pubkey,
+    pub creator_fee_per_mint_in_lamports: u64
 }
 
 /*
@@ -42,6 +44,16 @@ pub struct InitialiseV2Ctx<'info>  {
         seeds = ["deployment".as_ref(), input.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
 
+    #[account(
+        init,
+        payer = payer,
+        space = DeploymentConfig::SIZE,
+        // deployment must be executed by the payer 
+        seeds=["deployment_config".as_bytes(), deployment.key().as_ref()],
+        bump
+    )]
+    pub deployment_config: Account<'info, DeploymentConfig>,
+
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -56,7 +68,9 @@ pub struct InitialiseV2Ctx<'info>  {
 
 pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) -> Result<()> {
     
-    let deployment = &mut ctx.accounts.deployment;
+    let deployment: &mut Account<'_, Deployment> = &mut ctx.accounts.deployment;
+
+    let deployment_config = &mut ctx.accounts.deployment_config;
 
     
 
@@ -71,20 +85,34 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
         mint_template, 
         offchain_url, 
         require_creator_cosign, 
-        use_inscriptions, deployment_type } = input;
+        use_inscriptions, 
+        deployment_type,
+        creator_fee_per_mint_in_lamports: creator_fee_in_lamports,
+        creator_fee_treasury} = input;
 
     if require_creator_cosign {
-        panic!("Only creator cosign can currently use v2 methods")
+        panic!("Creator cosign not currently supported")
     }
 
-    deployment.require_creator_cosign = require_creator_cosign;
-    deployment.use_inscriptions = use_inscriptions;
+    if deployment_type != TOKEN2022_DEPLOYMENT_TYPE {
+        panic!("Only token 2022 currently supported in v2 methods")
+    }
 
+
+   deployment_config.creator_fee_treasury = creator_fee_treasury;
+   deployment_config.creator_fee_per_mint_lamports = creator_fee_in_lamports;
     
 
     initialise_logic(InitialiseInput {
         limit_per_mint, 
         max_number_of_tokens, decimals, ticker, deployment_template, mint_template, offchain_url, deployment_type
-    }, deployment, creator.key())
+    }, deployment, creator.key())?;
+
+    
+    deployment.require_creator_cosign = require_creator_cosign;
+    deployment.use_inscriptions = use_inscriptions;
+
+    Ok(())
+
 
 }

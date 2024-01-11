@@ -2,10 +2,9 @@ use crate::{move_fungible_into_escrow, HashlistMarker};
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{Mint, Token, TokenAccount},
+    token::{Mint, TokenAccount, self}, token_2022,
 };
-
-use bubblegum::utils::get_asset_id;
+use libreplex_shared::operations::transfer_non_pnft;
 // use libreplex_shared::operations::transfer_non_pnft;
 
 use crate::Deployment;
@@ -16,14 +15,7 @@ pub mod sysvar_instructions_program {
 }
 
 #[derive(Accounts)]
-#[instruction(
-    root: [u8; 32],
-    data_hash: [u8; 32],
-    creator_hash: [u8; 32],
-    nonce: u64,
-    index: u32
-)]
-pub struct SwapFungibleToCompressedCtx<'info> {
+pub struct SwapFungibleToLegacyCtx<'info> {
     #[account(
         mut,
         constraint = deployment.fungible_mint == fungible_mint.key(),
@@ -33,9 +25,6 @@ pub struct SwapFungibleToCompressedCtx<'info> {
 
     #[account(mut)]
     pub payer: Signer<'info>,
-
-    /// CHECK: Can be anything
-    pub compressed_receiver: UncheckedAccount<'info>,
 
     /* fungible accounts */
     #[account(mut)]
@@ -52,34 +41,35 @@ pub struct SwapFungibleToCompressedCtx<'info> {
     #[account(mut)]
     pub fungible_target_token_account: UncheckedAccount<'info>,
 
+    /* NON-FUNGIBLE COMES OUT OF THE ESCROW */
+    #[account(mut)]
+    pub non_fungible_mint: Account<'info, Mint>,
+
+    #[account(
+        mut,
+        token::mint = non_fungible_mint,
+        token::authority = deployment, // escrow is always owned by the deployment
+    )]
+    pub non_fungible_source_token_account: Account<'info, TokenAccount>,
+
     // verifies that the NFT coming out of the escrow has
     // been registered with the escrow, either via minting or importing
     // from legacy hashlist
     #[account(seeds = ["hashlist_marker".as_bytes(), 
         deployment.key().as_ref(),
-        get_asset_id(merkle_tree.key, nonce).as_ref()],
+        non_fungible_mint.key().as_ref()],
         bump,)]
     pub hashlist_marker: Account<'info, HashlistMarker>,
 
-    /// CHECK: Checked in cpi
+    /// CHECK: Checked in transfer logic
     #[account(mut)]
-    pub merkle_tree: UncheckedAccount<'info>,
+    pub non_fungible_target_token_account: UncheckedAccount<'info>,
 
-    /// CHECK: Checked in cpi
-    pub tree_authority: UncheckedAccount<'info>,
-
-    /// CHECK: Checked in cpi
-    pub log_wrapper: UncheckedAccount<'info>,
-
-    /// CHECK: Checked in cpi
-    pub compression_program: UncheckedAccount<'info>,
-
-    /// CHECK: Checked by address
-    #[account(address = bubblegum::ID)]
-    pub bubble_gum_program: UncheckedAccount<'info>,
-
-    #[account()]
-    pub token_program: Program<'info, Token>,
+     /// CHECK: Checked in constraint
+     #[account(
+        constraint = token_program.key() == token_2022::ID || token_program.key() == token::ID
+    )]
+    pub token_program: UncheckedAccount<'info>,
 
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -94,17 +84,13 @@ pub struct SwapFungibleToCompressedCtx<'info> {
     sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn swap_fungible_to_compressed<'info>(
-    ctx: Context<'_, '_, '_, 'info, SwapFungibleToCompressedCtx<'info>>,
-    root: [u8; 32],
-    data_hash: [u8; 32],
-    creator_hash: [u8; 32],
-    nonce: u64,
-    index: u32,
-) -> Result<()> {
+pub fn swap_to_nonfungible(ctx: Context<SwapFungibleToLegacyCtx>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
 
     let payer = &ctx.accounts.payer;
+    let non_fungible_source_token_account = &ctx.accounts.non_fungible_source_token_account;
+    let non_fungible_target_token_account = &ctx.accounts.non_fungible_target_token_account;
+    let non_fungible_mint = &ctx.accounts.non_fungible_mint;
 
     let source_wallet = &ctx.accounts.payer;
     let fungible_source_token_account = &ctx.accounts.fungible_source_token_account;
@@ -117,6 +103,7 @@ pub fn swap_fungible_to_compressed<'info>(
 
     // simples. two steps:
     // 1) move the fungible into the escrow
+
     move_fungible_into_escrow(
         token_program,
         fungible_source_token_account,
@@ -135,31 +122,21 @@ pub fn swap_fungible_to_compressed<'info>(
         &[ctx.bumps.deployment],
     ];
 
-    // 2) move the compressed out of the escrow
-    bubblegum_proxy::cpi::transfer(
-        CpiContext::new_with_signer(
-            ctx.accounts.bubble_gum_program.to_account_info(),
-            bubblegum_proxy::cpi::accounts::Transfer {
-                tree_authority: ctx.accounts.tree_authority.to_account_info(),
-                leaf_owner: deployment.to_account_info(),
-                leaf_delegate: deployment.to_account_info(),
-                new_leaf_owner: ctx.accounts.compressed_receiver.to_account_info(),
-                merkle_tree: ctx.accounts.merkle_tree.to_account_info(),
-                log_wrapper: ctx.accounts.log_wrapper.to_account_info(),
-                compression_program: ctx.accounts.compression_program.to_account_info(),
-                system_program: system_program.to_account_info(),
-            },
-            &[authority_seeds],
-        )
-        .with_remaining_accounts(ctx.remaining_accounts.to_vec()),
-        root,
-        data_hash,
-        creator_hash,
-        nonce,
-        index,
-    )?;
+    // 2) move the non_fungible_mint out of the escrow
 
-    // mark one of the non fungibles as moving out of the contract
+    transfer_non_pnft(
+        &token_program.to_account_info(),
+        &non_fungible_source_token_account.to_account_info(),
+        &non_fungible_target_token_account.to_account_info(),
+        &deployment.to_account_info(),
+        &non_fungible_mint.to_account_info(),
+        &source_wallet.to_account_info(),
+        &associated_token_program.to_account_info(),
+        &system_program.to_account_info(),
+        Some(&[authority_seeds]), // payer signs
+        &payer.to_account_info(),
+        1,
+    )?;
 
     // We have crossed the NFT / Defi barrier. As a side effect have a splittable SPL 20
 

@@ -2,7 +2,7 @@
 use anchor_lang::prelude::*;
 use bubblegum_proxy::{TreeConfig, MetadataArgs};
 // use libreplex_shared::sysvar_instructions_program;
-use mpl_bubblegum::utils::get_asset_id;
+use bubblegum::utils::get_asset_id;
 
 
 use crate::{
@@ -55,7 +55,7 @@ pub struct MintCompressedCtx<'info> {
     pub global_tree_delegate: Option<UncheckedAccount<'info>>,
 
     /// CHECK: checked by address
-    #[account(address = mpl_bubblegum::id())]
+    #[account(address = bubblegum::id())]
     bubblegum_program: AccountInfo<'info>,
 
     #[account()]

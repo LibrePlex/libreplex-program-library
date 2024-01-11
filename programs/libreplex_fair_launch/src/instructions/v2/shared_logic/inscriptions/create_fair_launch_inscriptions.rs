@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::Mint;
-use libreplex_inscriptions::InscriptionSummary;
+
+
 // use libreplex_shared::sysvar_instructions_program;
 
 use libreplex_inscriptions::{
@@ -14,8 +14,8 @@ use crate::{
 
 pub fn create_fair_launch_inscriptions<'a>(
     inscriptions_program: &UncheckedAccount<'a>,
-    inscription_summary: &Account<'a, InscriptionSummary>,
-    non_fungible_mint: &Account<'a, Mint>,
+    inscription_summary: &UncheckedAccount<'a>,
+    non_fungible_mint: &Signer<'a>,
     inscription_v3: &UncheckedAccount<'a>,
     system_program: &Program<'a, System>,
     payer: &Signer<'a>,

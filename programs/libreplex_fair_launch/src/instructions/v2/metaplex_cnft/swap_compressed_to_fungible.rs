@@ -4,7 +4,7 @@ use anchor_spl::{
     token::{Mint, Token, TokenAccount},
 };
 
-use mpl_bubblegum::utils::get_asset_id;
+use bubblegum::utils::get_asset_id;
 
 use crate::{move_fungible_out_of_escrow, Deployment, HashlistMarker};
 
@@ -56,7 +56,7 @@ pub struct SwapCompressedToFungibleCtx<'info> {
     pub compression_program: UncheckedAccount<'info>,
 
     /// CHECK: Checked by address
-    #[account(address = mpl_bubblegum::ID)]
+    #[account(address = bubblegum::ID)]
     pub bubble_gum_program: UncheckedAccount<'info>,
 
     // verifies that the NFT coming out of the escrow has

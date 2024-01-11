@@ -23,16 +23,16 @@ anchor-lang = {version = "~0.29", features = ["init-if-needed"]}
 anchor-spl = {version = "~0.29"}
 libreplex_inscriptions = {version = "*", path="../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
 spl-associated-token-account = "2.2.0"
-solana-program = {version = "~1.16"}
+solana-program = {version = "1.17.13"}
 mpl-token-metadata = { version="~3" }
-mpl-bubblegum = {version = "0.11.0", features = ["cpi", "no-entrypoint"]}
+bubblegum = {path = "../../../mpl-bubblegum/programs/bubblegum/program", features = ["no-entrypoint"]}
 bubblegum-proxy = {path = "../../utils/bubblegum-proxy", features = ["cpi", "no-entrypoint"]}
 spl-compression-proxy = {path = "../../utils/spl-compression-proxy", features = ["cpi", "no-entrypoint"]}
-spl-account-compression = { version="0.2.0", features = ["cpi", "no-entrypoint"] }
+spl-account-compression = { version="0.3.0", features = ["cpi", "no-entrypoint"] }
 
 
 [dev-dependencies]
 mocha = "0.1.1"
 assert_matches = "1.5.0"
-solana-program-test = "~1.16"
-solana-sdk = "~1.16"
+solana-program-test = "1.17.13"
+solana-sdk = "1.17.13"

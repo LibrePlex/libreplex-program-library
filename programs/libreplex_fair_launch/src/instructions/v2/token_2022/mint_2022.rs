@@ -3,27 +3,35 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{self},
+    token_2022, token_interface::Mint
 };
 
-// use libreplex_shared::sysvar_instructions_program;
 
-
-use libreplex_shared::{SharedError, sysvar_instructions_program};
-
+use libreplex_shared::SharedError;
 
 
 use crate::{
-    errors::FairLaunchError, Deployment, HashlistMarker, mint_metaplex_logic, STANDARD_DEPLOYMENT_TYPE,
+    errors::FairLaunchError, Deployment, HashlistMarker, TOKEN2022_DEPLOYMENT_TYPE, mint_token2022_logic, DeploymentConfig,
 };
 
 #[derive(Accounts)]
-pub struct MintMetaplexStandardCtx<'info> {
+pub struct MintToken2022Ctx<'info> {
     #[account(mut,
        
 
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
+
+    #[account(mut,
+        seeds = ["deployment_config".as_ref(), deployment.key().as_ref()], bump)]
+    pub deployment_config: Account<'info, DeploymentConfig>,
+
+    /// CHECK: checked in constraint
+    #[account(mut,
+        constraint = deployment_config.creator_fee_treasury == creator_fee_treasury.key())] 
+    pub creator_fee_treasury: UncheckedAccount<'info>,
+
+
 
     /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
     
@@ -51,12 +59,16 @@ pub struct MintMetaplexStandardCtx<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
+    #[account(mut)]
+    pub fungible_mint: InterfaceAccount<'info, Mint>,
+
+
     /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
     #[account(mut)]
-    pub inscriber: UncheckedAccount<'info>,
+    pub minter: UncheckedAccount<'info>,
 
-    // legacy - TokenKeg
-    // libre - Token22
+    /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
+    
     #[account(mut)]
     pub non_fungible_mint: Signer<'info>,
 
@@ -64,21 +76,10 @@ pub struct MintMetaplexStandardCtx<'info> {
     #[account(mut)]
     pub non_fungible_token_account: UncheckedAccount<'info>,
     
-    /// CHECK: passed in via CPI to mpl_token_metadata program
-    #[account(mut)]
-    pub non_fungible_metadata: UncheckedAccount<'info>,
 
-    /// CHECK: passed in via CPI to mpl_token_metadata program
-    #[account(mut)]
-    pub non_fungible_masteredition: UncheckedAccount<'info>,
-
-    /// CHECK: passed in via CPI to libreplex_inscriptions program
+     /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
     pub inscription_summary: UncheckedAccount<'info>,
-
-    /// CHECK: passed in via CPI to libreplex_inscriptions program
-    #[account(mut)]
-    pub inscription: UncheckedAccount<'info>,
 
     /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(mut)]
@@ -93,7 +94,7 @@ pub struct MintMetaplexStandardCtx<'info> {
     /* BOILERPLATE PROGRAM ACCOUNTS */
     /// CHECK: Checked in constraint
     #[account(
-        constraint = token_program.key() == token::ID
+        constraint = token_program.key() == token_2022::ID
     )]
     pub token_program: UncheckedAccount<'info>,
 
@@ -109,28 +110,40 @@ pub struct MintMetaplexStandardCtx<'info> {
     #[account()]
     pub system_program: Program<'info, System>,
 
-    /// CHECK: Checked in constraint
-    #[account(
-        constraint = sysvar_instructions.key() == sysvar_instructions_program::ID
-    )]
-    sysvar_instructions: UncheckedAccount<'info>,
-
     
-    /// CHECK: address checked
-    #[account(address = mpl_token_metadata::ID)]
-    pub metadata_program: UncheckedAccount<'info>,
 
 }
 
-pub fn mint_metaplex(ctx: Context<MintMetaplexStandardCtx>) -> Result<()> {
+pub fn mint_token2022(ctx: Context<MintToken2022Ctx>) -> Result<()> {
+    // let MintToken2022Ctx { 
+      
+    //     ..
+    // } = &ctx.accounts;
+
+    let payer = &ctx.accounts.payer; 
+    let signer = &ctx.accounts.signer;
+    let minter= &ctx.accounts.minter;
+    let non_fungible_mint = &ctx.accounts.non_fungible_mint;
+    let non_fungible_token_account = &ctx.accounts.non_fungible_token_account;
+    let inscription_summary = &ctx.accounts.inscription_summary; 
+    let inscription_v3= &ctx.accounts.inscription_v3;
+    let inscription_data = &ctx.accounts.inscription_data;
+    let token_program = &ctx.accounts.token_program;
+    let associated_token_program = &ctx.accounts.associated_token_program;
+    let inscriptions_program = &ctx.accounts.inscriptions_program;
+    let system_program = &ctx.accounts.system_program;
+    let fungible_mint = &ctx.accounts.fungible_mint;
+
+    // mutable borrows
     let deployment = &mut ctx.accounts.deployment;
+    let deployment_config = &mut ctx.accounts.deployment_config;
+    let creator_fee_treasury = &mut ctx.accounts.creator_fee_treasury;
+    let hashlist = &mut ctx.accounts.hashlist;
 
-    if !deployment.require_creator_cosign {
-        panic!("Only creator cosign can currently use v2 methods")
+    if !deployment.deployment_type.eq(&TOKEN2022_DEPLOYMENT_TYPE) {
+        return Err(FairLaunchError::IncorrectMintType.into())
     }
-
-    // to be discussed w/ everybody and feedback. Not strictly in line with BRC 20 thinking
-    // but seems pointless to issue tokens if they can never be valid
+  
     if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens {
         return Err(FairLaunchError::MintedOut.into());
     }
@@ -138,44 +151,20 @@ pub fn mint_metaplex(ctx: Context<MintMetaplexStandardCtx>) -> Result<()> {
     if deployment.migrated_from_legacy {
         return Err(FairLaunchError::LegacyMigrationsAreMintedOut.into());
     }
-    
-    if deployment.deployment_type != STANDARD_DEPLOYMENT_TYPE {
-        return Err(FairLaunchError::IncorrectMintType.into())
-    }
-    
 
-    let hashlist = &mut ctx.accounts.hashlist;
-
-    let inscription_summary = &ctx.accounts.inscription_summary;
-
-    let payer = &ctx.accounts.payer;
-    let signer = &ctx.accounts.signer;
-    let non_fungible_metadata =  &ctx.accounts.non_fungible_metadata;
-    let non_fungible_masteredition = &ctx.accounts.non_fungible_masteredition;
-    
-    let non_fungible_token_account = &ctx.accounts.non_fungible_token_account;
-    let inscriptions_program = &ctx.accounts.inscriptions_program;
-    let non_fungible_mint = &ctx.accounts.non_fungible_mint;
-    let inscription_v3 = &ctx.accounts.inscription_v3;
-    let inscription_data = &ctx.accounts.inscription_data;
-    let token_program = &ctx.accounts.token_program;
-    let system_program = &ctx.accounts.system_program;
-    let metadata_program = &ctx.accounts.metadata_program;
-    let inscriber = &ctx.accounts.inscriber;
-    let associated_token_program = &ctx.accounts.associated_token_program;
-    let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
-
-   
 
 
     if deployment.require_creator_cosign && !signer.key().eq(&deployment.creator.key()) {
         return Err(SharedError::InvalidCreatorCosigner.into());
     }
 
-    mint_metaplex_logic(
+    mint_token2022_logic(
         deployment, 
+        deployment_config,
+        creator_fee_treasury,
         inscriptions_program, 
         inscription_summary, 
+        &fungible_mint.to_account_info(),
         non_fungible_mint, 
         inscription_v3, 
         system_program, 
@@ -183,12 +172,8 @@ pub fn mint_metaplex(ctx: Context<MintMetaplexStandardCtx>) -> Result<()> {
         inscription_data, 
         associated_token_program, 
         token_program, 
-        inscriber, 
+        minter, 
         non_fungible_token_account, 
-        non_fungible_metadata, 
-        non_fungible_masteredition, 
-        metadata_program, 
-        sysvar_instructions_program, 
         hashlist,
     ctx.bumps.deployment)?;
 

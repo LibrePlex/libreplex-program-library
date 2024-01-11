@@ -69,6 +69,22 @@ impl Deployment {
     }
 }
 
+
+#[account]
+pub struct DeploymentConfig {
+    pub deployment: Pubkey,
+    // defined by creator. this is NOT a libreplex fee as libreplex charges no fees.
+    pub creator_fee_treasury: Pubkey,
+    pub creator_fee_per_mint_lamports: u64,
+
+}
+
+impl DeploymentConfig {
+    /// leave a bit of extra space at the end in case more config is needed
+    pub const SIZE: usize = 8 + 32 + 32 + 8 + 500;
+}
+
+
 #[event]
 pub struct NewDeploymentEvent {
     pub ticker: String,

@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use libreplex_inscriptions::{instructions::SignerType, InscriptionSummary};
+use libreplex_inscriptions::instructions::SignerType;
 // use libreplex_shared::sysvar_instructions_program;
 use crate::{
     create_immutable_inscription, Deployment,
@@ -8,7 +8,7 @@ use crate::{
 
 pub fn create_fair_launch_ghost_inscriptions<'a>(
     inscriptions_program: &UncheckedAccount<'a>,
-    inscription_summary: &Account<'a, InscriptionSummary>,
+    inscription_summary: &UncheckedAccount<'a>,
     ghost_root_signer: &UncheckedAccount<'a>,
     inscription_v3: &UncheckedAccount<'a>,
     system_program: &Program<'a, System>,
