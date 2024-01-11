@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 
-use crate::{Deployment, initialise_logic, InitialiseInput, TOKEN2022_DEPLOYMENT_TYPE, DeploymentConfig};
+use crate::{Deployment, initialise_logic, InitialiseInput, TOKEN2022_DEPLOYMENT_TYPE, DeploymentConfig, errors::FairLaunchError};
 
 
 
@@ -99,8 +99,12 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
     }
 
 
-   deployment_config.creator_fee_treasury = creator_fee_treasury;
-   deployment_config.creator_fee_per_mint_lamports = creator_fee_in_lamports;
+    if creator_fee_in_lamports  > 50_000_000 {
+        return Err(FairLaunchError::CreatorFeeTooHigh.into())
+    }
+
+    deployment_config.creator_fee_treasury = creator_fee_treasury;
+    deployment_config.creator_fee_per_mint_lamports = creator_fee_in_lamports;
     
 
     initialise_logic(InitialiseInput {

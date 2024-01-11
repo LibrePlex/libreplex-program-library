@@ -29,4 +29,7 @@ pub enum FairLaunchError {
 
     #[msg("Invalid Metadata")]
     InvalidMetadata,
+
+    #[msg("Creator fee too high")]
+    CreatorFeeTooHigh
 }
