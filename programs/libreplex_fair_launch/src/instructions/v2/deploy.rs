@@ -13,7 +13,7 @@ pub mod sysvar_instructions_program {
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct DeployV2Input {
     pub require_creator_cosign: bool,
-    pub use_inscriptions: bool,
+    pub use_inscriptions: bool
 }
 
 /*
