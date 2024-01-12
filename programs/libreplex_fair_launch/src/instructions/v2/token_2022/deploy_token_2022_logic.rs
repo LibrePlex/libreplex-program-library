@@ -28,8 +28,6 @@ pub fn deploy_token_2022_logic<'f>(
     deployment_bump: u8,
 ) -> Result<()> {
     hashlist.deployment = deployment.key();
-    deployment.require_creator_cosign = false;
-    deployment.use_inscriptions = true;
     msg!("Set fungible mint to {}", fungible_mint.key());
     deployment.fungible_mint = fungible_mint.key();
     let deployment_seeds: &[&[u8]] = &[

@@ -32,8 +32,6 @@ pub struct DeployV2Input {
 pub struct DeployToken2022Ctx<'info> {
     #[account(
         mut,
-        // deployment must be executed by the payer 
-        constraint = deployment.creator == payer.key(),
         seeds=["deployment".as_bytes(), deployment.ticker.as_bytes()],
         bump
     )]
@@ -49,7 +47,9 @@ pub struct DeployToken2022Ctx<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    // can be different from the payer. typically used with PDA
+    // this signer is no longer used but retained for backwards compatibility.
+    // reason being, the deploy call can be permissionless - it conveys no 
+    // special privileges to the creator that initialised the mint.
     #[account(mut)]
     pub creator: Signer<'info>,
 
