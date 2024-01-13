@@ -35,7 +35,9 @@ pub fn mint_token2022_logic<'info>(
 ) -> Result<()> {
     let update_authority =
         OptionalNonZeroPubkey::try_from(Some(deployment.key())).expect("Bad update auth");
+ 
 
+        
     deployment.number_of_tokens_issued += 1;
 
     let ticker = deployment.ticker.clone();

@@ -7,7 +7,7 @@ use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGr
 
 use spl_token_metadata_interface::state::TokenMetadata;
 
-use crate::{mint_all_fungibles, Deployment, Hashlist, errors::FairLaunchError};
+use crate::{mint_all_fungibles, Deployment, Hashlist};
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 
 pub mod sysvar_instructions_program {
@@ -37,9 +37,7 @@ pub fn deploy_token_2022_logic<'f>(
     ];
 
     
-    if deployment.number_of_tokens_issued >= deployment.max_number_of_tokens - 1{
-        return Err(FairLaunchError::MintedOut.into());
-    }
+    
     let update_authority =
         OptionalNonZeroPubkey::try_from(Some(deployment.key())).expect("Bad update auth");
 
