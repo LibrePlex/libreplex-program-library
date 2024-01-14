@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 
-use crate::{Deployment, initialise_logic, InitialiseInput, TOKEN2022_DEPLOYMENT_TYPE, DeploymentConfig, errors::FairLaunchError};
+use crate::{Deployment, initialise_logic, InitialiseInput, TOKEN2022_DEPLOYMENT_TYPE, DeploymentConfig};
 
 
 
@@ -96,11 +96,6 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
 
     if deployment_type != TOKEN2022_DEPLOYMENT_TYPE {
         panic!("Only token 2022 currently supported in v2 methods")
-    }
-
-
-    if creator_fee_in_lamports  > 50_000_000 {
-        return Err(FairLaunchError::CreatorFeeTooHigh.into())
     }
 
     deployment_config.creator_fee_treasury = creator_fee_treasury;
