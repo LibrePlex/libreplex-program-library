@@ -13,11 +13,11 @@ pub mod token_2022;
 pub use token_2022::*;
 
 
-// v1 initialise
 pub use initialise::*;
 pub mod initialise;
 
-// v1 deploy
+
+
 pub use deploy::*;
 pub mod deploy;
 

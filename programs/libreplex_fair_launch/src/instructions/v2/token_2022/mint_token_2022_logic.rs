@@ -56,7 +56,7 @@ pub fn mint_token2022_logic<'info>(
         0,
         Some(TokenMetadata {
             name: deployment.ticker.clone(),
-            symbol: "".to_owned(),
+            symbol: deployment.ticker.clone(),
             uri: deployment.offchain_url.clone(),
             update_authority,
             mint: non_fungible_mint.key(),

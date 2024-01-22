@@ -56,7 +56,7 @@ pub fn deploy_token_2022_logic<'f>(
             update_authority,
             mint: fungible_mint.key(),
             name: deployment.ticker.clone(),
-            symbol: "".to_owned(),
+            symbol: deployment.ticker.clone(),
             uri: deployment.offchain_url.clone(),
             additional_metadata: vec![],
         }),
