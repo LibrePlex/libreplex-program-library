@@ -25,3 +25,6 @@ pub use mint_all_fungibles_2022_logic::*;
 
 pub mod mint_non_fungible_2022_logic;
 pub use mint_non_fungible_2022_logic::*;
+
+pub mod update_symbol_2022;
+pub use update_symbol_2022::*;

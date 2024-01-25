@@ -33,6 +33,23 @@ pub mod libreplex_fair_launch {
         instructions::deploy_token_2022(ctx)
     }
 
+
+
+    // some of the early token-2022 launches had "" as symbol instead of the ticker.
+    // this is a throwback to metaplex metadata where symbol is limited to 10 characters
+    // whereas there are no limits on the ticker size
+
+    // this method works because metadata update authority is retain until token-metadata-2022
+    // groups roll out. the plan is to include all generated token-2022 launches in groups 
+    // and for that you need the update auth too
+
+    // incidentally the update auth can be used to update the symbol here as well from "" 
+    // to the ticker as token-2022 metadata has no limitations on the size of the symbol
+    pub fn update_symbol22<'info>(
+        ctx: Context<'_, '_, '_, 'info, UpdateSymbol2022Ctx<'info>>,
+    ) -> Result<()> {
+        instructions::update_symbol2022(ctx)
+    }
    
 
 
@@ -74,6 +91,7 @@ pub mod libreplex_fair_launch {
     pub fn swap_to_nonfungible22(ctx: Context<SwapToNonFungible2022Ctx>) -> Result<()> {
         instructions::swap_to_nonfungible_2022(ctx)
     }
+    
 
        
     pub fn mint_compressed<'info>(
