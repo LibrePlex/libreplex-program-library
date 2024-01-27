@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use mpl_token_metadata::{
-    instructions::{CreateMetadataAccountV3Builder, CreateV1Builder, CreateMasterEditionV3Builder},
+    instructions::{CreateMetadataAccountV3Builder, CreateV1CpiBuilder, CreateMasterEditionV3Builder},
     types::{Creator, PrintSupply, TokenStandard, DataV2},
 };
 use solana_program::{account_info::AccountInfo, program::invoke_signed};
@@ -29,46 +29,29 @@ pub fn create_legacy_metadata(
     symbol: String,
     seller_fee_basis_points: u16,
     uri: String,
-    creators: Option<Vec<Creator>>,
+    creators: Vec<Creator>,
     // new_update_auth: Pubkey,
     is_mutable: bool,
 ) -> Result<()> {
+    let mut create_metadata_ix_builder = CreateV1CpiBuilder::new(&accounts.metadata_program);
     
-    let mut create_metadata_ix_builder = CreateMetadataAccountV3Builder::new();
-    
-    let data = DataV2{
-        name,
-        symbol,
-        uri,
-        seller_fee_basis_points,
-        creators,
-        collection: None,
-        uses: None,
-    };
+
     create_metadata_ix_builder
-        .metadata(accounts.nft_metadata.key())
-        .mint(accounts.nft_mint.key())
-        .data(data.clone())
-        .mint_authority(accounts.nft_mint_authority.key())
-        .payer(accounts.payer.key())
-        .update_authority(accounts.authority_pda.key(), true)
-        .is_mutable(is_mutable);
-    let create_ix = create_metadata_ix_builder.instruction();
-
-    let create_infos = vec![
-        accounts.nft_metadata.to_account_info(),
-        accounts.nft_mint.to_account_info(),
-        accounts.nft_mint_authority.to_account_info(),
-        accounts.payer.to_account_info(),
-        accounts.metadata_program.to_account_info(),
-        accounts.token_program.to_account_info(),
-        accounts.system_program.to_account_info(),
-        accounts.rent.to_account_info(),
-        accounts.sysvar_instructions_info.to_account_info()
-    ];
-    
-    invoke_signed(&create_ix, &create_infos, &[&authority_seeds])?;
-
+    .metadata(&accounts.nft_metadata)
+    .mint(&accounts.nft_mint, false)
+    .authority(&accounts.nft_mint_authority)
+    .payer(&accounts.payer)
+    .update_authority(&accounts.authority_pda, true)
+    .system_program(&accounts.system_program)
+    .sysvar_instructions(&accounts.sysvar_instructions_info)
+    .spl_token_program(&accounts.token_program)
+    .name(name).symbol(symbol)
+    .uri(uri)
+    .seller_fee_basis_points(seller_fee_basis_points)
+    .creators(creators)
+    .primary_sale_happened(true)
+    .is_mutable(is_mutable)
+    .token_standard(TokenStandard::Fungible).invoke_signed(&[&authority_seeds])?;
 
     Ok(())
 }

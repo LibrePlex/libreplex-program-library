@@ -17,6 +17,7 @@ pub fn transfer_generic_spl<'info>(
     decimals: u8,
     amount: u64,
 ) -> Result<()> {
+    msg!("{}", token_program.key());
     let expected_token_account =
         anchor_spl::associated_token::get_associated_token_address_with_program_id(
             &target_wallet.key(),

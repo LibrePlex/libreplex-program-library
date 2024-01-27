@@ -82,6 +82,7 @@ pub fn deploy_token_2022_logic<'f>(
         system_program,
         token_program,
         deployment_seeds,
+        true,
     )?;
 
     msg!("Created non fungible");

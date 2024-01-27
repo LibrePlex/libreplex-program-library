@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use anchor_spl::{token_2022,  associated_token::AssociatedToken, token_interface::TokenAccount, token};
+use anchor_spl::{token_2022,  associated_token::AssociatedToken, token_interface::{Token2022, TokenAccount}, token::{self, spl_token, Token}};
 use libreplex_shared::operations::transfer_generic_spl;
 
 use crate::{Deployment, HashlistMarker};
@@ -26,7 +26,7 @@ pub struct SwapToFungible2022Ctx<'info> {
     
     /// CHECK: Owner must be spl token or token 2022
     #[account(mut,
-        constraint = fungible_mint.owner.eq(&token_2022::ID))]
+        constraint = fungible_mint.owner.eq(&token_2022::ID) || fungible_mint.owner.eq(&spl_token::ID))]
     pub fungible_mint: UncheckedAccount<'info>,
 
     // verifies that the NFT coming out of the escrow has
@@ -53,7 +53,7 @@ pub struct SwapToFungible2022Ctx<'info> {
     /* non-fungible accounts */
     /// CHECK: checked in constraint
     #[account(mut,
-        constraint = fungible_mint.owner.eq(&token_2022::ID)
+        owner = token_2022::ID,
     )]
     pub non_fungible_mint: UncheckedAccount<'info>,
 
@@ -70,11 +70,9 @@ pub struct SwapToFungible2022Ctx<'info> {
     #[account(mut)]
     pub non_fungible_target_token_account: UncheckedAccount<'info>,
 
-    /// CHECK: Checked in constraint
-    #[account(
-        constraint = token_program.key() == token_2022::ID || token_program.key() == token::ID
-    )]
-    pub token_program: UncheckedAccount<'info>,
+    pub token_program_22: Program<'info, Token2022>,
+
+    pub token_program: Program<'info, Token>,
 
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -91,6 +89,7 @@ pub struct SwapToFungible2022Ctx<'info> {
 
 pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
+    let token_program_22 = &ctx.accounts.token_program_22;
 
     let payer = &ctx.accounts.payer;
     let non_fungible_source_token_account = &ctx.accounts.non_fungible_source_token_account;
@@ -105,12 +104,13 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
 
+
     // simples. two steps:
     // 1) move the non_fungible into the escrow
 
     msg!("Transferring non fungible into escrow");
     transfer_generic_spl(
-        &token_program.to_account_info(),
+        &token_program_22.to_account_info(),
         &non_fungible_source_token_account.to_account_info(),
         &non_fungible_target_token_account.to_account_info(),
         &payer.to_account_info(),
@@ -135,8 +135,20 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
     // // 2) move the fungible_mint out of the escrow
     msg!("Transferring fungible from escrow");
 
+    let target_token_program = match fungible_mint.owner {
+        &spl_token::ID => {
+            token_program.to_account_info()
+        },
+        &spl_token_2022::ID => {
+            token_program_22.to_account_info()
+        },
+        _ => {
+            panic!("How could you do this to me")
+        }
+    };
+
     transfer_generic_spl(
-        &token_program.to_account_info(),
+        &target_token_program,
         &fungible_source_token_account.to_account_info(),
         &fungible_target_token_account.to_account_info(),
         &deployment.to_account_info(),

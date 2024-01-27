@@ -11,10 +11,10 @@ pub use write::*;
 mod immutable;
 pub use immutable::*;
 
-use solana_program::account_info::AccountInfo;
+use solana_program::{account_info::AccountInfo, keccak};
 use mpl_token_metadata::accounts::Metadata;
 use crate::LegacyInscriptionErrorCode;
-use bubblegum::state::leaf_schema::LeafSchema;
+use mpl_bubblegum::types::LeafSchema;
 use anchor_lang::prelude::*;
 
 pub struct CNFTCheckAccounts<'a, 'info> {
@@ -57,19 +57,20 @@ pub fn assert_can_inscribe_cnft(input: &InscribeCNFTInput, accounts: &CNFTCheckA
     .with_remaining_accounts(remaining_accounts.to_vec());
 
     let asset_id = asset_id.key();
-    let leaf_schema = LeafSchema::new_v0(
-        asset_id,
-        *leaf_owner,
-        *leaf_delegate,
-        *nonce,
-        *data_hash,
-        *creator_hash,
-    );
-
+    
     spl_compression_proxy::cpi::verify_leaf(
         verify_leaf_ctx,
         *root,
-        leaf_schema.to_node(),
+        keccak::hashv(&[
+            &[1],
+            asset_id.as_ref(),
+            leaf_owner.as_ref(),
+            leaf_delegate.as_ref(),
+            nonce.to_le_bytes().as_ref(),
+            data_hash.as_ref(),
+            creator_hash.as_ref(),
+        ])
+        .to_bytes(),
         *index,
     )?;
 

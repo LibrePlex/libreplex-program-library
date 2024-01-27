@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::associated_token::AssociatedToken;
+use anchor_spl::{associated_token::AssociatedToken, token::{spl_token, Mint, TokenAccount}};
 
 
 
@@ -37,8 +37,6 @@ pub struct DeployHybridCtx<'info> {
     )]
     pub deployment: Account<'info, Deployment>,
 
-  
-
     #[account(init, seeds = ["hashlist".as_bytes(), 
     deployment.key().as_ref()],
     bump, payer = payer, space = 8 + 32 + 4)]
@@ -54,8 +52,11 @@ pub struct DeployHybridCtx<'info> {
     pub creator: Signer<'info>,
 
     /* INITIALISE FUNGIBLE ACCOUNTS */
-    #[account(mut)]
-    pub fungible_mint: Signer<'info>,
+    #[account(init, payer = payer, 
+        mint::freeze_authority = deployment,
+        mint::authority = deployment, 
+        mint::decimals = deployment.decimals)]
+    pub fungible_mint: Account<'info, Mint>,
     
     /// CHECK: Passed via CPI
     #[account(mut)]
@@ -66,8 +67,10 @@ pub struct DeployHybridCtx<'info> {
     pub fungible_metadata: UncheckedAccount<'info>,
 
     /// CHECK: checked in code
-    #[account(mut)]
-    pub fungible_escrow_token_account: UncheckedAccount<'info>,
+    #[account(init, 
+        associated_token::mint = fungible_mint, 
+        payer = payer, associated_token::authority = deployment)]
+    pub fungible_escrow_token_account: Account<'info, TokenAccount>,
 
     /* INITIALISE NON_FUNGIBLE ACCOUNTS. NB: no token account neede until mint */
     // #[account(mut)]
@@ -76,7 +79,7 @@ pub struct DeployHybridCtx<'info> {
     /* BOILERPLATE PROGRAM ACCOUNTS */
     /// CHECK: passed in via CPI to libreplex_inscriptions program
     #[account(
-        constraint = token_program.key() == spl_token_2022::ID
+        constraint = token_program.key() == spl_token::ID
     )]
     pub token_program: UncheckedAccount<'info>,
 
@@ -127,11 +130,11 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
     deploy_hybrid_logic(
         hashlist,
         deployment,
-        fungible_mint,
+        fungible_mint.as_ref(),
         fungible_metadata,
         fungible_master_edition,
         payer,
-        fungible_escrow_token_account,
+        fungible_escrow_token_account.as_ref(),
         token_program,
         associated_token_program,
         system_program,
