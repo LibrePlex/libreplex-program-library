@@ -4,7 +4,7 @@ use anchor_spl::associated_token::AssociatedToken;
 
 
 use crate::{
-    deploy_token_2022_logic, Deployment, Hashlist, TOKEN2022_DEPLOYMENT_TYPE,
+    Deployment, Hashlist, deploy_hybrid_logic, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE,
 };
 
 pub mod sysvar_instructions_program {
@@ -29,7 +29,7 @@ pub struct DeployV2Input {
     launch lifecycle.
 */
 #[derive(Accounts)]
-pub struct DeployToken2022Ctx<'info> {
+pub struct DeployHybridCtx<'info> {
     #[account(
         mut,
         seeds=["deployment".as_bytes(), deployment.ticker.as_bytes()],
@@ -56,6 +56,14 @@ pub struct DeployToken2022Ctx<'info> {
     /* INITIALISE FUNGIBLE ACCOUNTS */
     #[account(mut)]
     pub fungible_mint: Signer<'info>,
+    
+    /// CHECK: Passed via CPI
+    #[account(mut)]
+    pub fungible_master_edition: UncheckedAccount<'info>,
+
+    /// CHECK: Passed via CPI
+    #[account(mut)]
+    pub fungible_metadata: UncheckedAccount<'info>,
 
     /// CHECK: checked in code
     #[account(mut)]
@@ -87,40 +95,51 @@ pub struct DeployToken2022Ctx<'info> {
     )]
     #[account()]
     pub sysvar_instructions: UncheckedAccount<'info>,
+
+    /// CHECK: address checked
+    #[account(address = mpl_token_metadata::ID)]
+    pub metadata_program: UncheckedAccount<'info>,
+
 }
 
-pub fn deploy_token_2022(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
+pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
 
     let hashlist = &mut ctx.accounts.hashlist;
     let deployment = &mut ctx.accounts.deployment;
 
     let payer = &ctx.accounts.payer;
     let fungible_mint= &ctx.accounts.fungible_mint;
+    let fungible_metadata= &ctx.accounts.fungible_metadata;
+    let fungible_master_edition = &ctx.accounts.fungible_master_edition;    
     let fungible_escrow_token_account = &ctx.accounts.fungible_escrow_token_account;
     // let non_fungible_mint = &ctx.accounts.non_fungible_mint;
     let token_program = &ctx.accounts.token_program;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
+    let rent = &ctx.accounts.rent;
+    let metadata_program = &ctx.accounts.metadata_program;
     
-    // msg!("Set fungible mint to {}", fungible_mint.key());
-    // deployment.fungible_mint = fungible_mint.key();
-   
-
-    if deployment.deployment_type != TOKEN2022_DEPLOYMENT_TYPE {
+    let sysvar_instructions = &ctx.accounts.sysvar_instructions;
+    if deployment.deployment_type != HYBRID_DEPLOYMENT_TYPE && deployment.deployment_type != TOKEN2022_DEPLOYMENT_TYPE{
         panic!("Wrong deployment type")
     }
 
-    deploy_token_2022_logic(
+    deploy_hybrid_logic(
         hashlist,
         deployment,
         fungible_mint,
+        fungible_metadata,
+        fungible_master_edition,
         payer,
         fungible_escrow_token_account,
         token_program,
         associated_token_program,
         system_program,
         // non_fungible_mint,
-        ctx.bumps.deployment,
+        rent,
+        sysvar_instructions,
+        metadata_program,
+        ctx.bumps.deployment
     )?;
 
     Ok(())

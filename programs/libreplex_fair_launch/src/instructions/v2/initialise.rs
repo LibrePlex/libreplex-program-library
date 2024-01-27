@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 
-use crate::{Deployment, initialise_logic, InitialiseInput, TOKEN2022_DEPLOYMENT_TYPE, DeploymentConfig};
+use crate::{Deployment, initialise_logic, InitialiseInput, TOKEN2022_DEPLOYMENT_TYPE, DeploymentConfig, HYBRID_DEPLOYMENT_TYPE};
 
 
 
@@ -94,7 +94,7 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
         panic!("Creator cosign not currently supported")
     }
 
-    if deployment_type != TOKEN2022_DEPLOYMENT_TYPE {
+    if deployment_type != TOKEN2022_DEPLOYMENT_TYPE && deployment_type != HYBRID_DEPLOYMENT_TYPE{
         panic!("Only token 2022 currently supported in v2 methods")
     }
 

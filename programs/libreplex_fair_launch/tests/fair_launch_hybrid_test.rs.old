@@ -7,7 +7,7 @@ use anchor_spl::associated_token::{
     self, get_associated_token_address_with_program_id, AssociatedToken,
 };
 
-use libreplex_fair_launch::{Deployment, DeploymentConfig, TOKEN2022_DEPLOYMENT_TYPE};
+use libreplex_fair_launch::{Deployment, DeploymentConfig, TOKEN2022_DEPLOYMENT_TYPE, HYBRID_DEPLOYMENT_TYPE};
 use libreplex_shared::sysvar_instructions_program;
 use solana_program::hash::Hash;
 use solana_program::program_pack::Pack;
@@ -50,12 +50,6 @@ mod inscriptions_tests {
             Pubkey::from_str("inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp").unwrap(),
             None,
         );
-
-        // program.add_program(
-        //     "mpl_token_metadata",
-        //     Pubkey::from_str("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s").unwrap(),
-        //     None,
-        // );
         program.prefer_bpf(false);
         program.add_program(
             "spl_token_2022",
@@ -101,12 +95,12 @@ mod inscriptions_tests {
 
         assert_eq!(
             deployment_account_obj.deployment_type,
-            TOKEN2022_DEPLOYMENT_TYPE
+            HYBRID_DEPLOYMENT_TYPE
         );
 
         assert_eq!(deployment_account_obj.limit_per_mint, LIMIT_PER_MINT);
 
-        let (fungible_mint, fungible_mint_escrow) =
+        let (fungible_mint, fungible_mint_escrow, fungible_metadata, fungible_master_edition) =
             deploy_2022(&mut context, &deployment_account_obj)
                 .await
                 .unwrap();
@@ -117,6 +111,13 @@ mod inscriptions_tests {
             .await
             .unwrap()
             .unwrap();
+
+
+        context.banks_client.get_account(fungible_metadata).await.unwrap().unwrap();
+
+        context.banks_client.get_account(fungible_master_edition).await.unwrap().unwrap();
+
+
 
         let fungible_mint_account_info = AccountInfo::new(
             &fungible_mint,
@@ -409,7 +410,7 @@ pub async fn initialise_token_2022(
                         offchain_url: offchain_url.clone(),
                         require_creator_cosign: false,
                         use_inscriptions: true,
-                        deployment_type: TOKEN2022_DEPLOYMENT_TYPE,
+                        deployment_type: HYBRID_DEPLOYMENT_TYPE,
                         creator_fee_per_mint_in_lamports: CREATOR_FEE_IN_LAMPORTS,
                         creator_fee_treasury
                     },
@@ -438,7 +439,7 @@ pub async fn initialise_token_2022(
 pub async fn deploy_2022<'info>(
     context: &mut ProgramTestContext,
     deployment: &Account<'info, Deployment>,
-) -> Result<(Pubkey, Pubkey)> {
+) -> Result<(Pubkey, Pubkey, Pubkey, Pubkey)> {
     let hashlist = Pubkey::find_program_address(
         &[b"hashlist", deployment.key().as_ref()],
         &libreplex_fair_launch::ID,
@@ -456,6 +457,28 @@ pub async fn deploy_2022<'info>(
             &fungible_mint.pubkey(),
             &spl_token_2022::ID,
         );
+
+
+    let fungible_metadata = Pubkey::find_program_address(
+        &[
+            b"metadata",
+            &mpl_token_metadata::ID.as_ref(),
+            fungible_mint.pubkey().as_ref(),
+        ],
+        &mpl_token_metadata::ID,
+    )
+    .0;
+
+    let fungible_master_edition = Pubkey::find_program_address(
+        &[
+            b"metadata",
+            &mpl_token_metadata::ID.as_ref(),
+            fungible_mint.pubkey().as_ref(),
+            b"edition",
+        ],
+        &mpl_token_metadata::ID,
+    )
+    .0;
 
     context
         .banks_client
@@ -475,11 +498,10 @@ pub async fn deploy_2022<'info>(
                     associated_token_program: AssociatedToken::id(),
                     system_program: system_program::ID,
                     sysvar_instructions: sysvar_instructions_program::ID,
-                    // these will be ignored for hybrid w/ deployment type TOKEN2022
-                    fungible_master_edition: Keypair::new().pubkey(),
                     metadata_program: mpl_token_metadata::ID,
-                    fungible_metadata: Keypair::new().pubkey(),
                     rent: Pubkey::from_str("SysvarRent111111111111111111111111111111111").unwrap(),
+                    fungible_master_edition,
+                    fungible_metadata,
                 }
                 .to_account_metas(None),
             }],
@@ -492,7 +514,7 @@ pub async fn deploy_2022<'info>(
 
     // check that the fungible token has been minted out into the escrow
     // and that authorities have been removed
-    Ok((fungible_mint.pubkey(), fungible_escrow_token_account))
+    Ok((fungible_mint.pubkey(), fungible_escrow_token_account, fungible_metadata, fungible_master_edition))
 }
 
 pub async fn mint_token_2022(

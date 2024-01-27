@@ -29,9 +29,16 @@ pub mod libreplex_fair_launch {
     // }
 
     // deploy token 2022 - token 2022 uses Token 2022 including native metadata 
-    pub fn deploy_token22(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
-        instructions::deploy_token_2022(ctx)
+    // pub fn deploy_token22(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
+    //     instructions::deploy_token_2022(ctx)
+    // }
+
+    // deploy hybrid - it's like token 2022 but with an extra metaplex
+    // metadata for the FUNGIBLE mint only
+    pub fn deployhybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
+        instructions::deploy_hybrid(ctx)
     }
+
 
 
 
@@ -94,18 +101,18 @@ pub mod libreplex_fair_launch {
     
 
        
-    pub fn mint_compressed<'info>(
-        ctx: Context<'_, '_, '_, 'info, MintCompressedCtx<'info>>,
-        input: MintCompressedInput,
-    ) -> Result<()> {
-        instructions::mint_compressed(ctx, input)
-    }
+    // pub fn mint_compressed<'info>(
+    //     ctx: Context<'_, '_, '_, 'info, MintCompressedCtx<'info>>,
+    //     input: MintCompressedInput,
+    // ) -> Result<()> {
+    //     instructions::mint_compressed(ctx, input)
+    // }
 
-    pub fn redeem_compressed(
-        ctx: Context<InscribeCompressedCtx>,
-    ) -> Result<()> {
-        instructions::redeem(ctx)
-    }
+    // pub fn redeem_compressed(
+    //     ctx: Context<InscribeCompressedCtx>,
+    // ) -> Result<()> {
+    //     instructions::redeem(ctx)
+    // }
 
 
     /* v1 swap methods */
