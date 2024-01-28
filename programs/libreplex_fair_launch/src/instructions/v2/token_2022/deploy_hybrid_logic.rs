@@ -1,19 +1,17 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 
-use libreplex_shared::{
-    create_token_2022_and_metadata, CreateMetadataAccounts, MintAccounts2022, TokenGroupInput,
-};
+use libreplex_shared::CreateMetadataAccounts;
 
 use libreplex_shared::create_legacy_metadata;
 
 use mpl_token_metadata::types::Creator;
-use spl_token_metadata_interface::state::TokenMetadata;
+
 
 use crate::{
     mint_all_fungibles, revoke_mint_auths, Deployment, Hashlist, HYBRID_DEPLOYMENT_TYPE
 };
-use spl_pod::optional_keys::OptionalNonZeroPubkey;
+
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -45,35 +43,6 @@ pub fn deploy_hybrid_logic<'f>(
         deployment.ticker.as_ref(),
         &[deployment_bump],
     ];
-
-    let update_authority =
-        OptionalNonZeroPubkey::try_from(Some(deployment.key())).expect("Bad update auth");
-
-    // msg!("Create token 2022 w/ metadata and group");
-    // create_token_2022_and_metadata(
-    //     MintAccounts2022 {
-    //         authority: deployment.to_account_info(),
-    //         payer: payer.to_account_info(),
-    //         nft_owner: deployment.to_account_info(),
-    //         nft_mint: fungible_mint.to_account_info(),
-    //         spl_token_program: token_program.to_account_info(),
-    //     },
-    //     deployment.decimals,
-    //     // None,
-    //     Some(TokenMetadata {
-    //         update_authority,
-    //         mint: fungible_mint.key(),
-    //         name: deployment.ticker.clone(),
-    //         symbol: deployment.ticker.clone(),
-    //         uri: deployment.offchain_url.clone(),
-    //         additional_metadata: vec![],
-    //     }),
-    //     Some(TokenGroupInput {
-    //         max_size: deployment.max_number_of_tokens as u32,
-    //     }),
-    //     None,
-    //     Some(deployment_seeds),
-    // )?;
 
     mint_all_fungibles(
         deployment,
@@ -114,7 +83,7 @@ pub fn deploy_hybrid_logic<'f>(
         )?
     }
 
-    revoke_mint_auths(&deployment, &token_program, &fungible_mint, deployment_seeds)?;
+    revoke_mint_auths(deployment, token_program, fungible_mint, deployment_seeds)?;
 
     Ok(())
 }

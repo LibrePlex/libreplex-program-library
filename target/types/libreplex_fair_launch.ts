@@ -611,6 +611,11 @@ export type LibreplexFairLaunch = {
           "isSigner": false
         },
         {
+          "name": "tokenProgram22",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -2388,6 +2393,11 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "nonFungibleTargetTokenAccount",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram22",
+          "isMut": false,
           "isSigner": false
         },
         {
