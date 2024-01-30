@@ -4,7 +4,7 @@ use anchor_spl::{associated_token::AssociatedToken, token::{spl_token, Mint, Tok
 
 
 use crate::{
-    Deployment, Hashlist, deploy_hybrid_logic, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE,
+    Deployment, Hashlist, deploy_hybrid_logic, HYBRID_DEPLOYMENT_TYPE,
 };
 
 pub mod sysvar_instructions_program {
@@ -123,7 +123,7 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
     let metadata_program = &ctx.accounts.metadata_program;
     
     let sysvar_instructions = &ctx.accounts.sysvar_instructions;
-    if deployment.deployment_type != HYBRID_DEPLOYMENT_TYPE && deployment.deployment_type != TOKEN2022_DEPLOYMENT_TYPE{
+    if deployment.deployment_type != HYBRID_DEPLOYMENT_TYPE {
         panic!("Wrong deployment type")
     }
 

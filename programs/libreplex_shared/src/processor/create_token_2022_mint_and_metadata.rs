@@ -5,7 +5,11 @@ use solana_program::{
     system_instruction,
 };
 
-use spl_token_2022::{extension::ExtensionType, instruction::initialize_mint2, state::Mint};
+use spl_token_2022::{
+    extension::{transfer_fee::TransferFeeConfig, ExtensionType},
+    instruction::initialize_mint2,
+    state::Mint,
+};
 
 use spl_token_group_interface::{
     instruction::{initialize_group, initialize_member},
@@ -40,6 +44,7 @@ pub fn create_token_2022_and_metadata<'f>(
     token_group: Option<TokenGroupInput>,
     token_member: Option<TokenMemberInput<'f>>,
     auth_seeds: Option<&[&[u8]]>,
+    transfer_fee_bps: u16,
 ) -> Result<()> {
     // msg!("create_token_2022_and_metadata called");
     let MintAccounts2022 {
@@ -73,6 +78,11 @@ pub fn create_token_2022_and_metadata<'f>(
         }
         None => {}
     };
+
+    if transfer_fee_bps > 0 {
+        extension_types.push(ExtensionType::TransferFeeConfig);
+        extension_extra_space += std::mem::size_of::<TransferFeeConfig>()
+    }
 
     match &token_member {
         Some(_) => {
@@ -138,6 +148,41 @@ pub fn create_token_2022_and_metadata<'f>(
             }
         }
         _ => {}
+    }
+
+    if transfer_fee_bps > 0 {
+        let initialise_transfer_fee_extension =
+            spl_token_2022::extension::transfer_fee::instruction::initialize_transfer_fee_config(
+                &spl_token_2022::ID,
+                &nft_mint.key(),
+                Some(&authority.key()),
+                None,
+                transfer_fee_bps,
+                std::u64::MAX,
+            )?;
+        match &auth_seeds {
+            Some(y) => {
+                invoke_signed(
+                    &initialise_transfer_fee_extension,
+                    &[
+                        nft_mint.to_account_info(),
+                        authority.to_account_info(),
+                        nft_mint.to_account_info(),
+                    ],
+                    &[y],
+                )?;
+            }
+            None => {
+                invoke(
+                    &initialise_transfer_fee_extension,
+                    &[
+                        nft_mint.to_account_info(),
+                        authority.to_account_info(),
+                        nft_mint.to_account_info(),
+                    ],
+                )?;
+            }
+        }
     }
 
     match &token_group {
@@ -227,7 +272,6 @@ pub fn create_token_2022_and_metadata<'f>(
     // msg!("Invoke initialise mint2");
     invoke(&initialize_ix, &[nft_mint.to_account_info()])?;
 
-
     // to be enabled when groups have been audited and rolled out
 
     // match &token_group {
@@ -269,7 +313,6 @@ pub fn create_token_2022_and_metadata<'f>(
     //     None => {}
     // }
 
-
     msg!("Initialise metadata if needed");
     if let Some(x) = token_metadata {
         let initialise_metadata_ix = initialize(
@@ -299,9 +342,8 @@ pub fn create_token_2022_and_metadata<'f>(
         }
     }
 
-
     // to be enabled when groups have been audited and rolled out
-    
+
     // match &token_member {
     //     Some(x) => {
     //         let group_mint = x.group_mint.clone();

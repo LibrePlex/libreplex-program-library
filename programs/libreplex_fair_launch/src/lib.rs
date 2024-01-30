@@ -28,10 +28,9 @@ pub mod libreplex_fair_launch {
     //     instructions::deploy_v2(ctx)
     // }
 
-    // deploy token 2022 - token 2022 uses Token 2022 including native metadata 
-    // pub fn deploy_token22(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
-    //     instructions::deploy_token_2022(ctx)
-    // }
+    pub fn deploy_token22(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
+        instructions::deploy_token_2022(ctx)
+    }
 
     // deploy hybrid - it's like token 2022 but with an extra metaplex
     // metadata for the FUNGIBLE mint only
@@ -57,6 +56,13 @@ pub mod libreplex_fair_launch {
     ) -> Result<()> {
         instructions::update_symbol2022(ctx)
     }
+
+    pub fn update_spl_symbol22<'info>(
+        ctx: Context<'_, '_, '_, 'info, UpdateSplSymbol2022Ctx<'info>>,
+    ) -> Result<()> {
+        instructions::update_spl_symbol2022(ctx)
+    }
+   
    
 
 
