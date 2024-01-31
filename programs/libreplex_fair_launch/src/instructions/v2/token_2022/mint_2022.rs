@@ -11,7 +11,8 @@ use libreplex_shared::SharedError;
 
 
 use crate::{
-    errors::FairLaunchError, Deployment, HashlistMarker, TOKEN2022_DEPLOYMENT_TYPE, mint_token2022_logic, DeploymentConfig,
+    errors::FairLaunchError, Deployment, HashlistMarker, TOKEN2022_DEPLOYMENT_TYPE, HYBRID_DEPLOYMENT_TYPE, 
+    mint_token2022_logic, DeploymentConfig,
 };
 
 #[derive(Accounts)]
@@ -140,7 +141,7 @@ pub fn mint_token2022(ctx: Context<MintToken2022Ctx>) -> Result<()> {
     let creator_fee_treasury = &mut ctx.accounts.creator_fee_treasury;
     let hashlist = &mut ctx.accounts.hashlist;
 
-    if !deployment.deployment_type.eq(&TOKEN2022_DEPLOYMENT_TYPE) {
+    if !deployment.deployment_type.eq(&TOKEN2022_DEPLOYMENT_TYPE) && !deployment.deployment_type.eq(&HYBRID_DEPLOYMENT_TYPE){
         return Err(FairLaunchError::IncorrectMintType.into())
     }
   

@@ -20,9 +20,10 @@ const TICKER: &str = "hedgehog";
 const CREATOR_FEE_IN_LAMPORTS: u64 = 10_000_000;
 const LIMIT_PER_MINT: u64 = 1000;
 const MAX_NUMBER_OF_TOKENS: u64 = 2;
-// pick a silly number to make sure we haven't hard coded a 9 in there
+const DEFLATION_RATE: u16 = 200; // 2% - this is in basis points
+                                 // pick a silly number to make sure we haven't hard coded a 9 in there
 const DECIMALS: u8 = 5;
-mod inscriptions_tests {
+mod fair_launch_deflationary_test {
 
     use anchor_lang::prelude::Account;
     use libreplex_fair_launch::{Deployment, TOKEN2022_DEPLOYMENT_TYPE};
@@ -64,7 +65,8 @@ mod inscriptions_tests {
         );
         let mut context: ProgramTestContext = program.start_with_context().await;
 
-        let (deployment, deployment_config, creator_fee_treasury) = initialise_token_2022(&mut context, TICKER).await.unwrap();
+        let (deployment, deployment_config, creator_fee_treasury) =
+            initialise_token_2022(&mut context, TICKER).await.unwrap();
 
         let mut deployment_account = context
             .banks_client
@@ -175,7 +177,8 @@ mod inscriptions_tests {
             0,
             0,
             DECIMALS,
-        ).await;
+        )
+        .await;
 
         let minter_wallet = Keypair::new();
 
@@ -217,7 +220,7 @@ mod inscriptions_tests {
             context.payer.pubkey(),
             0,
             1,
-            DECIMALS
+            DECIMALS,
         )
         .await;
 
@@ -241,7 +244,7 @@ mod inscriptions_tests {
             context.payer.pubkey(),
             0,
             2,
-            DECIMALS
+            DECIMALS,
         )
         .await;
 
@@ -257,7 +260,7 @@ mod inscriptions_tests {
             creator_fee_treasury,
             fungible_mint,
             &context.payer,
-            context.last_blockhash
+            context.last_blockhash,
         )
         .await;
 
@@ -269,7 +272,7 @@ mod inscriptions_tests {
             context.payer.pubkey(),
             0,
             2,
-            DECIMALS
+            DECIMALS,
         )
         .await;
 
@@ -298,6 +301,7 @@ mod inscriptions_tests {
         )
         .await;
 
+        println!("Swapping NFT #1");
         // see if we can swap
         let minter_fungible_token_account = swap_to_fungible_2022(
             banks_client,
@@ -327,7 +331,12 @@ mod inscriptions_tests {
             minter_fungible_token_account,
             fungible_mint,
             minter_wallet_key,
-            deployment_account_obj.limit_per_mint
+            deployment_account_obj
+                .limit_per_mint
+                .checked_mul(10000_u64 - DEFLATION_RATE as u64)
+                .unwrap()
+                .checked_div(10000_u64)
+                .unwrap()
                 * (10_u64.pow(deployment_account_obj.decimals as u32)),
         )
         .await;
@@ -340,9 +349,23 @@ mod inscriptions_tests {
             context.payer.pubkey(),
             1,
             2,
-            DECIMALS
+            DECIMALS,
         )
         .await;
+
+        println!("Swapping NFT #2");
+        // need to swap another. otherwise not enough funds for a swap to non-fungible
+        let minter_fungible_token_account = swap_to_fungible_2022(
+            banks_client,
+            &deployment_account_obj.ticker,
+            non_fungible_mints[1],
+            Some(&minter_wallet),
+            fungible_mint,
+            context.payer.pubkey(),
+            context.last_blockhash,
+        )
+        .await
+        .unwrap();
 
         // see if we can swap back
         swap_to_non_fungible_2022(
@@ -363,9 +386,9 @@ mod inscriptions_tests {
             deployment,
             fungible_mint,
             context.payer.pubkey(),
-            0,
+            1,
             2,
-            DECIMALS
+            DECIMALS,
         )
         .await;
     }
@@ -412,7 +435,7 @@ pub async fn initialise_token_2022(
                         deployment_type: TOKEN2022_DEPLOYMENT_TYPE,
                         creator_fee_per_mint_in_lamports: CREATOR_FEE_IN_LAMPORTS,
                         creator_fee_treasury,
-                        deflation_rate_per_swap: 0
+                        deflation_rate_per_swap: DEFLATION_RATE,
                     },
                 }
                 .data(),
@@ -457,13 +480,12 @@ pub async fn deploy_2022<'info>(
             &fungible_mint.pubkey(),
             &anchor_spl::token_2022::ID,
         );
-
     let deployment_config = Pubkey::find_program_address(
         &[b"deployment_config", deployment.key().as_ref()],
         &libreplex_fair_launch::ID,
     )
     .0;
-
+    
 
     context
         .banks_client
@@ -479,7 +501,7 @@ pub async fn deploy_2022<'info>(
                     creator: context.payer.pubkey(),
                     fungible_mint: fungible_mint.pubkey(),
                     fungible_escrow_token_account,
-                    // non_fungible_mint: non_fungible_mint.pubkey(),
+                    // just need 
                     token_program_2022: anchor_spl::token_2022::ID,
                     associated_token_program: AssociatedToken::id(),
                     system_program: system_program::ID,
@@ -665,7 +687,7 @@ pub async fn swap_to_fungible_2022(
     let fungible_target_token_account = get_associated_token_address_with_program_id(
         &minter_wallet_key,
         &fungible_mint,
-        &anchor_spl::token_2022::ID
+        &anchor_spl::token_2022::ID,
     );
 
     let deployment_config = Pubkey::find_program_address(

@@ -4,7 +4,7 @@ use libreplex_inscriptions::{
     instructions::SignerType, program::LibreplexInscriptions,
 };
 use bubblegum_proxy::state::TreeConfig;
-use bubblegum::utils::get_asset_id;
+use mpl_bubblegum::utils::get_asset_id;
 use crate::instructions::{create_legacy_inscription_logic_v3, RootType};
 use crate::{legacy_inscription::LegacyInscription, instructions::AuthorityType};
 pub use bubblegum_proxy::MetadataArgs;
@@ -47,8 +47,8 @@ pub struct InscribeCNFT<'info> {
     #[account(mut)]
     pub merkle_tree: UncheckedAccount<'info>,
 
-    #[account(seeds = [merkle_tree.key().as_ref()], seeds::program = bubblegum::ID, 
-        bump, owner = bubblegum::ID)]
+    #[account(seeds = [merkle_tree.key().as_ref()], seeds::program = mpl_bubblegum::ID, 
+        bump, owner = mpl_bubblegum::ID)]
     pub tree_authority: Account<'info, TreeConfig>,
 
     #[account(init,

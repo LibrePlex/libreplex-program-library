@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use bubblegum_proxy::TreeConfig;
-use bubblegum::utils::get_asset_id;
+use mpl_bubblegum::utils::get_asset_id;
 use crate::LegacyInscription;
 
 use super::{InscribeCNFTInput, assert_can_inscribe_cnft, CNFTCheckAccounts};
@@ -33,8 +33,8 @@ pub struct MakeImmutableCNFT<'info> {
     #[account(mut)]
     pub merkle_tree: UncheckedAccount<'info>,
 
-    #[account(seeds = [merkle_tree.key().as_ref()], seeds::program = bubblegum::ID, 
-        bump, owner = bubblegum::ID)]
+    #[account(seeds = [merkle_tree.key().as_ref()], seeds::program = bubblegum_proxy::ID, 
+        bump, owner = bubblegum_proxy::ID)]
     pub tree_authority: Account<'info, TreeConfig>,
 
     /// CHECK: Checked in logic

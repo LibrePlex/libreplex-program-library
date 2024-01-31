@@ -55,3 +55,4 @@ pub use v2::*;
 pub const COMPRESSED_DEPLOYMENT_TYPE: u8 = 2;
 pub const STANDARD_DEPLOYMENT_TYPE: u8 = 0;
 pub const TOKEN2022_DEPLOYMENT_TYPE: u8 = 3;
+pub const HYBRID_DEPLOYMENT_TYPE: u8 = 4; // creates token-2022 NFTs and metaple standard SPLs

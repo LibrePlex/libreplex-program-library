@@ -7,7 +7,7 @@ use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGr
 
 use spl_token_metadata_interface::state::TokenMetadata;
 
-use crate::{mint_all_fungibles, Deployment, Hashlist};
+use crate::{mint_all_fungibles, Deployment, Hashlist, DeploymentConfig};
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 
 pub mod sysvar_instructions_program {
@@ -18,6 +18,7 @@ pub mod sysvar_instructions_program {
 pub fn deploy_token_2022_logic<'f>(
     hashlist: &mut Account<'f, Hashlist>,
     deployment: &mut Account<'f, Deployment>,
+    deployment_config: &Account<'f, DeploymentConfig>,
     fungible_mint: &Signer<'f>,
     payer: &Signer<'f>,
     fungible_escrow_token_account: &UncheckedAccount<'f>,
@@ -64,7 +65,8 @@ pub fn deploy_token_2022_logic<'f>(
             max_size: deployment.max_number_of_tokens as u32,
         }),
         None,
-        Some(deployment_seeds)
+        Some(deployment_seeds),
+        deployment_config.deflation_rate_per_swap
     )?;
 
     let deployment_seeds: &[&[u8]] = &[
@@ -72,23 +74,6 @@ pub fn deploy_token_2022_logic<'f>(
         deployment.ticker.as_ref(),
         &[deployment_bump],
     ];
-
-    // create_group_mint(
-    //     payer,
-    //     group_mint,
-    //     &deployment.to_account_info(),
-    //     group,
-    //     deployment_seeds,
-    //     deployment.max_number_of_tokens as u32,
-    // )?;
-
-    // create_group_mint_combined(
-    //     payer,
-    //     group_mint,
-    //     &deployment.to_account_info(),
-    //     deployment_seeds,
-    //     deployment.max_number_of_tokens as u32,
-    // )?;
 
     mint_all_fungibles(
         deployment,
@@ -99,6 +84,7 @@ pub fn deploy_token_2022_logic<'f>(
         system_program,
         token_program,
         deployment_seeds,
+        true,
     )?;
 
     msg!("Created non fungible");
