@@ -1,0 +1,30 @@
+[package]
+name = "libreplex_liquidity"
+version = "0.0.1"
+description = "Created with Anchor"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/Libreplex/libreplex-program-library"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "libreplex_liquidity"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = {version = "~0.29", features = ["init-if-needed"]}
+anchor-spl = {version = "~0.29"}
+libreplex_fair_launch = {version="*", path = "../libreplex_fair_launch", features =["cpi", "no-entrypoint"]}
+amm-proxy = {path = "../../utils/mercurial-proxy", features = ["cpi"]}
+vault-proxy = {path = "../../utils/vault-proxy", features = ["cpi"]}
+
+
+[dev-dependencies]
+solana-program-test = {version= "1.17.13"}
+solana-sdk= "1.17.13"
