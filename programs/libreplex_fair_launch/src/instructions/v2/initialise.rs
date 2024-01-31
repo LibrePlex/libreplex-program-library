@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 
 
 
@@ -15,11 +15,13 @@ pub struct InitialiseInputV2 {
     pub deployment_template: String,
     pub mint_template: String,
     pub offchain_url: String, // used both for the fungible and the non-fungible
-    pub require_creator_cosign: bool,
+    pub creator_cosign_program_id: Option<Pubkey>,
     pub use_inscriptions: bool,
     pub deployment_type: u8,
     pub creator_fee_treasury: Pubkey,
-    pub creator_fee_per_mint_in_lamports: u64
+    pub creator_fee_per_mint_in_lamports: u64,
+    // this allows for interesting dynamics
+    pub deflation_rate_per_swap: u16
 }
 
 /*
@@ -72,6 +74,7 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
 
     let deployment_config = &mut ctx.accounts.deployment_config;
 
+
     
 
     let creator = &ctx.accounts.creator;
@@ -84,23 +87,25 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
         deployment_template, 
         mint_template, 
         offchain_url, 
-        require_creator_cosign, 
         use_inscriptions, 
         deployment_type,
+        creator_cosign_program_id,
         creator_fee_per_mint_in_lamports: creator_fee_in_lamports,
-        creator_fee_treasury} = input;
-
-    if require_creator_cosign {
-        panic!("Creator cosign not currently supported")
-    }
+        creator_fee_treasury,
+        deflation_rate_per_swap} = input;
 
     if deployment_type != TOKEN2022_DEPLOYMENT_TYPE && deployment_type != HYBRID_DEPLOYMENT_TYPE{
-        panic!("Only token 2022 currently supported in v2 methods")
+        panic!("Bad deployment type")
     }
+    
+    if deployment_type == HYBRID_DEPLOYMENT_TYPE && deflation_rate_per_swap > 0{
+        panic!("Non-zero deflation rate requires a token-2022 deployment")
+    }
+
 
     deployment_config.creator_fee_treasury = creator_fee_treasury;
     deployment_config.creator_fee_per_mint_lamports = creator_fee_in_lamports;
-    
+    deployment_config.deflation_rate_per_swap = deflation_rate_per_swap;
 
     initialise_logic(InitialiseInput {
         limit_per_mint, 
@@ -108,7 +113,14 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
     }, deployment, creator.key())?;
 
     
-    deployment.require_creator_cosign = require_creator_cosign;
+    deployment.require_creator_cosign = creator_cosign_program_id.is_some();
+
+    deployment_config.cosigner_program_id = match creator_cosign_program_id {
+        Some(x) => x,
+        _ => system_program::ID
+    };
+
+
     deployment.use_inscriptions = use_inscriptions;
 
     Ok(())

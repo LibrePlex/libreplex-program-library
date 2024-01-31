@@ -72,6 +72,117 @@ export type LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "deployToken22",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram2022",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "deployhybrid",
       "accounts": [
         {
@@ -232,6 +343,52 @@ export type LibreplexFairLaunch = {
         },
         {
           "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateSplSymbol22",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
           "isMut": true,
           "isSigner": false
         },
@@ -608,6 +765,11 @@ export type LibreplexFairLaunch = {
         {
           "name": "nonFungibleTargetTokenAccount",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram22",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1439,6 +1601,14 @@ export type LibreplexFairLaunch = {
           {
             "name": "creatorFeePerMintLamports",
             "type": "u64"
+          },
+          {
+            "name": "deflationRatePerSwap",
+            "type": "u16"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
           }
         ]
       }
@@ -1585,8 +1755,10 @@ export type LibreplexFairLaunch = {
             "type": "string"
           },
           {
-            "name": "requireCreatorCosign",
-            "type": "bool"
+            "name": "creatorCosignProgramId",
+            "type": {
+              "option": "publicKey"
+            }
           },
           {
             "name": "useInscriptions",
@@ -1603,6 +1775,26 @@ export type LibreplexFairLaunch = {
           {
             "name": "creatorFeePerMintInLamports",
             "type": "u64"
+          },
+          {
+            "name": "deflationRatePerSwap",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeployV2Input",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "requireCreatorCosign",
+            "type": "bool"
+          },
+          {
+            "name": "useInscriptions",
+            "type": "bool"
           }
         ]
       }
@@ -1852,6 +2044,117 @@ export const IDL: LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "deployToken22",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram2022",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "deployhybrid",
       "accounts": [
         {
@@ -2012,6 +2315,52 @@ export const IDL: LibreplexFairLaunch = {
         },
         {
           "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateSplSymbol22",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment"
+              },
+              {
+                "kind": "account",
+                "type": "string",
+                "account": "Deployment",
+                "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
           "isMut": true,
           "isSigner": false
         },
@@ -2388,6 +2737,11 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "nonFungibleTargetTokenAccount",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram22",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -3219,6 +3573,14 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "creatorFeePerMintLamports",
             "type": "u64"
+          },
+          {
+            "name": "deflationRatePerSwap",
+            "type": "u16"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
           }
         ]
       }
@@ -3365,8 +3727,10 @@ export const IDL: LibreplexFairLaunch = {
             "type": "string"
           },
           {
-            "name": "requireCreatorCosign",
-            "type": "bool"
+            "name": "creatorCosignProgramId",
+            "type": {
+              "option": "publicKey"
+            }
           },
           {
             "name": "useInscriptions",
@@ -3383,6 +3747,26 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "creatorFeePerMintInLamports",
             "type": "u64"
+          },
+          {
+            "name": "deflationRatePerSwap",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeployV2Input",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "requireCreatorCosign",
+            "type": "bool"
+          },
+          {
+            "name": "useInscriptions",
+            "type": "bool"
           }
         ]
       }

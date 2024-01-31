@@ -407,11 +407,12 @@ pub async fn initialise_token_2022(
                         deployment_template: deploy_template.clone(),
                         mint_template: mint_template.clone(),
                         offchain_url: offchain_url.clone(),
-                        require_creator_cosign: false,
+                        creator_cosign_program_id: None,
                         use_inscriptions: true,
                         deployment_type: TOKEN2022_DEPLOYMENT_TYPE,
                         creator_fee_per_mint_in_lamports: CREATOR_FEE_IN_LAMPORTS,
-                        creator_fee_treasury
+                        creator_fee_treasury,
+                        deflation_rate_per_swap: 0
                     },
                 }
                 .data(),
@@ -454,31 +455,36 @@ pub async fn deploy_2022<'info>(
         anchor_spl::associated_token::get_associated_token_address_with_program_id(
             &deployment.key(),
             &fungible_mint.pubkey(),
-            &spl_token_2022::ID,
+            &anchor_spl::token_2022::ID,
         );
+
+    let deployment_config = Pubkey::find_program_address(
+        &[b"deployment_config", deployment.key().as_ref()],
+        &libreplex_fair_launch::ID,
+    )
+    .0;
+
 
     context
         .banks_client
         .process_transaction(Transaction::new_signed_with_payer(
             &[Instruction {
                 program_id: libreplex_fair_launch::id(),
-                data: libreplex_fair_launch::instruction::DeployHybrid {}.data(),
-                accounts: libreplex_fair_launch::accounts::DeployHybridCtx {
+                data: libreplex_fair_launch::instruction::DeployToken22 {}.data(),
+                accounts: libreplex_fair_launch::accounts::DeployToken2022Ctx {
                     deployment: deployment.key(),
+                    deployment_config: deployment_config.key(),
                     hashlist,
                     payer: context.payer.pubkey(),
                     creator: context.payer.pubkey(),
                     fungible_mint: fungible_mint.pubkey(),
                     fungible_escrow_token_account,
                     // non_fungible_mint: non_fungible_mint.pubkey(),
-                    token_program: spl_token_2022::ID,
+                    token_program_2022: anchor_spl::token_2022::ID,
                     associated_token_program: AssociatedToken::id(),
                     system_program: system_program::ID,
                     sysvar_instructions: sysvar_instructions_program::ID,
                     // these will be ignored for hybrid w/ deployment type TOKEN2022
-                    fungible_master_edition: Keypair::new().pubkey(),
-                    metadata_program: mpl_token_metadata::ID,
-                    fungible_metadata: Keypair::new().pubkey(),
                     rent: Pubkey::from_str("SysvarRent111111111111111111111111111111111").unwrap(),
                 }
                 .to_account_metas(None),
@@ -652,14 +658,21 @@ pub async fn swap_to_fungible_2022(
     let fungible_source_token_account = get_associated_token_address_with_program_id(
         &deployment.key(),
         &fungible_mint,
-        &spl_token_2022::ID,
+        // fungible is still old skool at this point
+        &anchor_spl::token_2022::ID,
     );
 
     let fungible_target_token_account = get_associated_token_address_with_program_id(
         &minter_wallet_key,
         &fungible_mint,
-        &spl_token_2022::ID,
+        &anchor_spl::token_2022::ID
     );
+
+    let deployment_config = Pubkey::find_program_address(
+        &[b"deployment_config", deployment.key().as_ref()],
+        &libreplex_fair_launch::ID,
+    )
+    .0;
 
     banks_client
         .process_transaction(Transaction::new_signed_with_payer(
@@ -672,7 +685,8 @@ pub async fn swap_to_fungible_2022(
                     system_program: system_program::ID,
                     hashlist_marker,
                     non_fungible_mint,
-                    token_program: spl_token_2022::ID,
+                    token_program: anchor_spl::token::ID,
+                    token_program_22: spl_token_2022::ID,
                     associated_token_program: associated_token::ID,
                     sysvar_instructions: sysvar_instructions_program::ID,
                     fungible_mint,
@@ -743,13 +757,13 @@ pub async fn swap_to_non_fungible_2022(
     let fungible_source_token_account = get_associated_token_address_with_program_id(
         &minter_wallet_key,
         &fungible_mint,
-        &spl_token_2022::ID,
+        &anchor_spl::token_2022::ID,
     );
 
     let fungible_target_token_account = get_associated_token_address_with_program_id(
         &deployment.key(),
         &fungible_mint,
-        &spl_token_2022::ID,
+        &anchor_spl::token_2022::ID,
     );
 
     banks_client
@@ -763,7 +777,8 @@ pub async fn swap_to_non_fungible_2022(
                     system_program: system_program::ID,
                     hashlist_marker,
                     non_fungible_mint,
-                    token_program: spl_token_2022::ID,
+                    token_program: anchor_spl::token::ID,
+                    token_program_22: spl_token_2022::ID,
                     associated_token_program: associated_token::ID,
                     sysvar_instructions: sysvar_instructions_program::ID,
                     fungible_mint,

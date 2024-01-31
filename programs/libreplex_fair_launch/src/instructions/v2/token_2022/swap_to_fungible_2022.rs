@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use anchor_spl::{token_2022,  associated_token::AssociatedToken, token_interface::{Token2022, TokenAccount}, token::{self, spl_token, Token}};
+use anchor_spl::{token_2022,  associated_token::AssociatedToken, token_interface::{Token2022, TokenAccount}, token::{spl_token, Token}};
 use libreplex_shared::operations::transfer_generic_spl;
 
 use crate::{Deployment, HashlistMarker};
@@ -135,11 +135,11 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
     // // 2) move the fungible_mint out of the escrow
     msg!("Transferring fungible from escrow");
 
-    let target_token_program = match fungible_mint.owner {
-        &spl_token::ID => {
+    let target_token_program = match *fungible_mint.owner {
+        spl_token::ID => {
             token_program.to_account_info()
         },
-        &spl_token_2022::ID => {
+        spl_token_2022::ID => {
             token_program_22.to_account_info()
         },
         _ => {

@@ -14,7 +14,6 @@ pub use immutable::*;
 use solana_program::{account_info::AccountInfo, keccak};
 use mpl_token_metadata::accounts::Metadata;
 use crate::LegacyInscriptionErrorCode;
-use mpl_bubblegum::types::LeafSchema;
 use anchor_lang::prelude::*;
 
 pub struct CNFTCheckAccounts<'a, 'info> {

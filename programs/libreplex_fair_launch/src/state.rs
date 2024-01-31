@@ -76,6 +76,9 @@ pub struct DeploymentConfig {
     // defined by creator. this is NOT a libreplex fee as libreplex charges no fees.
     pub creator_fee_treasury: Pubkey,
     pub creator_fee_per_mint_lamports: u64,
+    pub deflation_rate_per_swap: u16, // in basis points
+    // makes it easier to identify the program / endpoints that need to be called
+    pub cosigner_program_id: Pubkey
 
 }
 
