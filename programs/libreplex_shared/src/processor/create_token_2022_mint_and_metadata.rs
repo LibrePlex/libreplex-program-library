@@ -156,7 +156,7 @@ pub fn create_token_2022_and_metadata<'f>(
                 &spl_token_2022::ID,
                 &nft_mint.key(),
                 Some(&authority.key()),
-                None,
+                Some(&authority.key()),
                 transfer_fee_bps,
                 std::u64::MAX,
             )?;
