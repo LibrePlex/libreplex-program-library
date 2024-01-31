@@ -18,7 +18,7 @@ pub use bootstrap_pool::*;
 declare_id!("8bvPnYE5Pvz2Z9dE6RAqWr1rzLknTndZ9hwvRE6kPDXH");
 
 #[program]
-pub mod libreplex_liqudity {
+pub mod libreplex_liquidity {
     use super::*;
 
     pub fn swap_to_fungible(ctx: Context<SwapToFungible>) -> Result<()> {

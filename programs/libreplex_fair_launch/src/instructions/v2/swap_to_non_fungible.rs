@@ -101,6 +101,11 @@ pub fn swap_to_nonfungible(ctx: Context<SwapFungibleToLegacyCtx>) -> Result<()> 
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
 
+
+    if deployment.require_creator_cosign {
+        panic!("Only launches without creator cosign can currently use v1 methods")
+    }
+
     // simples. two steps:
     // 1) move the fungible into the escrow
 
