@@ -22,6 +22,11 @@ pub struct SwapToFungible2022Ctx<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    #[account(
+        constraint = !deployment.require_creator_cosign || deployment.creator == signer.key()
+    )]
+    pub signer: Signer<'info>,
+
     /* fungible accounts */
     
     /// CHECK: Owner must be spl token or token 2022
