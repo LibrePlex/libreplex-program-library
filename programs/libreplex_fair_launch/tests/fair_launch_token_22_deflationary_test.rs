@@ -326,20 +326,24 @@ mod fair_launch_deflationary_test {
         )
         .await;
 
+        let post_swap_1_balance = deployment_account_obj
+            .limit_per_mint
+            .checked_mul(10000_u64 - DEFLATION_RATE as u64)
+            .unwrap()
+            .checked_div(10000_u64)
+            .unwrap()
+            * (10_u64.pow(deployment_account_obj.decimals as u32));
+
         check_token_account_state(
             banks_client,
             minter_fungible_token_account,
             fungible_mint,
             minter_wallet_key,
-            deployment_account_obj
-                .limit_per_mint
-                .checked_mul(10000_u64 - DEFLATION_RATE as u64)
-                .unwrap()
-                .checked_div(10000_u64)
-                .unwrap()
-                * (10_u64.pow(deployment_account_obj.decimals as u32)),
+            post_swap_1_balance,
         )
         .await;
+
+        println!("post swap balance: {}", post_swap_1_balance);
 
         // deployment should be unchanged
         check_deployment_account_state(
@@ -367,6 +371,33 @@ mod fair_launch_deflationary_test {
         .await
         .unwrap();
 
+        check_token_account_state(
+            banks_client,
+            minter_fungible_token_account,
+            fungible_mint,
+            minter_wallet_key,
+            post_swap_1_balance.checked_mul(2_u64).unwrap(),
+        )
+        .await;
+
+
+        let mut numerator = (deployment_account_obj.limit_per_mint as u128).checked_mul(10000_u128).unwrap().checked_mul(10_u128.pow(deployment_account_obj.decimals as u32)).unwrap();
+
+        let denominator = 10000_u128.checked_sub(DEFLATION_RATE as u128).unwrap();
+
+        let remainder = numerator.checked_rem(denominator);
+    
+        if let Some(x) = remainder {
+            if x > 0 {
+                numerator = numerator.checked_add(denominator).unwrap().checked_sub(x).unwrap();
+            }
+        }
+
+        let expected_cost_to_swap = numerator.checked_div(denominator).unwrap();
+
+
+        println!("Expected cost to swap {}", expected_cost_to_swap);
+
         // see if we can swap back
         swap_to_non_fungible_2022(
             banks_client,
@@ -380,6 +411,26 @@ mod fair_launch_deflationary_test {
         .await
         .unwrap();
 
+
+        check_token_account_state(
+            banks_client,
+            minter_fungible_token_account,
+            fungible_mint,
+            minter_wallet_key,
+            post_swap_1_balance.checked_mul(2_u64).unwrap().checked_sub(expected_cost_to_swap as u64).unwrap(),
+        )
+        .await;
+
+
+        // check_token_account_state(
+        //     banks_client,
+        //     minter_fungible_token_account,
+        //     fungible_mint,
+        //     minter_wallet_key,
+        //     post_swap_1_balance.checked_mul(2_u64).unwrap(),
+        // )
+        // .await;
+
         // deployment should be unchanged
         check_deployment_account_state(
             &mut banks_client,
@@ -391,6 +442,18 @@ mod fair_launch_deflationary_test {
             DECIMALS,
         )
         .await;
+    println!("cost_to_swap {}", expected_cost_to_swap);
+
+    let post_swap_2_balance = post_swap_1_balance.checked_mul(2_u64).unwrap().checked_sub(expected_cost_to_swap as u64).unwrap();
+
+        // check_token_account_state(
+        //     banks_client,
+        //     minter_fungible_token_account,
+        //     fungible_mint,
+        //     minter_wallet_key,
+        //     post_swap_2_balance,
+        // )
+        // .await;
     }
 }
 
@@ -485,7 +548,6 @@ pub async fn deploy_2022<'info>(
         &libreplex_fair_launch::ID,
     )
     .0;
-    
 
     context
         .banks_client
@@ -501,7 +563,7 @@ pub async fn deploy_2022<'info>(
                     creator: context.payer.pubkey(),
                     fungible_mint: fungible_mint.pubkey(),
                     fungible_escrow_token_account,
-                    // just need 
+                    // just need
                     token_program_2022: anchor_spl::token_2022::ID,
                     associated_token_program: AssociatedToken::id(),
                     system_program: system_program::ID,
@@ -704,6 +766,9 @@ pub async fn swap_to_fungible_2022(
                 accounts: libreplex_fair_launch::accounts::SwapToFungible2022Ctx {
                     deployment,
                     payer: minter_wallet_key,
+                    signer: minter_wallet_key,
+                    fungible_target_token_account_owner: minter_wallet_key,
+                    non_fungible_source_account_owner: minter_wallet_key,
                     system_program: system_program::ID,
                     hashlist_marker,
                     non_fungible_mint,
@@ -788,6 +853,12 @@ pub async fn swap_to_non_fungible_2022(
         &anchor_spl::token_2022::ID,
     );
 
+    let deployment_config = Pubkey::find_program_address(
+        &[b"deployment_config", deployment.as_ref()],
+        &libreplex_fair_launch::ID,
+    )
+    .0;
+
     banks_client
         .process_transaction(Transaction::new_signed_with_payer(
             &[Instruction {
@@ -795,6 +866,7 @@ pub async fn swap_to_non_fungible_2022(
                 data: libreplex_fair_launch::instruction::SwapToNonfungible22 {}.data(),
                 accounts: libreplex_fair_launch::accounts::SwapToNonFungible2022Ctx {
                     deployment,
+                    deployment_config,
                     payer: minter_wallet_key,
                     system_program: system_program::ID,
                     hashlist_marker,

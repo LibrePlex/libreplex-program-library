@@ -682,6 +682,9 @@ pub async fn swap_to_fungible_2022(
                 accounts: libreplex_fair_launch::accounts::SwapToFungible2022Ctx {
                     deployment,
                     payer: minter_wallet_key,
+                    fungible_target_token_account_owner: minter_wallet_key,
+                    signer: minter_wallet_key,
+                    non_fungible_source_account_owner: minter_wallet_key,
                     system_program: system_program::ID,
                     hashlist_marker,
                     non_fungible_mint,
@@ -766,6 +769,13 @@ pub async fn swap_to_non_fungible_2022(
         &anchor_spl::token_2022::ID,
     );
 
+    let deployment_config = Pubkey::find_program_address(
+        &[b"deployment_config", deployment.as_ref()],
+        &libreplex_fair_launch::ID,
+    )
+    .0;
+
+
     banks_client
         .process_transaction(Transaction::new_signed_with_payer(
             &[Instruction {
@@ -773,6 +783,7 @@ pub async fn swap_to_non_fungible_2022(
                 data: libreplex_fair_launch::instruction::SwapToNonfungible22 {}.data(),
                 accounts: libreplex_fair_launch::accounts::SwapToNonFungible2022Ctx {
                     deployment,
+                    deployment_config,
                     payer: minter_wallet_key,
                     system_program: system_program::ID,
                     hashlist_marker,

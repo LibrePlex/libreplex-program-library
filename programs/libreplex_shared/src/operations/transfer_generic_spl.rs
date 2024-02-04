@@ -26,6 +26,7 @@ pub fn transfer_generic_spl<'info>(
         );
 
     if expected_token_account != target_token_account.key() {
+        msg!("{} {}", expected_token_account, target_token_account.key);
         return Err(SharedError::InvalidTokenAccount.into());
     }
     msg!("Creating token account");

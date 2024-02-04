@@ -21,7 +21,7 @@ pub struct InitialiseInputV2 {
     pub creator_fee_treasury: Pubkey,
     pub creator_fee_per_mint_in_lamports: u64,
     // this allows for interesting dynamics
-    pub deflation_rate_per_swap: u16,
+    pub deflation_rate_per_swap: u16
 }
 
 /*

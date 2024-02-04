@@ -12,8 +12,9 @@ pub struct Liquidity {
 
     pub pool_bootstrapped: bool,
 
+    pub creator_basis_points: u64,
+
     pub deployment: Pubkey,
-    pub fungible_mint: Pubkey,
     pub authority: Pubkey,
     pub padding: [u8; 100]
 }

@@ -15,7 +15,7 @@ pub use swap_to_fungible::*;
 pub mod bootstrap_pool;
 pub use bootstrap_pool::*;
 
-declare_id!("8bvPnYE5Pvz2Z9dE6RAqWr1rzLknTndZ9hwvRE6kPDXH");
+declare_id!("LiquGRWGrp8JKspo8zDDu6qpRmX1p6U3PX2USqiE1eg");
 
 #[program]
 pub mod libreplex_liquidity {
@@ -35,5 +35,9 @@ pub mod libreplex_liquidity {
 
     pub fn bootstrap_pool(ctx: Context<BootstapPool>) -> Result<()> {
         bootstrap_pool_handler(ctx)
+    }
+
+    pub fn prepare_native_escrow(ctx: Context<PrepareNativeEscrow>) -> Result<()> {
+        prepare_native_escrow_handler(ctx)
     }
 }

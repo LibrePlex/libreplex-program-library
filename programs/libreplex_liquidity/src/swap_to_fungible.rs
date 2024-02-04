@@ -7,12 +7,12 @@ use crate::Liquidity;
 
 #[derive(Accounts)]
 pub struct SwapToFungible<'info> {
-    #[account(has_one = deployment, 
-        has_one = fungible_mint)]
+    #[account(has_one = deployment)]
     pub liqudity: Box<Account<'info, Liquidity>>,
 
     #[account(
-        mut
+        mut,
+        has_one = fungible_mint
     )]
     pub deployment: Box<Account<'info, Deployment>>,
 
@@ -24,7 +24,10 @@ pub struct SwapToFungible<'info> {
     pub fungible_mint: UncheckedAccount<'info>,
 
     /// CHECK: Checked in cpi
-    #[account(mut)]
+    #[account(mut, seeds = ["hashlist_marker".as_bytes(), 
+    deployment.key().as_ref(),
+    non_fungible_mint.key().as_ref()],
+    bump, seeds::program = libreplex_fair_launch::ID)]
     pub hashlist_marker: UncheckedAccount<'info>,
 
     /// CHECK: Checked in cpi
@@ -86,6 +89,8 @@ pub fn swap_to_fungible_handler(ctx: Context<SwapToFungible>) -> Result<()> {
             ctx.accounts.fair_launch_program.to_account_info(),
             libreplex_fair_launch::cpi::accounts::SwapToFungible2022Ctx {
                 deployment: ctx.accounts.deployment.to_account_info(),
+                fungible_target_token_account_owner: ctx.accounts.payer.to_account_info(),
+                non_fungible_source_account_owner: ctx.accounts.payer.to_account_info(),
                 payer: ctx.accounts.payer.to_account_info(),
                 signer: liqudity.to_account_info(),
                 fungible_mint: ctx.accounts.fungible_mint.to_account_info(),

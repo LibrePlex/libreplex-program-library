@@ -13,7 +13,10 @@ pub struct MintCtx<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account(mut, has_one = deployment)]
+    /// CHECK: Checked by has one
+    pub authority: UncheckedAccount<'info>,
+
+    #[account(mut, has_one = deployment, has_one = authority)]
     pub liquidity: Box<Account<'info, Liquidity>>,
 
     pub system_program: Program<'info, System>,
@@ -48,6 +51,10 @@ pub struct MintCtx<'info> {
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
+    pub pooled_hashlist_market: UncheckedAccount<'info>,
+
+    /// CHECK: Checked in cpi.
+    #[account(mut)]
     pub fungible_mint: UncheckedAccount<'info>,
 
     #[account(mut, 
@@ -57,7 +64,7 @@ pub struct MintCtx<'info> {
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
-    pub non_fungible_mint: UncheckedAccount<'info>,
+    pub non_fungible_mint: Signer<'info>,
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
@@ -65,7 +72,7 @@ pub struct MintCtx<'info> {
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
-    pub pooled_non_fungible_mint: UncheckedAccount<'info>,
+    pub pooled_non_fungible_mint: Signer<'info>,
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
@@ -116,32 +123,7 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
             deployment_config: ctx.accounts.deployment_config.to_account_info(),
             creator_fee_treasury: ctx.accounts.creator_fee_treasury.to_account_info(),
             hashlist: ctx.accounts.hashlist.to_account_info(),
-            hashlist_marker: ctx.accounts.hashlist_marker.to_account_info(),
-            payer: ctx.accounts.payer.to_account_info(),
-            signer: ctx.accounts.liquidity.to_account_info(),
-            fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
-            minter: ctx.accounts.receiver.to_account_info(),
-            non_fungible_mint: ctx.accounts.non_fungible_mint.to_account_info(),
-            non_fungible_token_account: ctx.accounts.non_fungible_token_account.to_account_info(),
-            inscription_summary: ctx.accounts.inscription_summary.to_account_info(),
-            inscription_v3: ctx.accounts.inscription_v3.to_account_info(),
-            inscription_data: ctx.accounts.inscription_data.to_account_info(),
-            token_program: ctx.accounts.token_program.to_account_info(),
-            associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
-            inscriptions_program: ctx.accounts.inscriptions_program.to_account_info(),
-            system_program: ctx.accounts.system_program.to_account_info(),
-        },
-        &[seeds],
-    ))?;
-
-    libreplex_fair_launch::cpi::mint_token22(CpiContext::new_with_signer(
-        fair_launch.to_account_info(),
-        libreplex_fair_launch::cpi::accounts::MintToken2022Ctx {
-            deployment: ctx.accounts.deployment.to_account_info(),
-            deployment_config: ctx.accounts.deployment_config.to_account_info(),
-            creator_fee_treasury: ctx.accounts.creator_fee_treasury.to_account_info(),
-            hashlist: ctx.accounts.hashlist.to_account_info(),
-            hashlist_marker: ctx.accounts.hashlist_marker.to_account_info(),
+            hashlist_marker: ctx.accounts.pooled_hashlist_market.to_account_info(),
             payer: ctx.accounts.payer.to_account_info(),
             signer: ctx.accounts.liquidity.to_account_info(),
             fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
@@ -154,7 +136,7 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
             inscription_summary: ctx.accounts.inscription_summary.to_account_info(),
             inscription_v3: ctx.accounts.inscription_v3.to_account_info(),
             inscription_data: ctx.accounts.inscription_data.to_account_info(),
-            token_program: ctx.accounts.token_program.to_account_info(),
+            token_program: ctx.accounts.token_program_22.to_account_info(),
             associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
             inscriptions_program: ctx.accounts.inscriptions_program.to_account_info(),
             system_program: ctx.accounts.system_program.to_account_info(),
@@ -162,15 +144,22 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
         &[seeds],
     ))?;
 
+
+    let pooled_non_fungible_token_account = &ctx.accounts.pooled_non_fungible_token_account;
+
+    msg!("{:?}", pooled_non_fungible_token_account.owner);
+
     libreplex_fair_launch::cpi::swap_to_fungible22(
         CpiContext::new_with_signer(
             ctx.accounts.fair_launch.to_account_info(),
              libreplex_fair_launch::cpi::accounts::SwapToFungible2022Ctx {
+                non_fungible_source_account_owner: ctx.accounts.liquidity.to_account_info(),
+                fungible_target_token_account_owner: ctx.accounts.liquidity.to_account_info(),
                 deployment: ctx.accounts.deployment.to_account_info(),
                 payer: ctx.accounts.payer.to_account_info(),
                 signer: ctx.accounts.liquidity.to_account_info(),
                 fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
-                hashlist_marker: ctx.accounts.hashlist_marker.to_account_info(),
+                hashlist_marker: ctx.accounts.pooled_hashlist_market.to_account_info(),
                 fungible_source_token_account: ctx.accounts.deployment_fungible_token_account.to_account_info(),
                 fungible_target_token_account: ctx.accounts.liquidity_fungible_token_account.to_account_info(),
                 non_fungible_mint: ctx.accounts.pooled_non_fungible_mint.to_account_info(),
@@ -185,6 +174,32 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
              &[seeds]
         )
     )?;
+
+    libreplex_fair_launch::cpi::mint_token22(CpiContext::new_with_signer(
+        fair_launch.to_account_info(),
+        libreplex_fair_launch::cpi::accounts::MintToken2022Ctx {
+            deployment: ctx.accounts.deployment.to_account_info(),
+            deployment_config: ctx.accounts.deployment_config.to_account_info(),
+            creator_fee_treasury: ctx.accounts.creator_fee_treasury.to_account_info(),
+            hashlist: ctx.accounts.hashlist.to_account_info(),
+            hashlist_marker: ctx.accounts.hashlist_marker.to_account_info(),
+            payer: ctx.accounts.payer.to_account_info(),
+            signer: ctx.accounts.liquidity.to_account_info(),
+            fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
+            minter: ctx.accounts.receiver.to_account_info(),
+            non_fungible_mint: ctx.accounts.non_fungible_mint.to_account_info(),
+            non_fungible_token_account: ctx.accounts.non_fungible_token_account.to_account_info(),
+            inscription_summary: ctx.accounts.inscription_summary.to_account_info(),
+            inscription_v3: ctx.accounts.inscription_v3.to_account_info(),
+            inscription_data: ctx.accounts.inscription_data.to_account_info(),
+            token_program: ctx.accounts.token_program_22.to_account_info(),
+            associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
+            inscriptions_program: ctx.accounts.inscriptions_program.to_account_info(),
+            system_program: ctx.accounts.system_program.to_account_info(),
+        },
+        &[seeds],
+    ))?;
+
 
     Ok(())
 }
