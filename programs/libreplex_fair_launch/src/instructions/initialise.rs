@@ -40,8 +40,6 @@ pub struct InitialiseCtx<'info>  {
 
     #[account()]
     pub system_program: Program<'info, System>,
-
-
 }
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
@@ -57,10 +55,8 @@ pub struct InitialiseInput {
 }
 
 pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
-    
     let deployment = &mut ctx.accounts.deployment;
     let payer = &ctx.accounts.payer;
-
 
     // set default values - v2 endpoint allows the setting of these
     deployment.require_creator_cosign = false;
@@ -69,8 +65,6 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
 
     // setting creator equal to payer - use v2 endpoints to control this and override as desired
     initialise_logic(input, deployment, payer.key())
-
-    
 }
 
 pub fn initialise_logic(input: InitialiseInput, deployment: &mut Account<'_, Deployment>, creator: Pubkey) -> Result<()> {
@@ -103,6 +97,7 @@ pub fn initialise_logic(input: InitialiseInput, deployment: &mut Account<'_, Dep
     deployment.migrated_from_legacy = false;
     (input.limit_per_mint).checked_mul(input.max_number_of_tokens).unwrap().checked_mul(
         (10_u64).checked_pow(input.decimals as u32).unwrap()).unwrap();
+    
     emit!(NewDeploymentEvent {
         creator: deployment.creator,
         limit_per_mint: deployment.limit_per_mint,

@@ -55,6 +55,9 @@ pub struct SwapToFungible2022Ctx<'info> {
     #[account(mut)]
     pub fungible_target_token_account: UncheckedAccount<'info>,
 
+    /// CHECK: Can be anyone they do not need to consent to receiving a token.
+    pub fungible_target_token_account_owner: UncheckedAccount<'info>,
+
     /* non-fungible accounts */
     /// CHECK: checked in constraint
     #[account(mut,
@@ -62,12 +65,14 @@ pub struct SwapToFungible2022Ctx<'info> {
     )]
     pub non_fungible_mint: UncheckedAccount<'info>,
 
+    pub non_fungible_source_account_owner: Signer<'info>,
+
     /// this always exists (otherwise we couldn't swap), so we can specify the account
     /// type explicitly
     #[account(
         mut,
         token::mint = non_fungible_mint,
-        token::authority = payer,
+        token::authority = non_fungible_source_account_owner,
     )]
     pub non_fungible_source_token_account: InterfaceAccount<'info, TokenAccount>,
 
@@ -97,10 +102,13 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
     let token_program_22 = &ctx.accounts.token_program_22;
 
     let payer = &ctx.accounts.payer;
+
+    let non_fungible_source_account_owner = &ctx.accounts.non_fungible_source_account_owner;
     let non_fungible_source_token_account = &ctx.accounts.non_fungible_source_token_account;
     let non_fungible_target_token_account = &ctx.accounts.non_fungible_target_token_account;
     let non_fungible_mint = &ctx.accounts.non_fungible_mint;
 
+    let fungible_target_token_account_owner = &ctx.accounts.fungible_target_token_account_owner;
     let fungible_source_token_account = &ctx.accounts.fungible_source_token_account;
     let fungible_target_token_account = &ctx.accounts.fungible_target_token_account;
     let fungible_mint = &ctx.accounts.fungible_mint;
@@ -115,16 +123,16 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
 
     msg!("Transferring non fungible into escrow");
     transfer_generic_spl(
-        &token_program_22.to_account_info(),
-        &non_fungible_source_token_account.to_account_info(),
-        &non_fungible_target_token_account.to_account_info(),
-        &payer.to_account_info(),
-        &non_fungible_mint.to_account_info(),
-        &deployment.to_account_info(),
-        &associated_token_program.to_account_info(),
-        &system_program.to_account_info(),
+        &token_program_22,
+        non_fungible_source_token_account.as_ref(),
+        &non_fungible_target_token_account,
+        &non_fungible_source_account_owner,
+        &non_fungible_mint,
+        deployment.as_ref().as_ref(),
+        &associated_token_program,
+        &system_program,
         None, // payer signs
-        &payer.to_account_info(),
+        &payer,
         0,
         1,
     )?;
@@ -158,7 +166,7 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
         &fungible_target_token_account.to_account_info(),
         &deployment.to_account_info(),
         &fungible_mint.clone(),
-        &payer.to_account_info(),
+        &fungible_target_token_account_owner.to_account_info(),
         &associated_token_program.to_account_info(),
         &system_program.to_account_info(),
         Some(&[authority_seeds]),

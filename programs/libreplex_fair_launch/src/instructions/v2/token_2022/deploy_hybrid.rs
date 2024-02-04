@@ -127,6 +127,7 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
         panic!("Wrong deployment type")
     }
 
+
     deploy_hybrid_logic(
         hashlist,
         deployment,

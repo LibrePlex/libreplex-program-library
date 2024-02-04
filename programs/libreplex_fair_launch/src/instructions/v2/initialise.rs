@@ -21,7 +21,7 @@ pub struct InitialiseInputV2 {
     pub creator_fee_treasury: Pubkey,
     pub creator_fee_per_mint_in_lamports: u64,
     // this allows for interesting dynamics
-    pub deflation_rate_per_swap: u16
+    pub deflation_rate_per_swap: u16,
 }
 
 /*
@@ -59,8 +59,8 @@ pub struct InitialiseV2Ctx<'info>  {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account(mut)]
-    pub creator: Signer<'info>,
+    /// CHECK: Can be anyone.
+    pub creator: UncheckedAccount<'info>,
 
     #[account()]
     pub system_program: Program<'info, System>,

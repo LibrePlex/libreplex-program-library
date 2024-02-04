@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.7.2",
   "name": "vault",
   "instructions": [
     {
@@ -8,36 +8,22 @@
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "This is base account for all vault",
-            "No need base key now because we only allow 1 vault per token now",
-            "Vault account"
-          ]
+          "isSigner": false
         },
         {
           "name": "payer",
           "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "Payer can be anyone"
-          ]
+          "isSigner": true
         },
         {
           "name": "tokenVault",
           "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token vault account"
-          ]
+          "isSigner": false
         },
         {
           "name": "tokenMint",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Token mint account"
-          ]
+          "isSigner": false
         },
         {
           "name": "lpMint",
@@ -47,99 +33,587 @@
         {
           "name": "rent",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "rent"
-          ]
+          "isSigner": false
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "token_program"
-          ]
+          "isSigner": false
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "system_program"
-          ]
+          "isSigner": false
         }
       ],
       "args": []
     },
     {
-      "name": "initializeIdleVault",
+      "name": "enableVault",
       "accounts": [
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Vault account"
-          ]
+          "isSigner": false
         },
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "Payer can be anyone"
-          ]
-        },
-        {
-          "name": "tokenVault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token vault account"
-          ]
-        },
-        {
-          "name": "tokenMint",
+          "name": "admin",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Token mint account"
-          ]
-        },
+          "isSigner": true
+        }
+      ],
+      "args": [
         {
-          "name": "lpMint",
+          "name": "enabled",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "setOperator",
+      "accounts": [
+        {
+          "name": "vault",
           "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "LP mint"
-          ]
+          "isSigner": false
         },
         {
-          "name": "rent",
+          "name": "operator",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "rent"
-          ]
+          "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "admin",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "token_program"
-          ]
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateLockedProfitDegradation",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "lockedProfitDegradation",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "getUnlockedAmount",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "transferAdmin",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "transferFeeVault",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newFeeVault",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeStrategy",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategyProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "strategy",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserve",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collateralMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "system_program"
-          ]
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bumps",
+          "type": {
+            "defined": "StrategyBumps"
+          }
+        },
+        {
+          "name": "strategyType",
+          "type": {
+            "defined": "StrategyType"
+          }
+        }
+      ]
+    },
+    {
+      "name": "removeStrategy",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategy",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategyProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserve",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": []
+    },
+    {
+      "name": "removeStrategy2",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategy",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategyProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserve",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAdminAdvancePayment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVaultAdvancePayment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "maxAdminPayAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "collectDust",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAdmin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "addStrategy",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategy",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "depositStrategy",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategy",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategyProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserve",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "operator",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawStrategy",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategy",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "strategyProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collateralVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reserve",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "operator",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "claimRewards",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "strategy",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenRewardAcc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "operator",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdraw2",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLp",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "unmintAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minOutAmount",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "deposit",
@@ -315,144 +789,11 @@
           "type": "u64"
         }
       ]
-    },
-    {
-      "name": "getUnlockedAmount",
-      "accounts": [
-        {
-          "name": "vault",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "depositStrategy",
-      "accounts": [
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "strategy",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "feeVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "lpMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "strategyProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "collateralVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "reserve",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "operator",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "withdrawStrategy",
-      "accounts": [
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "strategy",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "feeVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "lpMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "strategyProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "collateralVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "reserve",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "operator",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
     }
   ],
   "accounts": [
     {
-      "name": "Vault",
+      "name": "vault",
       "type": {
         "kind": "struct",
         "fields": [
@@ -517,7 +858,7 @@
       }
     },
     {
-      "name": "Strategy",
+      "name": "strategy",
       "type": {
         "kind": "struct",
         "fields": [
@@ -584,14 +925,6 @@
         "fields": [
           {
             "name": "strategyIndex",
-            "type": "u8"
-          },
-          {
-            "name": "strategyBump",
-            "type": "u8"
-          },
-          {
-            "name": "collateralVaultBump",
             "type": "u8"
           },
           {
@@ -666,12 +999,6 @@
           },
           {
             "name": "Marginfi"
-          },
-          {
-            "name": "Cypher"
-          },
-          {
-            "name": "Psylend"
           }
         ]
       }
@@ -697,7 +1024,7 @@
       "name": "RemoveLiquidity",
       "fields": [
         {
-          "name": "lpunmintAmount",
+          "name": "lpUnmintAmount",
           "type": "u64",
           "index": false
         },
@@ -748,7 +1075,7 @@
       ]
     },
     {
-      "name": "StakingReward",
+      "name": "ClaimReward",
       "fields": [
         {
           "name": "strategyType",
@@ -890,6 +1217,21 @@
       "code": 6016,
       "name": "PayAmountIsExeeced",
       "msg": "Pay amount is exceeded"
+    },
+    {
+      "code": 6017,
+      "name": "FeeVaultIsNotSet",
+      "msg": "Fee vault is not set"
+    },
+    {
+      "code": 6018,
+      "name": "LendingAssertionViolation",
+      "msg": "deposit amount in lending is not matched"
+    },
+    {
+      "code": 6019,
+      "name": "HaveMoneyInLending",
+      "msg": "Cannot remove strategy becase we have some in lending"
     }
   ]
 }
