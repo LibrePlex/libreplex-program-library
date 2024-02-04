@@ -708,6 +708,26 @@ export type LibreplexFairLaunch = {
           }
         },
         {
+          "name": "deploymentConfig",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -2675,6 +2695,26 @@ export const IDL: LibreplexFairLaunch = {
                 "type": "string",
                 "account": "Deployment",
                 "path": "deployment.ticker"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
               }
             ]
           }
