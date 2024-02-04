@@ -1,4 +1,4 @@
-use crate::HashlistMarker;
+use crate::{DeploymentConfig, HashlistMarker};
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
@@ -22,6 +22,13 @@ pub struct SwapToNonFungible2022Ctx<'info> {
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump
     )]
     pub deployment: Account<'info, Deployment>,
+
+    #[account(
+        // deployment must be executed by the payer 
+        seeds=["deployment_config".as_bytes(), deployment.key().as_ref()],
+        bump
+    )]
+    pub deployment_config: Account<'info, DeploymentConfig>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -103,6 +110,7 @@ pub fn swap_to_nonfungible_2022(ctx: Context<SwapToNonFungible2022Ctx>) -> Resul
     let fungible_mint = &ctx.accounts.fungible_mint;
 
     let deployment = &mut ctx.accounts.deployment;
+    let deployment_config = &mut ctx.accounts.deployment_config;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
 
@@ -122,7 +130,21 @@ pub fn swap_to_nonfungible_2022(ctx: Context<SwapToNonFungible2022Ctx>) -> Resul
             panic!("How could you do this to me")
         }
     };
+
+    let mut numerator = (deployment.get_fungible_mint_amount() as u128).checked_mul(10_000_u128).unwrap();
+    let denominator = 10_000_u128.checked_sub(deployment_config.deflation_rate_per_swap as u128).unwrap();
     
+    let remainder = numerator.checked_rem(denominator);
+
+    
+    if let Some(x) = remainder {
+        if x > 0 {
+            numerator = numerator.checked_add(denominator).unwrap().checked_sub(x).unwrap();
+        }
+    }
+    let fungible_amount_to_transfer = numerator.checked_div(denominator).unwrap();
+    
+    // msg!("Fungible amount to transfer: {}", fungible_amount_to_transfer);
     transfer_generic_spl(
         &target_token_program.to_account_info(),
         &fungible_source_token_account.to_account_info(),
@@ -135,7 +157,8 @@ pub fn swap_to_nonfungible_2022(ctx: Context<SwapToNonFungible2022Ctx>) -> Resul
         None,
         &payer.to_account_info(),
         deployment.decimals,
-        deployment.get_fungible_mint_amount(),
+        // we need to add deflationary adjustment if applicable
+        fungible_amount_to_transfer as u64
     )?;
     deployment.escrow_non_fungible_count -= 1;
 
