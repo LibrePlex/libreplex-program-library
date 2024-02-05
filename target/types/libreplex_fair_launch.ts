@@ -595,11 +595,6 @@ export type LibreplexFairLaunch = {
           "isSigner": true
         },
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "fungibleMint",
           "isMut": true,
           "isSigner": false
@@ -643,19 +638,9 @@ export type LibreplexFairLaunch = {
           "isSigner": false
         },
         {
-          "name": "fungibleTargetTokenAccountOwner",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "nonFungibleMint",
           "isMut": true,
           "isSigner": false
-        },
-        {
-          "name": "nonFungibleSourceAccountOwner",
-          "isMut": false,
-          "isSigner": true
         },
         {
           "name": "nonFungibleSourceTokenAccount",
@@ -2602,11 +2587,6 @@ export const IDL: LibreplexFairLaunch = {
           "isSigner": true
         },
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "fungibleMint",
           "isMut": true,
           "isSigner": false
@@ -2650,19 +2630,9 @@ export const IDL: LibreplexFairLaunch = {
           "isSigner": false
         },
         {
-          "name": "fungibleTargetTokenAccountOwner",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "nonFungibleMint",
           "isMut": true,
           "isSigner": false
-        },
-        {
-          "name": "nonFungibleSourceAccountOwner",
-          "isMut": false,
-          "isSigner": true
         },
         {
           "name": "nonFungibleSourceTokenAccount",
