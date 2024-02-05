@@ -59,8 +59,8 @@ pub struct InitialiseV2Ctx<'info>  {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account(mut)]
-    pub creator: Signer<'info>,
+    /// CHECK: Can be anyone.
+    pub creator: UncheckedAccount<'info>,
 
     #[account()]
     pub system_program: Program<'info, System>,
