@@ -123,16 +123,16 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
 
     msg!("Transferring non fungible into escrow");
     transfer_generic_spl(
-        &token_program_22,
+        token_program_22,
         non_fungible_source_token_account.as_ref(),
-        &non_fungible_target_token_account,
-        &non_fungible_source_account_owner,
-        &non_fungible_mint,
+        non_fungible_target_token_account,
+        non_fungible_source_account_owner,
+        non_fungible_mint,
         deployment.as_ref().as_ref(),
-        &associated_token_program,
-        &system_program,
+        associated_token_program,
+        system_program,
         None, // payer signs
-        &payer,
+        payer,
         0,
         1,
     )?;

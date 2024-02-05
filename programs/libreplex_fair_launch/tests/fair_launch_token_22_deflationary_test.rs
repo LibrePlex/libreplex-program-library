@@ -655,32 +655,55 @@ pub async fn mint_token_2022(
     )
     .0;
 
+    let mut accounts = libreplex_fair_launch::accounts::MintToken2022Ctx {
+        deployment,
+        deployment_config,
+        creator_fee_treasury,
+        payer: minter_wallet_key,
+        fungible_mint,
+        system_program: system_program::ID,
+        hashlist,
+        hashlist_marker,
+        signer: context_payer.pubkey(),
+        minter: minter_wallet_key,
+        non_fungible_mint: non_fungible_mint.pubkey(),
+        non_fungible_token_account,
+        token_program: spl_token_2022::ID,
+        associated_token_program: associated_token::ID,
+        
+    }
+    .to_account_metas(None);
+
+    accounts.push(AccountMeta{
+        pubkey: libreplex_inscriptions::ID,
+        is_signer: false,
+        is_writable: false,
+    });
+
+    accounts.push(AccountMeta{
+        pubkey: inscription_summary,
+        is_signer: false,
+        is_writable: true,
+    });
+
+    accounts.push(AccountMeta{
+        pubkey: inscription_v3,
+        is_signer: false,
+        is_writable: true,
+    });
+
+    accounts.push(AccountMeta{
+        pubkey: inscription_data,
+        is_signer: false,
+        is_writable: true,
+    });
+
     let err = banks_client
         .process_transaction(Transaction::new_signed_with_payer(
             &[Instruction {
                 program_id: libreplex_fair_launch::id(),
                 data: libreplex_fair_launch::instruction::MintToken22 {}.data(),
-                accounts: libreplex_fair_launch::accounts::MintToken2022Ctx {
-                    deployment,
-                    deployment_config,
-                    creator_fee_treasury,
-                    payer: minter_wallet_key,
-                    fungible_mint,
-                    system_program: system_program::ID,
-                    hashlist,
-                    hashlist_marker,
-                    signer: context_payer.pubkey(),
-                    minter: minter_wallet_key,
-                    non_fungible_mint: non_fungible_mint.pubkey(),
-                    non_fungible_token_account,
-                    inscription_summary,
-                    inscription_v3,
-                    inscription_data,
-                    token_program: spl_token_2022::ID,
-                    associated_token_program: associated_token::ID,
-                    inscriptions_program: libreplex_inscriptions::ID,
-                }
-                .to_account_metas(None),
+                accounts,
             }],
             Some(&minter_wallet_key),
             signing_keypairs.as_slice(),

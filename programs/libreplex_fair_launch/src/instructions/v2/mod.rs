@@ -20,8 +20,3 @@ pub mod initialise;
 pub use shared_logic::*;
 pub mod shared_logic;
 
-pub use swap_to_fungible::*;
-pub mod swap_to_fungible;
-
-pub use swap_to_non_fungible::*;
-pub mod swap_to_non_fungible;

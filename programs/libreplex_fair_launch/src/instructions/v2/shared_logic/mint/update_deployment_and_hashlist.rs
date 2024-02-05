@@ -11,7 +11,7 @@ pub fn update_deployment_and_hashlist<'a>(
     payer: &Signer<'a>,
     system_program: &Program<'a, System>,
     root_key: Pubkey,
-    inscription_summary: &UncheckedAccount<'a>,
+    inscription_summary: Option<&AccountInfo<'a>>,
 ) -> Result<()> {
 
   
@@ -19,13 +19,21 @@ pub fn update_deployment_and_hashlist<'a>(
         msg!("updating hashlist");
         let mut order_number = 0;
         if deployment.use_inscriptions {
-            msg!("using inscriptions");
+            match inscription_summary {
+                Some(x) => {
+                    msg!("using inscriptions");
           
-            if inscription_summary.to_account_info().data_is_empty() {
-                let mut data: &[u8] = &inscription_summary.try_borrow_data()?[..];
-                let inscription_summary_obj = InscriptionSummary::deserialize(&mut data)?;
-                order_number = inscription_summary_obj.inscription_count_total;
+                    if x.data_is_empty() {
+                        let mut data: &[u8] = &x.try_borrow_data()?[..];
+                        let inscription_summary_obj = InscriptionSummary::deserialize(&mut data)?;
+                        order_number = inscription_summary_obj.inscription_count_total;
+                    }
+                },
+                None => {
+                    panic!("inscription_summary must be provided when using inscriptions")
+                }
             }
+            
 
         } 
 

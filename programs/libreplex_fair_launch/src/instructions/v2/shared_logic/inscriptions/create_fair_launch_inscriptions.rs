@@ -13,13 +13,13 @@ use crate::{
 };
 
 pub fn create_fair_launch_inscriptions<'a>(
-    inscriptions_program: &UncheckedAccount<'a>,
-    inscription_summary: &UncheckedAccount<'a>,
+    inscriptions_program: &AccountInfo<'a>,
+    inscription_summary: &AccountInfo<'a>,
     non_fungible_mint: &Signer<'a>,
-    inscription_v3: &UncheckedAccount<'a>,
+    inscription_v3: &AccountInfo<'a>,
     system_program: &Program<'a, System>,
     payer: &Signer<'a>,
-    inscription_data: &UncheckedAccount<'a>,
+    inscription_data: &AccountInfo<'a>,
     deployment: &mut Account<'a, Deployment>,
 ) -> Result<()> {
     libreplex_inscriptions::cpi::create_inscription_v3(
