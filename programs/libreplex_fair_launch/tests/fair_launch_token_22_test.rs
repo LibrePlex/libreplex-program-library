@@ -682,6 +682,9 @@ pub async fn swap_to_fungible_2022(
                 accounts: libreplex_fair_launch::accounts::SwapToFungible2022Ctx {
                     deployment,
                     payer: minter_wallet_key,
+                    fungible_target_token_account_owner: minter_wallet_key,
+                    signer: minter_wallet_key,
+                    non_fungible_source_account_owner: minter_wallet_key,
                     system_program: system_program::ID,
                     hashlist_marker,
                     non_fungible_mint,

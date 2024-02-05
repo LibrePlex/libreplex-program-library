@@ -1,0 +1,20 @@
+[package]
+name = "amm-proxy"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-gen = "0.3.1"
+anchor-lang = "0.29.0"
+bytemuck = "1.12.3"
