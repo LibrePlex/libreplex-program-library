@@ -529,32 +529,12 @@ export type LibreplexFairLaunch = {
           "isSigner": false
         },
         {
-          "name": "inscriptionSummary",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV3",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionData",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2536,32 +2516,12 @@ export const IDL: LibreplexFairLaunch = {
           "isSigner": false
         },
         {
-          "name": "inscriptionSummary",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV3",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionData",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
           "isMut": false,
           "isSigner": false
         },

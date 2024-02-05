@@ -14,12 +14,12 @@ use crate::Deployment;
 
 pub fn create_immutable_inscription<'a>(
     deployment: &mut Account<'a, Deployment>,
-    inscriptions_program: &UncheckedAccount<'a>,
+    inscriptions_program: &AccountInfo<'a>,
     payer: &Signer<'a>,
     system_program: &Program<'a, System>,
-    inscription_data: &UncheckedAccount<'a>,
-    inscription_v3: &UncheckedAccount<'a>,
-    inscription_summary: &UncheckedAccount<'a>,
+    inscription_data: &AccountInfo<'a>,
+    inscription_v3: &AccountInfo<'a>,
+    inscription_summary: &AccountInfo<'a>,
 ) -> Result<()> {
     let data_bytes = deployment.mint_template.clone().into_bytes();
     libreplex_inscriptions::cpi::resize_inscription_v3(
