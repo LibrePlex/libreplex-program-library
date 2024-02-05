@@ -52,10 +52,11 @@ pub mod libreplex_fair_launch {
         instructions::update_symbol2022(ctx)
     }
 
-    pub fn update_spl_symbol22<'info>(
-        ctx: Context<'_, '_, '_, 'info, UpdateSplSymbol2022Ctx<'info>>,
+    pub fn update_spl_metadata<'info>(
+        ctx: Context<'_, '_, '_, 'info, UpdateSplMetadata2022Ctx<'info>>,
+        new_uri: String
     ) -> Result<()> {
-        instructions::update_spl_symbol2022(ctx)
+        instructions::update_spl_metadata2022(ctx, new_uri)
     }
    
    

@@ -13,7 +13,7 @@ use spl_token_metadata_interface::{instruction::update_field, state::Field};
 use crate::Deployment;
 
 #[derive(Accounts)]
-pub struct UpdateSplSymbol2022Ctx<'info> {
+pub struct UpdateSplMetadata2022Ctx<'info> {
     #[account(mut,
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
@@ -21,7 +21,8 @@ pub struct UpdateSplSymbol2022Ctx<'info> {
 
     // when deployment.require_creator_cosign is true, this must be equal to the creator
     // of the deployment otherwise, can be any signer account
-    #[account(mut)]
+    #[account(mut,
+        constraint = deployment.creator == signer.key())]
     pub signer: Signer<'info>,
 
     /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
@@ -41,7 +42,7 @@ pub struct UpdateSplSymbol2022Ctx<'info> {
 
 }
 
-pub fn update_spl_symbol2022(ctx: Context<UpdateSplSymbol2022Ctx>) -> Result<()> {
+pub fn update_spl_metadata2022(ctx: Context<UpdateSplMetadata2022Ctx>, new_uri: String) -> Result<()> {
     // let MintToken2022Ctx { 
       
     //     ..
@@ -64,6 +65,21 @@ pub fn update_spl_symbol2022(ctx: Context<UpdateSplSymbol2022Ctx>) -> Result<()>
         &deployment.key(),
         Field::Symbol,
         deployment.ticker.clone(),
+    );
+
+
+    let account_infos = &[
+        fungible_mint.to_account_info(),
+        deployment.to_account_info(),
+    ];
+    invoke_signed(&update_metadata_ix, account_infos, &[deployment_seeds])?;
+
+    let update_metadata_ix: solana_program::instruction::Instruction = update_field(
+        &spl_token_2022::ID,
+        &fungible_mint.key(),
+        &deployment.key(),
+        Field::Uri,
+        new_uri
     );
 
     let account_infos = &[
