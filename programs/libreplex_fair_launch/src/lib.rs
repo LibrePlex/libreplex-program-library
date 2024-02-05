@@ -23,11 +23,6 @@ pub mod libreplex_fair_launch {
         instructions::initialise_v2(ctx, input)
     }
 
-    // allows for deploying of cNFTs - to be enabled once tested 
-    // pub fn deploy_v2(ctx: Context<DeployLegacyV2Ctx>) -> Result<()> {
-    //     instructions::deploy_v2(ctx)
-    // }
-
     pub fn deploy_token22(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
         instructions::deploy_token_2022(ctx)
     }

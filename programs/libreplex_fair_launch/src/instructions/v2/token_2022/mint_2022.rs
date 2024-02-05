@@ -78,18 +78,6 @@ pub struct MintToken2022Ctx<'info> {
     pub non_fungible_token_account: UncheckedAccount<'info>,
     
 
-     /// CHECK: passed in via CPI to libreplex_inscriptions program
-    #[account(mut)]
-    pub inscription_summary: UncheckedAccount<'info>,
-
-    /// CHECK: passed in via CPI to libreplex_inscriptions program
-    #[account(mut)]
-    pub inscription_v3: UncheckedAccount<'info>,
-
-    /// CHECK: sent via CPI to libreplex_inscriptions_program
-    #[account(mut)]
-    pub inscription_data: UncheckedAccount<'info>,
-
 
 
     /* BOILERPLATE PROGRAM ACCOUNTS */
@@ -102,20 +90,15 @@ pub struct MintToken2022Ctx<'info> {
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// CHECK: Checked in constraint
-    #[account(
-        constraint = inscriptions_program.key() == libreplex_inscriptions::ID
-    )]
-    pub inscriptions_program: UncheckedAccount<'info>,
+
+
 
     #[account()]
     pub system_program: Program<'info, System>,
 
-    
-
 }
 
-pub fn mint_token2022(ctx: Context<MintToken2022Ctx>) -> Result<()> {
+pub fn mint_token2022<'info>(ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>) -> Result<()> {
     // let MintToken2022Ctx { 
       
     //     ..
@@ -126,12 +109,8 @@ pub fn mint_token2022(ctx: Context<MintToken2022Ctx>) -> Result<()> {
     let minter= &ctx.accounts.minter;
     let non_fungible_mint = &ctx.accounts.non_fungible_mint;
     let non_fungible_token_account = &ctx.accounts.non_fungible_token_account;
-    let inscription_summary = &ctx.accounts.inscription_summary; 
-    let inscription_v3= &ctx.accounts.inscription_v3;
-    let inscription_data = &ctx.accounts.inscription_data;
     let token_program = &ctx.accounts.token_program;
     let associated_token_program = &ctx.accounts.associated_token_program;
-    let inscriptions_program = &ctx.accounts.inscriptions_program;
     let system_program = &ctx.accounts.system_program;
     let fungible_mint = &ctx.accounts.fungible_mint;
 
@@ -163,20 +142,17 @@ pub fn mint_token2022(ctx: Context<MintToken2022Ctx>) -> Result<()> {
         deployment, 
         deployment_config,
         creator_fee_treasury,
-        inscriptions_program, 
-        inscription_summary, 
         &fungible_mint.to_account_info(),
         non_fungible_mint, 
-        inscription_v3, 
         system_program, 
         payer, 
-        inscription_data, 
         associated_token_program, 
         token_program, 
         minter, 
         non_fungible_token_account, 
         hashlist,
-    ctx.bumps.deployment)?;
+    ctx.bumps.deployment,
+ctx.remaining_accounts)?;
 
     
     Ok(())

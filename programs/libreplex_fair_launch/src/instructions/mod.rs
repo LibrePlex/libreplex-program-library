@@ -48,6 +48,13 @@ pub use migrate_to_hashlist::*;
 pub mod add_to_hashlist;
 pub use add_to_hashlist::*;
 
+
+pub use swap_to_fungible::*;
+pub mod swap_to_fungible;
+
+pub use swap_to_non_fungible::*;
+pub mod swap_to_non_fungible;
+
 pub mod v2;
 pub use v2::*;
 

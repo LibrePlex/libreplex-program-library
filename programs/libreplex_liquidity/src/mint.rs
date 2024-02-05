@@ -79,17 +79,6 @@ pub struct MintCtx<'info> {
     #[account(mut)]
     pub pooled_non_fungible_token_account: UncheckedAccount<'info>,
 
-    /// CHECK: passed in via CPI to libreplex_inscriptions program
-    #[account(mut)]
-    pub inscription_v3: UncheckedAccount<'info>,
-
-    /// CHECK: Checked in cpi.
-    #[account(mut)]
-    pub inscription_summary: UncheckedAccount<'info>,
-
-    /// CHECK: sent via CPI to libreplex_inscriptions_program
-    #[account(mut)]
-    pub inscription_data: UncheckedAccount<'info>,
 
     /// CHECK: Checked in cpi.
     pub token_program: UncheckedAccount<'info>,
@@ -98,9 +87,6 @@ pub struct MintCtx<'info> {
     pub token_program_22: UncheckedAccount<'info>,
 
     pub associated_token_program: Program<'info, AssociatedToken>,
-
-    /// CHECK: Checked in cpi.
-    pub inscriptions_program: UncheckedAccount<'info>,
 
     pub fair_launch: Program<'info, LibreplexFairLaunch>,
 
@@ -143,12 +129,8 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
                 .accounts
                 .pooled_non_fungible_token_account
                 .to_account_info(),
-            inscription_summary: ctx.accounts.inscription_summary.to_account_info(),
-            inscription_v3: ctx.accounts.inscription_v3.to_account_info(),
-            inscription_data: ctx.accounts.inscription_data.to_account_info(),
             token_program: ctx.accounts.token_program_22.to_account_info(),
             associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
-            inscriptions_program: ctx.accounts.inscriptions_program.to_account_info(),
             system_program: ctx.accounts.system_program.to_account_info(),
         },
         &[seeds],
@@ -200,12 +182,8 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
             minter: ctx.accounts.receiver.to_account_info(),
             non_fungible_mint: ctx.accounts.non_fungible_mint.to_account_info(),
             non_fungible_token_account: ctx.accounts.non_fungible_token_account.to_account_info(),
-            inscription_summary: ctx.accounts.inscription_summary.to_account_info(),
-            inscription_v3: ctx.accounts.inscription_v3.to_account_info(),
-            inscription_data: ctx.accounts.inscription_data.to_account_info(),
             token_program: ctx.accounts.token_program_22.to_account_info(),
             associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
-            inscriptions_program: ctx.accounts.inscriptions_program.to_account_info(),
             system_program: ctx.accounts.system_program.to_account_info(),
         },
         &[seeds],

@@ -36,13 +36,13 @@ pub struct TokenMemberInput<'f> {
 }
 
 /// Creates the metadata accounts and mint a new token.
-pub fn create_token_2022_and_metadata<'f>(
-    accounts: MintAccounts2022<'f>,
+pub fn create_token_2022_and_metadata(
+    accounts: MintAccounts2022,
     decimals: u8,
     token_metadata: Option<TokenMetadata>,
     // token group is optional - specifying this turns this into a group mint
     token_group: Option<TokenGroupInput>,
-    token_member: Option<TokenMemberInput<'f>>,
+    token_member: Option<TokenMemberInput>,
     auth_seeds: Option<&[&[u8]]>,
     transfer_fee_bps: u16,
 ) -> Result<()> {
