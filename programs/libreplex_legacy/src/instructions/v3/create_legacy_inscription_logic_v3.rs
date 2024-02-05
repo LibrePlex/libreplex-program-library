@@ -95,10 +95,10 @@ pub fn create_legacy_inscription_logic_v3<'a>(
                         inscription_summary: inscription_summary.to_account_info(),
         
                         root: mint.to_account_info(),
-                        /// since root in this case can not sign,
-                        /// this legacy inscription must be the signer
-                        /// this is ok as the inscriptions guarantee uniqueness
-                        /// per mint.
+                        // since root in this case can not sign,
+                        // this legacy inscription must be the signer
+                        // this is ok as the inscriptions guarantee uniqueness
+                        // per mint.
                         signer: legacy_signer.to_account_info(),
                         inscription_v3: inscription_v3.to_account_info(),
         
@@ -159,10 +159,10 @@ pub fn create_legacy_inscription_logic_v3<'a>(
                          inscription object.
                         */
                         inscription_summary: inscription_summary.to_account_info(),
-                        /// since root in this case can not sign,
-                        /// this legacy inscription must be the signer
-                        /// this is ok as the inscriptions guarantee uniqueness
-                        /// per mint.
+                        // since root in this case can not sign,
+                        // this legacy inscription must be the signer
+                        // this is ok as the inscriptions guarantee uniqueness
+                        // per mint.
                         signer: legacy_signer.to_account_info(),
                         inscription_v3: inscription_v3.to_account_info(),
         

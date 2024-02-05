@@ -360,7 +360,7 @@ export type LibreplexFairLaunch = {
       "args": []
     },
     {
-      "name": "updateSplSymbol22",
+      "name": "updateSplMetadata",
       "accounts": [
         {
           "name": "deployment",
@@ -403,7 +403,12 @@ export type LibreplexFairLaunch = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "newUri",
+          "type": "string"
+        }
+      ]
     },
     {
       "name": "mintToken22",
@@ -2347,7 +2352,7 @@ export const IDL: LibreplexFairLaunch = {
       "args": []
     },
     {
-      "name": "updateSplSymbol22",
+      "name": "updateSplMetadata",
       "accounts": [
         {
           "name": "deployment",
@@ -2390,7 +2395,12 @@ export const IDL: LibreplexFairLaunch = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "newUri",
+          "type": "string"
+        }
+      ]
     },
     {
       "name": "mintToken22",
