@@ -11,6 +11,8 @@ pub struct InitialiseInput {
     pub bootstrap_start_time: Option<i64>,
     pub bootstrap_requires_sold_out: bool,
     pub creator_basis_points: u64,
+
+    pub lp_ratio: u16,
 }
 
 #[derive(Accounts)]
@@ -37,10 +39,13 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         bootstrap_requires_sold_out,
         deployment,
         creator_basis_points,
+        lp_ratio,
     } = input;
 
     ctx.accounts.liquidity.set_inner(Liquidity {
         pool_bootstrapped: false,
+        lp_ratio,
+        total_mints: 0,
         seed,
         bump: ctx.bumps.liquidity,
         bootstrap_start_time,
