@@ -15,9 +15,9 @@ pub struct MintCtx<'info> {
 
     /// CHECK: Checked by has one
     #[account(mut)]
-    pub authority: UncheckedAccount<'info>,
+    pub treasury: UncheckedAccount<'info>,
 
-    #[account(mut, has_one = deployment, has_one = authority)]
+    #[account(mut, has_one = deployment, has_one = treasury)]
     pub liquidity: Box<Account<'info, Liquidity>>,
 
     pub system_program: Program<'info, System>,
@@ -203,7 +203,7 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
         let fee_to_creator =  mint_funds_received.checked_mul(liquidity.creator_basis_points).unwrap().checked_div(10000).unwrap();
 
         liquidity.sub_lamports(fee_to_creator)?;
-        ctx.accounts.authority.add_lamports(fee_to_creator)?;
+        ctx.accounts.treasury.add_lamports(fee_to_creator)?;
     }
 
     Ok(())

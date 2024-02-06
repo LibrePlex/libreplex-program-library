@@ -19,8 +19,11 @@ pub struct InitialiseInput {
 #[instruction(input: InitialiseInput)]
 pub struct Initialise<'info> {
 
-    /// CHECK: CAn be anyone
+    /// CHECK: Can be anyone
     pub authority: UncheckedAccount<'info>,
+
+    /// CHECK: Can be anyone
+    pub treasury: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -45,6 +48,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
     ctx.accounts.liquidity.set_inner(Liquidity {
         pool_bootstrapped: false,
         lp_ratio,
+        treasury: ctx.accounts.treasury.key(),
         total_mints: 0,
         seed,
         bump: ctx.bumps.liquidity,
