@@ -63,8 +63,8 @@ pub fn mint_legacy_logic<'info>(
                     inscription_summary: inscription_summary.to_account_info(),
 
                     root: non_fungible_mint.to_account_info(),
-                    /// since root in this case can sign (we are creating a brand new mint),
-                    /// it will sign
+                    // since root in this case can sign (we are creating a brand new mint),
+                    // it will sign
                     signer: non_fungible_mint.to_account_info(),
                     inscription_v3: inscription_v3.to_account_info(),
 
