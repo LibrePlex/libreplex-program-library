@@ -248,16 +248,6 @@ export type LibreplexLiquidity = {
       "name": "createLookupTable",
       "accounts": [
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "treasury",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -265,7 +255,10 @@ export type LibreplexLiquidity = {
         {
           "name": "liquidity",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
         },
         {
           "name": "deployment",
@@ -279,6 +272,11 @@ export type LibreplexLiquidity = {
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVault",
           "isMut": false,
           "isSigner": false
         }
@@ -926,16 +924,6 @@ export const IDL: LibreplexLiquidity = {
       "name": "createLookupTable",
       "accounts": [
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "treasury",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -943,7 +931,10 @@ export const IDL: LibreplexLiquidity = {
         {
           "name": "liquidity",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
         },
         {
           "name": "deployment",
@@ -957,6 +948,11 @@ export const IDL: LibreplexLiquidity = {
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVault",
           "isMut": false,
           "isSigner": false
         }
