@@ -7,7 +7,7 @@ use libreplex_fair_launch::deploy_hybrid::sysvar_instructions_program;
 use libreplex_fair_launch::Deployment;
 use solana_address_lookup_table_program::instruction::{create_lookup_table, extend_lookup_table};
 use solana_program::{address_lookup_table, msg};
-use solana_program::program::{invoke, invoke_signed};
+use solana_program::program::invoke_signed;
 use solana_program::pubkey::Pubkey;
 use libreplex_shared::wrapped_sol;
 use vault_proxy::VAULT_BASE;
@@ -50,11 +50,16 @@ pub fn create_lookup_table_for_liquidity(ctx: Context<CreateLookupTableForLiquid
     let deployment = &ctx.accounts.deployment;
     let wrapped_sol_vault = &ctx.accounts.wrapped_sol_vault;
 
-    msg!(
-        "{} <=> {}",
-        lookup_table_ix.1.key(),
-        &ctx.accounts.lookup_table.key()
-    );
+    let seeds = &[
+        b"liquidity",
+        liquidity.seed.as_ref(),
+        &[liquidity.bump],
+    ];
+    // msg!(
+    //     "{} <=> {}",
+    //     lookup_table_ix.1.key(),
+    //     &ctx.accounts.lookup_table.key()
+    // );
     let account_infos = vec![
         lookup_table.to_account_info(),
         liquidity.to_account_info(),
@@ -63,15 +68,11 @@ pub fn create_lookup_table_for_liquidity(ctx: Context<CreateLookupTableForLiquid
     ];
    
     
-    invoke(&lookup_table_ix.0, account_infos.as_slice())?;
+    invoke_signed(&lookup_table_ix.0, account_infos.as_slice(), &[seeds])?;
 
     msg!("Invoking extend");
 
-    let seeds = &[
-        b"liquidity",
-        liquidity.seed.as_ref(),
-        &[liquidity.bump],
-    ];
+   
     let account_infos_extend = vec![
         lookup_table.to_account_info(),
         liquidity.to_account_info(),
