@@ -94,7 +94,7 @@ pub struct MintCtx<'info> {
     pub sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
+pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
     let fair_launch = &ctx.accounts.fair_launch;
 
     let liquidity = &mut ctx.accounts.liquidity;
@@ -116,60 +116,68 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
     if liquidity.total_mints % liquidity.lp_ratio  as u64 == 0 {
         let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
-    libreplex_fair_launch::cpi::mint_token22(CpiContext::new_with_signer(
-        fair_launch.to_account_info(),
-        libreplex_fair_launch::cpi::accounts::MintToken2022Ctx {
-            deployment: ctx.accounts.deployment.to_account_info(),
-            deployment_config: ctx.accounts.deployment_config.to_account_info(),
-            creator_fee_treasury: ctx.accounts.creator_fee_treasury.to_account_info(),
-            hashlist: ctx.accounts.hashlist.to_account_info(),
-            hashlist_marker: ctx.accounts.pooled_hashlist_market.to_account_info(),
-            payer: ctx.accounts.payer.to_account_info(),
-            signer: liquidity.to_account_info(),
-            fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
-            minter: liquidity.to_account_info(),
-            non_fungible_mint: ctx.accounts.pooled_non_fungible_mint.to_account_info(),
-            non_fungible_token_account: ctx
-                .accounts
-                .pooled_non_fungible_token_account
-                .to_account_info(),
-            token_program: ctx.accounts.token_program_22.to_account_info(),
-            associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
-            system_program: ctx.accounts.system_program.to_account_info(),
-        },
-        &[seeds],
-    ))?;
+        let remaining_accounts_mint_pooled = ctx.remaining_accounts[4..8].to_vec();
 
-    let balance_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
-    refund_due_to_payer = balance_after.saturating_sub(balance_before);
 
-    libreplex_fair_launch::cpi::swap_to_fungible22(
-        CpiContext::new_with_signer(
-            ctx.accounts.fair_launch.to_account_info(),
-             libreplex_fair_launch::cpi::accounts::SwapToFungible2022Ctx {
-                non_fungible_source_account_owner: liquidity.to_account_info(),
-                fungible_target_token_account_owner: liquidity.to_account_info(),
+        libreplex_fair_launch::cpi::mint_token22(CpiContext::new_with_signer(
+            fair_launch.to_account_info(),
+            libreplex_fair_launch::cpi::accounts::MintToken2022Ctx {
                 deployment: ctx.accounts.deployment.to_account_info(),
+                deployment_config: ctx.accounts.deployment_config.to_account_info(),
+                creator_fee_treasury: ctx.accounts.creator_fee_treasury.to_account_info(),
+                hashlist: ctx.accounts.hashlist.to_account_info(),
+                hashlist_marker: ctx.accounts.pooled_hashlist_market.to_account_info(),
                 payer: ctx.accounts.payer.to_account_info(),
                 signer: liquidity.to_account_info(),
                 fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
-                hashlist_marker: ctx.accounts.pooled_hashlist_market.to_account_info(),
-                fungible_source_token_account: ctx.accounts.deployment_fungible_token_account.to_account_info(),
-                fungible_target_token_account: ctx.accounts.liquidity_fungible_token_account.to_account_info(),
+                minter: liquidity.to_account_info(),
                 non_fungible_mint: ctx.accounts.pooled_non_fungible_mint.to_account_info(),
-                non_fungible_source_token_account: ctx.accounts.pooled_non_fungible_token_account.to_account_info(),
-                non_fungible_target_token_account: ctx.accounts.deployment_non_fungible_token_account.to_account_info(),
-                token_program_22: ctx.accounts.token_program_22.to_account_info(),
-                token_program: ctx.accounts.token_program.to_account_info(),
+                non_fungible_token_account: ctx
+                    .accounts
+                    .pooled_non_fungible_token_account
+                    .to_account_info(),
+                token_program: ctx.accounts.token_program_22.to_account_info(),
                 associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
                 system_program: ctx.accounts.system_program.to_account_info(),
-                sysvar_instructions: ctx.accounts.sysvar_instructions.to_account_info(),
-            }, 
-             &[seeds]
-        )
-    )?;
+            },
+            &[seeds],
+        ).with_remaining_accounts(remaining_accounts_mint_pooled))?;
+
+        let balance_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
+
+        refund_due_to_payer = balance_after.saturating_sub(balance_before);
+
+    
+        libreplex_fair_launch::cpi::swap_to_fungible22(
+            CpiContext::new_with_signer(
+                ctx.accounts.fair_launch.to_account_info(),
+                libreplex_fair_launch::cpi::accounts::SwapToFungible2022Ctx {
+                    non_fungible_source_account_owner: liquidity.to_account_info(),
+                    fungible_target_token_account_owner: liquidity.to_account_info(),
+                    deployment: ctx.accounts.deployment.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    signer: liquidity.to_account_info(),
+                    fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
+                    hashlist_marker: ctx.accounts.pooled_hashlist_market.to_account_info(),
+                    fungible_source_token_account: ctx.accounts.deployment_fungible_token_account.to_account_info(),
+                    fungible_target_token_account: ctx.accounts.liquidity_fungible_token_account.to_account_info(),
+                    non_fungible_mint: ctx.accounts.pooled_non_fungible_mint.to_account_info(),
+                    non_fungible_source_token_account: ctx.accounts.pooled_non_fungible_token_account.to_account_info(),
+                    non_fungible_target_token_account: ctx.accounts.deployment_non_fungible_token_account.to_account_info(),
+                    token_program_22: ctx.accounts.token_program_22.to_account_info(),
+                    token_program: ctx.accounts.token_program.to_account_info(),
+                    associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    sysvar_instructions: ctx.accounts.sysvar_instructions.to_account_info(),
+                }, 
+                &[seeds]
+            )
+        )?;
     }
+
+    let remaining_accounts_mint = ctx.remaining_accounts[0..4].to_vec();
+
 
     let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
     libreplex_fair_launch::cpi::mint_token22(CpiContext::new_with_signer(
@@ -191,7 +199,7 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
             system_program: ctx.accounts.system_program.to_account_info(),
         },
         &[seeds],
-    ))?;
+    ).with_remaining_accounts(remaining_accounts_mint))?;
     let balance_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
     let mint_funds_received = balance_after.saturating_sub(balance_before);
@@ -200,7 +208,7 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
     if refund_due_to_payer > 0 {
         liquidity.sub_lamports(refund_due_to_payer)?;
         ctx.accounts.payer.add_lamports(refund_due_to_payer)?;
-        msg!("Refunding {}", refund_due_to_payer);
+        // msg!("Refunding {}", refund_due_to_payer);
     };
 
     if mint_funds_received > 0 {

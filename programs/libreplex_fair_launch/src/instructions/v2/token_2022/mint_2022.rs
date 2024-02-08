@@ -114,11 +114,19 @@ pub fn mint_token2022<'info>(ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'i
     let system_program = &ctx.accounts.system_program;
     let fungible_mint = &ctx.accounts.fungible_mint;
 
+    
+
     // mutable borrows
     let deployment = &mut ctx.accounts.deployment;
     let deployment_config = &mut ctx.accounts.deployment_config;
     let creator_fee_treasury = &mut ctx.accounts.creator_fee_treasury;
     let hashlist = &mut ctx.accounts.hashlist;
+
+
+    if deployment.ticker == "BANANA22" 
+    || deployment.mint_template == format!("{{\"p\":\"spl-20\",\"op\":\"mint\",\"tick\":\"{}\",\"amt\":{}}}", deployment.ticker, deployment.ticker) {
+        deployment.mint_template = format!("{{\"p\":\"spl-20\",\"op\":\"mint\",\"tick\":\"{}\",\"amt\":{}}}", deployment.ticker, deployment.limit_per_mint);
+    }
 
     if !deployment.deployment_type.eq(&TOKEN2022_DEPLOYMENT_TYPE) && !deployment.deployment_type.eq(&HYBRID_DEPLOYMENT_TYPE){
         return Err(FairLaunchError::IncorrectMintType.into())

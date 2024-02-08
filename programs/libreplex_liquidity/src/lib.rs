@@ -28,7 +28,7 @@ pub mod libreplex_liquidity {
         swap_to_fungible_handler(ctx)
     }
 
-    pub fn mint(ctx: Context<MintCtx>) -> Result<()> {
+    pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
         mint_handler(ctx)
     }
 
