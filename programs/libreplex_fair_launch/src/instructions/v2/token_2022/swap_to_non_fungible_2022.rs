@@ -9,11 +9,6 @@ use libreplex_shared::operations::transfer_generic_spl;
 
 use crate::Deployment;
 
-pub mod sysvar_instructions_program {
-    use anchor_lang::declare_id;
-    declare_id!("Sysvar1nstructions1111111111111111111111111");
-}
-
 #[derive(Accounts)]
 pub struct SwapToNonFungible2022Ctx<'info> {
     #[account(
@@ -89,11 +84,7 @@ pub struct SwapToNonFungible2022Ctx<'info> {
     #[account()]
     pub system_program: Program<'info, System>,
 
-    /// CHECK: Checked in constraint
-    #[account(
-        constraint = sysvar_instructions.key() == sysvar_instructions_program::ID
-    )]
-    sysvar_instructions: UncheckedAccount<'info>,
+
 }
 
 pub fn swap_to_nonfungible_2022(ctx: Context<SwapToNonFungible2022Ctx>) -> Result<()> {

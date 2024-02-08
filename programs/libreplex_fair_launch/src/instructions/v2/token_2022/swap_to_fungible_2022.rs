@@ -89,12 +89,6 @@ pub struct SwapToFungible2022Ctx<'info> {
 
     #[account()]
     pub system_program: Program<'info, System>,
-
-    /// CHECK: Checked in constraint
-    #[account(
-        constraint = sysvar_instructions.key() == sysvar_instructions_program::ID
-    )]
-    sysvar_instructions: UncheckedAccount<'info>,
 }
 
 pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> {

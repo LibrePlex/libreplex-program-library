@@ -90,8 +90,6 @@ pub struct MintCtx<'info> {
 
     pub fair_launch: Program<'info, LibreplexFairLaunch>,
 
-    /// CHECK: Checked in cpi.
-    pub sysvar_instructions: UncheckedAccount<'info>,
 }
 
 pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
@@ -164,7 +162,6 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
                 token_program: ctx.accounts.token_program.to_account_info(),
                 associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
                 system_program: ctx.accounts.system_program.to_account_info(),
-                sysvar_instructions: ctx.accounts.sysvar_instructions.to_account_info(),
             }, 
              &[seeds]
         )

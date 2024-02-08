@@ -8,7 +8,6 @@ use anchor_spl::associated_token::{
 };
 
 use libreplex_fair_launch::{Deployment, DeploymentConfig, TOKEN2022_DEPLOYMENT_TYPE};
-use libreplex_shared::sysvar_instructions_program;
 use solana_program::hash::Hash;
 use solana_program::program_pack::Pack;
 use solana_program::{instruction::Instruction, pubkey::Pubkey};
@@ -567,7 +566,6 @@ pub async fn deploy_2022<'info>(
                     token_program_2022: anchor_spl::token_2022::ID,
                     associated_token_program: AssociatedToken::id(),
                     system_program: system_program::ID,
-                    sysvar_instructions: sysvar_instructions_program::ID,
                     // these will be ignored for hybrid w/ deployment type TOKEN2022
                     rent: Pubkey::from_str("SysvarRent111111111111111111111111111111111").unwrap(),
                 }
@@ -798,7 +796,6 @@ pub async fn swap_to_fungible_2022(
                     token_program: anchor_spl::token::ID,
                     token_program_22: spl_token_2022::ID,
                     associated_token_program: associated_token::ID,
-                    sysvar_instructions: sysvar_instructions_program::ID,
                     fungible_mint,
                     fungible_source_token_account,
                     fungible_target_token_account,
@@ -897,7 +894,6 @@ pub async fn swap_to_non_fungible_2022(
                     token_program: anchor_spl::token::ID,
                     token_program_22: spl_token_2022::ID,
                     associated_token_program: associated_token::ID,
-                    sysvar_instructions: sysvar_instructions_program::ID,
                     fungible_mint,
                     fungible_source_token_account,
                     fungible_target_token_account,

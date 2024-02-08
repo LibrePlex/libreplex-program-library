@@ -62,9 +62,6 @@ pub struct SwapToFungible<'info> {
 
     pub system_program: Program<'info, System>,
 
-    /// CHECK: Checked in cpi
-    sysvar_instructions: UncheckedAccount<'info>,
-
     fair_launch_program: Program<'info, LibreplexFairLaunch>
 }
 
@@ -104,7 +101,6 @@ pub fn swap_to_fungible_handler(ctx: Context<SwapToFungible>) -> Result<()> {
                 token_program: ctx.accounts.token_program.to_account_info(),
                 associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
                 system_program: ctx.accounts.system_program.to_account_info(),
-                sysvar_instructions: ctx.accounts.sysvar_instructions.to_account_info(),
             },
             &[seeds])
     )?;
