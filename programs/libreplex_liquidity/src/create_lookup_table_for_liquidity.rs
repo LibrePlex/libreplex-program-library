@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use anchor_lang::{prelude::*, system_program, Discriminator};
+use anchor_lang::{prelude::*, system_program};
 use anchor_spl::associated_token::get_associated_token_address;
 use anchor_spl::{associated_token, token, token_2022};
 use libreplex_fair_launch::deploy_hybrid::sysvar_instructions_program;
@@ -174,7 +174,7 @@ pub fn create_lookup_table_for_liquidity(ctx: Context<CreateLookupTableForLiquid
                liquidity_wrapped_sol_escrow,
                amm_proxy::ID,
                vault_proxy::ID,
-               // FEE_OWNER
+               // METEORA FEE_OWNER - this is a hard coded account in Meteora
                Pubkey::from_str("6WaLrrRfReGKBYUSkmx2K6AuT21ida4j8at2SUiZdXu8").unwrap(),
                fungible_vault,
                fungible_vault_token_account,
