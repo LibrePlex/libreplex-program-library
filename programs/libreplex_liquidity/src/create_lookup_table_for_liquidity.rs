@@ -5,9 +5,9 @@ use anchor_spl::associated_token::get_associated_token_address;
 use anchor_spl::{associated_token, token, token_2022};
 use libreplex_fair_launch::deploy_hybrid::sysvar_instructions_program;
 use libreplex_fair_launch::Deployment;
-use solana_address_lookup_table_program::instruction::{create_lookup_table, extend_lookup_table};
+use solana_address_lookup_table_program::instruction::{create_lookup_table, extend_lookup_table, freeze_lookup_table};
 use solana_program::{address_lookup_table, msg};
-use solana_program::program::invoke_signed;
+use solana_program::program::invoke;
 use solana_program::pubkey::Pubkey;
 use libreplex_shared::wrapped_sol;
 use vault_proxy::VAULT_BASE;
@@ -45,37 +45,27 @@ pub fn create_lookup_table_for_liquidity(ctx: Context<CreateLookupTableForLiquid
     let payer = &ctx.accounts.payer;
     let liquidity = &mut ctx.accounts.liquidity;
     let lookup_table = &ctx.accounts.lookup_table;
-    let lookup_table_ix = create_lookup_table(liquidity.key(), payer.key(), recent_slot);
+    let lookup_table_ix = create_lookup_table(payer.key(), payer.key(), recent_slot);
     let system_program = &ctx.accounts.system_program;
     let deployment = &ctx.accounts.deployment;
     let wrapped_sol_vault = &ctx.accounts.wrapped_sol_vault;
 
-    let seeds = &[
-        b"liquidity",
-        liquidity.seed.as_ref(),
-        &[liquidity.bump],
-    ];
-    // msg!(
-    //     "{} <=> {}",
-    //     lookup_table_ix.1.key(),
-    //     &ctx.accounts.lookup_table.key()
-    // );
     let account_infos = vec![
         lookup_table.to_account_info(),
-        liquidity.to_account_info(),
+        payer.to_account_info(),
         payer.to_account_info(),
         system_program.to_account_info(),
     ];
    
     
-    invoke_signed(&lookup_table_ix.0, account_infos.as_slice(), &[seeds])?;
+    invoke(&lookup_table_ix.0, account_infos.as_slice())?;
 
     msg!("Invoking extend");
 
    
     let account_infos_extend = vec![
         lookup_table.to_account_info(),
-        liquidity.to_account_info(),
+        payer.to_account_info(),
         payer.to_account_info(),
         system_program.to_account_info(),
     ];
@@ -144,7 +134,7 @@ pub fn create_lookup_table_for_liquidity(ctx: Context<CreateLookupTableForLiquid
     {
         let extend_lookup_table = extend_lookup_table(
             lookup_table_ix.1,
-            liquidity.key(),
+            payer.key(),
             Some(payer.key()),
             vec![
                associated_token::ID,
@@ -183,13 +173,13 @@ pub fn create_lookup_table_for_liquidity(ctx: Context<CreateLookupTableForLiquid
                fungible_vault_lp_token_account,
             ],
         );
-        invoke_signed(&extend_lookup_table, &account_infos_extend, &[seeds])?;
+        invoke(&extend_lookup_table, &account_infos_extend)?;
     }
 
     {
         let extend_lookup_table = extend_lookup_table(
             lookup_table_ix.1,
-            liquidity.key(),
+            payer.key(),
             Some(payer.key()),
             vec![
                wrapped_sol_vault.key(),
@@ -204,8 +194,19 @@ pub fn create_lookup_table_for_liquidity(ctx: Context<CreateLookupTableForLiquid
                fungible_mint_fee,
             ],
         );
-        invoke_signed(&extend_lookup_table, &account_infos_extend, &[seeds])?;
+        invoke(&extend_lookup_table, &account_infos_extend)?;
     }
+    
+    {
+         
+        let account_infos_freeze = vec![
+            lookup_table.to_account_info(),
+            payer.to_account_info(),
+        ];
+        let freeze_lookup_table = freeze_lookup_table(lookup_table_ix.1, payer.key()); 
+        invoke(&freeze_lookup_table, &account_infos_freeze)?;
+    }
+
     
     // update this - mint is not possible because lookup table is defined
     liquidity.lookup_table_address = lookup_table_ix.1;
