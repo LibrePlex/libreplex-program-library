@@ -336,7 +336,7 @@ pub fn bootstrap_pool_handler(ctx: Context<BootstapPool>) -> Result<()> {
 
     amm_proxy::cpi::initialize_permissionless_pool_with_fee_tier(
         CpiContext::new(ctx.accounts.amm_program.to_account_info(), init_pool_accs),
-         amm_proxy::CurveType::ConstantProduct, 100, 
+         amm_proxy::CurveType::ConstantProduct, liquidity.pool_fee_basis_points, 
          wrapped_sol_escrow.amount, 
          fungible_escrow_token_account.amount)?;
 

@@ -128,8 +128,8 @@ export type LibreplexLiquidity = {
           "isSigner": true
         },
         {
-          "name": "authority",
-          "isMut": false,
+          "name": "treasury",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -138,7 +138,7 @@ export type LibreplexLiquidity = {
           "isSigner": false,
           "relations": [
             "deployment",
-            "authority"
+            "treasury"
           ]
         },
         {
@@ -217,21 +217,6 @@ export type LibreplexLiquidity = {
           "isSigner": false
         },
         {
-          "name": "inscriptionV3",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionSummary",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionData",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -243,11 +228,6 @@ export type LibreplexLiquidity = {
         },
         {
           "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -269,6 +249,11 @@ export type LibreplexLiquidity = {
       "accounts": [
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
           "isMut": false,
           "isSigner": false
         },
@@ -571,6 +556,22 @@ export type LibreplexLiquidity = {
             "type": "publicKey"
           },
           {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpRatio",
+            "type": "u16"
+          },
+          {
+            "name": "totalMints",
+            "type": "u64"
+          },
+          {
+            "name": "poolFeeBasisPoints",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -609,6 +610,14 @@ export type LibreplexLiquidity = {
           },
           {
             "name": "creatorBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "lpRatio",
+            "type": "u16"
+          },
+          {
+            "name": "poolFeeBasisPoints",
             "type": "u64"
           }
         ]
@@ -747,8 +756,8 @@ export const IDL: LibreplexLiquidity = {
           "isSigner": true
         },
         {
-          "name": "authority",
-          "isMut": false,
+          "name": "treasury",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -757,7 +766,7 @@ export const IDL: LibreplexLiquidity = {
           "isSigner": false,
           "relations": [
             "deployment",
-            "authority"
+            "treasury"
           ]
         },
         {
@@ -836,21 +845,6 @@ export const IDL: LibreplexLiquidity = {
           "isSigner": false
         },
         {
-          "name": "inscriptionV3",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionSummary",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionData",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -862,11 +856,6 @@ export const IDL: LibreplexLiquidity = {
         },
         {
           "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -888,6 +877,11 @@ export const IDL: LibreplexLiquidity = {
       "accounts": [
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
           "isMut": false,
           "isSigner": false
         },
@@ -1190,6 +1184,22 @@ export const IDL: LibreplexLiquidity = {
             "type": "publicKey"
           },
           {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpRatio",
+            "type": "u16"
+          },
+          {
+            "name": "totalMints",
+            "type": "u64"
+          },
+          {
+            "name": "poolFeeBasisPoints",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -1228,6 +1238,14 @@ export const IDL: LibreplexLiquidity = {
           },
           {
             "name": "creatorBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "lpRatio",
+            "type": "u16"
+          },
+          {
+            "name": "poolFeeBasisPoints",
             "type": "u64"
           }
         ]
