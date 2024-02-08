@@ -25,6 +25,8 @@ pub struct Liquidity {
 
     pub pool_fee_basis_points: u64,
 
+    pub lookup_table_address: Pubkey,
+
     pub padding: [u8; 100]
 }
 
