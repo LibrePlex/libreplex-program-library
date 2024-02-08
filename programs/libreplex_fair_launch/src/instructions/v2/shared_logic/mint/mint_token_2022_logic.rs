@@ -41,7 +41,7 @@ pub fn mint_token2022_logic<'info>(
     let deployment_seeds: &[&[u8]] =
         &["deployment".as_bytes(), ticker.as_ref(), &[bump_deployment]];
 
-    msg!("Create token 2022 w/ metadata");
+    // msg!("Create token 2022 w/ metadata");
     create_token_2022_and_metadata(
         MintAccounts2022 {
             authority: deployment.to_account_info(),
@@ -67,7 +67,7 @@ pub fn mint_token2022_logic<'info>(
         0
     )?;
 
-    msg!("Minting 2022");
+    // msg!("Minting 2022");
     mint_non_fungible_2022_logic(
         &non_fungible_mint.to_account_info(),
         non_fungible_token_account,
@@ -92,7 +92,7 @@ pub fn mint_token2022_logic<'info>(
         let inscription_v3 = &remaining_accounts[2];
         let inscription_data = &remaining_accounts[3];
 
-        msg!("Creating inscriptions");
+        // msg!("Creating inscriptions");
         create_fair_launch_inscriptions(
             inscriptions_program,
             inscription_summary,
