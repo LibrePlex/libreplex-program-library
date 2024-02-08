@@ -16,6 +16,15 @@ pub struct Liquidity {
 
     pub deployment: Pubkey,
     pub authority: Pubkey,
+
+    pub treasury: Pubkey,
+
+    pub lp_ratio: u16,
+
+    pub total_mints: u64,
+
+    pub pool_fee_basis_points: u64,
+
     pub padding: [u8; 100]
 }
 
