@@ -2318,8 +2318,12 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "libreplex_fair_launch",
+ "libreplex_inscriptions",
+ "libreplex_shared",
+ "mpl-token-metadata",
+ "solana-address-lookup-table-program",
+ "solana-program",
  "solana-program-test",
- "solana-sdk",
  "vault-proxy",
 ]
 
