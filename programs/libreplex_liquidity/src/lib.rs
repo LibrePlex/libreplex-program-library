@@ -6,6 +6,9 @@ pub use state::*;
 pub mod initialise;
 pub use initialise::*;
 
+pub mod create_lookup_table_for_liquidity;
+pub use create_lookup_table_for_liquidity::*;
+
 pub mod mint;
 pub use mint::*;
 
@@ -27,6 +30,11 @@ pub mod libreplex_liquidity {
 
     pub fn mint(ctx: Context<MintCtx>) -> Result<()> {
         mint_handler(ctx)
+    }
+
+    pub fn create_lookup_table(ctx: Context<CreateLookupTableForLiquidityCtx>,
+    recent_slot: u64) -> Result<()> {
+        create_lookup_table_for_liquidity(ctx, recent_slot)
     }
 
     pub fn initialise(ctx: Context<Initialise>, input: InitialiseInput) -> Result<()> {

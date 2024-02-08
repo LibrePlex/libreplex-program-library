@@ -8,7 +8,7 @@ use crate::Liquidity;
 #[derive(Accounts)]
 pub struct SwapToFungible<'info> {
     #[account(has_one = deployment)]
-    pub liqudity: Box<Account<'info, Liquidity>>,
+    pub liquidity: Box<Account<'info, Liquidity>>,
 
     #[account(
         mut,
@@ -70,7 +70,7 @@ pub struct SwapToFungible<'info> {
 
 
 pub fn swap_to_fungible_handler(ctx: Context<SwapToFungible>) -> Result<()> {
-    let liqudity = &ctx.accounts.liqudity;
+    let liqudity = &ctx.accounts.liquidity;
 
     
     if !liqudity.pool_bootstrapped {
@@ -79,8 +79,8 @@ pub fn swap_to_fungible_handler(ctx: Context<SwapToFungible>) -> Result<()> {
 
     let seeds = &[
         b"liquidity",
-        ctx.accounts.liqudity.seed.as_ref(),
-        &[ctx.accounts.liqudity.bump],
+        ctx.accounts.liquidity.seed.as_ref(),
+        &[ctx.accounts.liquidity.bump],
     ];
 
 

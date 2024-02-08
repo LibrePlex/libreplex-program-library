@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 
 
 use crate::Liquidity;
@@ -61,6 +61,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         deployment,
         creator_basis_points,
         authority: ctx.accounts.authority.key(),
+        lookup_table_address: system_program::ID,
         padding: [0; 100],
     });
 

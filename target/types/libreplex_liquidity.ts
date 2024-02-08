@@ -6,7 +6,7 @@ export type LibreplexLiquidity = {
       "name": "swapToFungible",
       "accounts": [
         {
-          "name": "liqudity",
+          "name": "liquidity",
           "isMut": false,
           "isSigner": false,
           "relations": [
@@ -243,6 +243,50 @@ export type LibreplexLiquidity = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "createLookupTable",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
+        },
+        {
+          "name": "deployment",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lookupTable",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVault",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "recentSlot",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "initialise",
@@ -570,6 +614,10 @@ export type LibreplexLiquidity = {
           {
             "name": "poolFeeBasisPoints",
             "type": "u64"
+          },
+          {
+            "name": "lookupTableAddress",
+            "type": "publicKey"
           },
           {
             "name": "padding",
@@ -634,7 +682,7 @@ export const IDL: LibreplexLiquidity = {
       "name": "swapToFungible",
       "accounts": [
         {
-          "name": "liqudity",
+          "name": "liquidity",
           "isMut": false,
           "isSigner": false,
           "relations": [
@@ -871,6 +919,50 @@ export const IDL: LibreplexLiquidity = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "createLookupTable",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
+        },
+        {
+          "name": "deployment",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lookupTable",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVault",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "recentSlot",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "initialise",
@@ -1198,6 +1290,10 @@ export const IDL: LibreplexLiquidity = {
           {
             "name": "poolFeeBasisPoints",
             "type": "u64"
+          },
+          {
+            "name": "lookupTableAddress",
+            "type": "publicKey"
           },
           {
             "name": "padding",

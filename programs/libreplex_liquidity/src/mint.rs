@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{associated_token::AssociatedToken, token::TokenAccount};
 
 use crate::Liquidity;
@@ -108,6 +108,10 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
 
     let mut refund_due_to_payer = 0;
 
+    if liquidity.lookup_table_address == system_program::ID {
+        panic!("Lookup table not initialised");
+    }
+
 
     if liquidity.total_mints % liquidity.lp_ratio  as u64 == 0 {
         let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
@@ -138,7 +142,7 @@ pub fn mint_handler(ctx: Context<MintCtx>) -> Result<()> {
 
     let balance_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
-    refund_due_to_payer = balance_after.saturating_sub(balance_before);;
+    refund_due_to_payer = balance_after.saturating_sub(balance_before);
 
     libreplex_fair_launch::cpi::swap_to_fungible22(
         CpiContext::new_with_signer(
