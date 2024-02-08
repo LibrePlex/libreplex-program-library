@@ -13,6 +13,8 @@ pub struct InitialiseInput {
     pub creator_basis_points: u64,
 
     pub lp_ratio: u16,
+
+    pub pool_fee_basis_points: u64,
 }
 
 #[derive(Accounts)]
@@ -43,6 +45,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         deployment,
         creator_basis_points,
         lp_ratio,
+        pool_fee_basis_points,
     } = input;
 
     ctx.accounts.liquidity.set_inner(Liquidity {
@@ -50,6 +53,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         lp_ratio,
         treasury: ctx.accounts.treasury.key(),
         total_mints: 0,
+        pool_fee_basis_points,
         seed,
         bump: ctx.bumps.liquidity,
         bootstrap_start_time,
