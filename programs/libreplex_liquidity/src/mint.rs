@@ -116,7 +116,8 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
     if liquidity.total_mints % liquidity.lp_ratio  as u64 == 0 {
         let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
-        let remaining_accounts_mint_pooled = ctx.remaining_accounts[4..8].to_vec();
+        let remaining_accounts_mint_pooled = ctx.remaining_accounts[
+            std::cmp::min(4, ctx.remaining_accounts.len())..std::cmp::min(8, ctx.remaining_accounts.len())].to_vec();
 
 
 
@@ -176,7 +177,8 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
         )?;
     }
 
-    let remaining_accounts_mint = ctx.remaining_accounts[0..4].to_vec();
+    let remaining_accounts_mint 
+        = ctx.remaining_accounts[0..std::cmp::min(4, ctx.remaining_accounts.len())].to_vec();
 
 
     let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
