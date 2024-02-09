@@ -1949,41 +1949,46 @@ export type LibreplexFairLaunch = {
     },
     {
       "code": 6002,
+      "name": "OffchainUrlTooLong",
+      "msg": "Offchain URL too long"
+    },
+    {
+      "code": 6003,
       "name": "DeploymentTemplateTooLong",
       "msg": "Deployment template too long"
     },
     {
-      "code": 6003,
+      "code": 6004,
       "name": "RootTypeTooLong",
       "msg": "Root type too long"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "MintedOut",
       "msg": "Minted out"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "LegacyMigrationsAreMintedOut",
       "msg": "Legacy migrations are minted out"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "MissingGlobalTreeDelegate",
       "msg": "Global tree delegate is missing"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "IncorrectMintType",
       "msg": "Incorrect mint type"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "InvalidMetadata",
       "msg": "Invalid Metadata"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "CreatorFeeTooHigh",
       "msg": "Creator fee too high"
     }
@@ -3941,41 +3946,46 @@ export const IDL: LibreplexFairLaunch = {
     },
     {
       "code": 6002,
+      "name": "OffchainUrlTooLong",
+      "msg": "Offchain URL too long"
+    },
+    {
+      "code": 6003,
       "name": "DeploymentTemplateTooLong",
       "msg": "Deployment template too long"
     },
     {
-      "code": 6003,
+      "code": 6004,
       "name": "RootTypeTooLong",
       "msg": "Root type too long"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "MintedOut",
       "msg": "Minted out"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "LegacyMigrationsAreMintedOut",
       "msg": "Legacy migrations are minted out"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "MissingGlobalTreeDelegate",
       "msg": "Global tree delegate is missing"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "IncorrectMintType",
       "msg": "Incorrect mint type"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "InvalidMetadata",
       "msg": "Invalid Metadata"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "CreatorFeeTooHigh",
       "msg": "Creator fee too high"
     }
