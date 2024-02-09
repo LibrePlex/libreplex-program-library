@@ -11,33 +11,31 @@ use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, SharedE
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::TokenMetadata;
 
-use crate::{errors::EditionsError, Editions, HashlistMarker};
+use crate::{errors::EditionsError, EditionsDeployment, HashlistMarker};
 
 
 
 
 #[derive(Accounts)]
 pub struct MintCtx<'info> {
-    #[account(mut)]
-    pub deployment: Account<'info, Editions>,
 
     #[account(mut,
-        seeds = ["editions_deployment".as_ref(), deployment.key().as_ref()], bump)]
-    pub editions_deployment: Account<'info, Editions>,
+        seeds = ["editions_deployment".as_ref(), editions_deployment.symbol.as_ref()], bump)]
+    pub editions_deployment: Account<'info, EditionsDeployment>,
 
     
     /// CHECK: Checked in PDA. Not deserialized because it can be rather big
     #[account(mut, 
         seeds = ["hashlist".as_bytes(), 
-        deployment.key().as_ref()],
+        editions_deployment.key().as_ref()],
         bump,)]
     pub hashlist: UncheckedAccount<'info>,
 
     #[account(init, 
-        space = 8,
+        space = HashlistMarker::SIZE,
         payer = payer,
         seeds = ["hashlist_marker".as_bytes(), 
-        deployment.key().as_ref(),
+        editions_deployment.key().as_ref(),
         mint.key().as_ref()],
         bump,)]
     pub hashlist_marker: Account<'info, HashlistMarker>,
@@ -65,7 +63,7 @@ pub struct MintCtx<'info> {
 
     /// CHECK: passed in via CPI to mpl_token_metadata program
     #[account(mut)]
-    pub non_fungible_token_account: UncheckedAccount<'info>,
+    pub token_account: UncheckedAccount<'info>,
     
 
 
@@ -97,7 +95,7 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
     let payer = &ctx.accounts.payer; 
     let signer = &ctx.accounts.signer;
     let minter= &ctx.accounts.minter;
-    let minter_token_account = &ctx.accounts.non_fungible_token_account;
+    let minter_token_account = &ctx.accounts.token_account;
     let token_program = &ctx.accounts.token_program;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
@@ -169,7 +167,7 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         deployment_seeds,
     )?;
     
-
+    editions_deployment.number_of_tokens_issued += 1;
     add_to_hashlist(
         editions_deployment.number_of_tokens_issued as u32,
         hashlist,

@@ -13,7 +13,7 @@ pub enum DeploymentStatus {
 
 #[account]
 #[derive(InitSpace)]
-pub struct Editions {
+pub struct EditionsDeployment {
     pub creator: Pubkey,
     // set to 0 for unlimited
     pub max_number_of_tokens: u64,
@@ -33,6 +33,7 @@ pub struct Editions {
     #[max_len(OFFCHAIN_URL_LIMIT)]
     pub offchain_url: String, // pub padding: Vec<u8, EXCESS>
     
+    
     pub padding: [u8; 100]
 
 }
@@ -43,6 +44,10 @@ pub struct Editions {
 pub struct HashlistMarker {
     pub editions_deployment: Pubkey,
     pub mint: Pubkey
+}
+
+impl HashlistMarker{
+    pub const SIZE: usize = 8 + 32 + 32;
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]

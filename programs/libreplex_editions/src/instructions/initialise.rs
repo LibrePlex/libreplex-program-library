@@ -3,7 +3,7 @@ use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGr
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::TokenMetadata;
 
-use crate::{Editions, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
+use crate::{EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
 
 
 
@@ -20,9 +20,16 @@ pub struct InitialiseInput {
 #[derive(Accounts)]
 #[instruction(input: InitialiseInput)]
 pub struct InitialiseCtx<'info>  {
-    #[account(init, payer = payer, space = 8 + Editions::INIT_SPACE, 
+    #[account(init, payer = payer, space = 8 + EditionsDeployment::INIT_SPACE, 
         seeds = ["editions_deployment".as_ref(), input.symbol.as_ref()], bump)]
-    pub editions_deployment: Account<'info, Editions>,
+    pub editions_deployment: Account<'info, EditionsDeployment>,
+
+
+    /// CHECK: Checked in PDA. Not deserialized because it can be rather big
+    #[account(init, seeds = ["hashlist".as_bytes(), 
+        editions_deployment.key().as_ref()],
+        bump, payer = payer, space = 8 + 32 + 4)]
+    pub hashlist: Account<'info, Hashlist>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -58,7 +65,7 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
 
     let group_mint = &ctx.accounts.group_mint;
 
-    ctx.accounts.editions_deployment.set_inner(Editions {
+    ctx.accounts.editions_deployment.set_inner(EditionsDeployment {
         creator: ctx.accounts.creator.key(),
         max_number_of_tokens: input.max_number_of_tokens,
         number_of_tokens_issued: 0,

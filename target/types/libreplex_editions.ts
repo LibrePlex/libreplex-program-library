@@ -27,6 +27,26 @@ export type LibreplexEditions = {
           }
         },
         {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
+              }
+            ]
+          }
+        },
+        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -65,11 +85,6 @@ export type LibreplexEditions = {
       "name": "mint",
       "accounts": [
         {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "editionsDeployment",
           "isMut": true,
           "isSigner": false,
@@ -82,9 +97,9 @@ export type LibreplexEditions = {
               },
               {
                 "kind": "account",
-                "type": "publicKey",
-                "account": "Editions",
-                "path": "deployment"
+                "type": "string",
+                "account": "EditionsDeployment",
+                "path": "editions_deployment.symbol"
               }
             ]
           }
@@ -103,8 +118,8 @@ export type LibreplexEditions = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Editions",
-                "path": "deployment"
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
               }
             ]
           }
@@ -123,8 +138,8 @@ export type LibreplexEditions = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Editions",
-                "path": "deployment"
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
               },
               {
                 "kind": "account",
@@ -160,7 +175,7 @@ export type LibreplexEditions = {
           "isSigner": false
         },
         {
-          "name": "nonFungibleTokenAccount",
+          "name": "tokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -185,7 +200,7 @@ export type LibreplexEditions = {
   ],
   "accounts": [
     {
-      "name": "editions",
+      "name": "editionsDeployment",
       "type": {
         "kind": "struct",
         "fields": [
@@ -415,6 +430,26 @@ export const IDL: LibreplexEditions = {
           }
         },
         {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "hashlist"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
+              }
+            ]
+          }
+        },
+        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -453,11 +488,6 @@ export const IDL: LibreplexEditions = {
       "name": "mint",
       "accounts": [
         {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "editionsDeployment",
           "isMut": true,
           "isSigner": false,
@@ -470,9 +500,9 @@ export const IDL: LibreplexEditions = {
               },
               {
                 "kind": "account",
-                "type": "publicKey",
-                "account": "Editions",
-                "path": "deployment"
+                "type": "string",
+                "account": "EditionsDeployment",
+                "path": "editions_deployment.symbol"
               }
             ]
           }
@@ -491,8 +521,8 @@ export const IDL: LibreplexEditions = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Editions",
-                "path": "deployment"
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
               }
             ]
           }
@@ -511,8 +541,8 @@ export const IDL: LibreplexEditions = {
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "Editions",
-                "path": "deployment"
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
               },
               {
                 "kind": "account",
@@ -548,7 +578,7 @@ export const IDL: LibreplexEditions = {
           "isSigner": false
         },
         {
-          "name": "nonFungibleTokenAccount",
+          "name": "tokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -573,7 +603,7 @@ export const IDL: LibreplexEditions = {
   ],
   "accounts": [
     {
-      "name": "editions",
+      "name": "editionsDeployment",
       "type": {
         "kind": "struct",
         "fields": [
