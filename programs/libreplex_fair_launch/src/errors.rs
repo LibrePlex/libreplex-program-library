@@ -8,6 +8,10 @@ pub enum FairLaunchError {
     #[msg("Mint template too long")]
     MintTemplateTooLong,
 
+    #[msg("Offchain URL too long")]
+    OffchainUrlTooLong,
+
+
 
     #[msg("Deployment template too long")]
     DeploymentTemplateTooLong,

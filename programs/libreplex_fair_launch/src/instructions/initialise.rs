@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 
-use crate::{Deployment, errors::FairLaunchError, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, NewDeploymentEvent};
+use crate::{errors::FairLaunchError, Deployment, NewDeploymentEvent, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT};
 
 
 pub mod sysvar_instructions_program {
@@ -68,11 +68,11 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
 }
 
 pub fn initialise_logic(input: InitialiseInput, deployment: &mut Account<'_, Deployment>, creator: Pubkey) -> Result<()> {
-    if input.ticker.len() > 12 {
+    if input.ticker.len() > TICKER_LIMIT {
         return Err(FairLaunchError::TickerTooLong.into());
     }
     if input.offchain_url.len() > OFFCHAIN_URL_LIMIT {
-        return Err(FairLaunchError::TickerTooLong.into());
+        return Err(FairLaunchError::OffchainUrlTooLong.into());
     }
     if input.mint_template.len() > TEMPLATE_LIMIT {
         return Err(FairLaunchError::MintTemplateTooLong.into());

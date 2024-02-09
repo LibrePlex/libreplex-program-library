@@ -50,7 +50,7 @@ pub fn migrate_from_validator(ctx: Context<MigrateFromValidatorCtx>, input: Init
     }
 
     if input.offchain_url.len() > OFFCHAIN_URL_LIMIT {
-        return Err(FairLaunchError::TickerTooLong.into());
+        return Err(FairLaunchError::OffchainUrlTooLong.into());
     }
 
     if input.mint_template.len() > TEMPLATE_LIMIT {
