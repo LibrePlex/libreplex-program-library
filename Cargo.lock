@@ -2253,6 +2253,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "libreplex_editions"
+version = "0.2.1"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "arrayref",
+ "bubblegum-proxy",
+ "libreplex_fair_launch",
+ "libreplex_inscriptions",
+ "libreplex_legacy",
+ "libreplex_shared",
+ "mpl-token-metadata",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "spl-account-compression",
+ "spl-compression-proxy",
+ "spl-pod",
+ "spl-token-2022 1.0.0",
+ "spl-token-group-interface",
+ "spl-token-metadata-interface",
+ "spl-type-length-value",
+]
+
+[[package]]
 name = "libreplex_fair_launch"
 version = "0.2.1"
 dependencies = [
