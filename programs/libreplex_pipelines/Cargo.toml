@@ -1,0 +1,40 @@
+[package]
+name = "libreplex_transformer"
+version = "0.0.0"
+description = "Created with Anchor"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/LibrePlex/metadata"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "libreplex_transformer"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build", "libreplex_inscriptions/idl-build"]
+
+[dependencies]
+anchor-lang = {version = "~0.29", features = ["init-if-needed"]}
+anchor-spl = {version = "~0.29"}
+libreplex_inscriptions = {version = "*", path="../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
+libreplex_fair_launch = {version = "*", path="../libreplex_fair_launch", features =["cpi", "no-entrypoint"]}
+spl-associated-token-account = "2.2.0"
+solana-program = {version = "1.17.13"}
+mpl-token-metadata = { version="~3" }
+bubblegum-proxy = {path = "../../utils/bubblegum-proxy", features = ["cpi", "no-entrypoint"]}
+libreplex_shared = {version = "*", path = "../libreplex_shared", features=["cpi"]}
+spl-compression-proxy = {path = "../../utils/spl-compression-proxy", features = ["cpi", "no-entrypoint"]}
+spl-account-compression = { version="0.3.0", features = ["cpi", "no-entrypoint"] }
+mpl-bubblegum = {version = "1.2.0"}
+libreplex_liquidity = {version = "*", path="../libreplex_liquidity", features =["cpi", "no-entrypoint"]}
+
+[dev-dependencies]
+mocha = "0.1.1"
+assert_matches = "1.5.0"
+solana-program-test = "1.17.13"
+solana-sdk = "1.17.13"

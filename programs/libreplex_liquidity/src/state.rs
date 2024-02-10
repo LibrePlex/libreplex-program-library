@@ -27,6 +27,9 @@ pub struct Liquidity {
 
     pub lookup_table_address: Pubkey,
 
-    pub padding: [u8; 100]
+    // 111111111111..... if not required
+    pub cosigner_program_id: Pubkey, 
+
+    pub padding: [u8; 68]
 }
 

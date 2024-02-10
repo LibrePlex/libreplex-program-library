@@ -1,11 +1,10 @@
 use anchor_lang::{prelude::*, system_program};
 
-
 use crate::Liquidity;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseInput {
-    seed: Pubkey,
+    pub seed: Pubkey,
 
     pub deployment: Pubkey,
     pub bootstrap_start_time: Option<i64>,
@@ -15,13 +14,12 @@ pub struct InitialiseInput {
     pub lp_ratio: u16,
 
     pub pool_fee_basis_points: u64,
+    pub cosigner_program_id: Option<Pubkey>,
 }
 
 #[derive(Accounts)]
 #[instruction(input: InitialiseInput)]
 pub struct Initialise<'info> {
-
-    /// CHECK: Can be anyone
     pub authority: UncheckedAccount<'info>,
 
     /// CHECK: Can be anyone
@@ -38,6 +36,7 @@ pub struct Initialise<'info> {
 }
 
 pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<()> {
+
     let InitialiseInput {
         seed,
         bootstrap_start_time,
@@ -46,6 +45,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         creator_basis_points,
         lp_ratio,
         pool_fee_basis_points,
+        cosigner_program_id,
     } = input;
 
     ctx.accounts.liquidity.set_inner(Liquidity {
@@ -62,7 +62,11 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         creator_basis_points,
         authority: ctx.accounts.authority.key(),
         lookup_table_address: system_program::ID,
-        padding: [0; 100],
+        cosigner_program_id: match cosigner_program_id {
+            Some(x) => x,
+            None => system_program::ID,
+        },
+        padding: [0; 68],
     });
 
     Ok(())

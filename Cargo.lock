@@ -2396,6 +2396,46 @@ dependencies = [
 ]
 
 [[package]]
+name = "libreplex_soloswap"
+version = "0.0.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "assert_matches",
+ "libreplex_fair_launch",
+ "libreplex_shared",
+ "mocha",
+ "mpl-token-metadata",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "spl-associated-token-account",
+]
+
+[[package]]
+name = "libreplex_transformer"
+version = "0.0.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "assert_matches",
+ "bubblegum-proxy",
+ "libreplex_fair_launch",
+ "libreplex_inscriptions",
+ "libreplex_liquidity",
+ "libreplex_shared",
+ "mocha",
+ "mpl-bubblegum",
+ "mpl-token-metadata",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "spl-account-compression",
+ "spl-associated-token-account",
+ "spl-compression-proxy",
+]
+
+[[package]]
 name = "libsecp256k1"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

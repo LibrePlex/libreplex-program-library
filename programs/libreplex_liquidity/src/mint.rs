@@ -13,6 +13,10 @@ pub struct MintCtx<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    #[account(mut,
+        constraint = liquidity.cosigner_program_id.eq(&system_program::ID) || authority.key() == liquidity.authority)]
+    pub authority: Signer<'info>,
+
     /// CHECK: Checked by has one
     #[account(mut)]
     pub treasury: UncheckedAccount<'info>,
