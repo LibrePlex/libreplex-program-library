@@ -32,9 +32,7 @@ pub fn mint_token2022_logic<'info>(
 ) -> Result<()> {
     let update_authority =
         OptionalNonZeroPubkey::try_from(Some(deployment.key())).expect("Bad update auth");
- 
 
-        
     deployment.number_of_tokens_issued += 1;
 
     let ticker = deployment.ticker.clone();
@@ -57,14 +55,23 @@ pub fn mint_token2022_logic<'info>(
             uri: deployment.offchain_url.clone(),
             update_authority,
             mint: non_fungible_mint.key(),
-            additional_metadata: vec![],
+            additional_metadata: vec![
+                (
+                    "fld".to_string(),
+                    deployment.key().to_string(),
+                ),
+                (
+                    "pos".to_string(),
+                    deployment.number_of_tokens_issued.to_string(),
+                ),
+            ],
         }),
         None,
         Some(TokenMemberInput {
             group_mint: fungible_mint.to_account_info(),
         }),
         Some(deployment_seeds),
-        0
+        0,
     )?;
 
     // msg!("Minting 2022");
@@ -81,10 +88,10 @@ pub fn mint_token2022_logic<'info>(
     )?;
 
     if deployment.use_inscriptions {
-
-
         if remaining_accounts.len() != 4 {
-            panic!("Incorrect number of remaining accounts. with use_inscriptions, you must provide 4");
+            panic!(
+                "Incorrect number of remaining accounts. with use_inscriptions, you must provide 4"
+            );
         }
 
         let inscriptions_program = &remaining_accounts[0];
@@ -121,7 +128,7 @@ pub fn mint_token2022_logic<'info>(
             None,
         )?;
     }
-    
+
     // finally send a fee to the creator if a fee is specified
 
     if deployment_config.creator_fee_per_mint_lamports > 0 {

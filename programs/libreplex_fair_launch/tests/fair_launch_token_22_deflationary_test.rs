@@ -276,7 +276,7 @@ mod fair_launch_deflationary_test {
         )
         .await;
 
-        assert_eq!(banks_client_error.unwrap().to_string(), "transport transaction error: Error processing Instruction 0: custom program error: 0x1774");
+        assert_eq!(banks_client_error.unwrap().to_string(), "transport transaction error: Error processing Instruction 0: custom program error: 0x1775");
 
         for m in non_fungible_mints.iter() {
             check_mint_state(
