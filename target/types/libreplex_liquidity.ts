@@ -518,6 +518,181 @@ export type LibreplexLiquidity = {
       "args": []
     },
     {
+      "name": "fixDeploymentType",
+      "accounts": [
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
+        },
+        {
+          "name": "deployment",
+          "isMut": false,
+          "isSigner": false,
+          "relations": [
+            "fungible_mint"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payerWrappedSolAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payerFungibleMintTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolTokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleTokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVaultLpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleVaultLpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVaultLp",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleVaultLp",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payerLpTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgramLpTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ammProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vaultProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Vault program. The pool will deposit/withdraw liquidity from the vault."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleTokenFee",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolTokenFee",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeOwner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpMintMetadata",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "prepareNativeEscrow",
       "accounts": [
         {
@@ -1020,6 +1195,181 @@ export const IDL: LibreplexLiquidity = {
     },
     {
       "name": "bootstrapPool",
+      "accounts": [
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment"
+          ]
+        },
+        {
+          "name": "deployment",
+          "isMut": false,
+          "isSigner": false,
+          "relations": [
+            "fungible_mint"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payerWrappedSolAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payerFungibleMintTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolTokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleTokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVaultLpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleVaultLpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolVaultLp",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleVaultLp",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payerLpTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgramLpTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ammProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vaultProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Vault program. The pool will deposit/withdraw liquidity from the vault."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleTokenFee",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wrappedSolTokenFee",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeOwner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpMintMetadata",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "fixDeploymentType",
       "accounts": [
         {
           "name": "liquidity",

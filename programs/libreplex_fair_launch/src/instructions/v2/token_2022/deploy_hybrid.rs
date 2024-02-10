@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{associated_token::AssociatedToken, token::{spl_token, Mint, TokenAccount}};
+use solana_program::system_program;
 
 
 
@@ -37,7 +38,7 @@ pub struct DeployHybridCtx<'info> {
     )]
     pub deployment: Account<'info, Deployment>,
 
-    #[account(init, seeds = ["hashlist".as_bytes(), 
+    #[account(init_if_needed, seeds = ["hashlist".as_bytes(), 
     deployment.key().as_ref()],
     bump, payer = payer, space = 8 + 32 + 4)]
     pub hashlist: Account<'info, Hashlist>,
@@ -107,6 +108,9 @@ pub struct DeployHybridCtx<'info> {
 
 pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
 
+
+
+
     let hashlist = &mut ctx.accounts.hashlist;
     let deployment = &mut ctx.accounts.deployment;
 
@@ -122,6 +126,9 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
     let rent = &ctx.accounts.rent;
     let metadata_program = &ctx.accounts.metadata_program;
     
+
+    check_deploy_allowed(deployment);
+
     let sysvar_instructions = &ctx.accounts.sysvar_instructions;
     if deployment.deployment_type != HYBRID_DEPLOYMENT_TYPE {
         panic!("Wrong deployment type")
@@ -146,4 +153,23 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
     )?;
 
     Ok(())
+}
+
+
+pub fn check_deploy_allowed (deployment: &Account<Deployment>){
+
+    // only allow redeploys if forced by a wrapping program and there are no mints
+    if deployment.fungible_mint != system_program::ID {
+        // already deployed
+        if deployment.require_creator_cosign {
+            // ok we may be able to force a redeploy
+            if deployment.number_of_tokens_issued > 0 {
+                panic!("Cannot force redeploy after tokens have been issued")
+            }
+        } else {
+            panic!("Cannot redeploy without creator cosign")
+        }   
+    }
+
+    // fungible mint = system program id, this has not been deployed yet at all
 }

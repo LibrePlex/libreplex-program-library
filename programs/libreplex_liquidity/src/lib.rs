@@ -45,6 +45,11 @@ pub mod libreplex_liquidity {
         bootstrap_pool_handler(ctx)
     }
 
+    pub fn fix_deployment_type(ctx: Context<BootstapPool>) -> Result<()> {
+        bootstrap_pool_handler(ctx)
+    }
+
+
     pub fn prepare_native_escrow(ctx: Context<PrepareNativeEscrow>) -> Result<()> {
         prepare_native_escrow_handler(ctx)
     }

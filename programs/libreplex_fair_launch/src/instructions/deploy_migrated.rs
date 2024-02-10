@@ -105,6 +105,9 @@ pub fn deploy_migrated(ctx: Context<DeployMigratedCtx>) -> Result<()> {
     let deployment = &mut ctx.accounts.deployment;
     let hashlist = &mut ctx.accounts.hashlist;
 
+
+    check_deploy_allowed(deployment);
+
     hashlist.deployment = deployment.key();
     deployment.require_creator_cosign = false;
     deployment.use_inscriptions = true;

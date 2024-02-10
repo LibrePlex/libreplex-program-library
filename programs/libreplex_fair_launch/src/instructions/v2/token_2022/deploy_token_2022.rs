@@ -4,7 +4,7 @@ use anchor_spl::associated_token::AssociatedToken;
 
 
 use crate::{
-    deploy_token_2022_logic, Deployment, Hashlist, TOKEN2022_DEPLOYMENT_TYPE, DeploymentConfig,
+    check_deploy_allowed, deploy_token_2022_logic, Deployment, DeploymentConfig, Hashlist, TOKEN2022_DEPLOYMENT_TYPE
 };
 
 pub mod sysvar_instructions_program {
@@ -96,6 +96,7 @@ pub struct DeployToken2022Ctx<'info> {
 
 pub fn deploy_token_2022(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
 
+
     let hashlist = &mut ctx.accounts.hashlist;
     let deployment = &mut ctx.accounts.deployment;
 
@@ -111,6 +112,7 @@ pub fn deploy_token_2022(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
     // msg!("Set fungible mint to {}", fungible_mint.key());
     // deployment.fungible_mint = fungible_mint.key();
    
+    check_deploy_allowed(deployment);
 
     if deployment.deployment_type != TOKEN2022_DEPLOYMENT_TYPE {
         panic!("Wrong deployment type")

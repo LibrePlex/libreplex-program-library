@@ -14,7 +14,7 @@ use libreplex_shared::{
 };
 use mpl_token_metadata::types::TokenStandard;
 
-use crate::{Deployment, Hashlist};
+use crate::{check_deploy_allowed, Deployment, Hashlist};
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -311,6 +311,9 @@ pub fn deploy_legacy_logic<'f>(
         deployment.ticker.as_ref(),
         &[deployment_bump],
     ];
+
+    check_deploy_allowed(deployment);
+    
     create_mint_with_metadata_and_masteredition(
         MintAccounts {
             authority_pda: deployment.to_account_info(),

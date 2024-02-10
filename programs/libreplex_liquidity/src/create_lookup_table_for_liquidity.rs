@@ -22,8 +22,7 @@ pub struct CreateLookupTableForLiquidityCtx<'info> {
 
     #[account(mut, 
         // only allowed when the lookup table has not yet been created
-        has_one = deployment,
-        constraint = liquidity.lookup_table_address.eq(&system_program::ID))]
+        has_one = deployment)]
     pub liquidity: Box<Account<'info, Liquidity>>,
 
     #[account()]

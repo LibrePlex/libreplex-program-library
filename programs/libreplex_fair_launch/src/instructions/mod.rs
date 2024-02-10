@@ -15,7 +15,9 @@ pub use initialise::*;
 pub mod deploy_legacy;
 pub use deploy_legacy::*;
 
-
+// this can be done before redeploy
+pub mod switch_deployment_type;
+pub use switch_deployment_type::*;
 
 /* 
     mints from a legacy metadata-based deployment.
@@ -29,25 +31,11 @@ pub use mint_legacy::*;
 pub mod mint_legacy_logic;
 pub use mint_legacy_logic::*;
 
-
-
-
-
-/* 
-    Migration methods from old validators to Libre Fair Launch
-*/
-// pub mod migrate_from_validator;
-// pub use migrate_from_validator::*;
-// no more legacy validators will be deployed to fair launch
-// pub mod deploy_migrated;
-// pub use deploy_migrated::*;
-
 pub mod migrate_to_hashlist;
 pub use migrate_to_hashlist::*;
 
 pub mod add_to_hashlist;
 pub use add_to_hashlist::*;
-
 
 pub use swap_to_fungible::*;
 pub mod swap_to_fungible;

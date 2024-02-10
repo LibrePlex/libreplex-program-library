@@ -411,6 +411,52 @@ export type LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "switchDeploymentType",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "deploymentType",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "mintToken22",
       "accounts": [
         {
@@ -2404,6 +2450,52 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "newUri",
           "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "switchDeploymentType",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "deployment_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Deployment",
+                "path": "deployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "deploymentType",
+          "type": "u8"
         }
       ]
     },

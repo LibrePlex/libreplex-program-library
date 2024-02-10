@@ -58,41 +58,18 @@ pub mod libreplex_fair_launch {
     ) -> Result<()> {
         instructions::update_spl_metadata2022(ctx, new_uri)
     }
+    pub fn switch_deployment_type<'info>(
+        ctx: Context<'_, '_, '_, 'info, SwitchDeploymentTypeCtx<'info>>,
+        deployment_type: u8
+    ) -> Result<()> {
+        instructions::switch_deployment_type(ctx, deployment_type)
+    }
    
-   
-
-
     pub fn mint_token22<'info>(
         ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>,
     ) -> Result<()> {
         instructions::mint_token2022(ctx)
     }
-
-
-    // disabling these for now - needs proper testing
-    // pub fn swap_fungible_to_compressed<'info>(
-    //     ctx: Context<'_, '_, '_, 'info, SwapFungibleToCompressedCtx<'info>>,
-    //     root: [u8; 32],
-    //     data_hash: [u8; 32],
-    //     creator_hash: [u8; 32],
-    //     nonce: u64,
-    //     index: u32,
-    // ) -> Result<()> {
-    //     instructions::v2::metaplex_cnft::swap_fungible_to_compressed(ctx, root, data_hash, creator_hash, nonce, index)
-    // }
-
-    // pub fn swap_compressed_to_fungible<'info>(
-    //     ctx: Context<'_, '_, '_, 'info, SwapCompressedToFungibleCtx<'info>>,
-    //     root: [u8; 32],
-    //     data_hash: [u8; 32],
-    //     creator_hash: [u8; 32],
-    //     nonce: u64,
-    //     index: u32,
-    // ) -> Result<()> {
-    //     instructions::v2::metaplex_cnft::swap_compressed_to_fungible(ctx, root, data_hash, creator_hash, nonce, index)
-    // }
-
-    
     pub fn swap_to_fungible22(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> {
         instructions::swap_to_fungible_2022(ctx)
     }
@@ -101,29 +78,6 @@ pub mod libreplex_fair_launch {
         instructions::swap_to_nonfungible_2022(ctx)
     }
     
-
-       
-    // pub fn mint_compressed<'info>(
-    //     ctx: Context<'_, '_, '_, 'info, MintCompressedCtx<'info>>,
-    //     input: MintCompressedInput,
-    // ) -> Result<()> {
-    //     instructions::mint_compressed(ctx, input)
-    // }
-
-    // pub fn redeem_compressed(
-    //     ctx: Context<InscribeCompressedCtx>,
-    // ) -> Result<()> {
-    //     instructions::redeem(ctx)
-    // }
-
-
-    /* v1 swap methods */
-
-
-
-
-    
-
     pub fn deploy_legacy<'f>(ctx: Context<'_, '_, '_, 'f, DeployLegacyCtx<'f>>) -> Result<()> {
         instructions::deploy_legacy::deploy(ctx)
     }
