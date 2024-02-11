@@ -12,8 +12,8 @@ pub use create_lookup_table_for_liquidity::*;
 pub mod mint;
 pub use mint::*;
 
-pub mod v2;
-pub use v2::*;
+pub mod mint_spl;
+pub use mint_spl::*;
 
 pub mod swap_to_fungible;
 pub use swap_to_fungible::*;
@@ -61,13 +61,10 @@ pub mod libreplex_liquidity {
 
     /* v2 methods - for generating SPL deployments and later everything else */
 
-    pub fn mint_spl_v2<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>>) -> Result<()> {
+    pub fn mint_spl<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>>) -> Result<()> {
         mint_spl_handler(ctx)
     }
 
-    pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseV2Input) -> Result<()> {
-        init_v2_handler(ctx, input)
-    }
-
+    
 
 }

@@ -104,7 +104,7 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
     let liquidity = &mut ctx.accounts.liquidity;
     
     if liquidity.deployment_type != DEPLOYMENT_TYPE_NFT {
-        panic!("Use v2 methods - this method only supports deployment type NFT")
+        panic!("Wrong deployment type. Expected type=0 (NFT), received {}", liquidity.deployment_type)
     }
 
     liquidity.total_mints += 1;
