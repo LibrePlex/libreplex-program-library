@@ -1,5 +1,5 @@
 [package]
-name = "libreplex_soloswap"
+name = "libreplex_monoswap"
 version = "0.0.0"
 description = "Created with Anchor"
 edition = "2021"
@@ -8,7 +8,7 @@ repository = "https://github.com/LibrePlex/metadata"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "libreplex_soloswap"
+name = "libreplex_monoswap"
 
 [features]
 no-entrypoint = []

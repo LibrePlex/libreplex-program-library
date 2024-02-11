@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("SoLopnx594TvVjTj5td3UxYEHFNWkkRcjmr13AaFXHe");
+declare_id!("MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221");
 
 pub mod constants;
 pub mod errors;
@@ -13,14 +13,14 @@ pub use state::*;
 pub use instructions::*;
 
 #[program]
-pub mod libreplex_multiswap {
+pub mod libreplex_monoswap {
     use super::*;
 
-    pub fn create_swap(
-        ctx: Context<CreateSwapCtx>,
-        input: CreateSwapInput,
+    pub fn create_monoswap(
+        ctx: Context<CreateMonoSwapCtx>,
+        input: CreateMonoSwapInput,
     ) -> Result<()> {
-        instructions::create_swap::create_swap(ctx, input)
+        instructions::create_monoswap::create_swap(ctx, input)
     }
 
 

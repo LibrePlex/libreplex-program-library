@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use libreplex_fair_launch::{cpi::accounts::InitialiseV2Ctx, InitialiseInputV2, HYBRID_DEPLOYMENT_TYPE};
-use libreplex_liquidity::{cpi::accounts::Initialise, InitialiseInput, DEPLOYMENT_TYPE_SPL};
-
+use libreplex_liquidity::{InitialiseV2Input, DEPLOYMENT_TYPE_SPL};
+use libreplex_liquidity::cpi::accounts::InitialiseV2Ctx as InitialiseV2CtxLiquidity;
 use crate::MccPipeline;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
@@ -18,7 +18,7 @@ pub struct InitialiseMetaplexPipelineInput {
 
 #[derive(Accounts)]
 #[instruction(fair_launch_input: InitialiseInputV2, input: InitialiseMetaplexPipelineInput)]
-pub struct InitialiseMetaplexPipelineCtx<'info> {
+pub struct MccPipelineInitialiseCtx<'info> {
     #[account(init,
         space = MccPipeline::SIZE,
         payer = payer,
@@ -64,8 +64,8 @@ pub struct InitialiseMetaplexPipelineCtx<'info> {
 
 
 
-pub fn initialise(
-    ctx: Context<InitialiseMetaplexPipelineCtx>,
+pub fn mcc_pipeline_initialise(
+    ctx: Context<MccPipelineInitialiseCtx>,
     fair_launch_input: InitialiseInputV2,
     pipeline_input: InitialiseMetaplexPipelineInput,
 ) -> Result<()> {
@@ -121,10 +121,10 @@ pub fn initialise(
 
     // and initialise liquidity too
 
-    libreplex_liquidity::cpi::initialise(
+    libreplex_liquidity::cpi::initialise_v2(
         CpiContext::new(
             libreplex_liquidity_program.to_account_info(),
-            Initialise {
+            InitialiseV2CtxLiquidity {
                 system_program: system_program.to_account_info(),
                 payer: payer.to_account_info(),
                 // can to liquidity can only be made via the pipeline program
@@ -137,7 +137,7 @@ pub fn initialise(
             },
         ),
         // this has the cosigner specified
-        InitialiseInput {
+        InitialiseV2Input {
             // deployment type set to spl - this doesn't mint extra stuff, but grabs
             // some SPL for the LP reserve and gives the minter a bunch of SPL 
             // instead of NFT

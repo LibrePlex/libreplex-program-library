@@ -8,12 +8,12 @@ use crate::SwapMarker;
 
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub struct CreateSwapInput {
+pub struct CreateMonoSwapInput {
     pub mint_outgoing_amount: u64
 }
 
 #[derive(Accounts)]
-pub struct CreateSwapCtx<'info> {
+pub struct CreateMonoSwapCtx<'info> {
 
     #[account(init,
         payer = payer, 
@@ -88,7 +88,7 @@ pub struct CreateSwapCtx<'info> {
 
 }
 
-pub fn create_swap(ctx: Context<CreateSwapCtx>, input: CreateSwapInput) -> Result<()> {
+pub fn create_swap(ctx: Context<CreateMonoSwapCtx>, input: CreateMonoSwapInput) -> Result<()> {
     
     let swap_marker = &mut ctx.accounts.swap_marker;
     let mint_outgoing = &mut ctx.accounts.mint_outgoing;

@@ -1,5 +1,5 @@
 [package]
-name = "libreplex_transformer"
+name = "libreplex_pipelines"
 version = "0.0.0"
 description = "Created with Anchor"
 edition = "2021"
@@ -8,7 +8,7 @@ repository = "https://github.com/LibrePlex/metadata"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "libreplex_transformer"
+name = "libreplex_pipelines"
 
 [features]
 no-entrypoint = []
@@ -32,7 +32,7 @@ spl-compression-proxy = {path = "../../utils/spl-compression-proxy", features = 
 spl-account-compression = { version="0.3.0", features = ["cpi", "no-entrypoint"] }
 mpl-bubblegum = {version = "1.2.0"}
 libreplex_liquidity = {version = "*", path="../libreplex_liquidity", features =["cpi", "no-entrypoint"]}
-libreplex_soloswap = {version = "*", path="../libreplex_soloswap", features =["cpi", "no-entrypoint"]}
+libreplex_monoswap = {version = "*", path="../libreplex_monoswap", features =["cpi", "no-entrypoint"]}
 
 
 [dev-dependencies]

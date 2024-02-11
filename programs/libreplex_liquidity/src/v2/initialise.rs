@@ -1,11 +1,10 @@
 use anchor_lang::{prelude::*, system_program};
 
-
-use crate::{Liquidity, DEPLOYMENT_TYPE_NFT};
+use crate::Liquidity;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
-pub struct InitialiseInput {
-    seed: Pubkey,
+pub struct InitialiseV2Input {
+    pub seed: Pubkey,
 
     pub deployment: Pubkey,
     pub bootstrap_start_time: Option<i64>,
@@ -15,13 +14,13 @@ pub struct InitialiseInput {
     pub lp_ratio: u16,
 
     pub pool_fee_basis_points: u64,
+    pub cosigner_program_id: Option<Pubkey>,
+    pub deployment_type: u8
 }
 
 #[derive(Accounts)]
-#[instruction(input: InitialiseInput)]
-pub struct Initialise<'info> {
-
-    /// CHECK: Can be anyone
+#[instruction(input: InitialiseV2Input)]
+pub struct InitialiseV2Ctx<'info> {
     pub authority: UncheckedAccount<'info>,
 
     /// CHECK: Can be anyone
@@ -37,8 +36,9 @@ pub struct Initialise<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<()> {
-    let InitialiseInput {
+pub fn init_v2_handler(ctx: Context<InitialiseV2Ctx>, input: InitialiseV2Input) -> Result<()> {
+
+    let InitialiseV2Input {
         seed,
         bootstrap_start_time,
         bootstrap_requires_sold_out,
@@ -46,6 +46,8 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         creator_basis_points,
         lp_ratio,
         pool_fee_basis_points,
+        cosigner_program_id,
+        deployment_type
     } = input;
 
     ctx.accounts.liquidity.set_inner(Liquidity {
@@ -59,11 +61,14 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         bootstrap_start_time,
         bootstrap_requires_sold_out,
         deployment,
+        deployment_type,
         creator_basis_points,
         authority: ctx.accounts.authority.key(),
         lookup_table_address: system_program::ID,
-        cosigner_program_id: system_program::ID,
-        deployment_type: DEPLOYMENT_TYPE_NFT,
+        cosigner_program_id: match cosigner_program_id {
+            Some(x) => x,
+            None => system_program::ID,
+        },
         padding: [0; 67],
     });
 

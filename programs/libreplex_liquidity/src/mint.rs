@@ -13,16 +13,11 @@ pub struct MintCtx<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account(mut,
-        constraint = liquidity.cosigner_program_id.eq(&system_program::ID) || authority.key() == liquidity.authority)]
-    pub authority: Signer<'info>,
-
     /// CHECK: Checked by has one
     #[account(mut)]
     pub treasury: UncheckedAccount<'info>,
 
-    #[account(mut, 
-        has_one = deployment, has_one = treasury)]
+    #[account(mut, has_one = deployment, has_one = treasury)]
     pub liquidity: Box<Account<'info, Liquidity>>,
 
     pub system_program: Program<'info, System>,
@@ -100,15 +95,19 @@ pub struct MintCtx<'info> {
 }
 
 pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
+
+    
     let fair_launch = &ctx.accounts.fair_launch;
 
+    
+
     let liquidity = &mut ctx.accounts.liquidity;
-    liquidity.total_mints += 1;
-
-
+    
     if liquidity.deployment_type != DEPLOYMENT_TYPE_NFT {
-        panic!("Wrong deployment type. Expected NFT (type=0)")
+        panic!("Use v2 methods - this method only supports deployment type NFT")
     }
+
+    liquidity.total_mints += 1;
 
     let seeds = &[
         b"liquidity",
