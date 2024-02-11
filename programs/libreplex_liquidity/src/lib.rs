@@ -12,6 +12,9 @@ pub use create_lookup_table_for_liquidity::*;
 pub mod mint;
 pub use mint::*;
 
+pub mod v2;
+pub use v2::*;
+
 pub mod swap_to_fungible;
 pub use swap_to_fungible::*;
 
@@ -40,6 +43,7 @@ pub mod libreplex_liquidity {
     pub fn initialise(ctx: Context<Initialise>, input: InitialiseInput) -> Result<()> {
         init_handler(ctx, input)
     }
+   
 
     pub fn bootstrap_pool(ctx: Context<BootstapPool>) -> Result<()> {
         bootstrap_pool_handler(ctx)
@@ -53,4 +57,17 @@ pub mod libreplex_liquidity {
     pub fn prepare_native_escrow(ctx: Context<PrepareNativeEscrow>) -> Result<()> {
         prepare_native_escrow_handler(ctx)
     }
+
+
+    /* v2 methods - for generating SPL deployments and later everything else */
+
+    pub fn mint_spl_v2<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>>) -> Result<()> {
+        mint_spl_handler(ctx)
+    }
+
+    pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseV2Input) -> Result<()> {
+        init_v2_handler(ctx, input)
+    }
+
+
 }
