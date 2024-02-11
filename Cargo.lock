@@ -2337,7 +2337,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_liquidity"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "amm-proxy",
  "anchor-lang",
