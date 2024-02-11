@@ -5,7 +5,7 @@ use crate::Liquidity;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseInput {
-    seed: Pubkey,
+    pub seed: Pubkey,
 
     pub deployment: Pubkey,
     pub bootstrap_start_time: Option<i64>,
@@ -15,6 +15,8 @@ pub struct InitialiseInput {
     pub lp_ratio: u16,
 
     pub pool_fee_basis_points: u64,
+    pub cosigner_program_id: Option<Pubkey>,
+    pub deployment_type: u8
 }
 
 #[derive(Accounts)]
@@ -46,6 +48,8 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         creator_basis_points,
         lp_ratio,
         pool_fee_basis_points,
+        cosigner_program_id,
+        deployment_type
     } = input;
 
     ctx.accounts.liquidity.set_inner(Liquidity {
@@ -62,7 +66,12 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         creator_basis_points,
         authority: ctx.accounts.authority.key(),
         lookup_table_address: system_program::ID,
-        padding: [0; 100],
+        cosigner_program_id: match cosigner_program_id {
+            Some(x)=>x,
+            _=>system_program::ID
+        },
+        deployment_type,
+        padding: [0; 67],
     });
 
     Ok(())
