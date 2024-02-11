@@ -1,5 +1,5 @@
 export type LibreplexLiquidity = {
-  "version": "0.0.1",
+  "version": "0.1.0",
   "name": "libreplex_liquidity",
   "instructions": [
     {
@@ -732,6 +732,141 @@ export type LibreplexLiquidity = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "mintSpl",
+      "accounts": [
+        {
+          "name": "receiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment",
+            "treasury"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentNonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorFeeTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pooledHashlistMarket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleTokenAccountMinter",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pooledNonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pooledNonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram22",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fairLaunch",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -795,11 +930,19 @@ export type LibreplexLiquidity = {
             "type": "publicKey"
           },
           {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                100
+                67
               ]
             }
           }
@@ -842,6 +985,16 @@ export type LibreplexLiquidity = {
           {
             "name": "poolFeeBasisPoints",
             "type": "u64"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
           }
         ]
       }
@@ -850,7 +1003,7 @@ export type LibreplexLiquidity = {
 };
 
 export const IDL: LibreplexLiquidity = {
-  "version": "0.0.1",
+  "version": "0.1.0",
   "name": "libreplex_liquidity",
   "instructions": [
     {
@@ -1583,6 +1736,141 @@ export const IDL: LibreplexLiquidity = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "mintSpl",
+      "accounts": [
+        {
+          "name": "receiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment",
+            "treasury"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentNonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorFeeTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pooledHashlistMarket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleTokenAccountMinter",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pooledNonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pooledNonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram22",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fairLaunch",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1646,11 +1934,19 @@ export const IDL: LibreplexLiquidity = {
             "type": "publicKey"
           },
           {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                100
+                67
               ]
             }
           }
@@ -1693,6 +1989,16 @@ export const IDL: LibreplexLiquidity = {
           {
             "name": "poolFeeBasisPoints",
             "type": "u64"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
           }
         ]
       }
