@@ -32,6 +32,8 @@ spl-compression-proxy = {path = "../../utils/spl-compression-proxy", features = 
 spl-account-compression = { version="0.3.0", features = ["cpi", "no-entrypoint"] }
 mpl-bubblegum = {version = "1.2.0"}
 libreplex_liquidity = {version = "*", path="../libreplex_liquidity", features =["cpi", "no-entrypoint"]}
+libreplex_soloswap = {version = "*", path="../libreplex_soloswap", features =["cpi", "no-entrypoint"]}
+
 
 [dev-dependencies]
 mocha = "0.1.1"

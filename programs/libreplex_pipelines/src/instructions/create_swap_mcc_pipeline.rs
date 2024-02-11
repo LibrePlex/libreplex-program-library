@@ -2,14 +2,30 @@
 
 use anchor_lang::prelude::*;
 use anchor_spl::{associated_token::AssociatedToken, token::spl_token, token_interface::{Mint,TokenAccount, spl_token_2022::{self}}};
-use libreplex_fair_launch::{deploy_hybrid::sysvar_instructions_program, DeploymentConfig, Hashlist};
-use libreplex_fair_launch::Deployment;
-use libreplex_liquidity::{cpi::accounts::MintCtx, Liquidity};
-use libreplex_shared::operations::transfer_generic_spl;
-use mpl_token_metadata::accounts::Metadata;
+use libreplex_fair_launch::{Deployment, DeploymentConfig, Hashlist};
+use libreplex_liquidity::{cpi::accounts::MintSplCtx, Liquidity};
+use libreplex_soloswap::SwapMarker;
+use libreplex_shared::{operations::transfer_generic_spl, sysvar_instructions_program};
 
 
-use crate::{MccPipeline, SwapMarker};
+
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct CreateSwapInput {
+    pub lp_amount_per_mint: u64
+}
+
+
+/// this is where the magic happens.
+/// 1) mint an item from the pipeline fair launch (this requires a creator cosign)
+/// 2) swap that mint immediately in the fair launch escrow for X tokens
+/// 3) keep Y tokens (for now - for liquidity pool later)
+/// 4) put X-Y tokens into the swap so that mint_incoming can always be swapped for those
+
+
+
+
+use crate::MccPipeline;
 
 
 
@@ -38,6 +54,8 @@ pub struct CreateSwapCtx<'info> {
     #[account(mut,
     constraint = pipeline.fair_launch_deployment == deployment.key())]
     pub deployment: Account<'info, Deployment>,
+
+
 
 
      /// CHECK: Checked via CPI
@@ -120,12 +138,7 @@ pub struct CreateSwapCtx<'info> {
     pub swapper_signer: Signer<'info>,
 
 
-    #[account(mut,
-        associated_token::mint = deployment.fungible_mint,
-        associated_token::authority = deployment.key()
-    )]
-    pub non_fungible_fair_launch_escrow_target_token_account: InterfaceAccount<'info, TokenAccount>,
-
+    pub pipeline_fungible_token_account: UncheckedAccount<'info>,
 
     /*
 
@@ -196,35 +209,20 @@ pub struct CreateSwapCtx<'info> {
 
 }
 
-pub fn create_swap(ctx: Context<CreateSwapCtx>) -> Result<()> {
+pub fn create_swap(ctx: Context<CreateSwapCtx>, input: CreateSwapInput) -> Result<()> {
     
     let swap_marker = &mut ctx.accounts.swap_marker;
-    let pipeline = &mut ctx.accounts.pipeline;
-    let metadata = &ctx.accounts.non_fungible_metadata_incoming;
-
-    if !metadata.to_account_info().data_is_empty() {
-        // we may have a pNFT
-        
-        let metadata_obj = Metadata::try_from(&metadata.to_account_info())?;
-        if let Some(x) = metadata_obj.collection {
-            if !x.key.eq(&pipeline.collection) {
-                panic!("Invalid collection"); 
-            }
-        } else {
-            panic!("No collection set");
-        }
-    } else {
-        panic!("Metadata is empty");
-    }
-
-
-
-
-    swap_marker.incoming_mint = ctx.accounts.non_fungible_mint.key();
-    swap_marker.pipeline = pipeline.key();
+    let fungible_mint = &mut ctx.accounts.fungible_mint;
     
+
+    swap_marker.mint_incoming = ctx.accounts.non_fungible_mint.key();
+    swap_marker.mint_outgoing = fungible_mint.key();
+    swap_marker.swapper_program = ctx.accounts.swapper_program.key();
+    swap_marker.used = false;
+
     // transfer the outgoing mint into escrow - 
     let token_program = &ctx.accounts.token_program;
+    let token_program_22 = &ctx.accounts.token_program_22;
     let mint_outgoing_token_account_escrow = &ctx.accounts.mint_outgoing_token_account_escrow;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
@@ -236,24 +234,18 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>) -> Result<()> {
     let hashlist = &ctx.accounts.hashlist;
     let hashlist_marker = &ctx.accounts.hashlist_marker;
     let fungible_mint = &ctx.accounts.fungible_mint;
-    let non_fungible_mint = &ctx.accounts.non_fungible_mint;
-    let non_fungible_token_account = &ctx.accounts.non_fungible_fair_launch_escrow_target_token_account;
-    let token_program_22 = &ctx.accounts.token_program_22;
-    let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
-    /*
-    
-        LIQUIDITY-SPECIFIC ACCOUNTS
-    
-     */
     let liquidity = &ctx.accounts.liquidity;
-    let deployment_fungible_token_account = &ctx.accounts.deployment_fungible_token_account;
-    let deployment_non_fungible_token_account = &ctx.accounts.deployment_non_fungible_token_account;
     let pooled_hashlist_marker = &ctx.accounts.pooled_hashlist_marker;
     let liquidity_fungible_token_account = &ctx.accounts.liquidity_fungible_token_account;
+    let deployment_fungible_token_account = &ctx.accounts.deployment_fungible_token_account;
+    let deployment_non_fungible_token_account = &ctx.accounts.deployment_non_fungible_token_account;
     let pooled_non_fungible_mint = &ctx.accounts.pooled_non_fungible_mint;
     let pooled_non_fungible_token_account = &ctx.accounts.pooled_non_fungible_token_account;
+    let pipeline_fungible_token_account = &ctx.accounts.pipeline_fungible_token_account;
 
-
+    let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
+    let non_fungible_mint = &ctx.accounts.non_fungible_mint;
+   
     let payer = &ctx.accounts.payer;
 
     let pipeline_seeds: &[&[u8]] = &[
@@ -263,11 +255,12 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>) -> Result<()> {
     ];
 
 
+
     // mint one
-    libreplex_liquidity::cpi::mint(
+    libreplex_liquidity::cpi::mint_spl(
         CpiContext::new_with_signer(
             libreplex_fair_launch_program.to_account_info(),
-            MintCtx {
+            MintSplCtx {
                 /* the inscription root is set to metaplex
                  inscription object.
                 */
@@ -279,10 +272,9 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>) -> Result<()> {
                 creator_fee_treasury: creator_fee_treasury.to_account_info(),
                 hashlist: hashlist.to_account_info(),
                 hashlist_marker: hashlist_marker.to_account_info(),
-                
+                fungible_token_account_minter: pipeline_fungible_token_account.to_account_info(),
                 fungible_mint: fungible_mint.to_account_info(),
                 non_fungible_mint: non_fungible_mint.to_account_info(),
-                non_fungible_token_account: non_fungible_token_account.to_account_info(),
                 // passing dummy accounts to these as the pipelines do not use inscriptions
                 // would be good to get a version of mint_2022 that ignores inscriptions
                 // so as to clean up the interfaces
@@ -305,76 +297,23 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>) -> Result<()> {
         )
     )?;
 
-    // transfer the new mint into the escrow so it's available for swapping
-
-
     transfer_generic_spl(
-            &token_program.to_account_info(),
-            &non_fungible_token_account.to_account_info(),
-            &mint_outgoing_token_account_escrow.to_account_info(),
-            &payer.to_account_info(),
-            &non_fungible_mint.to_account_info(),
-            // pipeline owns all the escrow items to start with
-            &pipeline.to_account_info(),
-            &associated_token_program.to_account_info(),
-            &system_program.to_account_info(),
-            None, // payer signs
-            &payer.to_account_info(),
-            0, // a non-fungible has no decimals 
-            1, // and there is only one of these
+        &token_program.to_account_info(),
+        &pipeline_fungible_token_account.to_account_info(),
+        &mint_outgoing_token_account_escrow.to_account_info(),
+        &payer.to_account_info(),
+        &fungible_mint.to_account_info(),
+        // swap marker outgoing owns this to start with.
+        // when swapping, this ATA will be emptied
+        // and a new mint will come in
+        &swap_marker.to_account_info(),
+        &associated_token_program.to_account_info(),
+        &system_program.to_account_info(),
+        None, // payer signs
+        &payer.to_account_info(),
+        fungible_mint.decimals,
+        input.lp_amount_per_mint,
     )?;
-
-    // libreplex_fair_launch::cpi::swap_to_fungible22(
-    //     CpiContext::new_with_signer(
-    //         libreplex_fair_launch_program.to_account_info(),
-    //         SwapToFungible2022Ctx {
-    //             /* the inscription root is set to metaplex
-    //              inscription object.
-    //             */
-    //             signer: pipeline.to_account_info(),
-    //             system_program: system_program.to_account_info(),
-    //             payer: payer.to_account_info(),
-    //             deployment: deployment.to_account_info(),
-    //             hashlist_marker: hashlist_marker.to_account_info(),
-                
-    //             fungible_mint: fungible_mint.to_account_info(),
-    //             non_fungible_mint: non_fungible_mint.to_account_info(),
-    //             // passing dummy accounts to these as the pipelines do not use inscriptions
-    //             // would be good to get a version of mint_2022 that ignores inscriptions
-    //             // so as to clean up the interfaces
-    //             token_program: token_program.to_account_info(),
-    //             associated_token_program: associated_token_program.to_account_info(),
-    //             fungible_source_token_account: fungible_fair_launch_escrow_token_account.to_account_info(),
-    //             fungible_target_token_account: fungible_fair_launch_escrow_token_account.to_account_info(),
-    //             fungible_target_token_account_owner: pipeline.to_account_info(),
-    //             non_fungible_source_token_account: fungible_fair_launch_escrow_token_account.to_account_info(),
-    //             non_fungible_source_account_owner: pipeline.to_account_info(),
-    //             non_fungible_target_token_account: fungible_fair_launch_escrow_token_account.to_account_info(),
-    //             token_program_22: fungible_fair_launch_escrow_token_account.to_account_info(),
-    //             sysvar_instructions: fungible_fair_launch_escrow_token_account.to_account_info(),
-    //         },
-    //         &[pipeline_seeds]
-    //     )
-    // )?;
-
-
-    // transfer_generic_spl(
-    //     &token_program.to_account_info(),
-    //     &non_fungible_token_account.to_account_info(),
-    //     &mint_outgoing_token_account_escrow.to_account_info(),
-    //     &payer.to_account_info(),
-    //     &non_fungible_mint.to_account_info(),
-    //     // swap marker outgoing owns this to start with.
-    //     // when swapping, this ATA will be emptied
-    //     // and a new mint will come in
-    //     &swap_marker.to_account_info(),
-    //     &associated_token_program.to_account_info(),
-    //     &system_program.to_account_info(),
-    //     None, // payer signs
-    //     &payer.to_account_info(),
-    //     0, // a non-fungible has no decimals 
-    //     1, // and there is only one of these
-    // )?;
     
 
     Ok(())

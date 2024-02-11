@@ -2424,6 +2424,7 @@ dependencies = [
  "libreplex_inscriptions",
  "libreplex_liquidity",
  "libreplex_shared",
+ "libreplex_soloswap",
  "mocha",
  "mpl-bubblegum",
  "mpl-token-metadata",
