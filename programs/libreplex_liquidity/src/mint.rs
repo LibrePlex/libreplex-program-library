@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{associated_token::AssociatedToken, token::TokenAccount};
 
-use crate::Liquidity;
+use crate::{Liquidity, DEPLOYMENT_TYPE_NFT};
 use libreplex_fair_launch::program::LibreplexFairLaunch;
 
 #[derive(Accounts)]
@@ -21,7 +21,8 @@ pub struct MintCtx<'info> {
     #[account(mut)]
     pub treasury: UncheckedAccount<'info>,
 
-    #[account(mut, has_one = deployment, has_one = treasury)]
+    #[account(mut, 
+        has_one = deployment, has_one = treasury)]
     pub liquidity: Box<Account<'info, Liquidity>>,
 
     pub system_program: Program<'info, System>,
@@ -103,6 +104,11 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
 
     let liquidity = &mut ctx.accounts.liquidity;
     liquidity.total_mints += 1;
+
+
+    if liquidity.deployment_type != DEPLOYMENT_TYPE_NFT {
+        panic!("Wrong deployment type. Expected NFT (type=0)")
+    }
 
     let seeds = &[
         b"liquidity",

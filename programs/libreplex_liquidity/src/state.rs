@@ -1,5 +1,8 @@
 use anchor_lang::prelude::*;
 
+pub const DEPLOYMENT_TYPE_NFT: u8 = 0;
+pub const DEPLOYMENT_TYPE_SPL: u8 = 1;
+
 #[account]
 #[derive(InitSpace)]
 pub struct Liquidity {
@@ -30,6 +33,8 @@ pub struct Liquidity {
     // 111111111111..... if not required
     pub cosigner_program_id: Pubkey, 
 
-    pub padding: [u8; 68]
+    pub deployment_type: u8,
+
+    pub padding: [u8; 67]
 }
 

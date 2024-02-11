@@ -15,6 +15,7 @@ pub struct InitialiseInput {
 
     pub pool_fee_basis_points: u64,
     pub cosigner_program_id: Option<Pubkey>,
+    pub deployment_type: u8
 }
 
 #[derive(Accounts)]
@@ -46,6 +47,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         lp_ratio,
         pool_fee_basis_points,
         cosigner_program_id,
+        deployment_type
     } = input;
 
     ctx.accounts.liquidity.set_inner(Liquidity {
@@ -59,6 +61,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
         bootstrap_start_time,
         bootstrap_requires_sold_out,
         deployment,
+        deployment_type,
         creator_basis_points,
         authority: ctx.accounts.authority.key(),
         lookup_table_address: system_program::ID,
@@ -66,7 +69,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
             Some(x) => x,
             None => system_program::ID,
         },
-        padding: [0; 68],
+        padding: [0; 67],
     });
 
     Ok(())

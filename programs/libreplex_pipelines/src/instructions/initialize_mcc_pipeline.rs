@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use libreplex_fair_launch::{cpi::accounts::InitialiseV2Ctx, InitialiseInputV2, HYBRID_DEPLOYMENT_TYPE};
-use libreplex_liquidity::{cpi::accounts::Initialise, InitialiseInput};
+use libreplex_liquidity::{cpi::accounts::Initialise, InitialiseInput, DEPLOYMENT_TYPE_SPL};
 
 use crate::MccPipeline;
 
@@ -138,6 +138,10 @@ pub fn initialise(
         ),
         // this has the cosigner specified
         InitialiseInput {
+            // deployment type set to spl - this doesn't mint extra stuff, but grabs
+            // some SPL for the LP reserve and gives the minter a bunch of SPL 
+            // instead of NFT
+            deployment_type: DEPLOYMENT_TYPE_SPL,
             seed: pipeline_input.liquidity_seed,
             deployment: deployment.key(),
             bootstrap_start_time: None, 

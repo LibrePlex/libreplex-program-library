@@ -12,6 +12,9 @@ pub use create_lookup_table_for_liquidity::*;
 pub mod mint;
 pub use mint::*;
 
+pub mod mint_spl;
+pub use mint_spl::*;
+
 pub mod swap_to_fungible;
 pub use swap_to_fungible::*;
 
@@ -30,6 +33,10 @@ pub mod libreplex_liquidity {
 
     pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
         mint_handler(ctx)
+    }
+
+    pub fn mint_spl<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>>) -> Result<()> {
+        mint_spl_handler(ctx)
     }
 
     pub fn create_lookup_table(ctx: Context<CreateLookupTableForLiquidityCtx>,
