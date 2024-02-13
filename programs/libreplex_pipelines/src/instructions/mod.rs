@@ -1,5 +1,8 @@
-pub mod mcc_pipeline_initialise;
-pub use mcc_pipeline_initialise::*;
+pub mod pipeline_initialise;
+pub use pipeline_initialise::*;
 
-pub mod mcc_pipeline_create_swap;
-pub use mcc_pipeline_create_swap::*;
+pub mod create_swap;
+pub use create_swap::*;
+
+pub mod add_liquidity;
+pub use add_liquidity::*;

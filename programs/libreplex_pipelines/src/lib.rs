@@ -16,15 +16,18 @@ pub use state::*;
 pub mod libreplex_pipelines {
     use super::*;
 
-    pub fn mcc_pipeline_initialise(
-        ctx: Context<MccPipelineInitialiseCtx>,
-        fair_launch_input: libreplex_fair_launch::InitialiseInputV2,
-        pipeline_input: InitialiseMetaplexPipelineInput,
+    pub fn initialise(
+        ctx: Context<InitialisePipelineCtx>,
+        input: InitialisePipeline,
     ) -> Result<()> {
-        instructions::mcc_pipeline_initialise::mcc_pipeline_initialise(ctx, fair_launch_input, pipeline_input)
+        instructions::pipeline_initialise::initialise_pipeline(ctx, input)
     }
 
-    pub fn mcc_pipeline_create_swap(ctx: Context<MccPipelineCreateSwap>) -> Result<()> {
-        instructions::mcc_pipeline_create_swap::mcc_pipeline_create_swap(ctx)
+    pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()> {
+        instructions::create_swap::create_swap(ctx, input)
+    }
+
+    pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
+        instructions::add_liquidity::add_liquidity(ctx)
     }
 }

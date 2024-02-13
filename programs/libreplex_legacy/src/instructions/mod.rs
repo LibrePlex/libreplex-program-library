@@ -9,10 +9,6 @@ pub use check_metadata_type::*;
 
 pub mod check_metadata_type;
 
-pub mod cnft;
-
-pub use cnft::*;
-
 
 
 pub use claim_excess_rent_as_uauth::*;

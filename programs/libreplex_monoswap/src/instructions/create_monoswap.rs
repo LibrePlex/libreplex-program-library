@@ -19,7 +19,7 @@ pub struct CreateMonoSwapCtx<'info> {
         payer = payer, 
         space = SwapMarker::SIZE,
         seeds = ["swap_marker".as_bytes(), 
-        swapper_program.key().as_ref(),
+        namespace.key().as_ref(),
         mint_incoming.key().as_ref()], // always indexed by the incoming mint
         bump,)]
     pub swap_marker: Account<'info, SwapMarker>,
@@ -40,7 +40,7 @@ pub struct CreateMonoSwapCtx<'info> {
     // from this account
     #[account(mut,
         associated_token::mint = mint_outgoing,
-        associated_token::authority = signer
+        associated_token::authority = mint_outgoing_owner
     )] 
     pub mint_outgoing_token_account_source: InterfaceAccount<'info, TokenAccount>,
     
@@ -58,18 +58,10 @@ pub struct CreateMonoSwapCtx<'info> {
 
     // leave this here for integrations
     #[account(mut)]
-    pub signer: Signer<'info>,
+    pub mint_outgoing_owner: Signer<'info>,
 
-    // swapper signer always has the same PDA derivation
-    // it tells the multiswap that the call originated 
-    // with a certain swapper program and that it's
-    // ok to generate the marker
-    #[account(mut,
-        seeds = ["swapper_signer".as_bytes()],
-        seeds::program = swapper_program.key(),
-        bump,
-    )]
-    pub swapper_signer: Signer<'info>,
+    // any account that can sign this. this is useful for grouping swaps 
+    pub namespace: Signer<'info>,
 
     /// CHECK: Checked in constraint
     #[account(
@@ -93,10 +85,10 @@ pub fn create_swap(ctx: Context<CreateMonoSwapCtx>, input: CreateMonoSwapInput) 
     let swap_marker = &mut ctx.accounts.swap_marker;
     let mint_outgoing = &mut ctx.accounts.mint_outgoing;
     
-
+    swap_marker.namespace = ctx.accounts.namespace.key();
     swap_marker.mint_incoming = ctx.accounts.mint_incoming.key();
     swap_marker.mint_outgoing = mint_outgoing.key();
-    swap_marker.swapper_program = ctx.accounts.swapper_program.key();
+  
     swap_marker.used = false;
 
     // transfer the outgoing mint into escrow - 

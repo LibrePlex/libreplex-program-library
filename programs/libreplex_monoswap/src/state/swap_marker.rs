@@ -7,9 +7,12 @@ use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 // they can never be deleted so the swap links are permanent
 #[account]
 pub struct SwapMarker {
+    // namespace can be anything that the caller can sign
+    pub namespace: Pubkey,
+    // allows slicing and dicing by incoming mint
     pub mint_incoming: Pubkey,
+     // allows slicing and dicing by outgoing mint
     pub mint_outgoing: Pubkey,
-    pub swapper_program: Pubkey,
     pub mint_incoming_amount: u64,
     pub mint_outgoing_amount: u64,
     // an unused marker can be closed.
