@@ -66,20 +66,24 @@ pub fn mint_non_fungible_2022_logic<'a>(
             ),
             1,
         )?;
-        msg!("Removing freeze auth - non_fungible");
+        // no longer removing freeze auth etc as this 
+        // kills things like escrowless staking. keeping update 
+        // auth too
 
-        set_authority(
-            CpiContext::new_with_signer(
-                token_program.to_account_info(),
-                SetAuthority {
-                    current_authority: authority.clone(),
-                    account_or_mint: non_fungible_mint.clone(),
-                },
-                &[deployment_seeds]
-            ),
-            anchor_spl::token_2022::spl_token_2022::instruction::AuthorityType::FreezeAccount,
-            None,
-        )?;
+        // msg!("Removing freeze auth - non_fungible");
+
+        // set_authority(
+        //     CpiContext::new_with_signer(
+        //         token_program.to_account_info(),
+        //         SetAuthority {
+        //             current_authority: authority.clone(),
+        //             account_or_mint: non_fungible_mint.clone(),
+        //         },
+        //         &[deployment_seeds]
+        //     ),
+        //     anchor_spl::token_2022::spl_token_2022::instruction::AuthorityType::FreezeAccount,
+        //     None,
+        // )?;
 
         msg!("Removing mint authority");
         // ok we are at max mint
