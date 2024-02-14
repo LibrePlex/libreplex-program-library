@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 use libreplex_fair_launch::{cpi::accounts::InitialiseV2Ctx, InitialiseInputV2, HYBRID_DEPLOYMENT_TYPE};
 use libreplex_liquidity::{InitialiseInput, DEPLOYMENT_TYPE_SPL};
 use libreplex_liquidity::cpi::accounts::Initialise as InitialiseV2CtxLiquidity;
@@ -89,7 +89,6 @@ pub fn initialise_pipeline(
     let libreplex_fair_launch_program = &ctx.accounts.libreplex_fair_launch_program;
     let system_program = &ctx.accounts.system_program;
     let payer = &ctx.accounts.payer;
-    let auth = &ctx.accounts.auth;
     let deployment = &ctx.accounts.deployment;
     let deployment_config = &ctx.accounts.deployment_config;
     let pipeline = &mut ctx.accounts.pipeline;
@@ -101,15 +100,23 @@ pub fn initialise_pipeline(
 
     // we add a creator program - this means mints and swaps can only happen with
     // the signature of the pipelines program
-    pipeline.filter = input.filter;
-    pipeline.fair_launch_deployment = deployment.key();
-    pipeline.processed_item_count = 0;
-    pipeline.auth = auth.key();
-    pipeline.liquidity_provider_amount_in_spl = input.liquidity_provider_amount_in_spl;
-    
     let clock = Clock::get()?;
-    pipeline.creation_time = clock.unix_timestamp;
-    pipeline.bump = ctx.bumps.pipeline;
+    pipeline.set_inner(Pipeline{ 
+        fair_launch_deployment: deployment.key(), 
+        liquidity: ctx.accounts.liquidity.key(), 
+        auth: ctx.accounts.auth.key(), 
+        processed_item_count: 0, 
+        creation_time: clock.unix_timestamp, 
+        bump: ctx.bumps.pipeline, 
+        filter: input.filter, 
+        liquidity_provider_amount_in_spl: input.liquidity_provider_amount_in_spl, 
+        fungible_chunk_count: 0, 
+        fungible_amount_net: 0, 
+        fungible_amount_total: 0, 
+        created_swap_count: 0, 
+        auth_program_id: system_program::ID });
+
+   
 
     libreplex_fair_launch::cpi::initialise_v2(
         CpiContext::new(

@@ -15,16 +15,12 @@ pub struct MintSplCtx<'info> {
 
     // this prevents direct mints via liquidity program, for ex with
     // pipelines
-    #[account(mut,
+    #[account(
         constraint = liquidity.cosigner_program_id.eq(&system_program::ID) || authority.key() == liquidity.authority)]
     pub authority: Signer<'info>,
 
-    /// CHECK: Checked by has one
-    #[account(mut)]
-    pub treasury: UncheckedAccount<'info>,
-
     #[account(mut, 
-        has_one = deployment, has_one = treasury)]
+        has_one = deployment)]
     pub liquidity: Box<Account<'info, Liquidity>>,
 
     pub system_program: Program<'info, System>,

@@ -6,7 +6,6 @@ use libreplex_fair_launch::{Deployment, DeploymentConfig, TOKEN2022_DEPLOYMENT_T
 
 use libreplex_monoswap::{cpi::accounts::CreateMonoSwapCtx, CreateMonoSwapInput};
 use libreplex_shared::sysvar_instructions_program;
-use mpl_token_metadata::accounts::Metadata;
 use solana_program::keccak;
 
 
@@ -43,7 +42,7 @@ pub struct CreateSwapCtx<'info> {
         payer = payer, 
         space = PipelineSwapMarker::SIZE,
         seeds = [
-            "swap_marker".as_bytes(), 
+            b"swap_marker", 
             pipeline.key().as_ref(),
             non_fungible_mint_incoming.key().as_ref()], // always indexed by the incoming mint
         bump,)]
@@ -58,12 +57,8 @@ pub struct CreateSwapCtx<'info> {
 
 
 
-     /// CHECK: Checked via CPI
-    
-    #[account(mut,
-        seeds = ["deployment_config".as_ref(), deployment.key().as_ref()], 
-        seeds::program = libreplex_fair_launch::ID,
-        bump)]
+    /// CHECK: Checked via CPI
+    #[account(mut)]
     pub deployment_config: Box<Account<'info, DeploymentConfig>>,
 
     
@@ -74,18 +69,6 @@ pub struct CreateSwapCtx<'info> {
         constraint = non_fungible_mint_incoming.decimals == 0 && non_fungible_mint_incoming.supply == 1
     )] 
     pub non_fungible_mint_incoming: Box<InterfaceAccount<'info, Mint>>,
-
-    /// CHECK: PDA derivation checked
-    #[account(mut,
-        seeds=[
-                "metadata".as_bytes(),
-                &mpl_token_metadata::ID.as_ref(),
-                non_fungible_mint_incoming.key().as_ref(),
-            ],
-            bump,
-        seeds::program=mpl_token_metadata::ID,
-    )] 
-    pub non_fungible_metadata_incoming: UncheckedAccount<'info>,
 
        
     // this is the fungible mint of the pipeline fair launch as well as the outgoing
@@ -223,27 +206,10 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()
     let namespace = &ctx.accounts.namespace;
     let libreplex_pipelines_program = &ctx.accounts.libreplex_pipelines_program;
     let pipeline = &mut ctx.accounts.pipeline;
-    let non_fungible_metadata_incoming = &ctx.accounts.non_fungible_metadata_incoming;
-
+    
 
     match pipeline.filter {
-        Filter::MCC {
-            collection_id
-        } => {
-            let metadata_obj = Metadata::try_from(&non_fungible_metadata_incoming.to_account_info())?;
-            match metadata_obj.collection {
-                Some(x) => {
-                    if !x.key.eq(&collection_id) {
-                        panic!("Bad collection. Expected {}", {collection_id.to_string()});
-                    } else {
-                        // this is the happy path
-                    }
-                },
-                _=>{
-                    panic!("Metadata has no collection. Expected {}", {collection_id.to_string()});
-                }
-            }
-        },
+        
         Filter::Hashlist { root } => {
             // do some validation here to
             let leaf = keccak::hash(&non_fungible_mint_incoming.key().to_bytes()).to_bytes();

@@ -117,30 +117,10 @@ export type LibreplexPipelines = {
         {
           "name": "deploymentConfig",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "nonFungibleMintIncoming",
-          "isMut": true,
           "isSigner": false
         },
         {
-          "name": "nonFungibleMetadataIncoming",
+          "name": "nonFungibleMintIncoming",
           "isMut": true,
           "isSigner": false
         },
@@ -248,6 +228,11 @@ export type LibreplexPipelines = {
           "isSigner": false
         },
         {
+          "name": "creatorFeeTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "deploymentConfig",
           "isMut": true,
           "isSigner": false,
@@ -264,7 +249,12 @@ export type LibreplexPipelines = {
                 "account": "Deployment",
                 "path": "deployment"
               }
-            ]
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "libreplex_fair_launch_program"
+            }
           }
         },
         {
@@ -284,16 +274,16 @@ export type LibreplexPipelines = {
                 "account": "Deployment",
                 "path": "deployment"
               }
-            ]
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "libreplex_fair_launch_program"
+            }
           }
         },
         {
           "name": "hashlistMarker",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "creatorFeeTreasury",
           "isMut": true,
           "isSigner": false
         },
@@ -314,7 +304,7 @@ export type LibreplexPipelines = {
         },
         {
           "name": "pipelineFungibleTokenAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -349,12 +339,12 @@ export type LibreplexPipelines = {
         },
         {
           "name": "pooledNonFungibleMint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "pooledNonFungibleTokenAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -779,30 +769,10 @@ export const IDL: LibreplexPipelines = {
         {
           "name": "deploymentConfig",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "nonFungibleMintIncoming",
-          "isMut": true,
           "isSigner": false
         },
         {
-          "name": "nonFungibleMetadataIncoming",
+          "name": "nonFungibleMintIncoming",
           "isMut": true,
           "isSigner": false
         },
@@ -910,6 +880,11 @@ export const IDL: LibreplexPipelines = {
           "isSigner": false
         },
         {
+          "name": "creatorFeeTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "deploymentConfig",
           "isMut": true,
           "isSigner": false,
@@ -926,7 +901,12 @@ export const IDL: LibreplexPipelines = {
                 "account": "Deployment",
                 "path": "deployment"
               }
-            ]
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "libreplex_fair_launch_program"
+            }
           }
         },
         {
@@ -946,16 +926,16 @@ export const IDL: LibreplexPipelines = {
                 "account": "Deployment",
                 "path": "deployment"
               }
-            ]
+            ],
+            "programId": {
+              "kind": "account",
+              "type": "publicKey",
+              "path": "libreplex_fair_launch_program"
+            }
           }
         },
         {
           "name": "hashlistMarker",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "creatorFeeTreasury",
           "isMut": true,
           "isSigner": false
         },
@@ -976,7 +956,7 @@ export const IDL: LibreplexPipelines = {
         },
         {
           "name": "pipelineFungibleTokenAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -1011,12 +991,12 @@ export const IDL: LibreplexPipelines = {
         },
         {
           "name": "pooledNonFungibleMint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "pooledNonFungibleTokenAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {

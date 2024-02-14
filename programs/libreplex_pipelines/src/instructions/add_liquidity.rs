@@ -1,15 +1,13 @@
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::spl_token,
-    token_interface::{
-        spl_token_2022::{self}, TokenAccount,
-    },
+    token::Token,
+    token_interface::spl_token_2022
 };
 use libreplex_fair_launch::{Deployment, DeploymentConfig, Hashlist};
 use libreplex_liquidity::{cpi::accounts::MintSplCtx, Liquidity};
 
-use libreplex_shared::{operations::transfer_generic_spl, sysvar_instructions_program};
+use libreplex_shared::sysvar_instructions_program;
 
 /// this is where the magic happens.
 /// 1) mint an item from the pipeline fair launch (this requires a creator cosign)
@@ -37,31 +35,26 @@ pub struct AddLiquidityCtx<'info> {
     pub deployment: Box<Account<'info, Deployment>>,
 
     /// CHECK: Checked via CPI
+    #[account(mut)]
+    pub creator_fee_treasury: UncheckedAccount<'info>,
 
     #[account(mut,
         seeds = ["deployment_config".as_ref(), deployment.key().as_ref()], 
-        seeds::program = libreplex_fair_launch::ID,
+        seeds::program = libreplex_fair_launch_program.key(),
         bump)]
-    pub deployment_config: Box<Account<'info, DeploymentConfig>>,
+    pub deployment_config: Account<'info, DeploymentConfig>,
 
     #[account(mut, seeds = ["hashlist".as_bytes(), 
         deployment.key().as_ref()],
-        seeds::program = libreplex_fair_launch::ID,
+        seeds::program = libreplex_fair_launch_program.key(),
         bump)]
-    pub hashlist: Box<Account<'info, Hashlist>>,
+    pub hashlist: Account<'info, Hashlist>,
 
     /// CHECK: Passed in via CPI
     #[account(mut)]
     pub hashlist_marker: UncheckedAccount<'info>,
 
-    /// CHECK: Checked in constraint against deployment_config
-    #[account(mut,
-        constraint = creator_fee_treasury.key() == deployment_config.creator_fee_treasury)]
-    pub creator_fee_treasury: UncheckedAccount<'info>,
-
-    // this is the fungible mint of the pipeline fair launch as well as the outgoing
-    // mint of the wap
-    /// CHECK: Checked in code
+    /// CHECK: Passed in via CPI
     #[account(mut,
         constraint = deployment.fungible_mint == fungible_mint.key())]
     pub fungible_mint: UncheckedAccount<'info>,
@@ -71,10 +64,11 @@ pub struct AddLiquidityCtx<'info> {
 
     // leave this here for integrations
     #[account(mut,
-        constraint = pipeline.auth_program_id.eq(&system_program::ID) || auth.key().eq(&pipeline.auth_program_id) )]
+        constraint = pipeline.auth_program_id.eq(&system_program::ID) || auth.key().eq(&pipeline.auth) )]
     pub auth: Signer<'info>,
 
     /// CHECK: Checked via CPI
+    #[account(mut)]
     pub pipeline_fungible_token_account: UncheckedAccount<'info>,
 
     /*
@@ -108,9 +102,11 @@ pub struct AddLiquidityCtx<'info> {
     pub liquidity_fungible_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Checked in cpi.
+    #[account(mut)]
     pub pooled_non_fungible_mint: Signer<'info>,
 
     /// CHECK: Checked in cpi.
+    #[account(mut)]
     pub pooled_non_fungible_token_account: UncheckedAccount<'info>,
 
     /// CHECK: ID checked in constraint
@@ -120,10 +116,7 @@ pub struct AddLiquidityCtx<'info> {
     pub libreplex_fair_launch_program: UncheckedAccount<'info>,
 
     /// CHECK: ID checked in constraint
-    #[account(
-        constraint = token_program.key() == spl_token::ID
-    )]
-    pub token_program: UncheckedAccount<'info>,
+    pub token_program: Program<'info, Token>,
 
     /// CHECK: ID checked in constraint
     #[account(
@@ -133,7 +126,6 @@ pub struct AddLiquidityCtx<'info> {
 
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    #[account()]
     pub system_program: Program<'info, System>,
 
     /// CHECK: Id checked in constraint
@@ -152,12 +144,11 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
     let libreplex_fair_launch_program = &ctx.accounts.libreplex_fair_launch_program;
     let deployment = &ctx.accounts.deployment;
     let deployment_config = &ctx.accounts.deployment_config;
-    let creator_fee_treasury = &ctx.accounts.creator_fee_treasury;
     let hashlist = &ctx.accounts.hashlist;
     let hashlist_marker = &ctx.accounts.hashlist_marker;
     let fungible_mint = &ctx.accounts.fungible_mint;
     let liquidity = &ctx.accounts.liquidity;
-    let liquidity_fungible_token_account = &ctx.accounts.liquidity_fungible_token_account;
+    // let liquidity_fungible_token_account = &ctx.accounts.liquidity_fungible_token_account;
     let deployment_fungible_token_account = &ctx.accounts.deployment_fungible_token_account;
     let deployment_non_fungible_token_account = &ctx.accounts.deployment_non_fungible_token_account;
     let pooled_non_fungible_mint = &ctx.accounts.pooled_non_fungible_mint;
@@ -165,22 +156,28 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
     let pipeline_fungible_token_account = &ctx.accounts.pipeline_fungible_token_account;
     let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
     let pipeline = &mut ctx.accounts.pipeline;
-    let liquidity_provider_token_account = &ctx.accounts.liquidity_provider_token_account;
+    // let liquidity_provider_token_account = &ctx.accounts.liquidity_provider_token_account;
     let payer = &ctx.accounts.payer;
-    let liquidity_provider = &ctx.accounts.liquidity_provider;
-
+    // let liquidity_provider = &ctx.accounts.liquidity_provider;
+    let creator_fee_treasury = &ctx.accounts.creator_fee_treasury;
     let pipeline_seeds: &[&[u8]] = &[
         "pipeline".as_bytes(),
         deployment.ticker.as_ref(),
         &[pipeline.bump],
     ];
+    let liquidity_fungible_token_account = &mut ctx.accounts.liquidity_fungible_token_account;
 
-    let tokenaccount_info_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref());
+    // let mut balance_before = 0;
 
-    let mut data: &[u8] = &tokenaccount_info_before.try_borrow_data()?;
-    let acc = TokenAccount::try_deserialize(&mut data)?;
+    if !liquidity_fungible_token_account.data_is_empty() {
+        // let tokenaccount_info_before =
+        //     AsRef::<AccountInfo>::as_ref(liquidity_fungible_token_account.as_ref());
 
-    let balance_before = acc.amount;
+        // let mut data: &[u8] = &tokenaccount_info_before.try_borrow_data()?;
+        // let acc = TokenAccount::try_deserialize(&mut data)?;
+
+        // balance_before = acc.amount;
+    }
 
     // mint one, the excess goes to pipeline_fungible_token_account.
     libreplex_liquidity::cpi::mint_spl(CpiContext::new_with_signer(
@@ -194,6 +191,7 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
             payer: payer.to_account_info(),
             deployment: deployment.to_account_info(),
             deployment_config: deployment_config.to_account_info(),
+            // creator fee treasury is always system program for these
             creator_fee_treasury: creator_fee_treasury.to_account_info(),
             hashlist: hashlist.to_account_info(),
             hashlist_marker: hashlist_marker.to_account_info(),
@@ -207,8 +205,6 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
             // so as to clean up the interfaces
             token_program: token_program.to_account_info(),
             associated_token_program: associated_token_program.to_account_info(),
-
-            treasury: creator_fee_treasury.to_account_info(),
             liquidity: liquidity.to_account_info(),
             deployment_fungible_token_account: deployment_fungible_token_account.to_account_info(),
             deployment_non_fungible_token_account: deployment_non_fungible_token_account
@@ -223,53 +219,53 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
         &[pipeline_seeds],
     ))?;
 
-    let token_program_for_fungible = match *fungible_mint.owner {
-        spl_token::ID => token_program.to_account_info(),
-        spl_token_2022::ID => token_program_22.to_account_info(),
-        _ => {
-            panic!("Fungible mint is not owned by tokenkeg or token-2022");
-        }
-    };
+    // let token_program_for_fungible = match *fungible_mint.owner {
+    //     spl_token::ID => token_program.to_account_info(),
+    //     spl_token_2022::ID => token_program_22.to_account_info(),
+    //     _ => {
+    //         panic!("Fungible mint is not owned by tokenkeg or token-2022");
+    //     }
+    // };
 
-    let tokenaccount_info_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref());
+    // let tokenaccount_info_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref());
 
-    let mut data: &[u8] = &tokenaccount_info_after.try_borrow_data()?;
-    let acc = TokenAccount::try_deserialize(&mut data)?;
+    // let mut data: &[u8] = &tokenaccount_info_after.try_borrow_data()?;
+    // let acc = TokenAccount::try_deserialize(&mut data)?;
 
-    let balance_after = acc.amount;
+    // let balance_after = acc.amount;
 
-    let total_funds_received = balance_after - balance_before;
+    // let total_funds_received = balance_after - balance_before;
 
-    let lp_provider_share = pipeline.liquidity_provider_amount_in_spl;
+    // let lp_provider_share = pipeline.liquidity_provider_amount_in_spl;
 
-    // a little safety net here
-    if lp_provider_share > total_funds_received {
-        panic!("Attempted to transfer too much. The code is wrong but caught you anyway.")
-    }
+    // // a little safety net here
+    // if lp_provider_share > total_funds_received {
+    //     panic!("Attempted to transfer too much. The code is wrong but caught you anyway.")
+    // }
 
-    if lp_provider_share > 0 {
-        // transfer the liquidity provider's share
-        transfer_generic_spl(
-            &token_program_for_fungible,
-            pipeline_fungible_token_account,
-            liquidity_provider_token_account,
-            &pipeline.to_account_info(),
-            fungible_mint,
-            liquidity_provider.as_ref(),
-            associated_token_program,
-            system_program,
-            Some(&[pipeline_seeds]), // pipeline signs
-            payer,
-            deployment.decimals,
-            lp_provider_share,
-        )?;
-    }
+    // if lp_provider_share > 0 {
+    //     // transfer the liquidity provider's share
+    //     transfer_generic_spl(
+    //         &token_program_for_fungible,
+    //         pipeline_fungible_token_account,
+    //         liquidity_provider_token_account,
+    //         &pipeline.to_account_info(),
+    //         fungible_mint,
+    //         liquidity_provider.as_ref(),
+    //         associated_token_program,
+    //         system_program,
+    //         Some(&[pipeline_seeds]), // pipeline signs
+    //         payer,
+    //         deployment.decimals,
+    //         lp_provider_share,
+    //     )?;
+    // }
 
-    pipeline.fungible_chunk_count += 1;
-    // somebody else could send spl here as well.
-    // we ignore that and just count what we need
-    pipeline.fungible_amount_total += total_funds_received - lp_provider_share;
-    pipeline.fungible_amount_net += total_funds_received - lp_provider_share;
+    // pipeline.fungible_chunk_count += 1;
+    // // somebody else could send spl here as well.
+    // // we ignore that and just count what we need
+    // pipeline.fungible_amount_total += total_funds_received - lp_provider_share;
+    // pipeline.fungible_amount_net += total_funds_received - lp_provider_share;
 
     Ok(())
 }
