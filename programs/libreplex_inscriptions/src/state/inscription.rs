@@ -201,7 +201,7 @@ impl Inscription {
     pub fn write_data(
         &self,
         mut current_data: RefMut<&mut [u8]>,
-        data_to_add: &Vec<u8>,
+        data_to_add: &[u8],
         start_pos: u32,
     ) -> Result<()> {
         if start_pos + data_to_add.len() as u32 > self.size {
@@ -313,7 +313,7 @@ pub struct InscriptionV3 {
     pub fn write_data(
         &self,
         mut current_data: RefMut<&mut [u8]>,
-        data_to_add: &Vec<u8>,
+        data_to_add: &[u8],
         start_pos: u32,
     ) -> Result<()> {
         if start_pos + data_to_add.len() as u32 > self.size {

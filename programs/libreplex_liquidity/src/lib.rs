@@ -58,9 +58,6 @@ pub mod libreplex_liquidity {
         prepare_native_escrow_handler(ctx)
     }
 
-
-    /* v2 methods - for generating SPL deployments and later everything else */
-
     pub fn mint_spl<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>>) -> Result<()> {
         mint_spl_handler(ctx)
     }

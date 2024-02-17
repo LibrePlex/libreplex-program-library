@@ -1,5 +1,7 @@
 use anchor_lang::{prelude::*, system_program};
-use anchor_spl::{associated_token::AssociatedToken, token::{spl_token, TokenAccount}, token_interface::{spl_token_2022, transfer_checked, TransferChecked}};
+use anchor_spl::{
+    token_interface::{TokenAccount, Mint},
+    associated_token::AssociatedToken, token::{spl_token}, token_interface::{spl_token_2022, transfer_checked, TransferChecked}};
 
 use crate::{Liquidity, DEPLOYMENT_TYPE_SPL};
 use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment};
@@ -13,23 +15,23 @@ pub struct MintSplCtx<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account(mut,
+    // this prevents direct mints via liquidity program, for ex with
+    // pipelines
+    #[account(
         constraint = liquidity.cosigner_program_id.eq(&system_program::ID) || authority.key() == liquidity.authority)]
     pub authority: Signer<'info>,
 
-    /// CHECK: Checked by has one
-    #[account(mut)]
-    pub treasury: UncheckedAccount<'info>,
-
     #[account(mut, 
-        has_one = deployment, has_one = treasury)]
+        has_one = deployment)]
     pub liquidity: Box<Account<'info, Liquidity>>,
 
     pub system_program: Program<'info, System>,
 
     /// CHECK: Checked in cpi.
-    #[account(mut)]
-    pub deployment_fungible_token_account: UncheckedAccount<'info>,
+    #[account(mut,
+        token::authority = liquidity,
+        token::mint = fungible_mint)]
+    pub deployment_fungible_token_account: InterfaceAccount<'info, TokenAccount>,
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
@@ -57,20 +59,12 @@ pub struct MintSplCtx<'info> {
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
-    pub pooled_hashlist_market: UncheckedAccount<'info>,
-
-    /// CHECK: Checked in cpi.
-    #[account(mut)]
-    pub fungible_mint: UncheckedAccount<'info>,
+    pub fungible_mint: InterfaceAccount<'info, Mint>,
 
     #[account(mut, 
         associated_token::authority = liquidity,
          associated_token::mint = fungible_mint)]
-    pub liquidity_fungible_token_account: Account<'info, TokenAccount>,
-
-    /// CHECK: Checked in cpi.
-    #[account(mut)]
-    pub non_fungible_mint: Signer<'info>,
+    pub liquidity_fungible_token_account: InterfaceAccount<'info, TokenAccount>,
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
@@ -78,11 +72,11 @@ pub struct MintSplCtx<'info> {
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
-    pub pooled_non_fungible_mint: Signer<'info>,
+    pub non_fungible_mint: Signer<'info>,
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
-    pub pooled_non_fungible_token_account: UncheckedAccount<'info>,
+    pub liquidity_non_fungible_token_account: UncheckedAccount<'info>,
 
 
     /// CHECK: Checked in cpi.
@@ -135,15 +129,15 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
             deployment_config: ctx.accounts.deployment_config.to_account_info(),
             creator_fee_treasury: ctx.accounts.creator_fee_treasury.to_account_info(),
             hashlist: ctx.accounts.hashlist.to_account_info(),
-            hashlist_marker: ctx.accounts.pooled_hashlist_market.to_account_info(),
+            hashlist_marker: ctx.accounts.hashlist_marker.to_account_info(),
             payer: ctx.accounts.payer.to_account_info(),
             signer: liquidity.to_account_info(),
             fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
             minter: liquidity.to_account_info(),
-            non_fungible_mint: ctx.accounts.pooled_non_fungible_mint.to_account_info(),
+            non_fungible_mint: ctx.accounts.non_fungible_mint.to_account_info(),
             non_fungible_token_account: ctx
                 .accounts
-                .pooled_non_fungible_token_account
+                .liquidity_non_fungible_token_account
                 .to_account_info(),
             token_program: ctx.accounts.token_program_22.to_account_info(),
             associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
@@ -157,18 +151,26 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
         CpiContext::new_with_signer(
             ctx.accounts.fair_launch.to_account_info(),
             libreplex_fair_launch::cpi::accounts::SwapToFungible2022Ctx {
+                
+                // these are the same
+                non_fungible_source_token_account: ctx.accounts.liquidity_non_fungible_token_account.to_account_info(),
                 non_fungible_source_account_owner: liquidity.to_account_info(),
+                non_fungible_target_token_account: ctx.accounts.deployment_non_fungible_token_account.to_account_info(),
+                
+
                 fungible_target_token_account_owner: liquidity.to_account_info(),
+                
+                fungible_source_token_account: ctx.accounts.deployment_fungible_token_account.to_account_info(),
+                fungible_target_token_account: ctx.accounts.liquidity_fungible_token_account.to_account_info(),
+                
+                
+                
                 deployment: ctx.accounts.deployment.to_account_info(),
                 payer: ctx.accounts.payer.to_account_info(),
                 signer: liquidity.to_account_info(),
                 fungible_mint: fungible_mint.to_account_info(),
-                hashlist_marker: ctx.accounts.pooled_hashlist_market.to_account_info(),
-                fungible_source_token_account: ctx.accounts.deployment_fungible_token_account.to_account_info(),
-                fungible_target_token_account: ctx.accounts.liquidity_fungible_token_account.to_account_info(),
-                non_fungible_mint: ctx.accounts.pooled_non_fungible_mint.to_account_info(),
-                non_fungible_source_token_account: ctx.accounts.pooled_non_fungible_token_account.to_account_info(),
-                non_fungible_target_token_account: ctx.accounts.deployment_non_fungible_token_account.to_account_info(),
+                hashlist_marker: ctx.accounts.hashlist_marker.to_account_info(),
+                non_fungible_mint: ctx.accounts.non_fungible_mint.to_account_info(),
                 token_program_22: ctx.accounts.token_program_22.to_account_info(),
                 token_program: ctx.accounts.token_program.to_account_info(),
                 associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
@@ -188,7 +190,7 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
     ).unwrap().checked_div(liquidity.lp_ratio as u64+1).unwrap();
 
 
-    let token_program_for_fungible = match *fungible_mint.owner {
+    let token_program_for_fungible = match *fungible_mint.to_account_info().owner{
         spl_token::ID => token_program.to_account_info(),
         spl_token_2022::ID => token_program_22.to_account_info(),
         _ => {
