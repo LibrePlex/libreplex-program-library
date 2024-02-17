@@ -14,6 +14,7 @@ pub struct InitialiseInput {
     pub name: String,
     pub offchain_url: String, // used both for the fungible and the non-fungible
     pub creator_cosign_program_id: Option<Pubkey>,
+    pub add_counter_to_name: bool
 }
 
 
@@ -77,7 +78,8 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         symbol: input.symbol,
         name: input.name,
         offchain_url: input.offchain_url,
-        padding: [0; 100],
+        add_counter_to_name: input.add_counter_to_name,
+        padding: [0; 99],
     });
 
 

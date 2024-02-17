@@ -128,6 +128,12 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
             &[ctx.bumps.editions_deployment],
         ];
 
+
+
+    let name = match editions_deployment.add_counter_to_name {
+        true => format!("{} #{}", editions_deployment.name.clone(), editions_deployment.number_of_tokens_issued+1),
+        false => editions_deployment.name.clone()
+    };
     // msg!("Create token 2022 w/ metadata");
     create_token_2022_and_metadata(
         MintAccounts2022 {
@@ -139,7 +145,7 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         },
         0,
         Some(TokenMetadata {
-            name: editions_deployment.name.clone(),
+            name,
             symbol: editions_deployment.symbol.clone(),
             uri: editions_deployment.offchain_url.clone(),
             update_authority,

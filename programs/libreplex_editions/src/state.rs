@@ -33,8 +33,9 @@ pub struct EditionsDeployment {
     #[max_len(OFFCHAIN_URL_LIMIT)]
     pub offchain_url: String, // pub padding: Vec<u8, EXCESS>
     
+    pub add_counter_to_name: bool,
     
-    pub padding: [u8; 100]
+    pub padding: [u8; 99]
 
 }
 
