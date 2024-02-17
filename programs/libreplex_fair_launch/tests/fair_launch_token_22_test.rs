@@ -280,7 +280,7 @@ mod inscriptions_tests {
                 banks_client,
                 m.clone(),
                 None, // mint auth must be None
-                None, // freeze auth must be None
+                Some(deployment.key()), // mint auth must be None
                 // check that this mint belongs to the fungible mint group
                 Some(fungible_mint.clone()),
             )

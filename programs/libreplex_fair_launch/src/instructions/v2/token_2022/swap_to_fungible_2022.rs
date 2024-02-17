@@ -60,9 +60,7 @@ pub struct SwapToFungible2022Ctx<'info> {
 
     /* non-fungible accounts */
     /// CHECK: checked in constraint
-    #[account(mut,
-        owner = token_2022::ID,
-    )]
+    #[account(mut)]
     pub non_fungible_mint: UncheckedAccount<'info>,
 
     pub non_fungible_source_account_owner: Signer<'info>,
@@ -121,9 +119,21 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
     // simples. two steps:
     // 1) move the non_fungible into the escrow
 
+    let source_token_program = match *non_fungible_mint.owner {
+        spl_token::ID => {
+            token_program.to_account_info()
+        },
+        spl_token_2022::ID => {
+            token_program_22.to_account_info()
+        },
+        _ => {
+            panic!("How could you do this to me")
+        }
+    };
+
     msg!("Transferring non fungible into escrow");
     transfer_generic_spl(
-        token_program_22,
+        source_token_program.as_ref(),
         non_fungible_source_token_account.as_ref(),
         non_fungible_target_token_account,
         non_fungible_source_account_owner,

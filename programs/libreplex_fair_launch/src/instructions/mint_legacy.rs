@@ -20,15 +20,12 @@ use crate::{
 #[derive(Accounts)]
 pub struct MintLegacyCtx<'info> {
     #[account(mut,
-       
-
-        seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
+       seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
 
     /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
     
     #[account(mut, 
-        
         seeds = ["hashlist".as_bytes(), 
         deployment.key().as_ref()],
         bump,)]

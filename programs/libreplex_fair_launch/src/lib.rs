@@ -74,7 +74,7 @@ pub mod libreplex_fair_launch {
         instructions::swap_to_fungible_2022(ctx)
     }
 
-    pub fn swap_to_nonfungible22(ctx: Context<SwapToNonFungible2022Ctx>) -> Result<()> {
+    pub fn swap_to_nonfungible22<'a>(ctx: Context<'_,'_,'_,'a, SwapToNonFungible2022Ctx<'a>>) -> Result<()> {
         instructions::swap_to_nonfungible_2022(ctx)
     }
     
