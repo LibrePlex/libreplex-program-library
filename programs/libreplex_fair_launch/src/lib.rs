@@ -33,8 +33,9 @@ pub mod libreplex_fair_launch {
         instructions::deploy_hybrid(ctx)
     }
 
-
-
+    pub fn relinquish_cosigner(ctx: Context<RelinquishCosignersCtx>) -> Result<()> {
+        instructions::relinquish_cosigner(ctx)
+    }
 
     // some of the early token-2022 launches had "" as symbol instead of the ticker.
     // this is a throwback to metaplex metadata where symbol is limited to 10 characters

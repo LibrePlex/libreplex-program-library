@@ -31,7 +31,6 @@ mod inscriptions_tests {
     use solana_program::pubkey::Pubkey;
 
     use solana_program::system_instruction::transfer;
-    use solana_program_test::tokio::time::sleep;
     use spl_token_2022::processor::Processor;
 
     use super::*;
@@ -368,6 +367,7 @@ mod inscriptions_tests {
             DECIMALS
         )
         .await;
+
     }
 }
 

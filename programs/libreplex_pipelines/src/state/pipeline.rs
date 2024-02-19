@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
-
+pub const HASHLIST_URL_LIMIT: u32 = 300;
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub enum Filter {
     MCC {
@@ -14,7 +14,12 @@ pub enum Filter {
     }
 }
 
+impl anchor_lang::Space for Filter  {
+    const INIT_SPACE: usize = 100;
+}
+
 #[account]
+#[derive(InitSpace)]
 pub struct Pipeline {
     pub fair_launch_deployment: Pubkey,
     pub liquidity: Pubkey,
@@ -35,13 +40,24 @@ pub struct Pipeline {
     // number of swaps created - each swap can have been utilised
     // multiple times but this program does not count those
     pub created_swap_count: u64,
-    pub auth_program_id: Pubkey  // system program for none
+    pub auth_program_id: Pubkey,  // system program for none
+    // the amount of SPL that you receive when you first swap in an element
+    // from the incoming collection. calculated upfront for convenience
+    // and to make sure there are no rounding errors later
+    pub spl_swap_amount_primary: u64,
+
+    // the amount for secondary swaps. secondary swap amount is always
+    // higher than the primary swap (accounting for the existence of the 
+    // SPL tokens distributed to the liquidity providers)
+    pub spl_swap_amount_secondary: u64,
+    
+    pub require_cosigner: bool,
+
+    #[max_len(HASHLIST_URL_LIMIT)]
+    pub hashlist_url: String, // pub padding: Vec<u8, EXCESS>
     
 }
 
-impl Pipeline {
-    pub const SIZE: usize = 8 + 32 + 32 + 8 + 8 + 1 + 2 + 32 + 8 + 8 + 100;
-}
 
 
 

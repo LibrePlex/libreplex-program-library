@@ -12,6 +12,8 @@
 pub mod token_2022;
 pub use token_2022::*;
 
+pub mod relinquish_cosigner;
+pub use relinquish_cosigner::*;
 
 pub use initialise::*;
 pub mod initialise;

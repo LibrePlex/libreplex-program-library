@@ -28,7 +28,8 @@ mpl-token-metadata = { version="~3" }
 libreplex_shared = {version = "*", path = "../libreplex_shared", features=["cpi"]}
 libreplex_liquidity = {version = "*", path="../libreplex_liquidity", features =["cpi", "no-entrypoint"]}
 libreplex_monoswap = {version = "*", path="../libreplex_monoswap", features =["cpi", "no-entrypoint"]}
-
+spl-token-metadata-interface = {version= "0.2.0"}
+spl-pod = {version= "0.1.0"}
 
 [dev-dependencies]
 mocha = "0.1.1"

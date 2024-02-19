@@ -23,6 +23,13 @@ pub mod libreplex_pipelines {
         instructions::pipeline_initialise::initialise_pipeline(ctx, input)
     }
 
+    pub fn claim_spl_as_liquidity_provider(
+        ctx: Context<ClaimSplAsLiquidityProviderCtx>,
+    ) -> Result<()> {
+        instructions::claim_spl_as_liquidity_provider::claim_spl_as_liquidity_provider(ctx)
+
+    }
+
     pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()> {
         instructions::create_swap::create_swap(ctx, input)
     }

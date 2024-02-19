@@ -1,7 +1,8 @@
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{
     token_interface::{TokenAccount, Mint},
-    associated_token::AssociatedToken, token::{spl_token}, token_interface::{spl_token_2022, transfer_checked, TransferChecked}};
+    associated_token::AssociatedToken, token::spl_token, token_interface::{spl_token_2022}};
+use libreplex_shared::operations::transfer_generic_spl;
 
 use crate::{Liquidity, DEPLOYMENT_TYPE_SPL};
 use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment};
@@ -29,7 +30,7 @@ pub struct MintSplCtx<'info> {
 
     /// CHECK: Checked in cpi.
     #[account(mut,
-        token::authority = liquidity,
+        token::authority = deployment,
         token::mint = fungible_mint)]
     pub deployment_fungible_token_account: InterfaceAccount<'info, TokenAccount>,
 
@@ -67,8 +68,15 @@ pub struct MintSplCtx<'info> {
     pub liquidity_fungible_token_account: InterfaceAccount<'info, TokenAccount>,
 
     /// CHECK: Checked in cpi.
-    #[account(mut)]
-    pub fungible_token_account_minter: UncheckedAccount<'info>,
+    #[account(mut,
+        constraint = fungible_token_account_receiver.key().eq(
+            &anchor_spl::associated_token::get_associated_token_address_with_program_id(
+                &receiver.key(),
+                &fungible_mint.key(),
+                fungible_mint.to_account_info().owner,
+            )
+        ))]
+    pub fungible_token_account_receiver: UncheckedAccount<'info>,
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
@@ -186,8 +194,8 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
     // that means 1/r is left in the LP reserve
 
     let amount_to_transfer_to_minter = deployment.get_fungible_mint_amount().checked_mul(
-        liquidity.lp_ratio as u64
-    ).unwrap().checked_div(liquidity.lp_ratio as u64+1).unwrap();
+        liquidity.lp_ratio as u64 - 1
+    ).unwrap().checked_div(liquidity.lp_ratio as u64).unwrap();
 
 
     let token_program_for_fungible = match *fungible_mint.to_account_info().owner{
@@ -198,20 +206,44 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
         }
     };
 
-    transfer_checked(
-        CpiContext::new_with_signer(
-            token_program_for_fungible.clone(),
-            TransferChecked {
-                to: ctx.accounts.fungible_token_account_minter.to_account_info(),
-                from: ctx.accounts.liquidity_fungible_token_account.to_account_info(),
-                authority: liquidity.to_account_info(),
-                mint: fungible_mint.to_account_info(),
-            },
-            &[seeds],
-        ),
+    msg!("amt before: {}", ctx.accounts.liquidity_fungible_token_account.amount);
+    msg!("{} {} {} {} {} {}",ctx.accounts.fungible_token_account_receiver.key(),
+        ctx.accounts.liquidity_fungible_token_account.key(),
+        liquidity.key(),
+        fungible_mint.key(),
         amount_to_transfer_to_minter,
         deployment.decimals
+    );
+    transfer_generic_spl(
+        &token_program_for_fungible,
+        &ctx.accounts.liquidity_fungible_token_account.to_account_info(),
+        &ctx.accounts.fungible_token_account_receiver.to_account_info(),
+        &liquidity.to_account_info(),
+        &fungible_mint.to_account_info(),
+        &ctx.accounts.receiver.to_account_info(),
+        &ctx.accounts.associated_token_program.to_account_info(),
+        &ctx.accounts.system_program.to_account_info(),
+        Some(&[seeds]),
+        &ctx.accounts.payer.to_account_info(),
+        deployment.decimals,
+        amount_to_transfer_to_minter
+
     )?;
+    // transfer_checked(
+    //     CpiContext::new_with_signer(
+    //         token_program_for_fungible.clone(),
+    //         TransferChecked {
+    //             to: ctx.accounts.fungible_token_account_minter.to_account_info(),
+    //             from: ctx.accounts.liquidity_fungible_token_account.to_account_info(),
+    //             authority: liquidity.to_account_info(),
+    //             mint: fungible_mint.to_account_info(),
+    //         },
+    //         &[seeds],
+    //     ),
+    //     amount_to_transfer_to_minter,
+    //     deployment.decimals
+    // )?;
+    msg!("Transferred");
    
     Ok(())
 }

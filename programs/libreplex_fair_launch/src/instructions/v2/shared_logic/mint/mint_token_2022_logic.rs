@@ -130,8 +130,10 @@ pub fn mint_token2022_logic<'info>(
     }
 
     // finally send a fee to the creator if a fee is specified
-
+    msg!("Creator fee: {}", deployment_config.creator_fee_per_mint_lamports);
     if deployment_config.creator_fee_per_mint_lamports > 0 {
+
+        msg!("{} {}", payer.key(), deployment_config.creator_fee_treasury.key());
         invoke(
             &system_instruction::transfer(
                 &payer.key(),

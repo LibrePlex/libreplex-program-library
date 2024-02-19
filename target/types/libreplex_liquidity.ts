@@ -34,27 +34,7 @@ export type LibreplexLiquidity = {
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "fungibleSourceTokenAccount",
@@ -309,23 +289,7 @@ export type LibreplexLiquidity = {
         {
           "name": "liquidity",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "liquidity"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInput"
-                },
-                "path": "input.seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -512,6 +476,32 @@ export type LibreplexLiquidity = {
         {
           "name": "lpMintMetadata",
           "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "relinquishCosigner",
+      "accounts": [
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "libreplexFairLaunchProgram",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -748,21 +738,15 @@ export type LibreplexLiquidity = {
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "treasury",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "liquidity",
           "isMut": true,
           "isSigner": false,
           "relations": [
-            "deployment",
-            "treasury"
+            "deployment"
           ]
         },
         {
@@ -806,11 +790,6 @@ export type LibreplexLiquidity = {
           "isSigner": false
         },
         {
-          "name": "pooledHashlistMarket",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "fungibleMint",
           "isMut": true,
           "isSigner": false
@@ -821,22 +800,17 @@ export type LibreplexLiquidity = {
           "isSigner": false
         },
         {
+          "name": "fungibleTokenAccountReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "nonFungibleMint",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "fungibleTokenAccountMinter",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "pooledNonFungibleMint",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "pooledNonFungibleTokenAccount",
+          "name": "liquidityNonFungibleTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -870,6 +844,74 @@ export type LibreplexLiquidity = {
     }
   ],
   "accounts": [
+    {
+      "name": "deployment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "limitPerMint",
+            "type": "u64"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "numberOfTokensIssued",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "useInscriptions",
+            "type": "bool"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          },
+          {
+            "name": "requireCreatorCosign",
+            "type": "bool"
+          },
+          {
+            "name": "migratedFromLegacy",
+            "type": "bool"
+          },
+          {
+            "name": "escrowNonFungibleCount",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "name": "deploymentTemplate",
+            "type": "string"
+          },
+          {
+            "name": "mintTemplate",
+            "type": "string"
+          },
+          {
+            "name": "fungibleMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          }
+        ]
+      }
+    },
     {
       "name": "liquidity",
       "type": {
@@ -1038,27 +1080,7 @@ export const IDL: LibreplexLiquidity = {
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "fungibleSourceTokenAccount",
@@ -1313,23 +1335,7 @@ export const IDL: LibreplexLiquidity = {
         {
           "name": "liquidity",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "liquidity"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInput"
-                },
-                "path": "input.seed"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -1516,6 +1522,32 @@ export const IDL: LibreplexLiquidity = {
         {
           "name": "lpMintMetadata",
           "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "relinquishCosigner",
+      "accounts": [
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "libreplexFairLaunchProgram",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -1752,21 +1784,15 @@ export const IDL: LibreplexLiquidity = {
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "treasury",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "liquidity",
           "isMut": true,
           "isSigner": false,
           "relations": [
-            "deployment",
-            "treasury"
+            "deployment"
           ]
         },
         {
@@ -1810,11 +1836,6 @@ export const IDL: LibreplexLiquidity = {
           "isSigner": false
         },
         {
-          "name": "pooledHashlistMarket",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "fungibleMint",
           "isMut": true,
           "isSigner": false
@@ -1825,22 +1846,17 @@ export const IDL: LibreplexLiquidity = {
           "isSigner": false
         },
         {
+          "name": "fungibleTokenAccountReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "nonFungibleMint",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "fungibleTokenAccountMinter",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "pooledNonFungibleMint",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "pooledNonFungibleTokenAccount",
+          "name": "liquidityNonFungibleTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1874,6 +1890,74 @@ export const IDL: LibreplexLiquidity = {
     }
   ],
   "accounts": [
+    {
+      "name": "deployment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "limitPerMint",
+            "type": "u64"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "numberOfTokensIssued",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "useInscriptions",
+            "type": "bool"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          },
+          {
+            "name": "requireCreatorCosign",
+            "type": "bool"
+          },
+          {
+            "name": "migratedFromLegacy",
+            "type": "bool"
+          },
+          {
+            "name": "escrowNonFungibleCount",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "name": "deploymentTemplate",
+            "type": "string"
+          },
+          {
+            "name": "mintTemplate",
+            "type": "string"
+          },
+          {
+            "name": "fungibleMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          }
+        ]
+      }
+    },
     {
       "name": "liquidity",
       "type": {

@@ -1,11 +1,11 @@
 
 
-use anchor_lang::{prelude::*, system_program};
+use anchor_lang::{prelude::*};
 use anchor_spl::{associated_token::AssociatedToken, token::spl_token, token_interface::{Mint, spl_token_2022::{self}}};
-use libreplex_fair_launch::{Deployment, DeploymentConfig, TOKEN2022_DEPLOYMENT_TYPE};
+use libreplex_fair_launch::{Deployment, TOKEN2022_DEPLOYMENT_TYPE};
 
 use libreplex_monoswap::{cpi::accounts::CreateMonoSwapCtx, CreateMonoSwapInput};
-use libreplex_shared::sysvar_instructions_program;
+use libreplex_shared::{operations::transfer_generic_spl, sysvar_instructions_program};
 use solana_program::keccak;
 
 
@@ -48,6 +48,10 @@ pub struct CreateSwapCtx<'info> {
         bump,)]
     pub pipeline_swap_marker: Account<'info, PipelineSwapMarker>,
 
+    /// CHECK: Checked in CPI
+    #[account(mut)]
+    pub monoswap_swap_marker: UncheckedAccount<'info>,
+
 
     /// CHECK: Checked via CPI and against the pipeline deployment
     #[account(mut,
@@ -55,13 +59,6 @@ pub struct CreateSwapCtx<'info> {
     pub deployment: Box<Account<'info, Deployment>>,
 
 
-
-
-    /// CHECK: Checked via CPI
-    #[account(mut)]
-    pub deployment_config: Box<Account<'info, DeploymentConfig>>,
-
-    
     // each mint has to exist. for now we restrict incoming mints to NFTS
     // to make sure that each of these marker pairs can only be hit once
     // unless the swap is reversed and then called again
@@ -77,48 +74,48 @@ pub struct CreateSwapCtx<'info> {
         constraint = deployment.fungible_mint == fungible_mint.key())]
     pub fungible_mint: InterfaceAccount<'info, Mint>, 
 
-    // ... into this escrow account
-    // #[account(init,
-    //     payer = payer,
-    //     associated_token::mint = fungible_mint,
-    //     associated_token::authority = pipeline // and deposited into the swap
-    // )]
-    // pub mint_outgoing_token_account_escrow: InterfaceAccount<'info, TokenAccount>,
-
-    #[account(mut)]
-    pub non_fungible_mint: Signer<'info>,
-
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    // leave this here for integrations
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    // swapper signer always has the same PDA derivation
-    // it tells the multiswap that it's
-    // ok to generate the marker in this namespace
-    pub namespace: Signer<'info>,
-
-      // leave this here for integrations
-      #[account(mut,
-        constraint = pipeline.auth_program_id.eq(&system_program::ID) || auth.key().eq(&pipeline.auth_program_id) )]
+     // leave this here for integrations
+     #[account(mut,
+        constraint = !pipeline.require_cosigner || auth.key().eq(&pipeline.auth) )]
     pub auth: Signer<'info>,
 
+
     /// CHECK: Checked via CPI
+    #[account(mut)]
+    pub payer_nonfungible_token_account: UncheckedAccount<'info>,
+
+    /// CHECK: Checked via CPI
+    #[account(mut)]
+    pub payer_fungible_token_account: UncheckedAccount<'info>,
+
+    /// CHECK: Checked via CPI
+    #[account(mut)]
     pub pipeline_fungible_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Checked in transfer logic (must be an ATA owned by the swap)
-    pub monoswap_fungible_token_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    pub monoswap_nonfungible_token_account: UncheckedAccount<'info>,
 
+
+    // there is one escrow holder per namespace + incoming mint
+    // this helps to find stuff by getTokenAccountsByOwner 
+    /// CHECK: Checked via CPI
+    #[account(mut,
+        seeds = ["swap_escrow".as_bytes(), 
+            pipeline.key().as_ref(),
+            fungible_mint.key().as_ref()],
+        seeds::program = libreplex_monoswap::ID,
+    bump)]
+    pub escrow_holder: UncheckedAccount<'info>,
     /*
 
         LIQUIDITY-SPECIFIC ACCOUNTS
 
     */
   
-    
-
     /// CHECK: ID checked in constraint
     #[account(
         constraint = token_program.key() == spl_token::ID
@@ -131,12 +128,7 @@ pub struct CreateSwapCtx<'info> {
     )]
     pub token_program_22: UncheckedAccount<'info>,
 
-
     pub associated_token_program: Program<'info, AssociatedToken>,
-
-    /// CHECK: Can we anything - see swapper_signer derivation above
-    #[account(mut)]
-    pub swapper_program: UncheckedAccount<'info>,    
 
     #[account()]
     pub system_program: Program<'info, System>,
@@ -185,11 +177,14 @@ pub fn verify(proof: Vec<[u8; 32]>, root: [u8; 32], leaf: [u8; 32]) -> bool {
 
 pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()> {
     
+    // to make sure we don't create initial swap twice for the same mint.
     let pipeline_swap_marker = &mut ctx.accounts.pipeline_swap_marker;
     
 
     pipeline_swap_marker.pipeline = ctx.accounts.pipeline.key();
-    pipeline_swap_marker.incoming_mint = ctx.accounts.non_fungible_mint.key();
+    pipeline_swap_marker.incoming_mint = ctx.accounts.non_fungible_mint_incoming.key();
+
+    let monoswap_swap_marker = &ctx.accounts.monoswap_swap_marker;
    
     // transfer the outgoing mint into escrow - 
     let token_program = &ctx.accounts.token_program;
@@ -199,14 +194,14 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()
     let deployment = &ctx.accounts.deployment;
     let fungible_mint = &ctx.accounts.fungible_mint;
     
-    let pipeline_fungible_token_account = &ctx.accounts.pipeline_fungible_token_account; 
+    let payer_nonfungible_token_account = &ctx.accounts.payer_nonfungible_token_account; 
     let libreplex_monoswap_program = &ctx.accounts.libreplex_monoswap_program;
     let non_fungible_mint_incoming = &ctx.accounts.non_fungible_mint_incoming;
-    let monoswap_fungible_token_account = &ctx.accounts.monoswap_fungible_token_account;
-    let namespace = &ctx.accounts.namespace;
-    let libreplex_pipelines_program = &ctx.accounts.libreplex_pipelines_program;
+    let monoswap_nonfungible_token_account = &ctx.accounts.monoswap_nonfungible_token_account;
     let pipeline = &mut ctx.accounts.pipeline;
-    
+    let pipeline_fungible_token_account = &ctx.accounts.pipeline_fungible_token_account;
+    let payer_fungible_token_account = &ctx.accounts.payer_fungible_token_account;
+    let escrow_holder = &ctx.accounts.escrow_holder;
 
     match pipeline.filter {
         
@@ -244,10 +239,10 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()
         _ => token_program.to_account_info()
     };
 
-    // calculate the total amount of the swap
-    let swap_amount = pipeline.fungible_amount_net.checked_div(pipeline.fungible_chunk_count).unwrap(); 
 
-    // swap all to fungible
+    // 
+
+    // creates a BACKWARDS swap (SPL -> NFT)
     libreplex_monoswap::cpi::create_monoswap(
         CpiContext::new_with_signer(
             libreplex_monoswap_program.to_account_info(),
@@ -255,9 +250,10 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()
                 /* the inscription root is set to metaplex
                     inscription object.
                 */
-                mint_outgoing_owner: pipeline.to_account_info(),
+                mint_outgoing_owner: payer.to_account_info(),
                 system_program: system_program.to_account_info(),
                 payer: payer.to_account_info(),
+                escrow_holder: escrow_holder.to_account_info(),
                 // passing dummy accounts to these as the pipelines do not use inscriptions
                 // would be good to get a version of mint_2022 that ignores inscriptions
                 // so as to clean up the interfaces
@@ -265,22 +261,50 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()
 
                 // this comes out of the escrow fungible
                 token_program: fungible_token_program,
-                swap_marker: pipeline_swap_marker.to_account_info(),
-                // the NFT from the original collection that can be swapped for SPL
-                mint_incoming: non_fungible_mint_incoming.to_account_info(),
-                mint_outgoing: fungible_mint.to_account_info(),
+                swap_marker: monoswap_swap_marker.to_account_info(),
+                // the SPL comes in 
+                mint_incoming: fungible_mint.to_account_info(),
+                // and the NFT comes out
+                mint_outgoing: non_fungible_mint_incoming.to_account_info(),
                 // where the fungible is coming from
-                mint_outgoing_token_account_source: pipeline_fungible_token_account.to_account_info(),
+                mint_outgoing_token_account_source: payer_nonfungible_token_account.to_account_info(),
                 // ... and where it's going to (into the swap)
-                mint_outgoing_token_account_escrow: monoswap_fungible_token_account.to_account_info(),
-                namespace: namespace.to_account_info(),
-                swapper_program: libreplex_pipelines_program.to_account_info(),
+                mint_outgoing_token_account_escrow: monoswap_nonfungible_token_account.to_account_info(),
+                namespace: pipeline.to_account_info(),
             },
             &[pipeline_seeds]
         ),CreateMonoSwapInput {
-            // empty out the swapper temporary account
-            mint_outgoing_amount: swap_amount
+            // secondary amount is the swap rate - higher than the original swap rate
+            mint_incoming_amount: pipeline.spl_swap_amount_secondary,
+            mint_outgoing_amount: 1 // just one NFT coming out
         }
+    )?;
+
+    let source_token_program = match *fungible_mint.to_account_info().owner {
+        spl_token::ID => token_program.to_account_info(),
+        spl_token_2022::ID => token_program_22.to_account_info(),
+        _ => {
+            panic!("Unexpected fungible mint owner (not keg or t22)")
+        }
+    };
+
+
+    // calculate the total amount of the swap
+    let swap_amount = pipeline.fungible_amount_net.checked_div(pipeline.fungible_chunk_count).unwrap(); 
+
+    transfer_generic_spl(
+        &source_token_program.to_account_info(),
+        &pipeline_fungible_token_account.to_account_info(),
+        &payer_fungible_token_account.to_account_info(),
+        &pipeline.to_account_info(),
+        &fungible_mint.to_account_info(),
+        &payer.to_account_info(),
+        &associated_token_program.to_account_info(),
+        &system_program.to_account_info(),
+        Some(&[pipeline_seeds]),
+        payer,
+        fungible_mint.decimals,
+        swap_amount
     )?;
 
     // one less of these, it's gone into the swaps
@@ -288,7 +312,6 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()
     pipeline.created_swap_count += 1;
     // somebody else could send spl here as well. 
     // we ignore that and just count what we need
-    pipeline.fungible_amount_total -= swap_amount;
     pipeline.fungible_amount_net -= swap_amount;
 
     Ok(())

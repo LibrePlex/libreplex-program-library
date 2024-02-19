@@ -6,6 +6,9 @@ pub use state::*;
 pub mod initialise;
 pub use initialise::*;
 
+pub mod relinquish_cosigner;
+pub use relinquish_cosigner::*;
+
 pub mod create_lookup_table_for_liquidity;
 pub use create_lookup_table_for_liquidity::*;
 
@@ -43,10 +46,15 @@ pub mod libreplex_liquidity {
     pub fn initialise(ctx: Context<Initialise>, input: InitialiseInput) -> Result<()> {
         init_handler(ctx, input)
     }
+    
    
 
     pub fn bootstrap_pool(ctx: Context<BootstapPool>) -> Result<()> {
         bootstrap_pool_handler(ctx)
+    }
+
+    pub fn relinquish_cosigner(ctx: Context<RelinquishCosignersCtx>) -> Result<()> {
+        relinquish_cosigner_handler(ctx)
     }
 
     pub fn fix_deployment_type(ctx: Context<BootstapPool>) -> Result<()> {

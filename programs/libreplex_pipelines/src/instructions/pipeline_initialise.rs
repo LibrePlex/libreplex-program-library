@@ -16,12 +16,15 @@ pub struct InitialisePipeline {
     pub mint_template: String,
     pub offchain_url: String, // used both for the fungible and the non-fungible
     pub creator_fee_treasury: Pubkey,
-    pub creator_fee_per_mint_in_lamports: u64,
     pub filter: Filter,
     pub lp_ratio: u16,
     pub pool_fee_basis_points: u64,
     pub liquidity_seed: Pubkey,
-    pub liquidity_provider_amount_in_spl: u64
+    pub liquidity_provider_amount_in_lamports: u64,
+    pub liquidity_provider_amount_in_spl: u64,
+    pub hashlist_url: String,
+    pub require_cosigner: bool
+   
     // this allows for interesting dynamics
 }
 
@@ -32,7 +35,7 @@ pub struct InitialisePipeline {
 #[instruction(input: InitialisePipeline)]
 pub struct InitialisePipelineCtx<'info> {
     #[account(init,
-        space = Pipeline::SIZE,
+        space = 8 + Pipeline::INIT_SPACE,
         payer = payer,
         // pipeline id can always be derived from the output launch ticker
         seeds=[b"pipeline",input.ticker.as_bytes()],
@@ -97,7 +100,13 @@ pub fn initialise_pipeline(
 
     let fair_launch_input = input.clone();
 
+    msg!("{} {} {}",input.limit_per_mint, input.lp_ratio, input.liquidity_provider_amount_in_spl );
+    let limit_per_mint_with_decimals = input.limit_per_mint.checked_mul(10_u64.checked_pow(input.decimals as u32).unwrap()).unwrap(); 
+    let spl_swap_amount_secondary = limit_per_mint_with_decimals.checked_sub(
+        limit_per_mint_with_decimals.checked_div(input.lp_ratio as u64).unwrap()).unwrap();
 
+    let spl_swap_amount_primary = spl_swap_amount_secondary.checked_sub(input.liquidity_provider_amount_in_spl).unwrap();
+    
     // we add a creator program - this means mints and swaps can only happen with
     // the signature of the pipelines program
     let clock = Clock::get()?;
@@ -114,9 +123,17 @@ pub fn initialise_pipeline(
         fungible_amount_net: 0, 
         fungible_amount_total: 0, 
         created_swap_count: 0, 
+        require_cosigner: input.require_cosigner,
+        // maybe the most important calc here: N - N/r - lp_provider_amount where r = lp_ratio 
+        spl_swap_amount_primary,
+        spl_swap_amount_secondary, 
+        hashlist_url: input.hashlist_url,
         auth_program_id: system_program::ID });
 
    
+    if fair_launch_input.liquidity_provider_amount_in_lamports == 0 {
+        panic!("Liquidity fee cannot be 0 for pipelines")
+    }
 
     libreplex_fair_launch::cpi::initialise_v2(
         CpiContext::new(
@@ -129,7 +146,7 @@ pub fn initialise_pipeline(
                 payer: payer.to_account_info(),
                 deployment: deployment.to_account_info(),
                 deployment_config: deployment_config.to_account_info(),
-                // important - FAIR LAUNCH creator be the liquidity account
+                // important - FAIR LAUNCH creator must be the liquidity account
                 // as the mint is called via liquidity 
                 creator: liquidity.to_account_info(),
             },
@@ -148,8 +165,9 @@ pub fn initialise_pipeline(
             creator_cosign_program_id: Some(libreplex_liquidity_program.key()),
             use_inscriptions: false,
             deployment_type: HYBRID_DEPLOYMENT_TYPE,
-            creator_fee_treasury: payer.key(), // this is irrelevant since no creator fees are paid anyway
-            creator_fee_per_mint_in_lamports: fair_launch_input.creator_fee_per_mint_in_lamports,
+            // and treasury is always liquidity
+            creator_fee_treasury: liquidity.key(),
+            creator_fee_per_mint_in_lamports: fair_launch_input.liquidity_provider_amount_in_lamports,
             deflation_rate_per_swap: 0,
         },
     )?;
@@ -181,6 +199,7 @@ pub fn initialise_pipeline(
             deployment: deployment.key(),
             bootstrap_start_time: None, 
             bootstrap_requires_sold_out: true,
+            // all fees go to the pool
             creator_basis_points: 0,
             lp_ratio: input.lp_ratio,
             pool_fee_basis_points: input.pool_fee_basis_points,

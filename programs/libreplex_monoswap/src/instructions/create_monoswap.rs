@@ -9,7 +9,8 @@ use crate::SwapMarker;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateMonoSwapInput {
-    pub mint_outgoing_amount: u64
+    pub mint_outgoing_amount: u64,
+    pub mint_incoming_amount: u64
 }
 
 #[derive(Accounts)]
@@ -20,16 +21,12 @@ pub struct CreateMonoSwapCtx<'info> {
         space = SwapMarker::SIZE,
         seeds = ["swap_marker".as_bytes(), 
         namespace.key().as_ref(),
+        mint_outgoing.key().as_ref(),
         mint_incoming.key().as_ref()], // always indexed by the incoming mint
         bump,)]
     pub swap_marker: Account<'info, SwapMarker>,
 
-    // each mint has to exist. for now we restrict incoming mints to NFTS
-    // to make sure that each of these marker pairs can only be hit once
-    // unless the swap is reversed and then called again
-    #[account(mut,
-        constraint = mint_incoming.decimals == 0 && mint_incoming.supply == 1
-    )] 
+    #[account(mut)] 
     pub mint_incoming: InterfaceAccount<'info, Mint>,
 
     // each mint has to exist - there must be enough 
@@ -44,11 +41,22 @@ pub struct CreateMonoSwapCtx<'info> {
     )] 
     pub mint_outgoing_token_account_source: InterfaceAccount<'info, TokenAccount>,
     
+    // escrow holders are organised by namespace + incoming mint - 
+    // that way you can get wallet contents to see what swaps are available to you
+    /// CHECK: Checked in transfer logic
+    #[account(
+        seeds = ["swap_escrow".as_bytes(), 
+        namespace.key().as_ref(),
+        mint_incoming.key().as_ref()], // always indexed by the incoming mint
+        bump)]
+    pub escrow_holder: UncheckedAccount<'info>,
+
     // ... into this escrow account
     #[account(init,
         payer = payer,
+        // yes this is mint_outgoing
         associated_token::mint = mint_outgoing,
-        associated_token::authority = swap_marker
+        associated_token::authority = escrow_holder
     )]
     pub mint_outgoing_token_account_escrow: InterfaceAccount<'info, TokenAccount>,
 
@@ -71,10 +79,6 @@ pub struct CreateMonoSwapCtx<'info> {
 
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// CHECK: Can we anything - see swapper_signer derivation above
-    #[account(mut)]
-    pub swapper_program: UncheckedAccount<'info>,    
-
     #[account()]
     pub system_program: Program<'info, System>,
 
@@ -85,10 +89,13 @@ pub fn create_swap(ctx: Context<CreateMonoSwapCtx>, input: CreateMonoSwapInput) 
     let swap_marker = &mut ctx.accounts.swap_marker;
     let mint_outgoing = &mut ctx.accounts.mint_outgoing;
     
+
     swap_marker.namespace = ctx.accounts.namespace.key();
     swap_marker.mint_incoming = ctx.accounts.mint_incoming.key();
     swap_marker.mint_outgoing = mint_outgoing.key();
-  
+    swap_marker.mint_incoming_amount = input.mint_incoming_amount;
+    swap_marker.mint_outgoing_amount = input.mint_outgoing_amount;
+
     swap_marker.used = false;
 
     // transfer the outgoing mint into escrow - 
@@ -97,7 +104,7 @@ pub fn create_swap(ctx: Context<CreateMonoSwapCtx>, input: CreateMonoSwapInput) 
     let mint_outgoing_token_account_escrow = &ctx.accounts.mint_outgoing_token_account_escrow;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
-
+    let escrow_holder = &ctx.accounts.escrow_holder;
     let payer = &ctx.accounts.payer;
 
     transfer_generic_spl(
@@ -109,7 +116,7 @@ pub fn create_swap(ctx: Context<CreateMonoSwapCtx>, input: CreateMonoSwapInput) 
         // swap marker outgoing owns this to start with.
         // when swapping, this ATA will be emptied
         // and a new mint will come in
-        &swap_marker.to_account_info(),
+        &escrow_holder.to_account_info(),
         &associated_token_program.to_account_info(),
         &system_program.to_account_info(),
         None, // payer signs

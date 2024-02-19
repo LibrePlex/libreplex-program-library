@@ -18,7 +18,8 @@ pub struct SwapCtx<'info> {
         constraint = mint_outgoing.key() == swap_marker.mint_outgoing,
         seeds = [
             "swap_marker".as_bytes(), 
-            swapper_program.key().as_ref(),
+            swap_marker.namespace.as_ref(),
+            mint_outgoing.key().as_ref(),
             mint_incoming.key().as_ref()],
         bump,)]
     pub swap_marker: Account<'info, SwapMarker>,
@@ -28,7 +29,8 @@ pub struct SwapCtx<'info> {
         payer = payer, 
         space = SwapMarker::SIZE,
         seeds = ["swap_marker".as_bytes(), 
-        swapper_program.key().as_ref(),
+        swap_marker.namespace.as_ref(),
+        mint_incoming.key().as_ref(),
         mint_outgoing.key().as_ref()], // always indexed by the incoming mint
         bump,)]
     pub swap_marker_reverse: Account<'info, SwapMarker>,
@@ -51,12 +53,26 @@ pub struct SwapCtx<'info> {
     )]
     pub mint_incoming_token_account_source: InterfaceAccount<'info, TokenAccount>,
 
+    /// CHECK: Check in pda derivation
+    #[account(
+        seeds = ["swap_escrow".as_bytes(), 
+        swap_marker.namespace.as_ref(),
+        mint_incoming.key().as_ref()], // always indexed by the incoming mint
+        bump)]
+    pub escrow_holder: UncheckedAccount<'info>,
+
+        /// CHECK: Check in pda derivation
+        #[account(
+            seeds = ["swap_escrow".as_bytes(), 
+            swap_marker.namespace.as_ref(),
+            mint_outgoing.key().as_ref()], // always indexed by the incoming mint
+            bump)]
+        pub escrow_holder_reverse: UncheckedAccount<'info>,
+
     // ... into this escrow account
-    #[account(mut,
-        associated_token::mint = mint_incoming,
-        associated_token::authority = swap_marker_reverse // this goes into the new swap_marker
-    )]
-    pub mint_incoming_token_account_target: InterfaceAccount<'info, TokenAccount>,
+    /// CHECK: Checked in transfer logic
+    #[account(mut)]
+    pub mint_incoming_token_account_target: UncheckedAccount<'info>,
 
 
     // it is the responsibility of each swapper program to create enough
@@ -64,16 +80,14 @@ pub struct SwapCtx<'info> {
     // from this account
     #[account(mut,
         associated_token::mint = mint_outgoing,
-        associated_token::authority = swap_marker
+        associated_token::authority = escrow_holder
     )]
     pub mint_outgoing_token_account_source: InterfaceAccount<'info, TokenAccount>,
 
     // ... into this escrow account
-    #[account(mut,
-        associated_token::mint = mint_outgoing,
-        associated_token::authority = payer
-    )]
-    pub mint_outgoing_token_account_target: InterfaceAccount<'info, TokenAccount>,
+    /// CHECK: Checked in transfer logic
+    #[account(mut)]
+    pub mint_outgoing_token_account_target: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -86,10 +100,7 @@ pub struct SwapCtx<'info> {
 
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// CHECK: Can we anything - see swapper_signer derivation above
-    #[account(mut)]
-    pub swapper_program: UncheckedAccount<'info>,
-
+    
     #[account()]
     pub system_program: Program<'info, System>,
 }
@@ -100,7 +111,7 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
     let swap_marker_reverse = &mut ctx.accounts.swap_marker_reverse;
     let mint_incoming = &mut ctx.accounts.mint_incoming;
     let mint_outgoing = &mut ctx.accounts.mint_outgoing;
-    
+    let escrow_holder_reverse = &ctx.accounts.escrow_holder_reverse;
     let swap_marker = &ctx.accounts.swap_marker;
     swap_marker_reverse.used = true; // cannot delete these since the swap has been activated
     swap_marker_reverse.mint_incoming = mint_outgoing.key();
@@ -118,6 +129,16 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
 
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
+    let escrow_holder = &ctx.accounts.escrow_holder;
+
+    let mint_incoming_key = mint_incoming.key();
+    let authority_seeds = &[
+        "swap_escrow".as_bytes(),
+        swap_marker.namespace.as_ref(),
+        mint_incoming_key.as_ref(),
+        &[ctx.bumps.escrow_holder],
+    ];
+
 
     let payer = &ctx.accounts.payer;
 
@@ -126,7 +147,7 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
         &token_program.to_account_info(),
         &mint_outgoing_token_account_source.to_account_info(),
         &mint_outgoing_token_account_target.to_account_info(),
-        &swap_marker.to_account_info(),
+        &escrow_holder.to_account_info(),
         &mint_outgoing.to_account_info(),
         // swap marker outgoing owns this to start with.
         // when swapping, this ATA will be emptied
@@ -134,7 +155,7 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
         &payer.to_account_info(),
         &associated_token_program.to_account_info(),
         &system_program.to_account_info(),
-        None, // payer signs
+        Some(&[authority_seeds]), // payer signs
         &payer.to_account_info(),
         mint_outgoing.decimals,
         swap_marker.mint_outgoing_amount,
@@ -145,16 +166,16 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
         &mint_incoming_token_account_source.to_account_info(),
         &mint_incoming_token_account_target.to_account_info(),
         &payer.to_account_info(),
-        &mint_outgoing.to_account_info(),
+        &mint_incoming.to_account_info(),
         // swap marker outgoing owns this to start with.
         // when swapping, this ATA will be emptied
         // and a new mint will come in
-        &swap_marker_reverse.to_account_info(),
+        &escrow_holder_reverse.to_account_info(),
         &associated_token_program.to_account_info(),
         &system_program.to_account_info(),
         None, // payer signs
         &payer.to_account_info(),
-        mint_outgoing.decimals,
+        mint_incoming.decimals,
         swap_marker.mint_incoming_amount,
     )?;
 

@@ -289,6 +289,27 @@ export type LibreplexFairLaunch = {
       "args": []
     },
     {
+      "name": "relinquishCosigner",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "cosigner",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateSymbol22",
       "accounts": [
         {
@@ -2327,6 +2348,27 @@ export const IDL: LibreplexFairLaunch = {
           "name": "metadataProgram",
           "isMut": false,
           "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "relinquishCosigner",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "cosigner",
+          "isMut": true,
+          "isSigner": true
         }
       ],
       "args": []

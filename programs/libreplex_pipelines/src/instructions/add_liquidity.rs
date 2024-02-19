@@ -1,13 +1,13 @@
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::Token,
+    token::{spl_token, Token},
     token_interface::spl_token_2022
 };
 use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment, DeploymentConfig, Hashlist};
 use libreplex_liquidity::{cpi::accounts::MintSplCtx, program::LibreplexLiquidity, Liquidity};
 
-use libreplex_shared::sysvar_instructions_program;
+use libreplex_shared::{operations::transfer_generic_spl, sysvar_instructions_program};
 
 /// this is where the magic happens.
 /// 1) mint an item from the pipeline fair launch (this requires a creator cosign)
@@ -86,11 +86,22 @@ pub struct AddLiquidityCtx<'info> {
     pub deployment_fungible_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Checked in logic. This is where the liquidity providers' share of token goes.
-    #[account(mut)]
-    pub liquidity_provider_token_account: UncheckedAccount<'info>,
+    #[account(mut,
+        constraint = liquidity_provider_escrow_token_account.key().eq(
+            &anchor_spl::associated_token::get_associated_token_address_with_program_id(
+                &liquidity_provider_escrow.key(),
+                &fungible_mint.key(),
+                fungible_mint.to_account_info().owner,
+            )
+        ))]
+    pub liquidity_provider_escrow_token_account: UncheckedAccount<'info>,
 
     /// CHECK: Checked in logic. This is where the liquidity providers' share of token goes.
-    #[account(mut)]
+    #[account(mut,
+        seeds=[b"liq_provider_escrow",pipeline.key().as_ref(), liquidity_provider.key().as_ref()], bump)]
+    pub liquidity_provider_escrow: UncheckedAccount<'info>,
+
+    /// CHECK: Can be any account - owns the escrow that holds SPL until bootstrapping, after which they can be withdrawn
     pub liquidity_provider: UncheckedAccount<'info>,
 
     /// CHECK: Checked in cpi.
@@ -157,9 +168,11 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
     let pipeline_fungible_token_account = &ctx.accounts.pipeline_fungible_token_account;
     let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
     let pipeline = &mut ctx.accounts.pipeline;
+    let liquidity_provider_escrow_token_account = &ctx.accounts.liquidity_provider_escrow_token_account;
+    let liquidity_provider_escrow = &ctx.accounts.liquidity_provider_escrow;
     // let liquidity_provider_token_account = &ctx.accounts.liquidity_provider_token_account;
     let payer = &ctx.accounts.payer;
-    // let liquidity_provider = &ctx.accounts.liquidity_provider;
+    let liquidity_provider = &ctx.accounts.liquidity_provider;
     let creator_fee_treasury = &ctx.accounts.creator_fee_treasury;
     let pipeline_seeds: &[&[u8]] = &[
         "pipeline".as_bytes(),
@@ -167,18 +180,6 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
         &[pipeline.bump],
     ];
     let liquidity_fungible_token_account = &mut ctx.accounts.liquidity_fungible_token_account;
-
-    // let mut balance_before = 0;
-
-    if !liquidity_fungible_token_account.data_is_empty() {
-        // let tokenaccount_info_before =
-        //     AsRef::<AccountInfo>::as_ref(liquidity_fungible_token_account.as_ref());
-
-        // let mut data: &[u8] = &tokenaccount_info_before.try_borrow_data()?;
-        // let acc = TokenAccount::try_deserialize(&mut data)?;
-
-        // balance_before = acc.amount;
-    }
 
     // mint one, the excess goes to pipeline_fungible_token_account.
     libreplex_liquidity::cpi::mint_spl(CpiContext::new_with_signer(
@@ -197,8 +198,8 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
             hashlist: hashlist.to_account_info(),
             hashlist_marker: hashlist_marker.to_account_info(),
             // fungible accounts
-            receiver: pipeline.to_account_info(),
-            fungible_token_account_minter: pipeline_fungible_token_account.to_account_info(),
+            receiver: liquidity_provider_escrow.to_account_info(),
+            fungible_token_account_receiver: liquidity_provider_escrow_token_account.to_account_info(),
             fungible_mint: fungible_mint.to_account_info(),
             // passing dummy accounts to these as the pipelines do not use inscriptions
             // would be good to get a version of mint_2022 that ignores inscriptions
@@ -219,53 +220,46 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
         &[pipeline_seeds],
     ))?;
 
-    // let token_program_for_fungible = match *fungible_mint.owner {
-    //     spl_token::ID => token_program.to_account_info(),
-    //     spl_token_2022::ID => token_program_22.to_account_info(),
-    //     _ => {
-    //         panic!("Fungible mint is not owned by tokenkeg or token-2022");
-    //     }
-    // };
+    let token_program_for_fungible = match *fungible_mint.owner {
+        spl_token::ID => token_program.to_account_info(),
+        spl_token_2022::ID => token_program_22.to_account_info(),
+        _ => {
+            panic!("Fungible mint is not owned by tokenkeg or token-2022");
+        }
+    };
 
-    // let tokenaccount_info_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref());
+    let pipeline_key = pipeline.key();
+    let liquidity_provider_key = liquidity_provider.key();
 
-    // let mut data: &[u8] = &tokenaccount_info_after.try_borrow_data()?;
-    // let acc = TokenAccount::try_deserialize(&mut data)?;
+    let liquidity_provider_escrow_seeds: &[&[u8]] = &[
+        "liq_provider_escrow".as_bytes(),
+        pipeline_key.as_ref(), liquidity_provider_key.as_ref(),
+        &[ctx.bumps.liquidity_provider_escrow],
+    ];
 
-    // let balance_after = acc.amount;
+    // move swap amount to pipeline escrow - the rest remains in liquidity_provider_escrow_token_account,
+    // where it can be reclaimed after LP has been bootstrapped
+    transfer_generic_spl(
+            &token_program_for_fungible,
+            liquidity_provider_escrow_token_account,
+            &pipeline_fungible_token_account.to_account_info(),
+            liquidity_provider_escrow,
+            &fungible_mint.to_account_info(),
+            &pipeline.to_account_info(),
+            associated_token_program,
+            system_program,
+            Some(&[liquidity_provider_escrow_seeds]), // pipeline signs
+            payer,
+            deployment.decimals,
+            pipeline.spl_swap_amount_primary,
+        )?;
+    
 
-    // let total_funds_received = balance_after - balance_before;
-
-    // let lp_provider_share = pipeline.liquidity_provider_amount_in_spl;
-
-    // // a little safety net here
-    // if lp_provider_share > total_funds_received {
-    //     panic!("Attempted to transfer too much. The code is wrong but caught you anyway.")
-    // }
-
-    // if lp_provider_share > 0 {
-    //     // transfer the liquidity provider's share
-    //     transfer_generic_spl(
-    //         &token_program_for_fungible,
-    //         pipeline_fungible_token_account,
-    //         liquidity_provider_token_account,
-    //         &pipeline.to_account_info(),
-    //         fungible_mint,
-    //         liquidity_provider.as_ref(),
-    //         associated_token_program,
-    //         system_program,
-    //         Some(&[pipeline_seeds]), // pipeline signs
-    //         payer,
-    //         deployment.decimals,
-    //         lp_provider_share,
-    //     )?;
-    // }
-
-    // pipeline.fungible_chunk_count += 1;
-    // // somebody else could send spl here as well.
-    // // we ignore that and just count what we need
-    // pipeline.fungible_amount_total += total_funds_received - lp_provider_share;
-    // pipeline.fungible_amount_net += total_funds_received - lp_provider_share;
+    pipeline.fungible_chunk_count += 1;
+    // somebody else could send spl here as well.
+    // we ignore that and just count what we need
+    pipeline.fungible_amount_total += pipeline.spl_swap_amount_primary;
+    pipeline.fungible_amount_net += pipeline.spl_swap_amount_primary;
 
     Ok(())
 }
