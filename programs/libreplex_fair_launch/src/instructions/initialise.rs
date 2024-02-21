@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 
-use crate::{errors::FairLaunchError, Deployment, NewDeploymentEvent, NewDeploymentV2, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT};
+use crate::{errors::FairLaunchError, Deployment, DeploymentConfig, NewDeploymentEvent, NewDeploymentV2, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT};
 
 
 pub mod sysvar_instructions_program {
@@ -64,10 +64,12 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     deployment.deployment_type = input.deployment_type;
 
     // setting creator equal to payer - use v2 endpoints to control this and override as desired
-    initialise_logic(input, deployment, payer.key())
+    initialise_logic(input, deployment, payer.key(), None)
 }
 
-pub fn initialise_logic(input: InitialiseInput, deployment: &mut Account<'_, Deployment>, creator: Pubkey) -> Result<()> {
+pub fn initialise_logic(input: InitialiseInput, 
+    deployment: &mut Account<'_, Deployment>, 
+    creator: Pubkey, config: Option<&DeploymentConfig>) -> Result<()> {
     if input.ticker.len() > TICKER_LIMIT {
         return Err(FairLaunchError::TickerTooLong.into());
     }
@@ -98,6 +100,15 @@ pub fn initialise_logic(input: InitialiseInput, deployment: &mut Account<'_, Dep
     (input.limit_per_mint).checked_mul(input.max_number_of_tokens).unwrap().checked_mul(
         (10_u64).checked_pow(input.decimals as u32).unwrap()).unwrap();
     
+
+    // Try avoid blowing up the stack
+    emit_init(deployment, config);
+    // for now, we limit ticker sizes to 12 bytes 
+
+    Ok(())
+}
+
+fn emit_init(deployment: &Deployment, config: Option<&DeploymentConfig>) {
     emit!(NewDeploymentV2 {
         creator: deployment.creator,
         limit_per_mint: deployment.limit_per_mint,
@@ -105,8 +116,13 @@ pub fn initialise_logic(input: InitialiseInput, deployment: &mut Account<'_, Dep
         ticker: deployment.ticker.clone(),
         off_chain_url: deployment.offchain_url.clone(),
         require_co_sign: deployment.require_creator_cosign,
+        uses_inscriptions: deployment.use_inscriptions,
+        decimals: deployment.decimals,
+        deployment_template: deployment.deployment_template.clone(),
+        mint_template: deployment.mint_template.clone(),
+        deployment_type: deployment.deployment_type,
+        config: config.map(|o| {
+            o.clone()
+        })
     });
-    // for now, we limit ticker sizes to 12 bytes 
-
-    Ok(())
 }

@@ -104,6 +104,12 @@ pub struct NewDeploymentV2 {
     pub creator: Pubkey,
     pub off_chain_url: String,
     pub require_co_sign: bool,
+    pub deployment_template: String,
+    pub mint_template: String,
+    pub uses_inscriptions: bool,
+    pub decimals: u8,
+    pub deployment_type: u8,
+    pub config: Option<DeploymentConfig>,
 }
 
 #[event]

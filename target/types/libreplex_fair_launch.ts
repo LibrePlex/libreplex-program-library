@@ -2009,6 +2009,40 @@ export type LibreplexFairLaunch = {
           "name": "requireCoSign",
           "type": "bool",
           "index": false
+        },
+        {
+          "name": "deploymentTemplate",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "mintTemplate",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "usesInscriptions",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "decimals",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "deploymentType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "config",
+          "type": {
+            "option": {
+              "defined": "DeploymentConfig"
+            }
+          },
+          "index": false
         }
       ]
     },
@@ -4117,6 +4151,40 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "requireCoSign",
           "type": "bool",
+          "index": false
+        },
+        {
+          "name": "deploymentTemplate",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "mintTemplate",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "usesInscriptions",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "decimals",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "deploymentType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "config",
+          "type": {
+            "option": {
+              "defined": "DeploymentConfig"
+            }
+          },
           "index": false
         }
       ]
