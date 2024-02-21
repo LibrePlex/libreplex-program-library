@@ -90,6 +90,7 @@ pub fn deploy_token_2022_logic<'f>(
     msg!("Created non fungible");
 
     emit!(DeploymentActive { 
+        ticker: deployment.ticker.clone(),
         fungible_mint: fungible_mint.key(),
     });
 

@@ -43,6 +43,7 @@ pub mod events {
 
     #[event]
     pub struct LiquidityCreate {
+        pub id: Pubkey,
         pub liquidity: Liquidity,
     }
 

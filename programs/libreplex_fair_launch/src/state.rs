@@ -63,14 +63,8 @@ pub struct Deployment {
     pub offchain_url: String, // pub padding: Vec<u8, EXCESS>
 }
 
-impl Deployment {
-    pub fn do_thing() -> u64 {
-        0
-    }
-}
-
-
 #[account]
+#[derive(InitSpace)]
 pub struct DeploymentConfig {
     pub deployment: Pubkey,
     // defined by creator. this is NOT a libreplex fee as libreplex charges no fees.
@@ -114,6 +108,7 @@ pub struct NewDeploymentV2 {
 
 #[event]
 pub struct DeploymentActive {
+    pub ticker: String,
     pub fungible_mint: Pubkey,
 }
 

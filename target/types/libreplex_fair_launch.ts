@@ -1420,6 +1420,11 @@ export type LibreplexFairLaunch = {
       "name": "DeploymentActive",
       "fields": [
         {
+          "name": "ticker",
+          "type": "string",
+          "index": false
+        },
+        {
           "name": "fungibleMint",
           "type": "publicKey",
           "index": false
@@ -3041,6 +3046,11 @@ export const IDL: LibreplexFairLaunch = {
     {
       "name": "DeploymentActive",
       "fields": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "index": false
+        },
         {
           "name": "fungibleMint",
           "type": "publicKey",

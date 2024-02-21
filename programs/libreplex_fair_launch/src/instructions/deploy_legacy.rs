@@ -373,6 +373,7 @@ pub fn deploy_legacy_logic<'f>(
     )?;
 
     emit!(DeploymentActive { 
+        ticker: deployment.ticker.clone(),
         fungible_mint: fungible_mint.key(),
     });
 

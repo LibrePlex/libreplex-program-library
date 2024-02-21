@@ -80,6 +80,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
 }
 
 // Avoid blowing up the stack.
-fn emit_create(liquidity: &Liquidity) {
-    emit!(LiquidityCreate { liquidity: liquidity.clone()});
+fn emit_create(liquidity: &Account<Liquidity>) {
+    let liquidity_ref: &Liquidity = liquidity.as_ref();
+    emit!(LiquidityCreate { liquidity: liquidity_ref.clone(), id: liquidity.key()});
 }

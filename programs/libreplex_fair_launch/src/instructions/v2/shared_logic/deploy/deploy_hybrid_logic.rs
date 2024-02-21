@@ -87,6 +87,7 @@ pub fn deploy_hybrid_logic<'f>(
     revoke_mint_auths(deployment, token_program, fungible_mint, deployment_seeds)?;
 
     emit!(DeploymentActive { 
+        ticker: deployment.ticker.clone(),
         fungible_mint: fungible_mint.key(),
     });
 

@@ -1136,6 +1136,11 @@ export type LibreplexLiquidity = {
       "name": "LiquidityCreate",
       "fields": [
         {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
           "name": "liquidity",
           "type": {
             "defined": "Liquidity"
@@ -2299,6 +2304,11 @@ export const IDL: LibreplexLiquidity = {
     {
       "name": "LiquidityCreate",
       "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
         {
           "name": "liquidity",
           "type": {
