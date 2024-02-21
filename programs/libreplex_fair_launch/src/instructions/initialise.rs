@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 
-use crate::{errors::FairLaunchError, Deployment, NewDeploymentEvent, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT};
+use crate::{errors::FairLaunchError, Deployment, NewDeploymentEvent, NewDeploymentV2, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT};
 
 
 pub mod sysvar_instructions_program {
@@ -98,11 +98,13 @@ pub fn initialise_logic(input: InitialiseInput, deployment: &mut Account<'_, Dep
     (input.limit_per_mint).checked_mul(input.max_number_of_tokens).unwrap().checked_mul(
         (10_u64).checked_pow(input.decimals as u32).unwrap()).unwrap();
     
-    emit!(NewDeploymentEvent {
+    emit!(NewDeploymentV2 {
         creator: deployment.creator,
         limit_per_mint: deployment.limit_per_mint,
         max_number_of_tokens: deployment.max_number_of_tokens,
         ticker: deployment.ticker.clone(),
+        off_chain_url: deployment.offchain_url.clone(),
+        require_co_sign: deployment.require_creator_cosign,
     });
     // for now, we limit ticker sizes to 12 bytes 
 

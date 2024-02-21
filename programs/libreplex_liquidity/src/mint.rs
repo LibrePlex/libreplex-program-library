@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{associated_token::AssociatedToken, token::TokenAccount};
 
-use crate::{Liquidity, DEPLOYMENT_TYPE_NFT};
+use crate::{events, Liquidity, DEPLOYMENT_TYPE_NFT};
 use libreplex_fair_launch::program::LibreplexFairLaunch;
 
 #[derive(Accounts)]
@@ -228,6 +228,9 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
         liquidity.sub_lamports(fee_to_creator)?;
         ctx.accounts.treasury.add_lamports(fee_to_creator)?;
     }
+
+    emit!(events::Mint{ liquidity: liquidity.key(), total_mints: liquidity.total_mints });
+   
 
     Ok(())
 }

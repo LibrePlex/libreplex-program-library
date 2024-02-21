@@ -8,6 +8,7 @@ use libreplex_shared::create_legacy_metadata;
 use mpl_token_metadata::types::Creator;
 
 
+use crate::DeploymentActive;
 use crate::{
     mint_all_fungibles, revoke_mint_auths, Deployment, Hashlist, HYBRID_DEPLOYMENT_TYPE
 };
@@ -84,6 +85,10 @@ pub fn deploy_hybrid_logic<'f>(
     }
 
     revoke_mint_auths(deployment, token_program, fungible_mint, deployment_seeds)?;
+
+    emit!(DeploymentActive { 
+        fungible_mint: fungible_mint.key(),
+    });
 
     Ok(())
 }

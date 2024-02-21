@@ -4,7 +4,7 @@ use anchor_spl::{
     associated_token::AssociatedToken, token::spl_token, token_interface::{spl_token_2022}};
 use libreplex_shared::operations::transfer_generic_spl;
 
-use crate::{Liquidity, DEPLOYMENT_TYPE_SPL};
+use crate::{events, Liquidity, DEPLOYMENT_TYPE_SPL};
 use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment};
 
 #[derive(Accounts)]
@@ -244,6 +244,8 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
     //     deployment.decimals
     // )?;
     msg!("Transferred");
+
+    emit!(events::Mint{ liquidity: liquidity.key(), total_mints: liquidity.total_mints });
    
     Ok(())
 }

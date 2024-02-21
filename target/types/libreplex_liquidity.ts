@@ -1040,6 +1040,124 @@ export type LibreplexLiquidity = {
           }
         ]
       }
+    },
+    {
+      "name": "Liquidity",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "bootstrapStartTime",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "bootstrapRequiresSoldOut",
+            "type": "bool"
+          },
+          {
+            "name": "poolBootstrapped",
+            "type": "bool"
+          },
+          {
+            "name": "creatorBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "deployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpRatio",
+            "type": "u16"
+          },
+          {
+            "name": "totalMints",
+            "type": "u64"
+          },
+          {
+            "name": "poolFeeBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "lookupTableAddress",
+            "type": "publicKey"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                67
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "Bootstrap",
+      "fields": [
+        {
+          "name": "liquidity",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "LiquidityCreate",
+      "fields": [
+        {
+          "name": "liquidity",
+          "type": {
+            "defined": "Liquidity"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "Mint",
+      "fields": [
+        {
+          "name": "liquidity",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "totalMints",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ]
 };
@@ -2086,6 +2204,124 @@ export const IDL: LibreplexLiquidity = {
           }
         ]
       }
+    },
+    {
+      "name": "Liquidity",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "bootstrapStartTime",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "bootstrapRequiresSoldOut",
+            "type": "bool"
+          },
+          {
+            "name": "poolBootstrapped",
+            "type": "bool"
+          },
+          {
+            "name": "creatorBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "deployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpRatio",
+            "type": "u16"
+          },
+          {
+            "name": "totalMints",
+            "type": "u64"
+          },
+          {
+            "name": "poolFeeBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "lookupTableAddress",
+            "type": "publicKey"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                67
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "Bootstrap",
+      "fields": [
+        {
+          "name": "liquidity",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "LiquidityCreate",
+      "fields": [
+        {
+          "name": "liquidity",
+          "type": {
+            "defined": "Liquidity"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "Mint",
+      "fields": [
+        {
+          "name": "liquidity",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "totalMints",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ]
 };

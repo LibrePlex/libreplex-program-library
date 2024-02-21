@@ -14,7 +14,7 @@ use libreplex_shared::{
 };
 use mpl_token_metadata::types::TokenStandard;
 
-use crate::{check_deploy_allowed, Deployment, Hashlist};
+use crate::{check_deploy_allowed, Deployment, DeploymentActive, Hashlist};
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -371,5 +371,10 @@ pub fn deploy_legacy_logic<'f>(
         0,
         TokenStandard::NonFungible,
     )?;
+
+    emit!(DeploymentActive { 
+        fungible_mint: fungible_mint.key(),
+    });
+
     Ok(())
 }

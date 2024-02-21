@@ -97,6 +97,21 @@ pub struct NewDeploymentEvent {
 }
 
 #[event]
+pub struct NewDeploymentV2 {
+    pub ticker: String,
+    pub limit_per_mint: u64,
+    pub max_number_of_tokens: u64,
+    pub creator: Pubkey,
+    pub off_chain_url: String,
+    pub require_co_sign: bool,
+}
+
+#[event]
+pub struct DeploymentActive {
+    pub fungible_mint: Pubkey,
+}
+
+#[event]
 pub struct MintEvent {
     pub mint: Pubkey,
     pub ticker: String,

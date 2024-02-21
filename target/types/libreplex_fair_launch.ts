@@ -1978,6 +1978,51 @@ export type LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "NewDeploymentV2",
+      "fields": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "limitPerMint",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "maxNumberOfTokens",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "creator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "offChainUrl",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "requireCoSign",
+          "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "DeploymentActive",
+      "fields": [
+        {
+          "name": "fungibleMint",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "MintEvent",
       "fields": [
         {
@@ -4036,6 +4081,51 @@ export const IDL: LibreplexFairLaunch = {
         },
         {
           "name": "creator",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "NewDeploymentV2",
+      "fields": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "limitPerMint",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "maxNumberOfTokens",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "creator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "offChainUrl",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "requireCoSign",
+          "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "DeploymentActive",
+      "fields": [
+        {
+          "name": "fungibleMint",
           "type": "publicKey",
           "index": false
         }

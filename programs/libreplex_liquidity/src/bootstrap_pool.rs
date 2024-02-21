@@ -5,7 +5,7 @@ use anchor_spl::{associated_token::AssociatedToken, token::{Mint, Token, TokenAc
 use libreplex_fair_launch::Deployment;
 use vault_proxy::program::Vault;
 
-use crate::Liquidity;
+use crate::{events, Liquidity};
 
 
 #[derive(Accounts)]
@@ -388,6 +388,8 @@ pub fn bootstrap_pool_handler(ctx: Context<BootstapPool>) -> Result<()> {
         lp_supply)?;
 
     liquidity.pool_bootstrapped = true;
+
+    emit!(events::Bootstrap { liquidity: liquidity.key() });
 
     Ok(())
 }
