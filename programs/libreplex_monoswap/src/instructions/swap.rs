@@ -113,11 +113,14 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
     let mint_outgoing = &mut ctx.accounts.mint_outgoing;
     let escrow_holder_reverse = &ctx.accounts.escrow_holder_reverse;
     let swap_marker = &ctx.accounts.swap_marker;
-    swap_marker_reverse.used = true; // cannot delete these since the swap has been activated
-    swap_marker_reverse.mint_incoming = mint_outgoing.key();
-    swap_marker_reverse.mint_outgoing = mint_incoming.key();
-    swap_marker_reverse.mint_incoming_amount = swap_marker.mint_outgoing_amount;
-    swap_marker_reverse.mint_outgoing_amount = swap_marker.mint_incoming_amount;
+
+    swap_marker_reverse.set_inner(SwapMarker { 
+        namespace: swap_marker.namespace.key(), 
+        mint_incoming: mint_outgoing.key(), 
+        mint_outgoing: mint_incoming.key(), 
+        mint_incoming_amount: swap_marker.mint_outgoing_amount, 
+        mint_outgoing_amount: swap_marker.mint_incoming_amount, 
+        used: true });
     
     // transfer the outgoing mint into escrow -
     let token_program = &ctx.accounts.token_program;

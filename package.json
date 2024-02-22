@@ -18,6 +18,8 @@
     "libreplex_editions:deploy:mainnet": "anchor deploy -p libreplex_editions --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_editions:deploy:eclipse": "anchor deploy -p libreplex_editions --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_editions:deploy:eclipse-dev": "anchor deploy -p libreplex_editions --provider.cluster https://staging-rpc.dev.eclipsenetwork.xyz --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_editions:deploy:eclipse-dev2": "anchor deploy -p libreplex_editions --provider.cluster https://staging-rpc.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/libreplex-deployer.json",
+
     "libreplex_liquidity:deploy:devnet": "anchor deploy -p libreplex_liquidity --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_fair_launch:deploy:mainnet": "anchor build -p libreplex_fair_launch && anchor deploy -p libreplex_fair_launch --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_liquidity:deploy:mainnet": "anchor build -p libreplex_liquidity&& anchor deploy -p libreplex_liquidity --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",

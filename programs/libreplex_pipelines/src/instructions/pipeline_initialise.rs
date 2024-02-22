@@ -102,10 +102,10 @@ pub fn initialise_pipeline(
 
     msg!("{} {} {}",input.limit_per_mint, input.lp_ratio, input.liquidity_provider_amount_in_spl );
     let limit_per_mint_with_decimals = input.limit_per_mint.checked_mul(10_u64.checked_pow(input.decimals as u32).unwrap()).unwrap(); 
-    let spl_swap_amount_secondary = limit_per_mint_with_decimals.checked_sub(
-        limit_per_mint_with_decimals.checked_div(input.lp_ratio as u64).unwrap()).unwrap();
+    let spl_swap_amount_secondary = limit_per_mint_with_decimals;
 
-    let spl_swap_amount_primary = spl_swap_amount_secondary.checked_sub(input.liquidity_provider_amount_in_spl).unwrap();
+    let spl_swap_amount_primary = limit_per_mint_with_decimals.checked_sub(
+        limit_per_mint_with_decimals.checked_div(input.lp_ratio as u64).unwrap()).unwrap().checked_sub(input.liquidity_provider_amount_in_spl).unwrap();
     
     // we add a creator program - this means mints and swaps can only happen with
     // the signature of the pipelines program
