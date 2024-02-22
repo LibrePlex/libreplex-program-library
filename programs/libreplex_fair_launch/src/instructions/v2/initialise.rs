@@ -110,7 +110,7 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
     initialise_logic(InitialiseInput {
         limit_per_mint, 
         max_number_of_tokens, decimals, ticker, deployment_template, mint_template, offchain_url, deployment_type
-    }, deployment, creator.key())?;
+    }, deployment, creator.key(), Some(&deployment_config))?;
 
     
     deployment.require_creator_cosign = creator_cosign_program_id.is_some();

@@ -7,7 +7,7 @@ use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGr
 
 use spl_token_metadata_interface::state::TokenMetadata;
 
-use crate::{mint_all_fungibles, Deployment, Hashlist, DeploymentConfig};
+use crate::{mint_all_fungibles, Deployment, DeploymentActive, DeploymentConfig, Hashlist};
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 
 pub mod sysvar_instructions_program {
@@ -88,6 +88,11 @@ pub fn deploy_token_2022_logic<'f>(
     )?;
 
     msg!("Created non fungible");
+
+    emit!(DeploymentActive { 
+        ticker: deployment.ticker.clone(),
+        fungible_mint: fungible_mint.key(),
+    });
 
     Ok(())
 }

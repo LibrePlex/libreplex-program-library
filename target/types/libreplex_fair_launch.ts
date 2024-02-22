@@ -8,43 +8,12 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInputV2"
-                },
-                "path": "input.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "deploymentConfig",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -77,62 +46,17 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "deploymentConfig",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -188,42 +112,12 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -315,47 +209,12 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "signer",
@@ -386,22 +245,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "signer",
@@ -442,22 +286,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "deploymentConfig",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -483,42 +312,12 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "deploymentConfig",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "creatorFeeTreasury",
@@ -528,47 +327,12 @@ export type LibreplexFairLaunch = {
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -624,22 +388,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -659,27 +408,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "fungibleSourceTokenAccount",
@@ -757,42 +486,12 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "deploymentConfig",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -827,27 +526,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "nonFungibleTargetTokenAccount",
@@ -888,42 +567,12 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -1024,23 +673,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInput"
-                },
-                "path": "input.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -1068,68 +701,17 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -1230,62 +812,17 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "migrationMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "migration_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "migrationCounter",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "migration_counter"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -1300,48 +837,12 @@ export type LibreplexFairLaunch = {
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -1387,22 +888,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -1417,28 +903,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "fungibleSourceTokenAccount",
@@ -1501,22 +966,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -1551,28 +1001,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "nonFungibleTargetTokenAccount",
@@ -1721,13 +1150,6 @@ export type LibreplexFairLaunch = {
       }
     },
     {
-      "name": "migrationMarker",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
       "name": "hashlistMarker",
       "type": {
         "kind": "struct",
@@ -1751,17 +1173,84 @@ export type LibreplexFairLaunch = {
       }
     },
     {
-      "name": "redeemable",
+      "name": "migrationMarker",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "inscriptionSummary",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "asset",
+            "name": "inscriptionCountTotal",
+            "type": "u64"
+          },
+          {
+            "name": "inscriptionCountImmutables",
+            "type": "u64"
+          },
+          {
+            "name": "lastInscription",
             "type": "publicKey"
           },
           {
-            "name": "deployment",
+            "name": "lastInscriber",
             "type": "publicKey"
+          },
+          {
+            "name": "lastInscriptionCreateTime",
+            "type": "i64"
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "SummaryExtension"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "inscriptionV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "contentType",
+            "type": "string"
+          },
+          {
+            "name": "encoding",
+            "type": "string"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
           }
         ]
       }
@@ -1871,33 +1360,29 @@ export type LibreplexFairLaunch = {
       }
     },
     {
-      "name": "DeployV2Input",
+      "name": "DeploymentConfig",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "requireCreatorCosign",
-            "type": "bool"
+            "name": "deployment",
+            "type": "publicKey"
           },
           {
-            "name": "useInscriptions",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "DeployV2Input",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "requireCreatorCosign",
-            "type": "bool"
+            "name": "creatorFeeTreasury",
+            "type": "publicKey"
           },
           {
-            "name": "useInscriptions",
-            "type": "bool"
+            "name": "creatorFeePerMintLamports",
+            "type": "u64"
+          },
+          {
+            "name": "deflationRatePerSwap",
+            "type": "u16"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
           }
         ]
       }
@@ -1919,24 +1404,33 @@ export type LibreplexFairLaunch = {
       }
     },
     {
-      "name": "DeploymentStatus",
+      "name": "SummaryExtension",
       "type": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Initialised"
-          },
-          {
-            "name": "Deployed"
-          },
-          {
-            "name": "MintedOut"
+            "name": "None"
           }
         ]
       }
     }
   ],
   "events": [
+    {
+      "name": "DeploymentActive",
+      "fields": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "fungibleMint",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "HashlistEvent",
       "fields": [
@@ -1948,6 +1442,31 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MintEvent",
+      "fields": [
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "ticker",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "tokensMinted",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "maxNumberOfTokens",
+          "type": "u64",
           "index": false
         }
       ]
@@ -1978,26 +1497,70 @@ export type LibreplexFairLaunch = {
       ]
     },
     {
-      "name": "MintEvent",
+      "name": "NewDeploymentV2",
       "fields": [
-        {
-          "name": "mint",
-          "type": "publicKey",
-          "index": false
-        },
         {
           "name": "ticker",
           "type": "string",
           "index": false
         },
         {
-          "name": "tokensMinted",
+          "name": "limitPerMint",
           "type": "u64",
           "index": false
         },
         {
           "name": "maxNumberOfTokens",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "creator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "offChainUrl",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "requireCoSign",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "deploymentTemplate",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "mintTemplate",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "usesInscriptions",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "decimals",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "deploymentType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "config",
+          "type": {
+            "option": {
+              "defined": "DeploymentConfig"
+            }
+          },
           "index": false
         }
       ]
@@ -2072,43 +1635,12 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInputV2"
-                },
-                "path": "input.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "deploymentConfig",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -2141,62 +1673,17 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "deploymentConfig",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -2252,42 +1739,12 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -2379,47 +1836,12 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "signer",
@@ -2450,22 +1872,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "signer",
@@ -2506,22 +1913,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deploymentConfig",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -2547,42 +1939,12 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "deploymentConfig",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "creatorFeeTreasury",
@@ -2592,47 +1954,12 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -2688,22 +2015,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -2723,27 +2035,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "fungibleSourceTokenAccount",
@@ -2821,42 +2113,12 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "deploymentConfig",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -2891,27 +2153,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "nonFungibleTargetTokenAccount",
@@ -2952,42 +2194,12 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -3088,23 +2300,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInput"
-                },
-                "path": "input.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -3132,68 +2328,17 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -3294,62 +2439,17 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "migrationMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "migration_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "migrationCounter",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "migration_counter"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -3364,48 +2464,12 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -3451,22 +2515,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -3481,28 +2530,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "fungibleSourceTokenAccount",
@@ -3565,22 +2593,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "Deployment",
-                "path": "deployment.ticker"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -3615,28 +2628,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "hashlistMarker",
           "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Deployment",
-                "path": "deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "non_fungible_mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "nonFungibleTargetTokenAccount",
@@ -3785,13 +2777,6 @@ export const IDL: LibreplexFairLaunch = {
       }
     },
     {
-      "name": "migrationMarker",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
       "name": "hashlistMarker",
       "type": {
         "kind": "struct",
@@ -3815,17 +2800,84 @@ export const IDL: LibreplexFairLaunch = {
       }
     },
     {
-      "name": "redeemable",
+      "name": "migrationMarker",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "inscriptionSummary",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "asset",
+            "name": "inscriptionCountTotal",
+            "type": "u64"
+          },
+          {
+            "name": "inscriptionCountImmutables",
+            "type": "u64"
+          },
+          {
+            "name": "lastInscription",
             "type": "publicKey"
           },
           {
-            "name": "deployment",
+            "name": "lastInscriber",
             "type": "publicKey"
+          },
+          {
+            "name": "lastInscriptionCreateTime",
+            "type": "i64"
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "SummaryExtension"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "inscriptionV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "contentType",
+            "type": "string"
+          },
+          {
+            "name": "encoding",
+            "type": "string"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
           }
         ]
       }
@@ -3935,33 +2987,29 @@ export const IDL: LibreplexFairLaunch = {
       }
     },
     {
-      "name": "DeployV2Input",
+      "name": "DeploymentConfig",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "requireCreatorCosign",
-            "type": "bool"
+            "name": "deployment",
+            "type": "publicKey"
           },
           {
-            "name": "useInscriptions",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "DeployV2Input",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "requireCreatorCosign",
-            "type": "bool"
+            "name": "creatorFeeTreasury",
+            "type": "publicKey"
           },
           {
-            "name": "useInscriptions",
-            "type": "bool"
+            "name": "creatorFeePerMintLamports",
+            "type": "u64"
+          },
+          {
+            "name": "deflationRatePerSwap",
+            "type": "u16"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
           }
         ]
       }
@@ -3983,24 +3031,33 @@ export const IDL: LibreplexFairLaunch = {
       }
     },
     {
-      "name": "DeploymentStatus",
+      "name": "SummaryExtension",
       "type": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Initialised"
-          },
-          {
-            "name": "Deployed"
-          },
-          {
-            "name": "MintedOut"
+            "name": "None"
           }
         ]
       }
     }
   ],
   "events": [
+    {
+      "name": "DeploymentActive",
+      "fields": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "fungibleMint",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
     {
       "name": "HashlistEvent",
       "fields": [
@@ -4012,6 +3069,31 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MintEvent",
+      "fields": [
+        {
+          "name": "mint",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "ticker",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "tokensMinted",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "maxNumberOfTokens",
+          "type": "u64",
           "index": false
         }
       ]
@@ -4042,26 +3124,70 @@ export const IDL: LibreplexFairLaunch = {
       ]
     },
     {
-      "name": "MintEvent",
+      "name": "NewDeploymentV2",
       "fields": [
-        {
-          "name": "mint",
-          "type": "publicKey",
-          "index": false
-        },
         {
           "name": "ticker",
           "type": "string",
           "index": false
         },
         {
-          "name": "tokensMinted",
+          "name": "limitPerMint",
           "type": "u64",
           "index": false
         },
         {
           "name": "maxNumberOfTokens",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "creator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "offChainUrl",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "requireCoSign",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "deploymentTemplate",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "mintTemplate",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "usesInscriptions",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "decimals",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "deploymentType",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "config",
+          "type": {
+            "option": {
+              "defined": "DeploymentConfig"
+            }
+          },
           "index": false
         }
       ]

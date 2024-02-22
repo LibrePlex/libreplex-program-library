@@ -20,7 +20,7 @@ use mpl_token_metadata::types::{Creator, TokenStandard};
 
 
 use crate::{
-    Deployment, MintEvent, add_to_hashlist, STANDARD_DEPLOYMENT_TYPE, errors::FairLaunchError,
+    add_to_hashlist, errors::FairLaunchError, Deployment, MintEvent, STANDARD_DEPLOYMENT_TYPE
 };
 
 

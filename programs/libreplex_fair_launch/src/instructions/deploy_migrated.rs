@@ -191,6 +191,10 @@ pub fn deploy_migrated(ctx: Context<DeployMigratedCtx>) -> Result<()> {
         panic!("Fungible escrow token account not empty.")
     }
 
+    emit!(DeploymentActive { 
+        fungible_mint: fungible_mint.key(),
+    });
+
 
     Ok(())
 }

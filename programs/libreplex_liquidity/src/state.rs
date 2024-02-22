@@ -38,3 +38,24 @@ pub struct Liquidity {
     pub padding: [u8; 67]
 }
 
+pub mod events {
+    use super::*;
+
+    #[event]
+    pub struct LiquidityCreate {
+        pub id: Pubkey,
+        pub liquidity: Liquidity,
+    }
+
+    #[event]
+    pub struct Mint {
+        pub liquidity: Pubkey,
+        pub total_mints: u64,
+    }
+
+    #[event]
+    pub struct Bootstrap {
+        pub liquidity: Pubkey,
+    }
+}
+
