@@ -27,3 +27,6 @@ pub use update_symbol_2022::*;
 
 pub mod update_spl_metadata_2022;
 pub use update_spl_metadata_2022::*;
+
+pub mod join;
+pub use join::*;

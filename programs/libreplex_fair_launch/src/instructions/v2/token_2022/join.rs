@@ -1,13 +1,12 @@
-
-
 use anchor_lang::prelude::*;
+use anchor_spl::token_interface::TokenAccount;
 use anchor_spl::{
-    associated_token::AssociatedToken,
-    token_2022, token_interface::Mint
+    associated_token::AssociatedToken, token_2022, token_interface::Mint
 };
-
-
-use libreplex_shared::SharedError;
+use spl_pod::optional_keys::OptionalNonZeroPubkey;
+use spl_token_2022::extension::group_member_pointer::GroupMemberPointer;
+use spl_token_2022::extension::{group_pointer::GroupPointer, BaseStateWithExtensions};
+use spl_token_2022::extension::metadata_pointer::MetadataPointer;
 
 
 use crate::{
@@ -16,10 +15,9 @@ use crate::{
 };
 
 #[derive(Accounts)]
-pub struct MintToken2022Ctx<'info> {
+pub struct JoinCtx<'info> {
     #[account(mut,
-       
-
+       has_one = fungible_mint,
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
 
@@ -63,22 +61,20 @@ pub struct MintToken2022Ctx<'info> {
     #[account(mut)]
     pub fungible_mint: InterfaceAccount<'info, Mint>,
 
-
     /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
     #[account(mut)]
     pub minter: UncheckedAccount<'info>,
 
-    /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
-    
-    #[account(mut)]
+    #[account(mut, owner = spl_token_2022::ID)]
     pub non_fungible_mint: Signer<'info>,
 
-    /// CHECK: passed in via CPI to mpl_token_metadata program
-    #[account(mut)]
-    pub non_fungible_token_account: UncheckedAccount<'info>,
+    /// CHECK: Will check in instruction
+    #[account(associated_token::mint = non_fungible_mint, 
+        associated_token::authority = non_fungible_token_account_owner)]
+    pub non_fungible_token_account: InterfaceAccount<'info, TokenAccount>,
+
+    pub non_fungible_token_account_owner: Signer<'info>,
     
-
-
 
     /* BOILERPLATE PROGRAM ACCOUNTS */
     /// CHECK: Checked in constraint
@@ -90,20 +86,14 @@ pub struct MintToken2022Ctx<'info> {
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-
-
-
     #[account()]
     pub system_program: Program<'info, System>,
 
 }
 
-pub fn mint_token2022<'info>(ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>) -> Result<()> {
-    // let MintToken2022Ctx { 
-      
-    //     ..
-    // } = &ctx.accounts;
-
+pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> Result<()> {
+    let deployment = &mut ctx.accounts.deployment;
+    let deployment_config = &mut ctx.accounts.deployment_config;
     let payer = &ctx.accounts.payer; 
     let signer = &ctx.accounts.signer;
     let minter= &ctx.accounts.minter;
@@ -114,19 +104,36 @@ pub fn mint_token2022<'info>(ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'i
     let system_program = &ctx.accounts.system_program;
     let fungible_mint = &ctx.accounts.fungible_mint;
 
-    
-
-    // mutable borrows
-    let deployment = &mut ctx.accounts.deployment;
-    let deployment_config = &mut ctx.accounts.deployment_config;
     let creator_fee_treasury = &mut ctx.accounts.creator_fee_treasury;
     let hashlist = &mut ctx.accounts.hashlist;
+    
+    if !deployment.require_creator_cosign {
+        panic!()
+    }
+   
+    if non_fungible_token_account.amount != 1 {
+        panic!()
+    }
 
+    let non_fungible_mint_data = non_fungible_mint.try_borrow_data()?;
+    let mint_with_extensions = spl_token_2022::extension::StateWithExtensions::<spl_token_2022::state::Mint>::unpack(
+        &non_fungible_mint_data,
+    )?;
 
-    // if deployment.ticker == "BANANA22" 
-    // || deployment.mint_template == format!("{{\"p\":\"spl-20\",\"op\":\"mint\",\"tick\":\"{}\",\"amt\":{}}}", deployment.ticker, deployment.ticker) {
-    //     deployment.mint_template = format!("{{\"p\":\"spl-20\",\"op\":\"mint\",\"tick\":\"{}\",\"amt\":{}}}", deployment.ticker, deployment.limit_per_mint);
-    // }
+    let mint_base = &mint_with_extensions.base;
+
+    if mint_base.supply != 1 || 
+        mint_base.mint_authority.is_some() || 
+        mint_base.freeze_authority.expect("Freeze authority not provided") != deployment.key() {
+        panic!()
+    }
+
+    mint_with_extensions.get_extension::<MetadataPointer>()?;
+    let group_member_ptr = mint_with_extensions.get_extension::<GroupMemberPointer>()?;
+
+    if group_member_ptr.authority != OptionalNonZeroPubkey::try_from(Some(deployment.key()))? {
+        panic!()
+    }
 
     mint_token2022_logic(
         deployment, 
@@ -139,11 +146,12 @@ pub fn mint_token2022<'info>(ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'i
         associated_token_program, 
         token_program, 
         minter, 
-        non_fungible_token_account, 
+        non_fungible_token_account.as_ref(), 
         hashlist,
     ctx.bumps.deployment,
-ctx.remaining_accounts, &signer, true)?;
+ctx.remaining_accounts, &signer, false)?;
 
     
+
     Ok(())
 }

@@ -14,7 +14,7 @@ use libreplex_shared::SharedError;
 
 pub fn mint_non_fungible_2022_logic<'a>(
     non_fungible_mint: &AccountInfo<'a>,
-    non_fungible_token_account: &UncheckedAccount<'a>,
+    non_fungible_token_account: &AccountInfo<'a>,
     associated_token_program: &Program<'a, AssociatedToken>,
     payer: &Signer<'a>,
     minter: &AccountInfo<'a>,
