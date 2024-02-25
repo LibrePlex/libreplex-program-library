@@ -8,43 +8,12 @@ export type LibreplexEditions = {
         {
           "name": "editionsDeployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "editions_deployment"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInput"
-                },
-                "path": "input.symbol"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "EditionsDeployment",
-                "path": "editions_deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -54,7 +23,7 @@ export type LibreplexEditions = {
         {
           "name": "creator",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "groupMint",
@@ -87,67 +56,17 @@ export type LibreplexEditions = {
         {
           "name": "editionsDeployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "editions_deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "EditionsDeployment",
-                "path": "editions_deployment.symbol"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "EditionsDeployment",
-                "path": "editions_deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "EditionsDeployment",
-                "path": "editions_deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -237,29 +156,21 @@ export type LibreplexEditions = {
             "type": "string"
           },
           {
+            "name": "nameIsTemplate",
+            "type": "bool"
+          },
+          {
+            "name": "urlIsTemplate",
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                100
+                98
               ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "hashlistMarker",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "editionsDeployment",
-            "type": "publicKey"
-          },
-          {
-            "name": "mint",
-            "type": "publicKey"
           }
         ]
       }
@@ -280,6 +191,22 @@ export type LibreplexEditions = {
                 "defined": "MintAndOrder"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "hashlistMarker",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "editionsDeployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
           }
         ]
       }
@@ -328,20 +255,6 @@ export type LibreplexEditions = {
           {
             "name": "order",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "DeploymentStatus",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Initialised"
-          },
-          {
-            "name": "MintedOut"
           }
         ]
       }
@@ -411,43 +324,12 @@ export const IDL: LibreplexEditions = {
         {
           "name": "editionsDeployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "editions_deployment"
-              },
-              {
-                "kind": "arg",
-                "type": {
-                  "defined": "InitialiseInput"
-                },
-                "path": "input.symbol"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "EditionsDeployment",
-                "path": "editions_deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -457,7 +339,7 @@ export const IDL: LibreplexEditions = {
         {
           "name": "creator",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "groupMint",
@@ -490,67 +372,17 @@ export const IDL: LibreplexEditions = {
         {
           "name": "editionsDeployment",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "editions_deployment"
-              },
-              {
-                "kind": "account",
-                "type": "string",
-                "account": "EditionsDeployment",
-                "path": "editions_deployment.symbol"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlist",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "EditionsDeployment",
-                "path": "editions_deployment"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "hashlist_marker"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "EditionsDeployment",
-                "path": "editions_deployment"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "mint"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -640,29 +472,21 @@ export const IDL: LibreplexEditions = {
             "type": "string"
           },
           {
+            "name": "nameIsTemplate",
+            "type": "bool"
+          },
+          {
+            "name": "urlIsTemplate",
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                100
+                98
               ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "hashlistMarker",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "editionsDeployment",
-            "type": "publicKey"
-          },
-          {
-            "name": "mint",
-            "type": "publicKey"
           }
         ]
       }
@@ -683,6 +507,22 @@ export const IDL: LibreplexEditions = {
                 "defined": "MintAndOrder"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "hashlistMarker",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "editionsDeployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
           }
         ]
       }
@@ -731,20 +571,6 @@ export const IDL: LibreplexEditions = {
           {
             "name": "order",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "DeploymentStatus",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Initialised"
-          },
-          {
-            "name": "MintedOut"
           }
         ]
       }

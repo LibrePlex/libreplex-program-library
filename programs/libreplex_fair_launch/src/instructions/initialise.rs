@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 
-use crate::{errors::FairLaunchError, Deployment, DeploymentConfig, NewDeploymentEvent, NewDeploymentV2, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT};
+use crate::{errors::FairLaunchError, Deployment, DeploymentConfig, NewDeploymentV2, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT};
 
 
 pub mod sysvar_instructions_program {
@@ -121,8 +121,6 @@ fn emit_init(deployment: &Deployment, config: Option<&DeploymentConfig>) {
         deployment_template: deployment.deployment_template.clone(),
         mint_template: deployment.mint_template.clone(),
         deployment_type: deployment.deployment_type,
-        config: config.map(|o| {
-            o.clone()
-        })
+        config: config.cloned()
     });
 }

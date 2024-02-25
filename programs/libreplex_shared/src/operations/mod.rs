@@ -4,6 +4,9 @@
 pub mod transfer_any_asset;
 pub use transfer_any_asset::*;
 
+pub mod minting;
+pub use minting::*;
+
 pub mod create_and_mint;
 pub use create_and_mint::*;
 

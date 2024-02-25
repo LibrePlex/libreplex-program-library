@@ -7,10 +7,10 @@ use spl_token_metadata_interface::state::TokenMetadata;
 
 // use libreplex_shared::sysvar_instructions_program;
 
-use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenMemberInput};
+use libreplex_shared::{create_token_2022_and_metadata, operations::mint_non_fungible_2022_logic, MintAccounts2022, TokenMemberInput};
 
 use crate::{
-    create_fair_launch_inscriptions, mint_non_fungible_2022_logic, update_deployment_and_hashlist,
+    create_fair_launch_inscriptions, update_deployment_and_hashlist,
     Deployment, DeploymentConfig,
 };
 
