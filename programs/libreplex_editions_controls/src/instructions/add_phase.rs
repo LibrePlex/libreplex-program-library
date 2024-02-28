@@ -22,8 +22,15 @@ pub struct InitialisePhaseInput {
 pub struct AddPhaseCtx<'info> {
    
    
-    #[account(mut)]
+    #[account(mut,
+        realloc = EditionsControls::get_size(editions_controls.phases.len()+1),
+        realloc::zero = false,
+        realloc::payer = payer
+        )]
     pub editions_controls: Account<'info, EditionsControls>,
+
+    #[account(mut)]
+    pub payer: Signer<'info>,
 
     // can be different from payer for PDA integration
     #[account(mut,

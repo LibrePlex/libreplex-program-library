@@ -83,6 +83,11 @@ export type LibreplexEditionsControls = {
           "isSigner": false
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "creator",
           "isMut": true,
           "isSigner": true
@@ -179,6 +184,12 @@ export type LibreplexEditionsControls = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
                 "path": "minter"
               }
             ]
@@ -198,14 +209,20 @@ export type LibreplexEditionsControls = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
                 "path": "minter"
               },
               {
                 "kind": "arg",
                 "type": {
-                  "defined": "usize"
+                  "defined": "MintInput"
                 },
-                "path": "phase_index"
+                "path": "mint_input.phase_index"
               }
             ]
           }
@@ -309,6 +326,10 @@ export type LibreplexEditionsControls = {
             "type": "u64"
           },
           {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -392,7 +413,7 @@ export type LibreplexEditionsControls = {
             "type": "string"
           },
           {
-            "name": "creatorCosignProgramId",
+            "name": "cosignerProgramId",
             "type": {
               "option": "publicKey"
             }
@@ -601,6 +622,11 @@ export const IDL: LibreplexEditionsControls = {
           "isSigner": false
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "creator",
           "isMut": true,
           "isSigner": true
@@ -697,6 +723,12 @@ export const IDL: LibreplexEditionsControls = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
                 "path": "minter"
               }
             ]
@@ -716,14 +748,20 @@ export const IDL: LibreplexEditionsControls = {
               {
                 "kind": "account",
                 "type": "publicKey",
+                "account": "EditionsDeployment",
+                "path": "editions_deployment"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
                 "path": "minter"
               },
               {
                 "kind": "arg",
                 "type": {
-                  "defined": "usize"
+                  "defined": "MintInput"
                 },
-                "path": "phase_index"
+                "path": "mint_input.phase_index"
               }
             ]
           }
@@ -827,6 +865,10 @@ export const IDL: LibreplexEditionsControls = {
             "type": "u64"
           },
           {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -910,7 +952,7 @@ export const IDL: LibreplexEditionsControls = {
             "type": "string"
           },
           {
-            "name": "creatorCosignProgramId",
+            "name": "cosignerProgramId",
             "type": {
               "option": "publicKey"
             }

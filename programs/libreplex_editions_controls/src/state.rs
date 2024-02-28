@@ -16,10 +16,12 @@ pub struct Phase {
 }
 
 impl Phase {
-    pub const SIZE: usize = 8 + 8
+    pub const SIZE: usize = 8 
+    + 32 
     + 8
     + 1
-    + 1 
+    + 8
+    + 8
     + 8
     + 8
     + 200;
@@ -43,13 +45,14 @@ pub struct EditionsControls {
     pub creator: Pubkey,
     pub treasury: Pubkey, // mint proceeds go here
     pub max_mints_per_wallet: u64, // set to 0 for unlimited (applied across all the phases)
+    pub cosigner_program_id: Pubkey,
     pub padding: [u8; 200],    // in case we need some more stuff in the future
     pub phases: Vec<Phase>,
 }
 
 impl EditionsControls {
-    pub const INITIAL_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 200 + 4;
-    pub fn get_size(&self, number_of_phases: usize) -> usize {
+    pub const INITIAL_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 32 + 200 + 4;
+    pub fn get_size(number_of_phases: usize) -> usize {
         EditionsControls::INITIAL_SIZE + Phase::SIZE * number_of_phases
     }
 }

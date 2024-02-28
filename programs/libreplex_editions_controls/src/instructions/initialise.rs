@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 use libreplex_editions::{
     program::LibreplexEditions, InitialiseInput,
     cpi::accounts::InitialiseCtx,
@@ -24,7 +24,7 @@ pub struct InitialiseControlInput {
     // ipfs://pippo/{} -> turns into ipfs://pippo/1, ipfs://pippo/2, etc
     // without curlies the url is the same for all mints 
     pub offchain_url: String,
-    pub creator_cosign_program_id: Option<Pubkey>,
+    pub cosigner_program_id: Option<Pubkey>,
 }
 
 
@@ -118,6 +118,10 @@ pub fn initialise_editions_controls(ctx: Context<InitialiseEditionControlsCtx>, 
         creator: creator.key(), 
         max_mints_per_wallet: input.max_mints_per_wallet,
         padding: [0; 200], 
+        cosigner_program_id: match input.cosigner_program_id {
+            Some(x)=>x,
+            None => system_program::ID
+        },
         phases: vec![],
         treasury: input.treasury, 
     });

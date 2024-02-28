@@ -23,18 +23,18 @@ pub struct MintInput {
 
 
 #[derive(Accounts)]
-#[instruction(phase_index: usize)]
+#[instruction(mint_input: MintInput)]
 
 pub struct MintWithControlsCtx<'info> {
 
     #[account(mut)]
-    pub editions_deployment: Account<'info, EditionsDeployment>,
+    pub editions_deployment: Box<Account<'info, EditionsDeployment>>,
 
     #[account(mut,
         seeds = [b"editions_controls", editions_deployment.key().as_ref()],
         bump
     )]
-    pub editions_controls: Account<'info, EditionsControls>,
+    pub editions_controls: Box<Account<'info, EditionsControls>>,
 
 
      /// CHECK: Checked via CPI
@@ -50,7 +50,7 @@ pub struct MintWithControlsCtx<'info> {
 
     // when deployment.require_creator_cosign is true, this must be equal to the creator
     // of the deployment otherwise, can be any signer account
-    #[account(constraint = editions_deployment.cosigner_program_id == system_program::ID || signer.key() == editions_deployment.creator)]
+    #[account(constraint = editions_controls.cosigner_program_id == system_program::ID || signer.key() == editions_deployment.creator)]
     pub signer: Signer<'info>,
 
     /// CHECK: Anybody can sign, anybody can receive the inscription
@@ -60,19 +60,19 @@ pub struct MintWithControlsCtx<'info> {
     /// CHECK: Anybody can sign, anybody can receive the inscription
     #[account(init_if_needed,
         payer = payer,
-        seeds=[b"minter_stats", minter.key().as_ref()],
+        seeds=[b"minter_stats", editions_deployment.key().as_ref(), minter.key().as_ref()],
         bump,
         space=MinterStats::SIZE)]
-    pub minter_stats: Account<'info, MinterStats>,
+    pub minter_stats: Box<Account<'info, MinterStats>>,
 
     /// CHECK: Anybody can sign, anybody can receive the inscription
     #[account(init_if_needed,
         payer = payer,
-        seeds=["minter_stats_phase".as_bytes(), minter.key().as_ref()
-        , &phase_index.to_le_bytes()],
+        seeds=["minter_stats_phase".as_bytes(), editions_deployment.key().as_ref(), minter.key().as_ref()
+        , &mint_input.phase_index.to_le_bytes()],
         bump,
         space=MinterStats::SIZE)]
-    pub minter_stats_phase: Account<'info, MinterStats>,
+    pub minter_stats_phase: Box<Account<'info, MinterStats>>,
 
 
 
@@ -134,11 +134,23 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     let treasury = &ctx.accounts.treasury;
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
 
+   
+
     let current_phase = &editions_controls.phases[mint_input.phase_index as usize]; 
     check_phase_constraints(current_phase,
         minter_stats,
         minter_stats_phase,
         editions_controls);
+
+    msg!("[mint_count] total:{} phase: {}", minter_stats.mint_count, minter_stats_phase.mint_count);
+     // update this in case it has been initialised
+    // idempotent because the account is determined by the PDA
+    minter_stats.wallet = minter.key();
+    minter_stats.mint_count += 1; 
+
+
+    minter_stats_phase.wallet = minter.key();
+    minter_stats_phase.mint_count += 1; 
 
     
     // ok, we are gucci. transfer funds to treasury if applicable
