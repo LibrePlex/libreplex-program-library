@@ -980,11 +980,17 @@ export type LibreplexLiquidity = {
             "type": "u8"
           },
           {
+            "name": "requiredDoubleMints",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                67
+                62
               ]
             }
           }
@@ -1109,11 +1115,17 @@ export type LibreplexLiquidity = {
             "type": "u8"
           },
           {
+            "name": "requiredDoubleMints",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                67
+                62
               ]
             }
           }
@@ -2149,11 +2161,17 @@ export const IDL: LibreplexLiquidity = {
             "type": "u8"
           },
           {
+            "name": "requiredDoubleMints",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                67
+                62
               ]
             }
           }
@@ -2278,11 +2296,17 @@ export const IDL: LibreplexLiquidity = {
             "type": "u8"
           },
           {
+            "name": "requiredDoubleMints",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                67
+                62
               ]
             }
           }

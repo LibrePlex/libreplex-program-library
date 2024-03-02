@@ -71,7 +71,8 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
             _=>system_program::ID
         },
         deployment_type,
-        padding: [0; 67],
+        required_double_mints: None,
+        padding: [0; 62],
     });
 
     emit_create(&ctx.accounts.liquidity);

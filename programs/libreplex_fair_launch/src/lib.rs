@@ -53,6 +53,12 @@ pub mod libreplex_fair_launch {
         instructions::update_symbol2022(ctx)
     }
 
+    pub fn join<'info>(
+        ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>,
+    ) -> Result<()> {
+        instructions::join_handler(ctx)
+    }
+
     pub fn update_spl_metadata<'info>(
         ctx: Context<'_, '_, '_, 'info, UpdateSplMetadata2022Ctx<'info>>,
         new_uri: String

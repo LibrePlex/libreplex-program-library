@@ -24,6 +24,9 @@ pub use swap_to_fungible::*;
 pub mod bootstrap_pool;
 pub use bootstrap_pool::*;
 
+pub mod join;
+pub use join::*;
+
 declare_id!("LiquGRWGrp8JKspo8zDDu6qpRmX1p6U3PX2USqiE1eg");
 
 #[program]
@@ -36,6 +39,10 @@ pub mod libreplex_liquidity {
 
     pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
         mint_handler(ctx)
+    }
+
+    pub fn join<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> Result<()> {
+        join_handler(ctx)
     }
 
     pub fn create_lookup_table(ctx: Context<CreateLookupTableForLiquidityCtx>,

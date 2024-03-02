@@ -5,13 +5,16 @@ use crate::{events, Liquidity, DEPLOYMENT_TYPE_NFT};
 use libreplex_fair_launch::program::LibreplexFairLaunch;
 
 #[derive(Accounts)]
-pub struct MintCtx<'info> {
-    /// CHECK: CAn be anyone
+pub struct JoinCtx<'info> {
     #[account(mut)]
-    pub receiver: UncheckedAccount<'info>,
+    pub receiver: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
+
+    #[account(
+        constraint = liquidity.cosigner_program_id.ne(&system_program::ID) && authority.key() == liquidity.authority)]
+    pub authority: Signer<'info>,
 
     /// CHECK: Checked by has one
     #[account(mut)]
@@ -94,13 +97,8 @@ pub struct MintCtx<'info> {
     pub sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
-
-    
+pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> Result<()> {
     let fair_launch = &ctx.accounts.fair_launch;
-
-    
-
     let liquidity = &mut ctx.accounts.liquidity;
     
     if liquidity.deployment_type != DEPLOYMENT_TYPE_NFT {
@@ -121,13 +119,8 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
         panic!("Lookup table not initialised");
     }
 
-    let should_double_mint = if let Some(required_double_mints) = liquidity.required_double_mints {
-        liquidity.total_mints < required_double_mints as u64
-    } else {
-        liquidity.total_mints % liquidity.lp_ratio  as u64 == 0
-    };
 
-    if should_double_mint {
+    if liquidity.total_mints % liquidity.lp_ratio  as u64 == 0 {
         let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
         let remaining_accounts_mint_pooled = ctx.remaining_accounts[
@@ -135,9 +128,10 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
 
 
 
-        libreplex_fair_launch::cpi::mint_token22(CpiContext::new_with_signer(
+        libreplex_fair_launch::cpi::join(CpiContext::new_with_signer(
             fair_launch.to_account_info(),
-            libreplex_fair_launch::cpi::accounts::MintToken2022Ctx {
+            libreplex_fair_launch::cpi::accounts::JoinCtx {
+                non_fungible_token_account_owner: liquidity.to_account_info(),
                 deployment: ctx.accounts.deployment.to_account_info(),
                 deployment_config: ctx.accounts.deployment_config.to_account_info(),
                 creator_fee_treasury: ctx.accounts.creator_fee_treasury.to_account_info(),
@@ -185,6 +179,7 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
                     associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
                     system_program: ctx.accounts.system_program.to_account_info(),
                     sysvar_instructions: ctx.accounts.sysvar_instructions.to_account_info(),
+
                 }, 
                 &[seeds]
             )
@@ -196,9 +191,10 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
 
 
     let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
-    libreplex_fair_launch::cpi::mint_token22(CpiContext::new_with_signer(
+    libreplex_fair_launch::cpi::join(CpiContext::new_with_signer(
         fair_launch.to_account_info(),
-        libreplex_fair_launch::cpi::accounts::MintToken2022Ctx {
+        libreplex_fair_launch::cpi::accounts::JoinCtx {
+            non_fungible_token_account_owner: ctx.accounts.receiver.to_account_info(),
             deployment: ctx.accounts.deployment.to_account_info(),
             deployment_config: ctx.accounts.deployment_config.to_account_info(),
             creator_fee_treasury: ctx.accounts.creator_fee_treasury.to_account_info(),

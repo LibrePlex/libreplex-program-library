@@ -35,7 +35,9 @@ pub struct Liquidity {
 
     pub deployment_type: u8,
 
-    pub padding: [u8; 67]
+    pub required_double_mints: Option<u32>,
+
+    pub padding: [u8; 62]
 }
 
 pub mod events {
