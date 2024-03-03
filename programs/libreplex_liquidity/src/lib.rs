@@ -24,6 +24,9 @@ pub use swap_to_fungible::*;
 pub mod bootstrap_pool;
 pub use bootstrap_pool::*;
 
+pub mod initialise_v2;
+pub use initialise_v2::*;
+
 pub mod join;
 pub use join::*;
 

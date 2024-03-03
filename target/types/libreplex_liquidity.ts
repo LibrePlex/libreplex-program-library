@@ -225,6 +225,141 @@ export type LibreplexLiquidity = {
       "args": []
     },
     {
+      "name": "join",
+      "accounts": [
+        {
+          "name": "receiver",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment",
+            "treasury"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentNonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorFeeTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pooledHashlistMarket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "nonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pooledNonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pooledNonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram22",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fairLaunch",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "createLookupTable",
       "accounts": [
         {
@@ -1286,6 +1421,141 @@ export const IDL: LibreplexLiquidity = {
         {
           "name": "payer",
           "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "deployment",
+            "treasury"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentNonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorFeeTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pooledHashlistMarket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "nonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pooledNonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pooledNonFungibleTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram22",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fairLaunch",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "join",
+      "accounts": [
+        {
+          "name": "receiver",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
           "isSigner": true
         },
         {
