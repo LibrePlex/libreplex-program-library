@@ -57,7 +57,10 @@ pub mod libreplex_liquidity {
         init_handler(ctx, input)
     }
     
-   
+    pub fn initialise_v2(ctx: Context<InitialiseV2>, input: InitialiseInputV2) -> Result<()> {
+        init_handler_v2(ctx, input)
+    }
+    
 
     pub fn bootstrap_pool(ctx: Context<BootstapPool>) -> Result<()> {
         bootstrap_pool_handler(ctx)

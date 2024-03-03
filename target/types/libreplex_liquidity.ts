@@ -442,6 +442,44 @@ export type LibreplexLiquidity = {
       ]
     },
     {
+      "name": "initialiseV2",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialiseInputV2"
+          }
+        }
+      ]
+    },
+    {
       "name": "bootstrapPool",
       "accounts": [
         {
@@ -1183,6 +1221,54 @@ export type LibreplexLiquidity = {
       }
     },
     {
+      "name": "InitialiseInputV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "deployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "bootstrapStartTime",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "bootstrapRequiresSoldOut",
+            "type": "bool"
+          },
+          {
+            "name": "creatorBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "requiredDoubleMints",
+            "type": "u32"
+          },
+          {
+            "name": "poolFeeBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "Liquidity",
       "type": {
         "kind": "struct",
@@ -1753,6 +1839,44 @@ export const IDL: LibreplexLiquidity = {
           "name": "input",
           "type": {
             "defined": "InitialiseInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialiseV2",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialiseInputV2"
           }
         }
       ]
@@ -2480,6 +2604,54 @@ export const IDL: LibreplexLiquidity = {
           {
             "name": "lpRatio",
             "type": "u16"
+          },
+          {
+            "name": "poolFeeBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitialiseInputV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "deployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "bootstrapStartTime",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "bootstrapRequiresSoldOut",
+            "type": "bool"
+          },
+          {
+            "name": "creatorBasisPoints",
+            "type": "u64"
+          },
+          {
+            "name": "requiredDoubleMints",
+            "type": "u32"
           },
           {
             "name": "poolFeeBasisPoints",
