@@ -1,6 +1,4 @@
 use anchor_lang::prelude::*;
-use bubblegum_proxy::TreeConfig;
-use mpl_bubblegum::utils::get_asset_id;
 use crate::LegacyInscription;
 
 use super::{InscribeCNFTInput, assert_can_inscribe_cnft, CNFTCheckAccounts};

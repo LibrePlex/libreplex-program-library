@@ -15,6 +15,7 @@
     "libreplex_pipelines:deploy:devnet": "anchor deploy -p libreplex_pipelines --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_pipelines:deploy:mainnet": "anchor deploy -p libreplex_pipelines --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_editions:deploy:devnet": "anchor deploy -p libreplex_editions --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_editions_controls:deploy:devnet": "anchor deploy -p libreplex_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_editions_controls:deploy:eclipse-dev2": "anchor deploy -p libreplex_editions_controls --provider.cluster https://staging-rpc.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_editions:deploy:mainnet": "anchor deploy -p libreplex_editions --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_editions:deploy:eclipse": "anchor deploy -p libreplex_editions --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/libreplex-deployer.json",

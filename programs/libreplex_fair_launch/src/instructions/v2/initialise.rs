@@ -2,7 +2,7 @@ use anchor_lang::{prelude::*, system_program};
 
 
 
-use crate::{Deployment, initialise_logic, InitialiseInput, TOKEN2022_DEPLOYMENT_TYPE, DeploymentConfig, HYBRID_DEPLOYMENT_TYPE};
+use crate::{initialise_logic, Deployment, DeploymentConfig, InitialiseInput, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE};
 
 
 

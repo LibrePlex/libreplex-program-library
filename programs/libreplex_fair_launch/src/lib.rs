@@ -79,14 +79,6 @@ pub mod libreplex_fair_launch {
         instructions::swap_to_nonfungible_2022(ctx)
     }
     
-    pub fn deploy_legacy<'f>(ctx: Context<'_, '_, '_, 'f, DeployLegacyCtx<'f>>) -> Result<()> {
-        instructions::deploy_legacy::deploy(ctx)
-    }
-
-    pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
-        instructions::initialise::initialise(ctx, input)
-    }
-
     pub fn mint_legacy<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyCtx<'info>>) -> Result<()> {
         instructions::mint_legacy::mint_legacy(ctx)
     }
