@@ -357,7 +357,14 @@ export type LibreplexLiquidity = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "JoinInput"
+          }
+        }
+      ]
     },
     {
       "name": "createLookupTable",
@@ -1264,6 +1271,34 @@ export type LibreplexLiquidity = {
           {
             "name": "deploymentType",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "JoinInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pooledMultiplierNumerator",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "pooledMultiplierDenominator",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "userMultiplierNumerator",
+            "type": "u16"
+          },
+          {
+            "name": "userMultiplierDenominator",
+            "type": "u16"
           }
         ]
       }
@@ -1759,7 +1794,14 @@ export const IDL: LibreplexLiquidity = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "JoinInput"
+          }
+        }
+      ]
     },
     {
       "name": "createLookupTable",
@@ -2666,6 +2708,34 @@ export const IDL: LibreplexLiquidity = {
           {
             "name": "deploymentType",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "JoinInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pooledMultiplierNumerator",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "pooledMultiplierDenominator",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "userMultiplierNumerator",
+            "type": "u16"
+          },
+          {
+            "name": "userMultiplierDenominator",
+            "type": "u16"
           }
         ]
       }

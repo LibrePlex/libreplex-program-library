@@ -55,8 +55,9 @@ pub mod libreplex_fair_launch {
 
     pub fn join<'info>(
         ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>,
+        input: MintInput,
     ) -> Result<()> {
-        instructions::join_handler(ctx)
+        instructions::join_handler(ctx, input)
     }
 
     pub fn update_spl_metadata<'info>(
@@ -74,8 +75,9 @@ pub mod libreplex_fair_launch {
    
     pub fn mint_token22<'info>(
         ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>,
+        input: MintInput,
     ) -> Result<()> {
-        instructions::mint_token2022(ctx)
+        instructions::mint_token2022(ctx, input)
     }
     pub fn swap_to_fungible22(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> {
         instructions::swap_to_fungible_2022(ctx)
@@ -87,10 +89,6 @@ pub mod libreplex_fair_launch {
     
     pub fn deploy_legacy<'f>(ctx: Context<'_, '_, '_, 'f, DeployLegacyCtx<'f>>) -> Result<()> {
         instructions::deploy_legacy::deploy(ctx)
-    }
-
-    pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
-        instructions::initialise::initialise(ctx, input)
     }
 
     pub fn mint_legacy<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyCtx<'info>>) -> Result<()> {

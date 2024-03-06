@@ -7,7 +7,7 @@ use anchor_spl::associated_token::{
     self, get_associated_token_address_with_program_id, AssociatedToken,
 };
 
-use libreplex_fair_launch::{Deployment, DeploymentConfig, TOKEN2022_DEPLOYMENT_TYPE};
+use libreplex_fair_launch::{Deployment, DeploymentConfig, MintInput, TOKEN2022_DEPLOYMENT_TYPE};
 use libreplex_shared::sysvar_instructions_program;
 use solana_program::hash::Hash;
 use solana_program::program_pack::Pack;
@@ -618,7 +618,12 @@ pub async fn mint_token_2022(
         .process_transaction(Transaction::new_signed_with_payer(
             &[Instruction {
                 program_id: libreplex_fair_launch::id(),
-                data: libreplex_fair_launch::instruction::MintToken22 {}.data(),
+                data: libreplex_fair_launch::instruction::MintToken22 {
+                    input: MintInput {
+                        multiplier_denominator: 1,
+                        multiplier_numerator: 1,
+                    }
+                }.data(),
                 accounts,
             }],
             Some(&minter_wallet_key),

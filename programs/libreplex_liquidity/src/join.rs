@@ -1,8 +1,8 @@
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{associated_token::AssociatedToken, token::TokenAccount};
 
-use crate::{events, Liquidity, DEPLOYMENT_TYPE_NFT};
-use libreplex_fair_launch::program::LibreplexFairLaunch;
+use crate::{events, Liquidity, DEPLOYMENT_TYPE_NFT, DEPLOYMENT_TYPE_NFT_JOIN};
+use libreplex_fair_launch::{program::LibreplexFairLaunch, MintInput};
 
 #[derive(Accounts)]
 pub struct JoinCtx<'info> {
@@ -97,11 +97,22 @@ pub struct JoinCtx<'info> {
     pub sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> Result<()> {
+
+
+#[derive(AnchorDeserialize, AnchorSerialize)]
+pub struct JoinInput {
+    pub pooled_multiplier_numerator: Option<u16>,
+    pub pooled_multiplier_denominator: Option<u16>,
+
+    pub user_multiplier_numerator: u16,
+    pub user_multiplier_denominator: u16,
+}
+
+pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, input: JoinInput) -> Result<()> {
     let fair_launch = &ctx.accounts.fair_launch;
     let liquidity = &mut ctx.accounts.liquidity;
     
-    if liquidity.deployment_type != DEPLOYMENT_TYPE_NFT {
+    if liquidity.deployment_type != DEPLOYMENT_TYPE_NFT_JOIN {
         panic!("Wrong deployment type. Expected type=0 (NFT), received {}", liquidity.deployment_type)
     }
 
@@ -119,8 +130,15 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> R
         panic!("Lookup table not initialised");
     }
 
+    let should_double_mint = if let Some(required_double_mints) = liquidity.required_double_mints {
+        liquidity.total_mints <= required_double_mints as u64
+    } else {
+        liquidity.total_mints % liquidity.lp_ratio  as u64 == 0
+    };
 
-    if liquidity.total_mints % liquidity.lp_ratio  as u64 == 0 {
+
+
+    if should_double_mint {
         let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
         let remaining_accounts_mint_pooled = ctx.remaining_accounts[
@@ -151,7 +169,10 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> R
                 system_program: ctx.accounts.system_program.to_account_info(),
             },
             &[seeds],
-        ).with_remaining_accounts(remaining_accounts_mint_pooled))?;
+        ).with_remaining_accounts(remaining_accounts_mint_pooled), MintInput {
+            multiplier_denominator: input.pooled_multiplier_denominator.expect("Provided pooled multiplier"),
+            multiplier_numerator: input.pooled_multiplier_numerator.expect("Provided pool multiplier"),
+        })?;
 
         let balance_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
@@ -211,7 +232,10 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> R
             system_program: ctx.accounts.system_program.to_account_info(),
         },
         &[seeds],
-    ).with_remaining_accounts(remaining_accounts_mint))?;
+    ).with_remaining_accounts(remaining_accounts_mint), MintInput {
+        multiplier_denominator: input.user_multiplier_denominator,
+        multiplier_numerator: input.user_multiplier_numerator
+    })?;
     let balance_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
     let mint_funds_received = balance_after.saturating_sub(balance_before);

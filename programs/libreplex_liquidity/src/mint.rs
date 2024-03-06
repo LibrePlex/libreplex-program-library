@@ -2,7 +2,7 @@ use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{associated_token::AssociatedToken, token::TokenAccount};
 
 use crate::{events, Liquidity, DEPLOYMENT_TYPE_NFT};
-use libreplex_fair_launch::program::LibreplexFairLaunch;
+use libreplex_fair_launch::{program::LibreplexFairLaunch, MintInput};
 
 #[derive(Accounts)]
 pub struct MintCtx<'info> {
@@ -95,11 +95,7 @@ pub struct MintCtx<'info> {
 }
 
 pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
-
-    
     let fair_launch = &ctx.accounts.fair_launch;
-
-    
 
     let liquidity = &mut ctx.accounts.liquidity;
     
@@ -157,7 +153,10 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
                 system_program: ctx.accounts.system_program.to_account_info(),
             },
             &[seeds],
-        ).with_remaining_accounts(remaining_accounts_mint_pooled))?;
+        ).with_remaining_accounts(remaining_accounts_mint_pooled), MintInput {
+            multiplier_denominator: 1,
+            multiplier_numerator: 1,
+        })?;
 
         let balance_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
@@ -215,7 +214,10 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
             system_program: ctx.accounts.system_program.to_account_info(),
         },
         &[seeds],
-    ).with_remaining_accounts(remaining_accounts_mint))?;
+    ).with_remaining_accounts(remaining_accounts_mint), MintInput {
+        multiplier_denominator: 1,
+        multiplier_numerator: 1,
+    })?;
     let balance_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
     let mint_funds_received = balance_after.saturating_sub(balance_before);

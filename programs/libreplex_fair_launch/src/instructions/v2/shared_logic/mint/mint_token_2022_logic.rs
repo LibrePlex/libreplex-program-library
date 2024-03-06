@@ -10,7 +10,7 @@ use spl_token_metadata_interface::state::TokenMetadata;
 use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, SharedError, TokenMemberInput};
 
 use crate::{
-    create_fair_launch_inscriptions, errors::FairLaunchError, mint_non_fungible_2022_logic, update_deployment_and_hashlist, Deployment, DeploymentConfig, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE
+    create_fair_launch_inscriptions, errors::FairLaunchError, mint_non_fungible_2022_logic, update_deployment_and_hashlist, Deployment, DeploymentConfig, HashlistMarker, MintInput, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE
 };
 
 pub fn mint_token2022_logic<'info>(
@@ -26,11 +26,21 @@ pub fn mint_token2022_logic<'info>(
     minter: &UncheckedAccount<'info>,
     non_fungible_token_account: &AccountInfo<'info>,
     hashlist: &mut UncheckedAccount<'info>,
+    hashlist_marker: &mut HashlistMarker,
     bump_deployment: u8,
     remaining_accounts: &[AccountInfo<'info>],
     co_signer: &Signer<'info>,
     create_the_nft: bool,
+    mint_input: MintInput,
 ) -> Result<()> {
+    if (mint_input.multiplier_denominator != 1 || mint_input.multiplier_numerator != 1 ) && !deployment.require_creator_cosign {
+        return Err(FairLaunchError::MultiplierMissMatch.into())
+    }
+
+    hashlist_marker.multiplier_denominator = mint_input.multiplier_denominator;
+    hashlist_marker.multiplier_numerator = mint_input.multiplier_numerator;
+
+
     if !deployment.deployment_type.eq(&TOKEN2022_DEPLOYMENT_TYPE) && !deployment.deployment_type.eq(&HYBRID_DEPLOYMENT_TYPE){
         return Err(FairLaunchError::IncorrectMintType.into())
     }

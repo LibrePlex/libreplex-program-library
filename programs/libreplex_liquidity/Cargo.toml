@@ -16,7 +16,7 @@ no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
 default = []
-idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build","anchor-lang/idl-build"]
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build","anchor-lang/idl-build", "libreplex_fair_launch/idl-build"]
 
 [dependencies]
 anchor-lang = {version = "~0.29", features = ["init-if-needed"]}

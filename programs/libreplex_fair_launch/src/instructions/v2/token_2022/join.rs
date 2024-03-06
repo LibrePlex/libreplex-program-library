@@ -9,6 +9,7 @@ use spl_token_2022::extension::{group_pointer::GroupPointer, BaseStateWithExtens
 use spl_token_2022::extension::metadata_pointer::MetadataPointer;
 
 
+use crate::MintInput;
 use crate::{
     errors::FairLaunchError, Deployment, HashlistMarker, TOKEN2022_DEPLOYMENT_TYPE, HYBRID_DEPLOYMENT_TYPE, 
     mint_token2022_logic, DeploymentConfig,
@@ -91,7 +92,7 @@ pub struct JoinCtx<'info> {
 
 }
 
-pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> Result<()> {
+pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, input: MintInput) -> Result<()> {
     let deployment = &mut ctx.accounts.deployment;
     let deployment_config = &mut ctx.accounts.deployment_config;
     let payer = &ctx.accounts.payer; 
@@ -148,8 +149,9 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> R
         minter, 
         non_fungible_token_account.as_ref(), 
         hashlist,
+        &mut ctx.accounts.hashlist_marker,
     ctx.bumps.deployment,
-ctx.remaining_accounts, &signer, false)?;
+ctx.remaining_accounts, &signer, false, input)?;
 
     
 

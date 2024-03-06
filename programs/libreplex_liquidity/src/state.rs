@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 
 pub const DEPLOYMENT_TYPE_NFT: u8 = 0;
 pub const DEPLOYMENT_TYPE_SPL: u8 = 1;
+pub const DEPLOYMENT_TYPE_NFT_JOIN: u8 = 2;
 
 #[account]
 #[derive(InitSpace)]

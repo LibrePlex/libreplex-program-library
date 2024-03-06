@@ -5,7 +5,7 @@ use anchor_spl::{
 use libreplex_shared::operations::transfer_generic_spl;
 
 use crate::{events, Liquidity, DEPLOYMENT_TYPE_SPL};
-use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment};
+use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment, MintInput};
 
 #[derive(Accounts)]
 pub struct MintSplCtx<'info> {
@@ -152,7 +152,10 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
             system_program: ctx.accounts.system_program.to_account_info(),
         },
         &[seeds],
-    ).with_remaining_accounts(remaining_accounts_mint_pooled))?;
+    ).with_remaining_accounts(remaining_accounts_mint_pooled), MintInput {
+        multiplier_denominator: 1,
+        multiplier_numerator: 1,
+    })?;
 
 
     libreplex_fair_launch::cpi::swap_to_fungible22(

@@ -44,8 +44,8 @@ pub mod libreplex_liquidity {
         mint_handler(ctx)
     }
 
-    pub fn join<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>) -> Result<()> {
-        join_handler(ctx)
+    pub fn join<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, input: JoinInput) -> Result<()> {
+        join_handler(ctx, input)
     }
 
     pub fn create_lookup_table(ctx: Context<CreateLookupTableForLiquidityCtx>,

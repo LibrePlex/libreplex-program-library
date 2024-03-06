@@ -44,7 +44,7 @@ pub struct MintToken2022Ctx<'info> {
     pub hashlist: UncheckedAccount<'info>,
 
     #[account(init, 
-        space = 8,
+        space = 8 + HashlistMarker::INIT_SPACE,
         payer = payer,
         seeds = ["hashlist_marker".as_bytes(), 
         deployment.key().as_ref(),
@@ -98,12 +98,35 @@ pub struct MintToken2022Ctx<'info> {
 
 }
 
-pub fn mint_token2022<'info>(ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>) -> Result<()> {
-    // let MintToken2022Ctx { 
-      
-    //     ..
-    // } = &ctx.accounts;
+#[derive(AnchorSerialize)]
+pub struct MintInput {
+    pub multiplier_numerator: u16,
+    pub multiplier_denominator: u16,
+}
 
+impl AnchorDeserialize for MintInput {
+    fn deserialize_reader<R: std::io::prelude::Read>(reader: &mut R) -> std::io::Result<Self> {
+        let maybe_multiplier_numerator: std::io::Result<u16> = AnchorDeserialize::deserialize_reader(reader);
+        let maybe_multiplier_denominator: std::io::Result<u16> = AnchorDeserialize::deserialize_reader(reader);
+
+        if maybe_multiplier_numerator.is_ok() && maybe_multiplier_denominator.is_ok()  {
+            return Ok(Self {
+                multiplier_numerator: maybe_multiplier_numerator.unwrap(),
+                multiplier_denominator: maybe_multiplier_denominator.unwrap(),
+            })
+        }
+
+        return Ok(Self {
+            multiplier_numerator: 1, 
+            multiplier_denominator: 1,
+        });
+    }
+}
+
+pub fn mint_token2022<'info>(
+    ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>, 
+    input: MintInput
+) -> Result<()> {
     let payer = &ctx.accounts.payer; 
     let signer = &ctx.accounts.signer;
     let minter= &ctx.accounts.minter;
@@ -114,19 +137,11 @@ pub fn mint_token2022<'info>(ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'i
     let system_program = &ctx.accounts.system_program;
     let fungible_mint = &ctx.accounts.fungible_mint;
 
-    
-
     // mutable borrows
     let deployment = &mut ctx.accounts.deployment;
     let deployment_config = &mut ctx.accounts.deployment_config;
     let creator_fee_treasury = &mut ctx.accounts.creator_fee_treasury;
     let hashlist = &mut ctx.accounts.hashlist;
-
-
-    // if deployment.ticker == "BANANA22" 
-    // || deployment.mint_template == format!("{{\"p\":\"spl-20\",\"op\":\"mint\",\"tick\":\"{}\",\"amt\":{}}}", deployment.ticker, deployment.ticker) {
-    //     deployment.mint_template = format!("{{\"p\":\"spl-20\",\"op\":\"mint\",\"tick\":\"{}\",\"amt\":{}}}", deployment.ticker, deployment.limit_per_mint);
-    // }
 
     mint_token2022_logic(
         deployment, 
@@ -141,9 +156,9 @@ pub fn mint_token2022<'info>(ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'i
         minter, 
         non_fungible_token_account, 
         hashlist,
-    ctx.bumps.deployment,
-ctx.remaining_accounts, &signer, true)?;
+        &mut ctx.accounts.hashlist_marker,
+        ctx.bumps.deployment,
+        ctx.remaining_accounts, &signer, true, input)?;
 
-    
     Ok(())
 }

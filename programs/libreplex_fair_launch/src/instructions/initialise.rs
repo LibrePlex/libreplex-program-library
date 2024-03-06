@@ -1,8 +1,8 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 
 
 
-use crate::{errors::FairLaunchError, Deployment, DeploymentConfig, NewDeploymentEvent, NewDeploymentV2, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT};
+use crate::{errors::FairLaunchError, Deployment, DeploymentConfig, InitialiseInputV2, NewDeploymentEvent, NewDeploymentV2, HYBRID_DEPLOYMENT_TYPE, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT, TOKEN2022_DEPLOYMENT_TYPE};
 
 
 pub mod sysvar_instructions_program {
@@ -54,22 +54,26 @@ pub struct InitialiseInput {
     pub deployment_type: u8,
 }
 
-pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
-    let deployment = &mut ctx.accounts.deployment;
-    let payer = &ctx.accounts.payer;
 
-    // set default values - v2 endpoint allows the setting of these
-    deployment.require_creator_cosign = false;
-    deployment.use_inscriptions = true;
-    deployment.deployment_type = input.deployment_type;
-
-    // setting creator equal to payer - use v2 endpoints to control this and override as desired
-    initialise_logic(input, deployment, payer.key(), None)
-}
-
-pub fn initialise_logic(input: InitialiseInput, 
+pub fn initialise_logic(input: InitialiseInputV2, 
     deployment: &mut Account<'_, Deployment>, 
-    creator: Pubkey, config: Option<&DeploymentConfig>) -> Result<()> {
+    creator: Pubkey, config: &mut DeploymentConfig) -> Result<()> {
+    let deployment_type = input.deployment_type;
+
+    if deployment_type != TOKEN2022_DEPLOYMENT_TYPE && deployment_type != HYBRID_DEPLOYMENT_TYPE{
+        panic!("Bad deployment type")
+    }
+    
+    if deployment_type == HYBRID_DEPLOYMENT_TYPE && input.deflation_rate_per_swap > 0{
+        panic!("Non-zero deflation rate requires a token-2022 deployment")
+    }
+
+
+    config.creator_fee_treasury = input.creator_fee_treasury;
+    config.creator_fee_per_mint_lamports = input.creator_fee_per_mint_in_lamports;
+    config.deflation_rate_per_swap = input.deflation_rate_per_swap;
+
+        
     if input.ticker.len() > TICKER_LIMIT {
         return Err(FairLaunchError::TickerTooLong.into());
     }
@@ -101,6 +105,17 @@ pub fn initialise_logic(input: InitialiseInput,
         (10_u64).checked_pow(input.decimals as u32).unwrap()).unwrap();
     
 
+
+    deployment.require_creator_cosign = input.creator_cosign_program_id.is_some();
+
+    config.cosigner_program_id = match input.creator_cosign_program_id {
+        Some(x) => x,
+        _ => system_program::ID
+    };
+
+
+    deployment.use_inscriptions = input.use_inscriptions;
+
     // Try avoid blowing up the stack
     emit_init(deployment, config);
     // for now, we limit ticker sizes to 12 bytes 
@@ -108,7 +123,7 @@ pub fn initialise_logic(input: InitialiseInput,
     Ok(())
 }
 
-fn emit_init(deployment: &Deployment, config: Option<&DeploymentConfig>) {
+fn emit_init(deployment: &Deployment, config: &DeploymentConfig) {
     emit!(NewDeploymentV2 {
         creator: deployment.creator,
         limit_per_mint: deployment.limit_per_mint,
@@ -121,8 +136,6 @@ fn emit_init(deployment: &Deployment, config: Option<&DeploymentConfig>) {
         deployment_template: deployment.deployment_template.clone(),
         mint_template: deployment.mint_template.clone(),
         deployment_type: deployment.deployment_type,
-        config: config.map(|o| {
-            o.clone()
-        })
+        config: Some(config.clone())
     });
 }
