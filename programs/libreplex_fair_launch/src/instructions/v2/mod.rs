@@ -18,6 +18,9 @@ pub use relinquish_cosigner::*;
 pub use initialise::*;
 pub mod initialise;
 
+pub use reduce_mint_count::*;
+pub mod reduce_mint_count;
+
 
 pub use shared_logic::*;
 pub mod shared_logic;

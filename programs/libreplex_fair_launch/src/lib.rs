@@ -65,6 +65,13 @@ pub mod libreplex_fair_launch {
     ) -> Result<()> {
         instructions::switch_deployment_type(ctx, deployment_type)
     }
+
+    pub fn reduce_mint_count<'info>(
+        ctx: Context<'_, '_, '_, 'info, ReduceMintCountCtx<'info>>,
+        input: ReduceMintCountInput
+    ) -> Result<()> {
+        instructions::reduce_mint_count(ctx, input)
+    }
    
     pub fn mint_token22<'info>(
         ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>,

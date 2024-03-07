@@ -307,6 +307,39 @@ export type LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "reduceMintCount",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "ReduceMintCountInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "mintToken22",
       "accounts": [
         {
@@ -560,140 +593,6 @@ export type LibreplexFairLaunch = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "deployLegacy",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "hashlist",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "fungibleMint",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "fungibleEscrowTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "fungibleMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nonFungibleMint",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "nonFungibleMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nonFungibleMasterEdition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nonFungibleTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionSummary",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscription",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV3",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionData",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadataProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "sysvarInstructions",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initialise",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "InitialiseInput"
-          }
-        }
-      ]
     },
     {
       "name": "mintLegacy",
@@ -1258,46 +1157,6 @@ export type LibreplexFairLaunch = {
   ],
   "types": [
     {
-      "name": "InitialiseInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "limitPerMint",
-            "type": "u64"
-          },
-          {
-            "name": "maxNumberOfTokens",
-            "type": "u64"
-          },
-          {
-            "name": "decimals",
-            "type": "u8"
-          },
-          {
-            "name": "ticker",
-            "type": "string"
-          },
-          {
-            "name": "deploymentTemplate",
-            "type": "string"
-          },
-          {
-            "name": "mintTemplate",
-            "type": "string"
-          },
-          {
-            "name": "offchainUrl",
-            "type": "string"
-          },
-          {
-            "name": "deploymentType",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
       "name": "InitialiseInputV2",
       "type": {
         "kind": "struct",
@@ -1355,6 +1214,18 @@ export type LibreplexFairLaunch = {
           {
             "name": "deflationRatePerSwap",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReduceMintCountInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
           }
         ]
       }
@@ -1934,6 +1805,39 @@ export const IDL: LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "reduceMintCount",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "ReduceMintCountInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "mintToken22",
       "accounts": [
         {
@@ -2187,140 +2091,6 @@ export const IDL: LibreplexFairLaunch = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "deployLegacy",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "hashlist",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "fungibleMint",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "fungibleEscrowTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "fungibleMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nonFungibleMint",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "nonFungibleMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nonFungibleMasterEdition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nonFungibleTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionSummary",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscription",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionV3",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionData",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inscriptionsProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadataProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "sysvarInstructions",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initialise",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "InitialiseInput"
-          }
-        }
-      ]
     },
     {
       "name": "mintLegacy",
@@ -2885,46 +2655,6 @@ export const IDL: LibreplexFairLaunch = {
   ],
   "types": [
     {
-      "name": "InitialiseInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "limitPerMint",
-            "type": "u64"
-          },
-          {
-            "name": "maxNumberOfTokens",
-            "type": "u64"
-          },
-          {
-            "name": "decimals",
-            "type": "u8"
-          },
-          {
-            "name": "ticker",
-            "type": "string"
-          },
-          {
-            "name": "deploymentTemplate",
-            "type": "string"
-          },
-          {
-            "name": "mintTemplate",
-            "type": "string"
-          },
-          {
-            "name": "offchainUrl",
-            "type": "string"
-          },
-          {
-            "name": "deploymentType",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
       "name": "InitialiseInputV2",
       "type": {
         "kind": "struct",
@@ -2982,6 +2712,18 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "deflationRatePerSwap",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReduceMintCountInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
           }
         ]
       }
