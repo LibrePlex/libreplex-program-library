@@ -37,6 +37,19 @@ pub fn mint_token2022_logic<'info>(
         return Err(FairLaunchError::MultiplierMissMatch.into())
     }
 
+    let multiplier = mint_input.multiplier_numerator / mint_input.multiplier_denominator;
+
+    if multiplier > 1 {
+        if let Some(upper_limit) = deployment_config.multiplier_upper_limit {
+            if multiplier > upper_limit {
+                return Err(FairLaunchError::MultiplierMissMatch.into())
+            }
+        } 
+        else {
+            return Err(FairLaunchError::MultiplierMissMatch.into())
+        }
+    }
+
     hashlist_marker.multiplier_denominator = mint_input.multiplier_denominator;
     hashlist_marker.multiplier_numerator = mint_input.multiplier_numerator;
 

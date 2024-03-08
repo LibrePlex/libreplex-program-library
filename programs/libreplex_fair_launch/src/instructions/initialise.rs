@@ -2,7 +2,7 @@ use anchor_lang::{prelude::*, system_program};
 
 
 
-use crate::{errors::FairLaunchError, Deployment, DeploymentConfig, InitialiseInputV2, NewDeploymentEvent, NewDeploymentV2, HYBRID_DEPLOYMENT_TYPE, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT, TOKEN2022_DEPLOYMENT_TYPE};
+use crate::{errors::FairLaunchError, Deployment, DeploymentConfig, InitialiseInputV2, InitialiseInputV3, NewDeploymentEvent, NewDeploymentV2, HYBRID_DEPLOYMENT_TYPE, OFFCHAIN_URL_LIMIT, TEMPLATE_LIMIT, TICKER_LIMIT, TOKEN2022_DEPLOYMENT_TYPE};
 
 
 pub mod sysvar_instructions_program {
@@ -55,7 +55,7 @@ pub struct InitialiseInput {
 }
 
 
-pub fn initialise_logic(input: InitialiseInputV2, 
+pub fn initialise_logic(input: InitialiseInputV3, 
     deployment: &mut Account<'_, Deployment>, 
     creator: Pubkey, config: &mut DeploymentConfig) -> Result<()> {
     let deployment_type = input.deployment_type;
@@ -72,6 +72,7 @@ pub fn initialise_logic(input: InitialiseInputV2,
     config.creator_fee_treasury = input.creator_fee_treasury;
     config.creator_fee_per_mint_lamports = input.creator_fee_per_mint_in_lamports;
     config.deflation_rate_per_swap = input.deflation_rate_per_swap;
+    config.multiplier_upper_limit = input.multiplier_upper_limit;
 
         
     if input.ticker.len() > TICKER_LIMIT {

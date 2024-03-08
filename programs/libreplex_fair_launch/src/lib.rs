@@ -23,6 +23,10 @@ pub mod libreplex_fair_launch {
         instructions::initialise_v2(ctx, input)
     }
 
+    pub fn initialise_v3(ctx: Context<InitialiseV3Ctx>, input: InitialiseInputV3) -> Result<()> {
+        instructions::initialise_v3(ctx, input)
+    }
+
     pub fn deploy_token22(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
         instructions::deploy_token_2022(ctx)
     }

@@ -41,6 +41,44 @@ export type LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "initialiseV3",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialiseInputV3"
+          }
+        }
+      ]
+    },
+    {
       "name": "deployToken22",
       "accounts": [
         {
@@ -1384,6 +1422,74 @@ export type LibreplexFairLaunch = {
           {
             "name": "deflationRatePerSwap",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitialiseInputV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limitPerMint",
+            "type": "u64"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "name": "deploymentTemplate",
+            "type": "string"
+          },
+          {
+            "name": "mintTemplate",
+            "type": "string"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          },
+          {
+            "name": "creatorCosignProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "useInscriptions",
+            "type": "bool"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          },
+          {
+            "name": "creatorFeeTreasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "creatorFeePerMintInLamports",
+            "type": "u64"
+          },
+          {
+            "name": "deflationRatePerSwap",
+            "type": "u16"
+          },
+          {
+            "name": "multiplierUpperLimit",
+            "type": {
+              "option": "u16"
+            }
           }
         ]
       }
@@ -1724,6 +1830,44 @@ export const IDL: LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "initialiseV3",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialiseInputV3"
+          }
+        }
+      ]
+    },
+    {
       "name": "deployToken22",
       "accounts": [
         {
@@ -3067,6 +3211,74 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "deflationRatePerSwap",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitialiseInputV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limitPerMint",
+            "type": "u64"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "name": "deploymentTemplate",
+            "type": "string"
+          },
+          {
+            "name": "mintTemplate",
+            "type": "string"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          },
+          {
+            "name": "creatorCosignProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "useInscriptions",
+            "type": "bool"
+          },
+          {
+            "name": "deploymentType",
+            "type": "u8"
+          },
+          {
+            "name": "creatorFeeTreasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "creatorFeePerMintInLamports",
+            "type": "u64"
+          },
+          {
+            "name": "deflationRatePerSwap",
+            "type": "u16"
+          },
+          {
+            "name": "multiplierUpperLimit",
+            "type": {
+              "option": "u16"
+            }
           }
         ]
       }
