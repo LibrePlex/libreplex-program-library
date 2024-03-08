@@ -9,6 +9,9 @@ pub use initialise::*;
 pub mod relinquish_cosigner;
 pub use relinquish_cosigner::*;
 
+pub mod reduce_mint_count;
+pub use reduce_mint_count::*;
+
 pub mod create_lookup_table_for_liquidity;
 pub use create_lookup_table_for_liquidity::*;
 
@@ -45,6 +48,13 @@ pub mod libreplex_liquidity {
 
     pub fn initialise(ctx: Context<Initialise>, input: InitialiseInput) -> Result<()> {
         init_handler(ctx, input)
+    }
+
+    pub fn reduce_mint_count<'info>(
+        ctx: Context<'_, '_, '_, 'info, ReduceMintCountCtx<'info>>,
+        input: ReduceMintCountInputLiquidity
+    ) -> Result<()> {
+        handle_reduce_mint_count(ctx, input)
     }
     
    

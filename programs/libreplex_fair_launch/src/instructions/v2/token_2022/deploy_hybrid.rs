@@ -36,12 +36,12 @@ pub struct DeployHybridCtx<'info> {
         seeds=["deployment".as_bytes(), deployment.ticker.as_bytes()],
         bump
     )]
-    pub deployment: Account<'info, Deployment>,
+    pub deployment: Box<Account<'info, Deployment>>,
 
     #[account(init_if_needed, seeds = ["hashlist".as_bytes(), 
     deployment.key().as_ref()],
     bump, payer = payer, space = 8 + 32 + 4)]
-    pub hashlist: Account<'info, Hashlist>,
+    pub hashlist: Box<Account<'info, Hashlist>>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -57,7 +57,7 @@ pub struct DeployHybridCtx<'info> {
         mint::freeze_authority = deployment,
         mint::authority = deployment, 
         mint::decimals = deployment.decimals)]
-    pub fungible_mint: Account<'info, Mint>,
+    pub fungible_mint: Box<Account<'info, Mint>>,
     
     /// CHECK: Passed via CPI
     #[account(mut)]
@@ -71,7 +71,7 @@ pub struct DeployHybridCtx<'info> {
     #[account(init, 
         associated_token::mint = fungible_mint, 
         payer = payer, associated_token::authority = deployment)]
-    pub fungible_escrow_token_account: Account<'info, TokenAccount>,
+    pub fungible_escrow_token_account: Box<Account<'info, TokenAccount>>,
 
     /* INITIALISE NON_FUNGIBLE ACCOUNTS. NB: no token account neede until mint */
     // #[account(mut)]
@@ -137,11 +137,11 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
     deploy_hybrid_logic(
         hashlist,
         deployment,
-        fungible_mint.as_ref(),
+        &fungible_mint.to_account_info(),
         fungible_metadata,
         fungible_master_edition,
         payer,
-        fungible_escrow_token_account.as_ref(),
+        &fungible_escrow_token_account.to_account_info(),
         token_program,
         associated_token_program,
         system_program,
