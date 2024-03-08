@@ -11,10 +11,16 @@ use crate::{EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL
 pub struct InitialiseInput {
     pub max_number_of_tokens: u64, // this is the max *number* of tokens
     pub symbol: String,
+     // add curlies if you want this to be created dynamically. For example
+    // hippo #{} -> turns into hippo #0, hippo #1, etc
+    // without curlies the url is the same for all mints 
     pub name: String,
-    pub offchain_url: String, // used both for the fungible and the non-fungible
+    // add curlies if you want this to be created dynamically. For example
+    // ipfs://pippo/{} -> turns into ipfs://pippo/1, ipfs://pippo/2, etc
+    // without curlies the url is the same for all mints 
+    pub offchain_url: String,
     pub creator_cosign_program_id: Option<Pubkey>,
-    pub add_counter_to_name: bool
+
 }
 
 
@@ -37,7 +43,7 @@ pub struct InitialiseCtx<'info>  {
 
     // can be different from payer for PDA integration
     #[account(mut)]
-    pub creator: Signer<'info>,
+    pub creator: UncheckedAccount<'info>,
 
 
     #[account(mut)]
@@ -66,6 +72,26 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
 
     let group_mint = &ctx.accounts.group_mint;
 
+
+
+    let url_is_template = match input.offchain_url.matches("{}").count() {
+        0 => false,
+        1 => true,
+        _ => {
+            panic!("Only one set of curlies ({{}}) can be specified. url had multiple");
+        }
+    };
+
+
+    let name_is_template = match input.name.matches("{}").count() {
+        0 => false,
+        1 => true,
+        _ => {
+            panic!("Only one set of curlies ({{}}) can be specified. name had multiple");
+        }
+    };
+  
+
     ctx.accounts.editions_deployment.set_inner(EditionsDeployment {
         creator: ctx.accounts.creator.key(),
         max_number_of_tokens: input.max_number_of_tokens,
@@ -77,9 +103,10 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         },
         symbol: input.symbol,
         name: input.name,
+        url_is_template,
+        name_is_template,
         offchain_url: input.offchain_url,
-        add_counter_to_name: input.add_counter_to_name,
-        padding: [0; 99],
+        padding: [0; 98],
     });
 
 

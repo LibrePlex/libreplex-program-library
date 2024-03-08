@@ -4,7 +4,7 @@ use anchor_spl::{
     token::{spl_token, Token},
     token_interface::spl_token_2022
 };
-use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment, DeploymentConfig, Hashlist};
+use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment, DeploymentConfig};
 use libreplex_liquidity::{cpi::accounts::MintSplCtx, program::LibreplexLiquidity, Liquidity};
 
 use libreplex_shared::{operations::transfer_generic_spl, sysvar_instructions_program};
@@ -44,11 +44,12 @@ pub struct AddLiquidityCtx<'info> {
         bump)]
     pub deployment_config: Account<'info, DeploymentConfig>,
 
+     /// CHECK: Checked via CPI
     #[account(mut, seeds = ["hashlist".as_bytes(), 
         deployment.key().as_ref()],
         seeds::program = libreplex_fair_launch_program.key(),
         bump)]
-    pub hashlist: Account<'info, Hashlist>,
+    pub hashlist: UncheckedAccount<'info>,
 
     /// CHECK: Passed in via CPI
     #[account(mut)]

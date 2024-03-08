@@ -7,6 +7,9 @@ declare_id!("Eddy2qpzTgTfUvNJ271Wgfw3RF2LsbmRJdNTSnZajmU3");
 pub mod errors;
 pub mod state;
 
+pub mod logic;
+pub use logic::*;
+
 pub use state::*;
 
 #[program]

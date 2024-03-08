@@ -1,17 +1,16 @@
 
-
+use dyn_fmt::AsStrFormatExt;
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{
     associated_token::AssociatedToken, token_2022, token_interface::Mint
 };
 
 
-use libreplex_fair_launch::{add_to_hashlist, mint_non_fungible_2022_logic};
-use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, SharedError, TokenMemberInput};
+use libreplex_shared::{create_token_2022_and_metadata, operations::mint_non_fungible_2022_logic, MintAccounts2022, SharedError, TokenMemberInput};
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::TokenMetadata;
 
-use crate::{errors::EditionsError, EditionsDeployment, HashlistMarker};
+use crate::{add_to_hashlist, errors::EditionsError, EditionsDeployment, HashlistMarker};
 
 
 
@@ -45,7 +44,8 @@ pub struct MintCtx<'info> {
 
     // when deployment.require_creator_cosign is true, this must be equal to the creator
     // of the deployment otherwise, can be any signer account
-    #[account(mut)]
+    #[account(mut,
+        constraint = editions_deployment.cosigner_program_id == system_program::ID || signer.key() == editions_deployment.creator)]
     pub signer: Signer<'info>,
 
     /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
@@ -130,9 +130,14 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
 
 
 
-    let name = match editions_deployment.add_counter_to_name {
-        true => format!("{} #{}", editions_deployment.name.clone(), editions_deployment.number_of_tokens_issued+1),
+    let name = match editions_deployment.name_is_template {
+        true => editions_deployment.name.format(&[editions_deployment.number_of_tokens_issued+1]),
         false => editions_deployment.name.clone()
+    };
+
+    let url = match editions_deployment.url_is_template {
+        true => editions_deployment.offchain_url.format(&[editions_deployment.number_of_tokens_issued+1]),
+        false => editions_deployment.offchain_url.clone()
     };
     // msg!("Create token 2022 w/ metadata");
     create_token_2022_and_metadata(
@@ -147,7 +152,7 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         Some(TokenMetadata {
             name,
             symbol: editions_deployment.symbol.clone(),
-            uri: editions_deployment.offchain_url.clone(),
+            uri: url,
             update_authority,
             mint: mint.key(),
             additional_metadata: vec![],
@@ -180,7 +185,6 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         payer,
         system_program,
         &mint.key(),
-        &editions_deployment.key(),
         editions_deployment.number_of_tokens_issued,
     )?;
     

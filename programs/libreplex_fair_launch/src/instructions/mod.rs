@@ -3,17 +3,9 @@
     initialises a new launch. does not create any 
     on-chain accounts, mints, token accounts etc 
 */
-pub mod initialise;
-pub use initialise::*;
+pub mod initialise_logic;
+pub use initialise_logic::*;
 
-
-/* 
-    deploys - i.e created mints, token accounts,
-    and deploy inscription
- */
-
-pub mod deploy_legacy;
-pub use deploy_legacy::*;
 
 // this can be done before redeploy
 pub mod switch_deployment_type;

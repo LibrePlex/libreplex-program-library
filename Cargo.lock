@@ -1456,6 +1456,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dyn-fmt"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2a0836c9bd73a9d3ca55b0effc5b1eedf96dd13ef994389bcac6d4d33c46188"
+
+[[package]]
 name = "eager"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2259,17 +2265,30 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "arrayref",
- "bubblegum-proxy",
- "libreplex_fair_launch",
- "libreplex_inscriptions",
- "libreplex_legacy",
+ "dyn-fmt",
  "libreplex_shared",
- "mpl-token-metadata",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
- "spl-account-compression",
- "spl-compression-proxy",
+ "spl-pod",
+ "spl-token-2022 1.0.0",
+ "spl-token-group-interface",
+ "spl-token-metadata-interface",
+ "spl-type-length-value",
+]
+
+[[package]]
+name = "libreplex_editions_controls"
+version = "0.2.1"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "arrayref",
+ "libreplex_editions",
+ "libreplex_shared",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
  "spl-pod",
  "spl-token-2022 1.0.0",
  "spl-token-group-interface",

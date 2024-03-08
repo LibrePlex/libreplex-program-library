@@ -76,6 +76,13 @@ pub mod libreplex_fair_launch {
     ) -> Result<()> {
         instructions::switch_deployment_type(ctx, deployment_type)
     }
+
+    pub fn reduce_mint_count<'info>(
+        ctx: Context<'_, '_, '_, 'info, ReduceMintCountCtx<'info>>,
+        input: ReduceMintCountInput
+    ) -> Result<()> {
+        instructions::reduce_mint_count(ctx, input)
+    }
    
     pub fn mint_token22<'info>(
         ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>,
@@ -91,10 +98,6 @@ pub mod libreplex_fair_launch {
         instructions::swap_to_nonfungible_2022(ctx)
     }
     
-    pub fn deploy_legacy<'f>(ctx: Context<'_, '_, '_, 'f, DeployLegacyCtx<'f>>) -> Result<()> {
-        instructions::deploy_legacy::deploy(ctx)
-    }
-
     pub fn mint_legacy<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyCtx<'info>>) -> Result<()> {
         instructions::mint_legacy::mint_legacy(ctx)
     }

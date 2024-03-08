@@ -7,10 +7,10 @@ use spl_token_metadata_interface::state::TokenMetadata;
 
 // use libreplex_shared::sysvar_instructions_program;
 
-use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, SharedError, TokenMemberInput};
+use libreplex_shared::{create_token_2022_and_metadata, operations::mint_non_fungible_2022_logic, MintAccounts2022, SharedError, TokenMemberInput};
 
 use crate::{
-    create_fair_launch_inscriptions, errors::FairLaunchError, mint_non_fungible_2022_logic, update_deployment_and_hashlist, Deployment, DeploymentConfig, HashlistMarker, MintInput, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE
+    create_fair_launch_inscriptions, errors::FairLaunchError, update_deployment_and_hashlist, Deployment, DeploymentConfig, HashlistMarker, MintInput, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE
 };
 
 pub fn mint_token2022_logic<'info>(
