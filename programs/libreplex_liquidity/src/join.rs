@@ -112,7 +112,7 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
     let fair_launch = &ctx.accounts.fair_launch;
     let liquidity = &mut ctx.accounts.liquidity;
     
-    if liquidity.deployment_type != DEPLOYMENT_TYPE_NFT_JOIN {
+    if liquidity.deployment_type != DEPLOYMENT_TYPE_NFT {
         panic!("Wrong deployment type. Expected type=0 (NFT), received {}", liquidity.deployment_type)
     }
 
@@ -126,9 +126,10 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
 
     let mut refund_due_to_payer = 0;
 
-    if liquidity.lookup_table_address == system_program::ID {
-        panic!("Lookup table not initialised");
-    }
+    // WHy do you care...
+    // if liquidity.lookup_table_address == system_program::ID {
+    //     panic!("Lookup table not initialised");
+    // }
 
     let should_double_mint = if let Some(required_double_mints) = liquidity.required_double_mints {
         liquidity.total_mints <= required_double_mints as u64
@@ -205,6 +206,14 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
                 &[seeds]
             )
         )?;
+
+        anchor_spl::token_interface::close_account(CpiContext::new_with_signer(ctx.accounts.token_program_22.to_account_info(), 
+        anchor_spl::token_interface::CloseAccount {
+            account: ctx.accounts.pooled_non_fungible_token_account.to_account_info(),
+            destination: ctx.accounts.payer.to_account_info(),
+            authority: liquidity.to_account_info(),
+        }, &[seeds]))?;
+
     }
 
     let remaining_accounts_mint 

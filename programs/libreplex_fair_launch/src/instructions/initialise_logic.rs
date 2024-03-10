@@ -25,7 +25,14 @@ pub fn initialise_logic(input: InitialiseInputV3,
     config.creator_fee_treasury = input.creator_fee_treasury;
     config.creator_fee_per_mint_lamports = input.creator_fee_per_mint_in_lamports;
     config.deflation_rate_per_swap = input.deflation_rate_per_swap;
+
     config.multiplier_limits = Some(input.multiplier_limits);
+
+    if let Some(limits) = config.multiplier_limits.as_ref() {
+        if limits.min_denominator == 0 || limits.max_numerator == 0 {
+            panic!("Invalid multiplier limits");
+        }
+    }
         
     if input.ticker.len() > TICKER_LIMIT {
         return Err(FairLaunchError::TickerTooLong.into());

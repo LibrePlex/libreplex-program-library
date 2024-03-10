@@ -42,7 +42,7 @@ pub struct DeployHybridCtx<'info> {
         seeds=["deployment_config".as_bytes(), deployment.key().as_ref()],
         bump
     )]
-    pub deployment_config: Account<'info, DeploymentConfig>,
+    pub deployment_config: Box<Account<'info, DeploymentConfig>>,
 
     #[account(init_if_needed, seeds = ["hashlist".as_bytes(), 
     deployment.key().as_ref()],

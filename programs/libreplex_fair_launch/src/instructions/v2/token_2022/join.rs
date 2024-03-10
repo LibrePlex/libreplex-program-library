@@ -43,7 +43,7 @@ pub struct JoinCtx<'info> {
     pub hashlist: UncheckedAccount<'info>,
 
     #[account(init, 
-        space = 8,
+        space = 8 + HashlistMarker::INIT_SPACE,
         payer = payer,
         seeds = ["hashlist_marker".as_bytes(), 
         deployment.key().as_ref(),
@@ -71,7 +71,7 @@ pub struct JoinCtx<'info> {
 
     /// CHECK: Will check in instruction
     #[account(associated_token::mint = non_fungible_mint, 
-        associated_token::authority = non_fungible_token_account_owner)]
+        associated_token::authority = non_fungible_token_account_owner, associated_token::token_program = token_program)]
     pub non_fungible_token_account: InterfaceAccount<'info, TokenAccount>,
 
     pub non_fungible_token_account_owner: Signer<'info>,

@@ -32,7 +32,7 @@ pub struct MintLegacyCtx<'info> {
     pub hashlist: UncheckedAccount<'info>,
 
     #[account(init, 
-        space = 8,
+        space = 8 + HashlistMarker::INIT_SPACE,
         payer = payer,
         seeds = ["hashlist_marker".as_bytes(), 
         deployment.key().as_ref(),

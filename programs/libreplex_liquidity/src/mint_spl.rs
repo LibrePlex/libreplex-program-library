@@ -5,7 +5,7 @@ use anchor_spl::{
 use libreplex_shared::operations::transfer_generic_spl;
 
 use crate::{events, Liquidity, DEPLOYMENT_TYPE_SPL};
-use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment, MintInput};
+use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment, HashlistMarker, MintInput};
 
 #[derive(Accounts)]
 pub struct MintSplCtx<'info> {
@@ -196,7 +196,10 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
     // the amount that goes to the minter is r/(r+1) where r = lp_ratio
     // that means 1/r is left in the LP reserve
 
-    let amount_to_transfer_to_minter = deployment.get_fungible_mint_amount().checked_mul(
+    let mut marker_data: &[u8] = &ctx.accounts.hashlist_marker.try_borrow_data()?;
+    let marker = HashlistMarker::try_deserialize(&mut marker_data)?;
+
+    let amount_to_transfer_to_minter = deployment.get_fungible_mint_amount(&marker).checked_mul(
         liquidity.lp_ratio as u64 - 1
     ).unwrap().checked_div(liquidity.lp_ratio as u64).unwrap();
 
