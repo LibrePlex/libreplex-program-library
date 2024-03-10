@@ -1,6 +1,8 @@
 use anchor_lang::{prelude::*, Discriminator};
 use solana_program::pubkey::Pubkey;
 
+use crate::errors::FairLaunchError;
+
 pub const TICKER_LIMIT: usize = 200;
 pub const TEMPLATE_LIMIT: usize = 1200;
 pub const OFFCHAIN_URL_LIMIT: usize = 1200;
@@ -63,6 +65,13 @@ pub struct Deployment {
     pub offchain_url: String, // pub padding: Vec<u8, EXCESS>
 }
 
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize, InitSpace, Debug)]
+pub struct MultiplierLimits {
+    pub max_numerator: u16,
+    pub min_denominator: u16
+}
+
 #[account]
 #[derive(InitSpace)]
 pub struct DeploymentConfig {
@@ -73,7 +82,8 @@ pub struct DeploymentConfig {
     pub deflation_rate_per_swap: u16, // in basis points
     // makes it easier to identify the program / endpoints that need to be called
     pub cosigner_program_id: Pubkey,
-    pub multiplier_upper_limit: Option<u16>,
+
+    pub multiplier_limits: Option<MultiplierLimits>,
 }
 
 impl DeploymentConfig {
@@ -121,16 +131,25 @@ pub struct MintEvent {
 }
 
 impl Deployment {
-    pub fn get_fungible_mint_amount(&self) -> u64 {
+    pub fn get_fungible_mint_amount(&self, traded_marker: &HashlistMarker) -> u64 {
         self.limit_per_mint
+            .checked_mul(traded_marker.multiplier_numerator as u64).unwrap()
+            .checked_div(traded_marker.multiplier_denominator as u64).unwrap()
             .checked_mul(10_u64.checked_pow(self.decimals as u32).unwrap())
             .unwrap()
     }
 
-    pub fn get_max_fungible_mint_amount(&self) -> u64 {
+    pub fn get_max_fungible_mint_amount(&self, config: &DeploymentConfig) -> u64 {
+        let multiplier_limits = config.multiplier_limits.as_ref().unwrap_or(&MultiplierLimits {
+            max_numerator: 1,
+            min_denominator: 1,
+        });
+
         self.max_number_of_tokens
             .checked_mul(self.limit_per_mint)
             .unwrap()
+            .checked_mul(multiplier_limits.max_numerator as u64).unwrap()
+            .checked_div(multiplier_limits.min_denominator as u64).unwrap()
             .checked_mul(10_u64.checked_pow(self.decimals as u32).unwrap())
             .unwrap()
     }
@@ -153,7 +172,7 @@ pub struct Hashlist {
 #[account]
 pub struct MigrationMarker {}
 
-#[derive(Clone, InitSpace)]
+#[derive(Clone, InitSpace, Debug)]
 pub struct HashlistMarker {
     pub multiplier_numerator: u16,
     pub multiplier_denominator: u16,

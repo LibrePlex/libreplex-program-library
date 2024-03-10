@@ -138,7 +138,7 @@ pub fn swap_to_nonfungible_2022<'a>(ctx: Context<'_,'_,'_,'a, SwapToNonFungible2
     };
 
     
-    let mut fungible_amount_to_transfer = deployment.get_fungible_mint_amount();
+    let mut fungible_amount_to_transfer = deployment.get_fungible_mint_amount(&ctx.accounts.hashlist_marker);
     if !deployment_config.data_is_empty() {
         
         let tai = deployment_config.to_account_info();
@@ -147,7 +147,7 @@ pub fn swap_to_nonfungible_2022<'a>(ctx: Context<'_,'_,'_,'a, SwapToNonFungible2
      
         if deployment_config_object.deflation_rate_per_swap > 0 {
             // where there is deflation, adjust accordingly
-            let mut numerator = (deployment.get_fungible_mint_amount() as u128)
+            let mut numerator = (deployment.get_fungible_mint_amount(&ctx.accounts.hashlist_marker) as u128)
                 .checked_mul(10_000_u128)
                 .unwrap();
             let denominator = 10_000_u128

@@ -13,6 +13,25 @@ use crate::{
     create_fair_launch_inscriptions, errors::FairLaunchError, update_deployment_and_hashlist, Deployment, DeploymentConfig, HashlistMarker, MintInput, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE
 };
 
+pub fn validate_new_multiplier(mint_input: &MintInput, config: &DeploymentConfig, deployment: &Deployment) -> Result<()> {
+    if (mint_input.multiplier_denominator != 1 || mint_input.multiplier_numerator != 1 ) && !deployment.require_creator_cosign {
+        return Err(FairLaunchError::MultiplierMissMatch.into())
+    }
+
+    if mint_input.multiplier_denominator != 1 || mint_input.multiplier_numerator != 1 {
+        if let Some(limit) = config.multiplier_limits.as_ref() {
+            if mint_input.multiplier_denominator < limit.min_denominator || 
+            mint_input.multiplier_numerator > limit.max_numerator {
+                return Err(FairLaunchError::MultiplierMissMatch.into())
+            }
+        } else {
+            return Err(FairLaunchError::MultiplierMissMatch.into())
+        }
+    }
+
+    Ok(())
+}
+
 pub fn mint_token2022_logic<'info>(
     deployment: &mut Account<'info, Deployment>,
     deployment_config: &mut Account<'info, DeploymentConfig>,
@@ -33,22 +52,7 @@ pub fn mint_token2022_logic<'info>(
     create_the_nft: bool,
     mint_input: MintInput,
 ) -> Result<()> {
-    if (mint_input.multiplier_denominator != 1 || mint_input.multiplier_numerator != 1 ) && !deployment.require_creator_cosign {
-        return Err(FairLaunchError::MultiplierMissMatch.into())
-    }
-
-    let multiplier = mint_input.multiplier_numerator / mint_input.multiplier_denominator;
-
-    if multiplier > 1 {
-        if let Some(upper_limit) = deployment_config.multiplier_upper_limit {
-            if multiplier > upper_limit {
-                return Err(FairLaunchError::MultiplierMissMatch.into())
-            }
-        } 
-        else {
-            return Err(FairLaunchError::MultiplierMissMatch.into())
-        }
-    }
+    validate_new_multiplier(&mint_input, &deployment_config, &deployment)?;
 
     hashlist_marker.multiplier_denominator = mint_input.multiplier_denominator;
     hashlist_marker.multiplier_numerator = mint_input.multiplier_numerator;

@@ -142,6 +142,7 @@ pub fn swap_metaplex_to_fungible(ctx: Context<SwapLegacyToFungibleCtx>) -> Resul
         associated_token_program,
         system_program,
         authority_seeds,
+        &ctx.accounts.hashlist_marker,
     )?;
 
     Ok(())

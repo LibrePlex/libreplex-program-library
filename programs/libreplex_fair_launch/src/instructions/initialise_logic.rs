@@ -25,8 +25,7 @@ pub fn initialise_logic(input: InitialiseInputV3,
     config.creator_fee_treasury = input.creator_fee_treasury;
     config.creator_fee_per_mint_lamports = input.creator_fee_per_mint_in_lamports;
     config.deflation_rate_per_swap = input.deflation_rate_per_swap;
-    config.multiplier_upper_limit = input.multiplier_upper_limit;
-
+    config.multiplier_limits = Some(input.multiplier_limits);
         
     if input.ticker.len() > TICKER_LIMIT {
         return Err(FairLaunchError::TickerTooLong.into());

@@ -7,7 +7,7 @@ use anchor_spl::{
 use libreplex_shared::operations::transfer_non_pnft;
 // use libreplex_shared::operations::transfer_non_pnft;
 
-use crate::Deployment;
+use crate::{Deployment, HashlistMarker};
 
 pub mod sysvar_instructions_program {
     use anchor_lang::declare_id;
@@ -24,6 +24,7 @@ pub fn move_fungible_into_escrow<'a>(
     associated_token_program: &Program<'a, AssociatedToken>,
     system_program: &Program<'a, System>,
     payer: &Signer<'a>,
+    hashlist_marker: &HashlistMarker,
 ) -> Result<()> {
     transfer_non_pnft(
         &token_program.to_account_info(),
@@ -36,7 +37,7 @@ pub fn move_fungible_into_escrow<'a>(
         &system_program.to_account_info(),
         None,
         &payer.to_account_info(),
-        deployment.get_fungible_mint_amount(),
+        deployment.get_fungible_mint_amount(hashlist_marker),
     )?;
     deployment.escrow_non_fungible_count -= 1;
     Ok(())

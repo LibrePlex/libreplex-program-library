@@ -1,8 +1,5 @@
-use anchor_lang::{prelude::*, system_program};
-
-
-
-use crate::{initialise_logic, Deployment, DeploymentConfig, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE};
+use anchor_lang::prelude::*;
+use crate::{initialise_logic, Deployment, DeploymentConfig, MultiplierLimits};
 
 
 
@@ -44,7 +41,7 @@ pub struct InitialiseInputV3 {
     pub deflation_rate_per_swap: u16,
 
     // The largest possible multiplier
-    pub multiplier_upper_limit: Option<u16>,
+    pub multiplier_limits: MultiplierLimits,
 }
 
 /*
@@ -127,6 +124,7 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
     let InitialiseInputV2 { limit_per_mint, max_number_of_tokens, 
         decimals, ticker, deployment_template,
          mint_template, offchain_url, 
+
          creator_cosign_program_id, use_inscriptions, 
         deployment_type, creator_fee_treasury, 
         creator_fee_per_mint_in_lamports, 
@@ -147,7 +145,10 @@ pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) ->
             creator_fee_treasury,
             creator_fee_per_mint_in_lamports,
             deflation_rate_per_swap,
-            multiplier_upper_limit: None,
+            multiplier_limits: MultiplierLimits {
+                max_numerator: 1,
+                min_denominator: 1,
+            },
         }, 
         deployment, 
         creator.key(), 

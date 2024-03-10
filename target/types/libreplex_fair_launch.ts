@@ -153,6 +153,11 @@ export type LibreplexFairLaunch = {
           "isSigner": false
         },
         {
+          "name": "deploymentConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "hashlist",
           "isMut": true,
           "isSigner": false
@@ -1162,9 +1167,11 @@ export type LibreplexFairLaunch = {
             "type": "publicKey"
           },
           {
-            "name": "multiplierUpperLimit",
+            "name": "multiplierLimits",
             "type": {
-              "option": "u16"
+              "option": {
+                "defined": "MultiplierLimits"
+              }
             }
           }
         ]
@@ -1413,9 +1420,9 @@ export type LibreplexFairLaunch = {
             "type": "u16"
           },
           {
-            "name": "multiplierUpperLimit",
+            "name": "multiplierLimits",
             "type": {
-              "option": "u16"
+              "defined": "MultiplierLimits"
             }
           }
         ]
@@ -1475,9 +1482,11 @@ export type LibreplexFairLaunch = {
             "type": "publicKey"
           },
           {
-            "name": "multiplierUpperLimit",
+            "name": "multiplierLimits",
             "type": {
-              "option": "u16"
+              "option": {
+                "defined": "MultiplierLimits"
+              }
             }
           }
         ]
@@ -1495,6 +1504,22 @@ export type LibreplexFairLaunch = {
           {
             "name": "order",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MultiplierLimits",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxNumerator",
+            "type": "u16"
+          },
+          {
+            "name": "minDenominator",
+            "type": "u16"
           }
         ]
       }
@@ -1881,6 +1906,11 @@ export const IDL: LibreplexFairLaunch = {
           "isSigner": false
         },
         {
+          "name": "deploymentConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "hashlist",
           "isMut": true,
           "isSigner": false
@@ -2890,9 +2920,11 @@ export const IDL: LibreplexFairLaunch = {
             "type": "publicKey"
           },
           {
-            "name": "multiplierUpperLimit",
+            "name": "multiplierLimits",
             "type": {
-              "option": "u16"
+              "option": {
+                "defined": "MultiplierLimits"
+              }
             }
           }
         ]
@@ -3141,9 +3173,9 @@ export const IDL: LibreplexFairLaunch = {
             "type": "u16"
           },
           {
-            "name": "multiplierUpperLimit",
+            "name": "multiplierLimits",
             "type": {
-              "option": "u16"
+              "defined": "MultiplierLimits"
             }
           }
         ]
@@ -3203,9 +3235,11 @@ export const IDL: LibreplexFairLaunch = {
             "type": "publicKey"
           },
           {
-            "name": "multiplierUpperLimit",
+            "name": "multiplierLimits",
             "type": {
-              "option": "u16"
+              "option": {
+                "defined": "MultiplierLimits"
+              }
             }
           }
         ]
@@ -3223,6 +3257,22 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "order",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MultiplierLimits",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxNumerator",
+            "type": "u16"
+          },
+          {
+            "name": "minDenominator",
+            "type": "u16"
           }
         ]
       }

@@ -119,6 +119,7 @@ pub fn swap_to_nonfungible(ctx: Context<SwapFungibleToLegacyCtx>) -> Result<()> 
         associated_token_program,
         system_program,
         payer,
+        &ctx.accounts.hashlist_marker,
     )?;
 
     let authority_seeds = &[

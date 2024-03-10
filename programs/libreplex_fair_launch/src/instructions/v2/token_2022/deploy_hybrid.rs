@@ -5,7 +5,7 @@ use solana_program::system_program;
 
 
 use crate::{
-    Deployment, Hashlist, deploy_hybrid_logic, HYBRID_DEPLOYMENT_TYPE,
+    deploy_hybrid_logic, Deployment, DeploymentConfig, Hashlist, HYBRID_DEPLOYMENT_TYPE
 };
 
 pub mod sysvar_instructions_program {
@@ -36,12 +36,18 @@ pub struct DeployHybridCtx<'info> {
         seeds=["deployment".as_bytes(), deployment.ticker.as_bytes()],
         bump
     )]
-    pub deployment: Account<'info, Deployment>,
+    pub deployment: Box<Account<'info, Deployment>>,
+
+    #[account(
+        seeds=["deployment_config".as_bytes(), deployment.key().as_ref()],
+        bump
+    )]
+    pub deployment_config: Account<'info, DeploymentConfig>,
 
     #[account(init_if_needed, seeds = ["hashlist".as_bytes(), 
     deployment.key().as_ref()],
     bump, payer = payer, space = 8 + 32 + 4)]
-    pub hashlist: Account<'info, Hashlist>,
+    pub hashlist: Box<Account<'info, Hashlist>>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -57,7 +63,7 @@ pub struct DeployHybridCtx<'info> {
         mint::freeze_authority = deployment,
         mint::authority = deployment, 
         mint::decimals = deployment.decimals)]
-    pub fungible_mint: Account<'info, Mint>,
+    pub fungible_mint: Box<Account<'info, Mint>>,
     
     /// CHECK: Passed via CPI
     #[account(mut)]
@@ -71,7 +77,7 @@ pub struct DeployHybridCtx<'info> {
     #[account(init, 
         associated_token::mint = fungible_mint, 
         payer = payer, associated_token::authority = deployment)]
-    pub fungible_escrow_token_account: Account<'info, TokenAccount>,
+    pub fungible_escrow_token_account: Box<Account<'info, TokenAccount>>,
 
     /* INITIALISE NON_FUNGIBLE ACCOUNTS. NB: no token account neede until mint */
     // #[account(mut)]
@@ -107,10 +113,6 @@ pub struct DeployHybridCtx<'info> {
 }
 
 pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
-
-
-
-
     let hashlist = &mut ctx.accounts.hashlist;
     let deployment = &mut ctx.accounts.deployment;
 
@@ -137,11 +139,11 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
     deploy_hybrid_logic(
         hashlist,
         deployment,
-        fungible_mint.as_ref(),
+        fungible_mint.as_ref().as_ref(),
         fungible_metadata,
         fungible_master_edition,
         payer,
-        fungible_escrow_token_account.as_ref(),
+        fungible_escrow_token_account.as_ref().as_ref(),
         token_program,
         associated_token_program,
         system_program,
@@ -149,7 +151,8 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
         rent,
         sysvar_instructions,
         metadata_program,
-        ctx.bumps.deployment
+        ctx.bumps.deployment,
+        &ctx.accounts.deployment_config
     )?;
 
     Ok(())

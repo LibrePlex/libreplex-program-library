@@ -6,20 +6,14 @@ use anchor_spl::{
     token_2022, token_interface::Mint
 };
 
-
-use libreplex_shared::SharedError;
-
-
 use crate::{
-    errors::FairLaunchError, Deployment, HashlistMarker, TOKEN2022_DEPLOYMENT_TYPE, HYBRID_DEPLOYMENT_TYPE, 
+    Deployment, HashlistMarker, 
     mint_token2022_logic, DeploymentConfig,
 };
 
 #[derive(Accounts)]
 pub struct MintToken2022Ctx<'info> {
     #[account(mut,
-       
-
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
 
@@ -32,10 +26,6 @@ pub struct MintToken2022Ctx<'info> {
         constraint = deployment_config.creator_fee_treasury == creator_fee_treasury.key())] 
     pub creator_fee_treasury: UncheckedAccount<'info>,
 
-
-
-    /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
-    
     #[account(mut, 
         
         seeds = ["hashlist".as_bytes(), 
@@ -77,9 +67,6 @@ pub struct MintToken2022Ctx<'info> {
     #[account(mut)]
     pub non_fungible_token_account: UncheckedAccount<'info>,
     
-
-
-
     /* BOILERPLATE PROGRAM ACCOUNTS */
     /// CHECK: Checked in constraint
     #[account(
@@ -89,9 +76,6 @@ pub struct MintToken2022Ctx<'info> {
 
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
-
-
-
 
     #[account()]
     pub system_program: Program<'info, System>,

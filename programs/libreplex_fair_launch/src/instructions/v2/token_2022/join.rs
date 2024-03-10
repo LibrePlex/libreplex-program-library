@@ -5,13 +5,13 @@ use anchor_spl::{
 };
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_2022::extension::group_member_pointer::GroupMemberPointer;
-use spl_token_2022::extension::{group_pointer::GroupPointer, BaseStateWithExtensions};
+use spl_token_2022::extension::BaseStateWithExtensions;
 use spl_token_2022::extension::metadata_pointer::MetadataPointer;
 
 
 use crate::MintInput;
 use crate::{
-    errors::FairLaunchError, Deployment, HashlistMarker, TOKEN2022_DEPLOYMENT_TYPE, HYBRID_DEPLOYMENT_TYPE, 
+    Deployment, HashlistMarker,
     mint_token2022_logic, DeploymentConfig,
 };
 
