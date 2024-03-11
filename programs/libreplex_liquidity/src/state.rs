@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 
 pub const DEPLOYMENT_TYPE_NFT: u8 = 0;
 pub const DEPLOYMENT_TYPE_SPL: u8 = 1;
+pub const DEPLOYMENT_TYPE_NFT_JOIN: u8 = 2;
 
 #[account]
 #[derive(InitSpace)]
@@ -35,7 +36,9 @@ pub struct Liquidity {
 
     pub deployment_type: u8,
 
-    pub padding: [u8; 67]
+    pub required_double_mints: Option<u32>,
+
+    pub padding: [u8; 62]
 }
 
 pub mod events {

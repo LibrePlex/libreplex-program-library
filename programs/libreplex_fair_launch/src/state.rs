@@ -1,5 +1,7 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, Discriminator};
 use solana_program::pubkey::Pubkey;
+
+use crate::errors::FairLaunchError;
 
 pub const TICKER_LIMIT: usize = 200;
 pub const TEMPLATE_LIMIT: usize = 1200;
@@ -63,6 +65,13 @@ pub struct Deployment {
     pub offchain_url: String, // pub padding: Vec<u8, EXCESS>
 }
 
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize, InitSpace, Debug)]
+pub struct MultiplierLimits {
+    pub max_numerator: u16,
+    pub min_denominator: u16
+}
+
 #[account]
 #[derive(InitSpace)]
 pub struct DeploymentConfig {
@@ -72,8 +81,9 @@ pub struct DeploymentConfig {
     pub creator_fee_per_mint_lamports: u64,
     pub deflation_rate_per_swap: u16, // in basis points
     // makes it easier to identify the program / endpoints that need to be called
-    pub cosigner_program_id: Pubkey
+    pub cosigner_program_id: Pubkey,
 
+    pub multiplier_limits: Option<MultiplierLimits>,
 }
 
 impl DeploymentConfig {
@@ -121,16 +131,25 @@ pub struct MintEvent {
 }
 
 impl Deployment {
-    pub fn get_fungible_mint_amount(&self) -> u64 {
+    pub fn get_fungible_mint_amount(&self, traded_marker: &HashlistMarker) -> u64 {
         self.limit_per_mint
+            .checked_mul(traded_marker.multiplier_numerator as u64).unwrap()
+            .checked_div(traded_marker.multiplier_denominator as u64).unwrap()
             .checked_mul(10_u64.checked_pow(self.decimals as u32).unwrap())
             .unwrap()
     }
 
-    pub fn get_max_fungible_mint_amount(&self) -> u64 {
+    pub fn get_max_fungible_mint_amount(&self, multiplier_limits: &Option<MultiplierLimits>) -> u64 {
+        let multiplier_limits = multiplier_limits.as_ref().unwrap_or(&MultiplierLimits {
+            max_numerator: 1,
+            min_denominator: 1,
+        });
+
         self.max_number_of_tokens
             .checked_mul(self.limit_per_mint)
             .unwrap()
+            .checked_mul(multiplier_limits.max_numerator as u64).unwrap()
+            .checked_div(multiplier_limits.min_denominator as u64).unwrap()
             .checked_mul(10_u64.checked_pow(self.decimals as u32).unwrap())
             .unwrap()
     }
@@ -153,9 +172,94 @@ pub struct Hashlist {
 #[account]
 pub struct MigrationMarker {}
 
-// Tells you whether a mint belongs to a hashlist
-#[account]
-pub struct HashlistMarker {}
+#[derive(Clone, InitSpace, Debug)]
+pub struct HashlistMarker {
+    pub multiplier_numerator: u16,
+    pub multiplier_denominator: u16,
+}
+
+impl Discriminator for HashlistMarker {
+    const DISCRIMINATOR: [u8; 8] = [55, 46, 160, 53, 239, 41, 223, 50];
+}
+
+#[cfg(feature = "idl-build")]
+impl anchor_lang::IdlBuild for HashlistMarker {
+
+}
+
+impl anchor_lang::AccountSerialize for HashlistMarker {
+   fn try_serialize<W: std::io::prelude::Write>(&self, writer: &mut W) -> Result<()> {
+        if writer.write_all(&HashlistMarker::discriminator()).is_err() {
+            return Err(anchor_lang::error::ErrorCode::AccountDidNotSerialize.into());
+        }
+
+        let wrote_numerator = AnchorSerialize::serialize(&self.multiplier_numerator, writer);
+        let wrote_denominator = AnchorSerialize::serialize(&self.multiplier_denominator, writer);
+
+        if (self.multiplier_denominator != 1 || self.multiplier_numerator != 1) && 
+            (wrote_numerator.is_err() || wrote_denominator.is_err()) {
+            return Err(anchor_lang::error::ErrorCode::AccountDidNotSerialize.into()); 
+        }
+
+        Ok(())
+    }
+}
+
+impl anchor_lang::Owner for HashlistMarker {
+    fn owner() -> Pubkey {
+        crate::ID
+    }
+}
+
+impl anchor_lang::AccountDeserialize for HashlistMarker {
+ fn try_deserialize(buf: &mut &[u8]) -> Result<Self> {
+    if buf.len() < HashlistMarker::discriminator().len() {
+        return Err(
+            anchor_lang::error::ErrorCode::AccountDiscriminatorNotFound.into(),
+        );
+    }
+
+    let given_disc = &buf[..8];
+    if &HashlistMarker::discriminator() != given_disc {
+        return Err(
+            anchor_lang::error::Error::from(anchor_lang::error::AnchorError {
+                    error_name: anchor_lang::error::ErrorCode::AccountDiscriminatorMismatch
+                        .name(),
+                    error_code_number: anchor_lang::error::ErrorCode::AccountDiscriminatorMismatch
+                        .into(),
+                    error_msg: anchor_lang::error::ErrorCode::AccountDiscriminatorMismatch
+                        .to_string(),
+                    error_origin: Some(
+                        anchor_lang::error::ErrorOrigin::Source(anchor_lang::error::Source {
+                            filename: "programs/libreplex_fair_launch/src/state.rs",
+                            line: 157u32,
+                        }),
+                    ),
+                    compared_values: None,
+                })
+                .with_account_name("HashlistMarker"),
+        );
+    }
+
+    Self::try_deserialize_unchecked(buf)
+ }
+
+ fn try_deserialize_unchecked(buf: &mut &[u8]) -> Result<Self> {
+    let mut data: &[u8] = &buf[8..];
+
+    if data.len() == 0 {
+        return Ok(Self {
+            multiplier_denominator: 1,
+            multiplier_numerator: 1,
+        })
+    }
+
+    Ok(Self {
+        multiplier_numerator: AnchorDeserialize::deserialize_reader(&mut data)?,
+        multiplier_denominator: AnchorDeserialize::deserialize_reader(&mut data)?,
+    })
+ }
+}
 
 #[account]
 pub struct MigrationCounter {

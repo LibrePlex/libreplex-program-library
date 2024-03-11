@@ -14,13 +14,8 @@ pub mod libreplex_fair_launch {
     
     use super::*;
 
-    // v2 endpoints. Prefer these over the original ones. 
-    // they allow setting of optional creator co-signer
-    // and toggling inscriptions on and off. 
-    // for now, creator co-sign is disabled but will be enabled
-    // soon to allow for wrapper contracts
-    pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) -> Result<()> {
-        instructions::initialise_v2(ctx, input)
+    pub fn initialise_v3(ctx: Context<InitialiseV3Ctx>, input: InitialiseInputV3) -> Result<()> {
+        instructions::initialise_v3(ctx, input)
     }
 
     pub fn deploy_token22(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
@@ -53,6 +48,13 @@ pub mod libreplex_fair_launch {
         instructions::update_symbol2022(ctx)
     }
 
+    pub fn join<'info>(
+        ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>,
+        input: MintInput,
+    ) -> Result<()> {
+        instructions::join_handler(ctx, input)
+    }
+
     pub fn update_spl_metadata<'info>(
         ctx: Context<'_, '_, '_, 'info, UpdateSplMetadata2022Ctx<'info>>,
         new_uri: String
@@ -75,8 +77,9 @@ pub mod libreplex_fair_launch {
    
     pub fn mint_token22<'info>(
         ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>,
+        input: MintInput,
     ) -> Result<()> {
-        instructions::mint_token2022(ctx)
+        instructions::mint_token2022(ctx, input)
     }
     pub fn swap_to_fungible22(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> {
         instructions::swap_to_fungible_2022(ctx)

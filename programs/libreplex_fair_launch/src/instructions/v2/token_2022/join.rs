@@ -1,19 +1,25 @@
-
-
 use anchor_lang::prelude::*;
+use anchor_spl::token_interface::TokenAccount;
 use anchor_spl::{
-    associated_token::AssociatedToken,
-    token_2022, token_interface::Mint
+    associated_token::AssociatedToken, token_2022, token_interface::Mint
 };
+use spl_pod::optional_keys::OptionalNonZeroPubkey;
+use spl_token_2022::extension::group_member_pointer::GroupMemberPointer;
+use spl_token_2022::extension::BaseStateWithExtensions;
+use spl_token_2022::extension::metadata_pointer::MetadataPointer;
+use spl_token_metadata_interface::state::TokenMetadata;
 
+
+use crate::MintInput;
 use crate::{
-    Deployment, HashlistMarker, 
+    Deployment, HashlistMarker,
     mint_token2022_logic, DeploymentConfig,
 };
 
 #[derive(Accounts)]
-pub struct MintToken2022Ctx<'info> {
+pub struct JoinCtx<'info> {
     #[account(mut,
+       has_one = fungible_mint,
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
 
@@ -26,6 +32,10 @@ pub struct MintToken2022Ctx<'info> {
         constraint = deployment_config.creator_fee_treasury == creator_fee_treasury.key())] 
     pub creator_fee_treasury: UncheckedAccount<'info>,
 
+
+
+    /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
+    
     #[account(mut, 
         
         seeds = ["hashlist".as_bytes(), 
@@ -53,20 +63,17 @@ pub struct MintToken2022Ctx<'info> {
     #[account(mut)]
     pub fungible_mint: InterfaceAccount<'info, Mint>,
 
-
-    /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
-    #[account(mut)]
-    pub minter: UncheckedAccount<'info>,
-
-    /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
-    
-    #[account(mut)]
+    #[account(mut, owner = spl_token_2022::ID)]
     pub non_fungible_mint: Signer<'info>,
 
-    /// CHECK: passed in via CPI to mpl_token_metadata program
-    #[account(mut)]
-    pub non_fungible_token_account: UncheckedAccount<'info>,
+    /// CHECK: Will check in instruction
+    #[account(associated_token::mint = non_fungible_mint, 
+        associated_token::authority = non_fungible_token_account_owner, associated_token::token_program = token_program)]
+    pub non_fungible_token_account: InterfaceAccount<'info, TokenAccount>,
+
+    pub non_fungible_token_account_owner: Signer<'info>,
     
+
     /* BOILERPLATE PROGRAM ACCOUNTS */
     /// CHECK: Checked in constraint
     #[account(
@@ -82,38 +89,11 @@ pub struct MintToken2022Ctx<'info> {
 
 }
 
-#[derive(AnchorSerialize)]
-pub struct MintInput {
-    pub multiplier_numerator: u16,
-    pub multiplier_denominator: u16,
-}
-
-impl AnchorDeserialize for MintInput {
-    fn deserialize_reader<R: std::io::prelude::Read>(reader: &mut R) -> std::io::Result<Self> {
-        let maybe_multiplier_numerator: std::io::Result<u16> = AnchorDeserialize::deserialize_reader(reader);
-        let maybe_multiplier_denominator: std::io::Result<u16> = AnchorDeserialize::deserialize_reader(reader);
-
-        if maybe_multiplier_numerator.is_ok() && maybe_multiplier_denominator.is_ok()  {
-            return Ok(Self {
-                multiplier_numerator: maybe_multiplier_numerator.unwrap(),
-                multiplier_denominator: maybe_multiplier_denominator.unwrap(),
-            })
-        }
-
-        return Ok(Self {
-            multiplier_numerator: 1, 
-            multiplier_denominator: 1,
-        });
-    }
-}
-
-pub fn mint_token2022<'info>(
-    ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>, 
-    input: MintInput
-) -> Result<()> {
+pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, input: MintInput) -> Result<()> {
+    let deployment = &mut ctx.accounts.deployment;
+    let deployment_config = &mut ctx.accounts.deployment_config;
     let payer = &ctx.accounts.payer; 
     let signer = &ctx.accounts.signer;
-    let minter= &ctx.accounts.minter;
     let non_fungible_mint = &ctx.accounts.non_fungible_mint;
     let non_fungible_token_account = &ctx.accounts.non_fungible_token_account;
     let token_program = &ctx.accounts.token_program;
@@ -121,11 +101,36 @@ pub fn mint_token2022<'info>(
     let system_program = &ctx.accounts.system_program;
     let fungible_mint = &ctx.accounts.fungible_mint;
 
-    // mutable borrows
-    let deployment = &mut ctx.accounts.deployment;
-    let deployment_config = &mut ctx.accounts.deployment_config;
     let creator_fee_treasury = &mut ctx.accounts.creator_fee_treasury;
     let hashlist = &mut ctx.accounts.hashlist;
+    
+    if !deployment.require_creator_cosign {
+        panic!("Joins require a co signer")
+    }
+   
+    if non_fungible_token_account.amount != 1 {
+        panic!("Can only join NFTs")
+    }
+
+    let non_fungible_mint_data = non_fungible_mint.try_borrow_data()?;
+    let mint_with_extensions = spl_token_2022::extension::StateWithExtensions::<spl_token_2022::state::Mint>::unpack(
+        &non_fungible_mint_data,
+    )?;
+
+    let mint_base = &mint_with_extensions.base;
+
+    if mint_base.supply != 1 || 
+        mint_base.mint_authority.is_some() || 
+        mint_base.freeze_authority.expect("Freeze authority not provided") != deployment.key() {
+        panic!("Invalid join mint")
+    }
+
+    mint_with_extensions.get_extension::<MetadataPointer>()?;
+    let group_member_ptr = mint_with_extensions.get_extension::<GroupMemberPointer>()?;
+
+    if group_member_ptr.authority != OptionalNonZeroPubkey::try_from(Some(deployment.key()))? {
+        panic!("Invalid group pointer")
+    }
 
     mint_token2022_logic(
         deployment, 
@@ -137,12 +142,14 @@ pub fn mint_token2022<'info>(
         payer, 
         associated_token_program, 
         token_program, 
-        minter, 
-        non_fungible_token_account, 
+        ctx.accounts.non_fungible_token_account_owner.as_ref(), 
+        non_fungible_token_account.as_ref(), 
         hashlist,
         &mut ctx.accounts.hashlist_marker,
-        ctx.bumps.deployment,
-        ctx.remaining_accounts, &signer, true, input)?;
+    ctx.bumps.deployment,
+ctx.remaining_accounts, &signer, false, input)?;
+
+    
 
     Ok(())
 }

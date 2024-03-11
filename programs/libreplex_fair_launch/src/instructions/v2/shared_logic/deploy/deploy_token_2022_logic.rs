@@ -36,8 +36,6 @@ pub fn deploy_token_2022_logic<'f>(
         deployment.ticker.as_ref(),
         &[deployment_bump],
     ];
-
-    
     
     let update_authority =
         OptionalNonZeroPubkey::try_from(Some(deployment.key())).expect("Bad update auth");
@@ -85,6 +83,7 @@ pub fn deploy_token_2022_logic<'f>(
         token_program,
         deployment_seeds,
         true,
+        &deployment_config,
     )?;
 
     msg!("Created non fungible");

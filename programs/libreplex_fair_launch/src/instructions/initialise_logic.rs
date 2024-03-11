@@ -1,27 +1,39 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
+use crate::{InitialiseInputV3, TOKEN2022_DEPLOYMENT_TYPE, HYBRID_DEPLOYMENT_TYPE};
 
 use crate::{
     errors::FairLaunchError, Deployment, DeploymentConfig, NewDeploymentV2, OFFCHAIN_URL_LIMIT,
     TEMPLATE_LIMIT, TICKER_LIMIT,
 };
 
-pub struct InitialiseInput {
-    pub limit_per_mint: u64, // this number of SPL tokens are issued into the escrow when an op: 'mint' comes in
-    pub max_number_of_tokens: u64, // this is the max *number* of tokens
-    pub decimals: u8,
-    pub ticker: String,
-    pub deployment_template: String,
-    pub mint_template: String,
-    pub offchain_url: String, // used both for the fungible and the non-fungible
-    pub deployment_type: u8,
-}
 
-pub fn initialise_logic(
-    input: InitialiseInput,
-    deployment: &mut Account<'_, Deployment>,
-    creator: Pubkey,
-    config: Option<&DeploymentConfig>,
-) -> Result<()> {
+
+pub fn initialise_logic(input: InitialiseInputV3, 
+    deployment: &mut Account<'_, Deployment>, 
+    creator: Pubkey, config: &mut DeploymentConfig) -> Result<()> {
+    let deployment_type = input.deployment_type;
+
+    if deployment_type != TOKEN2022_DEPLOYMENT_TYPE && deployment_type != HYBRID_DEPLOYMENT_TYPE{
+        panic!("Bad deployment type")
+    }
+    
+    if deployment_type == HYBRID_DEPLOYMENT_TYPE && input.deflation_rate_per_swap > 0{
+        panic!("Non-zero deflation rate requires a token-2022 deployment")
+    }
+
+
+    config.creator_fee_treasury = input.creator_fee_treasury;
+    config.creator_fee_per_mint_lamports = input.creator_fee_per_mint_in_lamports;
+    config.deflation_rate_per_swap = input.deflation_rate_per_swap;
+
+    config.multiplier_limits = Some(input.multiplier_limits);
+
+    if let Some(limits) = config.multiplier_limits.as_ref() {
+        if limits.min_denominator == 0 || limits.max_numerator == 0 {
+            panic!("Invalid multiplier limits");
+        }
+    }
+        
     if input.ticker.len() > TICKER_LIMIT {
         return Err(FairLaunchError::TickerTooLong.into());
     }
@@ -55,6 +67,17 @@ pub fn initialise_logic(
         .checked_mul((10_u64).checked_pow(input.decimals as u32).unwrap())
         .unwrap();
 
+
+    deployment.require_creator_cosign = input.creator_cosign_program_id.is_some();
+
+    config.cosigner_program_id = match input.creator_cosign_program_id {
+        Some(x) => x,
+        _ => system_program::ID
+    };
+
+
+    deployment.use_inscriptions = input.use_inscriptions;
+
     // Try avoid blowing up the stack
     emit_init(deployment, config);
     // for now, we limit ticker sizes to 12 bytes
@@ -62,7 +85,7 @@ pub fn initialise_logic(
     Ok(())
 }
 
-fn emit_init(deployment: &Deployment, config: Option<&DeploymentConfig>) {
+fn emit_init(deployment: &Deployment, config: &DeploymentConfig) {
     emit!(NewDeploymentV2 {
         creator: deployment.creator,
         limit_per_mint: deployment.limit_per_mint,
@@ -75,6 +98,6 @@ fn emit_init(deployment: &Deployment, config: Option<&DeploymentConfig>) {
         deployment_template: deployment.deployment_template.clone(),
         mint_template: deployment.mint_template.clone(),
         deployment_type: deployment.deployment_type,
-        config: config.cloned()
+        config: Some(config.clone())
     });
 }

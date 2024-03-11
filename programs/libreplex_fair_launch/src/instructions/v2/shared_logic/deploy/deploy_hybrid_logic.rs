@@ -9,6 +9,7 @@ use mpl_token_metadata::types::Creator;
 
 
 use crate::DeploymentActive;
+use crate::DeploymentConfig;
 use crate::{
     mint_all_fungibles, revoke_mint_auths, Deployment, Hashlist, HYBRID_DEPLOYMENT_TYPE
 };
@@ -35,6 +36,7 @@ pub fn deploy_hybrid_logic<'f>(
     metadata_program: &UncheckedAccount<'f>,
     // non_fungible_mint: &Signer<'f>,
     deployment_bump: u8,
+    deployment_config: &Account<'f, DeploymentConfig>,
 ) -> Result<()> {
     hashlist.deployment = deployment.key();
     msg!("Set fungible mint to {}", fungible_mint.key());
@@ -55,6 +57,7 @@ pub fn deploy_hybrid_logic<'f>(
         token_program,
         deployment_seeds,
         false,
+        &deployment_config,
     )?;
 
     if deployment.deployment_type == HYBRID_DEPLOYMENT_TYPE {

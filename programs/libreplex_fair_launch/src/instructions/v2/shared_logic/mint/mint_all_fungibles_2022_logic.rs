@@ -7,7 +7,7 @@ use anchor_spl::{
 
 use libreplex_shared::SharedError;
 
-use crate::Deployment;
+use crate::{Deployment, DeploymentConfig};
 
 
 pub fn revoke_mint_auths<'a>(
@@ -59,6 +59,7 @@ pub fn mint_all_fungibles<'a>(
     token_program: &UncheckedAccount<'a>,
     deployment_seeds: &[&[u8]],
     revoke_auths: bool,
+    deployment_config: &DeploymentConfig,
 ) -> Result<()> {
     msg!("Mint all fungibles {}", token_program.key());
     let expected_token_account =
@@ -100,7 +101,7 @@ pub fn mint_all_fungibles<'a>(
             },
             &[deployment_seeds],
         ),
-        deployment.get_max_fungible_mint_amount(),
+        deployment.get_max_fungible_mint_amount(&deployment_config.multiplier_limits),
     )?;
 
     if revoke_auths {

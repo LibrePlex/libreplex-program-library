@@ -1,13 +1,10 @@
-use anchor_lang::{prelude::*, system_program};
+use anchor_lang::prelude::*;
+use crate::{initialise_logic, Deployment, DeploymentConfig, MultiplierLimits};
 
 
-
-use crate::{initialise_logic, Deployment, DeploymentConfig, InitialiseInput, HYBRID_DEPLOYMENT_TYPE, TOKEN2022_DEPLOYMENT_TYPE};
-
-
-
+// Same as v2 with multiplier_upper_limit added
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
-pub struct InitialiseInputV2 {
+pub struct InitialiseInputV3 {
     pub limit_per_mint: u64, // this number of SPL tokens are issued into the escrow when an op: 'mint' comes in 
     pub max_number_of_tokens: u64, // this is the max *number* of tokens
     pub decimals: u8,
@@ -21,7 +18,10 @@ pub struct InitialiseInputV2 {
     pub creator_fee_treasury: Pubkey,
     pub creator_fee_per_mint_in_lamports: u64,
     // this allows for interesting dynamics
-    pub deflation_rate_per_swap: u16
+    pub deflation_rate_per_swap: u16,
+
+    // The largest possible multiplier
+    pub multiplier_limits: MultiplierLimits,
 }
 
 /*
@@ -39,9 +39,10 @@ pub struct InitialiseInputV2 {
 
 */
 
+// Same as V2 just with extra field in input.
 #[derive(Accounts)]
-#[instruction(input: InitialiseInputV2)]
-pub struct InitialiseV2Ctx<'info>  {
+#[instruction(input: InitialiseInputV3)]
+pub struct InitialiseV3Ctx<'info>  {
     #[account(init, payer = payer, space = 8 + Deployment::INIT_SPACE, 
         seeds = ["deployment".as_ref(), input.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
@@ -66,64 +67,15 @@ pub struct InitialiseV2Ctx<'info>  {
     pub system_program: Program<'info, System>,
 }
 
-
-
-pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) -> Result<()> {
-    
+pub fn initialise_v3(ctx: Context<InitialiseV3Ctx>, input: InitialiseInputV3) -> Result<()> {
     let deployment: &mut Account<'_, Deployment> = &mut ctx.accounts.deployment;
-
     let deployment_config = &mut ctx.accounts.deployment_config;
-
-
-    
-
     let creator = &ctx.accounts.creator;
 
-    let InitialiseInputV2 { 
-        limit_per_mint, 
-        max_number_of_tokens, 
-        decimals, 
-        ticker, 
-        deployment_template, 
-        mint_template, 
-        offchain_url, 
-        use_inscriptions, 
-        deployment_type,
-        creator_cosign_program_id,
-        creator_fee_per_mint_in_lamports: creator_fee_in_lamports,
-        creator_fee_treasury,
-        deflation_rate_per_swap} = input;
-
-    if deployment_type != TOKEN2022_DEPLOYMENT_TYPE && deployment_type != HYBRID_DEPLOYMENT_TYPE{
-        panic!("Bad deployment type")
-    }
-    
-    if deployment_type == HYBRID_DEPLOYMENT_TYPE && deflation_rate_per_swap > 0{
-        panic!("Non-zero deflation rate requires a token-2022 deployment")
-    }
-
-
-    deployment_config.creator_fee_treasury = creator_fee_treasury;
-    deployment_config.creator_fee_per_mint_lamports = creator_fee_in_lamports;
-    deployment_config.deflation_rate_per_swap = deflation_rate_per_swap;
-
-    initialise_logic(InitialiseInput {
-        limit_per_mint, 
-        max_number_of_tokens, decimals, ticker, deployment_template, mint_template, offchain_url, deployment_type
-    }, deployment, creator.key(), Some(deployment_config))?;
-
-    
-    deployment.require_creator_cosign = creator_cosign_program_id.is_some();
-
-    deployment_config.cosigner_program_id = match creator_cosign_program_id {
-        Some(x) => x,
-        _ => system_program::ID
-    };
-
-
-    deployment.use_inscriptions = use_inscriptions;
-
+    initialise_logic(input, 
+        deployment, 
+        creator.key(), 
+        deployment_config)?;
+  
     Ok(())
-
-
 }

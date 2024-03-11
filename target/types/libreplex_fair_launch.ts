@@ -3,7 +3,7 @@ export type LibreplexFairLaunch = {
   "name": "libreplex_fair_launch",
   "instructions": [
     {
-      "name": "initialiseV2",
+      "name": "initialiseV3",
       "accounts": [
         {
           "name": "deployment",
@@ -35,7 +35,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "input",
           "type": {
-            "defined": "InitialiseInputV2"
+            "defined": "InitialiseInputV3"
           }
         }
       ]
@@ -112,6 +112,11 @@ export type LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -238,6 +243,92 @@ export type LibreplexFairLaunch = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "join",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "fungible_mint"
+          ]
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorFeeTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "nonFungibleTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleTokenAccountOwner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintInput"
+          }
+        }
+      ]
     },
     {
       "name": "updateSplMetadata",
@@ -413,7 +504,14 @@ export type LibreplexFairLaunch = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintInput"
+          }
+        }
+      ]
     },
     {
       "name": "swapToFungible22",
@@ -710,6 +808,11 @@ export type LibreplexFairLaunch = {
       "accounts": [
         {
           "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
           "isMut": true,
           "isSigner": false
         },
@@ -1024,6 +1127,14 @@ export type LibreplexFairLaunch = {
           {
             "name": "cosignerProgramId",
             "type": "publicKey"
+          },
+          {
+            "name": "multiplierLimits",
+            "type": {
+              "option": {
+                "defined": "MultiplierLimits"
+              }
+            }
           }
         ]
       }
@@ -1046,13 +1157,6 @@ export type LibreplexFairLaunch = {
             }
           }
         ]
-      }
-    },
-    {
-      "name": "hashlistMarker",
-      "type": {
-        "kind": "struct",
-        "fields": []
       }
     },
     {
@@ -1157,7 +1261,7 @@ export type LibreplexFairLaunch = {
   ],
   "types": [
     {
-      "name": "InitialiseInputV2",
+      "name": "InitialiseInputV3",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1214,6 +1318,12 @@ export type LibreplexFairLaunch = {
           {
             "name": "deflationRatePerSwap",
             "type": "u16"
+          },
+          {
+            "name": "multiplierLimits",
+            "type": {
+              "defined": "MultiplierLimits"
+            }
           }
         ]
       }
@@ -1226,6 +1336,22 @@ export type LibreplexFairLaunch = {
           {
             "name": "maxNumberOfTokens",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "multiplierNumerator",
+            "type": "u16"
+          },
+          {
+            "name": "multiplierDenominator",
+            "type": "u16"
           }
         ]
       }
@@ -1254,6 +1380,14 @@ export type LibreplexFairLaunch = {
           {
             "name": "cosignerProgramId",
             "type": "publicKey"
+          },
+          {
+            "name": "multiplierLimits",
+            "type": {
+              "option": {
+                "defined": "MultiplierLimits"
+              }
+            }
           }
         ]
       }
@@ -1270,6 +1404,22 @@ export type LibreplexFairLaunch = {
           {
             "name": "order",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MultiplierLimits",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxNumerator",
+            "type": "u16"
+          },
+          {
+            "name": "minDenominator",
+            "type": "u16"
           }
         ]
       }
@@ -1492,6 +1642,11 @@ export type LibreplexFairLaunch = {
       "code": 6010,
       "name": "CreatorFeeTooHigh",
       "msg": "Creator fee too high"
+    },
+    {
+      "code": 6011,
+      "name": "MultiplierMissMatch",
+      "msg": "Custom multiplier mints require co signer"
     }
   ]
 };
@@ -1501,7 +1656,7 @@ export const IDL: LibreplexFairLaunch = {
   "name": "libreplex_fair_launch",
   "instructions": [
     {
-      "name": "initialiseV2",
+      "name": "initialiseV3",
       "accounts": [
         {
           "name": "deployment",
@@ -1533,7 +1688,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "input",
           "type": {
-            "defined": "InitialiseInputV2"
+            "defined": "InitialiseInputV3"
           }
         }
       ]
@@ -1610,6 +1765,11 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "deployment",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1736,6 +1896,92 @@ export const IDL: LibreplexFairLaunch = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "join",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "fungible_mint"
+          ]
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorFeeTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "nonFungibleTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleTokenAccountOwner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintInput"
+          }
+        }
+      ]
     },
     {
       "name": "updateSplMetadata",
@@ -1911,7 +2157,14 @@ export const IDL: LibreplexFairLaunch = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintInput"
+          }
+        }
+      ]
     },
     {
       "name": "swapToFungible22",
@@ -2208,6 +2461,11 @@ export const IDL: LibreplexFairLaunch = {
       "accounts": [
         {
           "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
           "isMut": true,
           "isSigner": false
         },
@@ -2522,6 +2780,14 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "cosignerProgramId",
             "type": "publicKey"
+          },
+          {
+            "name": "multiplierLimits",
+            "type": {
+              "option": {
+                "defined": "MultiplierLimits"
+              }
+            }
           }
         ]
       }
@@ -2544,13 +2810,6 @@ export const IDL: LibreplexFairLaunch = {
             }
           }
         ]
-      }
-    },
-    {
-      "name": "hashlistMarker",
-      "type": {
-        "kind": "struct",
-        "fields": []
       }
     },
     {
@@ -2655,7 +2914,7 @@ export const IDL: LibreplexFairLaunch = {
   ],
   "types": [
     {
-      "name": "InitialiseInputV2",
+      "name": "InitialiseInputV3",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2712,6 +2971,12 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "deflationRatePerSwap",
             "type": "u16"
+          },
+          {
+            "name": "multiplierLimits",
+            "type": {
+              "defined": "MultiplierLimits"
+            }
           }
         ]
       }
@@ -2724,6 +2989,22 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "maxNumberOfTokens",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "multiplierNumerator",
+            "type": "u16"
+          },
+          {
+            "name": "multiplierDenominator",
+            "type": "u16"
           }
         ]
       }
@@ -2752,6 +3033,14 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "cosignerProgramId",
             "type": "publicKey"
+          },
+          {
+            "name": "multiplierLimits",
+            "type": {
+              "option": {
+                "defined": "MultiplierLimits"
+              }
+            }
           }
         ]
       }
@@ -2768,6 +3057,22 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "order",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MultiplierLimits",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxNumerator",
+            "type": "u16"
+          },
+          {
+            "name": "minDenominator",
+            "type": "u16"
           }
         ]
       }
@@ -2990,6 +3295,11 @@ export const IDL: LibreplexFairLaunch = {
       "code": 6010,
       "name": "CreatorFeeTooHigh",
       "msg": "Creator fee too high"
+    },
+    {
+      "code": 6011,
+      "name": "MultiplierMissMatch",
+      "msg": "Custom multiplier mints require co signer"
     }
   ]
 };

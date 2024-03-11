@@ -5,7 +5,7 @@ use solana_program::system_program;
 
 
 use crate::{
-    Deployment, Hashlist, deploy_hybrid_logic, HYBRID_DEPLOYMENT_TYPE,
+    deploy_hybrid_logic, Deployment, DeploymentConfig, Hashlist, HYBRID_DEPLOYMENT_TYPE
 };
 
 pub mod sysvar_instructions_program {
@@ -37,6 +37,12 @@ pub struct DeployHybridCtx<'info> {
         bump
     )]
     pub deployment: Box<Account<'info, Deployment>>,
+
+    #[account(
+        seeds=["deployment_config".as_bytes(), deployment.key().as_ref()],
+        bump
+    )]
+    pub deployment_config: Box<Account<'info, DeploymentConfig>>,
 
     #[account(init_if_needed, seeds = ["hashlist".as_bytes(), 
     deployment.key().as_ref()],
@@ -107,10 +113,6 @@ pub struct DeployHybridCtx<'info> {
 }
 
 pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
-
-
-
-
     let hashlist = &mut ctx.accounts.hashlist;
     let deployment = &mut ctx.accounts.deployment;
 
@@ -137,11 +139,11 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
     deploy_hybrid_logic(
         hashlist,
         deployment,
-        &fungible_mint.to_account_info(),
+        fungible_mint.as_ref().as_ref(),
         fungible_metadata,
         fungible_master_edition,
         payer,
-        &fungible_escrow_token_account.to_account_info(),
+        fungible_escrow_token_account.as_ref().as_ref(),
         token_program,
         associated_token_program,
         system_program,
@@ -149,7 +151,8 @@ pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
         rent,
         sysvar_instructions,
         metadata_program,
-        ctx.bumps.deployment
+        ctx.bumps.deployment,
+        &ctx.accounts.deployment_config
     )?;
 
     Ok(())

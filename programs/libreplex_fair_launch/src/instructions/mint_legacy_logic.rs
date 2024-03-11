@@ -20,7 +20,7 @@ use mpl_token_metadata::types::{Creator, TokenStandard};
 
 
 use crate::{
-    add_to_hashlist, errors::FairLaunchError, Deployment, MintEvent, STANDARD_DEPLOYMENT_TYPE
+    add_to_hashlist, errors::FairLaunchError, Deployment, HashlistMarker, MintEvent, STANDARD_DEPLOYMENT_TYPE
 };
 
 
@@ -44,6 +44,7 @@ pub fn mint_legacy_logic<'info>(
        metadata_program: &UncheckedAccount<'info>, 
        sysvar_instructions_program: &UncheckedAccount<'info>, 
        hashlist: &mut UncheckedAccount<'info>,
+       hashlist_marker: &HashlistMarker,
         bump_deployment: u8) ->
  Result<()> {
     if deployment.deployment_type != STANDARD_DEPLOYMENT_TYPE {
@@ -186,7 +187,7 @@ pub fn mint_legacy_logic<'info>(
             },
             &[deployment_seeds],
         ),
-        deployment.get_fungible_mint_amount()   )?;
+        deployment.get_fungible_mint_amount(hashlist_marker)   )?;
     create_mint_with_metadata_and_masteredition(
         MintAccounts {
             authority_pda: deployment.to_account_info(),

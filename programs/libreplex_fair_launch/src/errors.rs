@@ -35,5 +35,8 @@ pub enum FairLaunchError {
     InvalidMetadata,
 
     #[msg("Creator fee too high")]
-    CreatorFeeTooHigh
+    CreatorFeeTooHigh,
+
+    #[msg("Custom multiplier mints require co signer")]
+    MultiplierMissMatch,
 }

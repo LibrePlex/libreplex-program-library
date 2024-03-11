@@ -182,7 +182,7 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
         Some(&[authority_seeds]),
         &payer.to_account_info(),
         deployment.decimals,
-        deployment.get_fungible_mint_amount(),
+        deployment.get_fungible_mint_amount(&ctx.accounts.hashlist_marker),
     )?;
     deployment.escrow_non_fungible_count += 1;
 

@@ -4,7 +4,7 @@ use anchor_lang::{prelude::*, system_program};
 use crate::{events::LiquidityCreate, Liquidity};
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
-pub struct InitialiseInput {
+pub struct InitialiseInputV2 {
     pub seed: Pubkey,
 
     pub deployment: Pubkey,
@@ -12,7 +12,7 @@ pub struct InitialiseInput {
     pub bootstrap_requires_sold_out: bool,
     pub creator_basis_points: u64,
 
-    pub lp_ratio: u16,
+    pub required_double_mints: u32,
 
     pub pool_fee_basis_points: u64,
     pub cosigner_program_id: Option<Pubkey>,
@@ -20,8 +20,8 @@ pub struct InitialiseInput {
 }
 
 #[derive(Accounts)]
-#[instruction(input: InitialiseInput)]
-pub struct Initialise<'info> {
+#[instruction(input: InitialiseInputV2)]
+pub struct InitialiseV2<'info> {
 
     /// CHECK: Can be anyone
     pub authority: UncheckedAccount<'info>,
@@ -39,14 +39,14 @@ pub struct Initialise<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<()> {
-    let InitialiseInput {
+pub fn init_handler_v2(ctx: Context<InitialiseV2>, input: InitialiseInputV2) -> Result<()> {
+    let InitialiseInputV2 {
         seed,
         bootstrap_start_time,
         bootstrap_requires_sold_out,
         deployment,
         creator_basis_points,
-        lp_ratio,
+        required_double_mints,
         pool_fee_basis_points,
         cosigner_program_id,
         deployment_type
@@ -54,7 +54,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
 
     ctx.accounts.liquidity.set_inner(Liquidity {
         pool_bootstrapped: false,
-        lp_ratio,
+        lp_ratio: 1,
         treasury: ctx.accounts.treasury.key(),
         total_mints: 0,
         pool_fee_basis_points,
@@ -71,7 +71,7 @@ pub fn init_handler(ctx: Context<Initialise>, input: InitialiseInput) -> Result<
             _=>system_program::ID
         },
         deployment_type,
-        required_double_mints: None,
+        required_double_mints: Some(required_double_mints),
         padding: [0; 62],
     });
 
@@ -85,3 +85,5 @@ fn emit_create(liquidity: &Account<Liquidity>) {
     let liquidity_ref: &Liquidity = liquidity.as_ref();
     emit!(LiquidityCreate { liquidity: liquidity_ref.clone(), id: liquidity.key()});
 }
+
+

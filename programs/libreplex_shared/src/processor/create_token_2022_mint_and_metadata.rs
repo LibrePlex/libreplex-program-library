@@ -222,6 +222,8 @@ pub fn create_token_2022_and_metadata(
         None => {}
     }
 
+
+
     match &token_member {
         Some(x) => {
             let initialize_extension =

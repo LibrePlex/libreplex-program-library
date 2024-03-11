@@ -6,7 +6,7 @@ use libreplex_shared::SharedError;
 
 
 
-use crate::{Deployment, MigrationMarker, HashlistMarker, add_to_hashlist, MigrationCounter};
+use crate::{add_to_hashlist, Deployment, DeploymentConfig, HashlistMarker, MigrationCounter, MigrationMarker};
 
 #[event]
 pub struct HashlistEvent {
@@ -40,6 +40,10 @@ pub struct MigrateToHashlistCtx<'info>  {
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
 
+    /// CHECK: Checked by address, may not exist.
+    #[account(mut,
+        seeds = ["deployment_config".as_ref(), deployment.key().as_ref()], bump)]
+    pub deployment_config: UncheckedAccount<'info>,
 
     // will prevent a single mint from being migrated multiple times
     #[account(
@@ -128,6 +132,8 @@ pub fn migrate_to_hashlist(ctx: Context<MigrateToHashlistCtx>) -> Result<()> {
     let payer = &ctx.accounts.payer;
     let migration_counter = &mut ctx.accounts.migration_counter;
 
+    let deployment_config = &ctx.accounts.deployment_config;
+
     migration_counter.migration_count += 1;
     migration_counter.deployment = deployment.key();
     
@@ -152,7 +158,14 @@ pub fn migrate_to_hashlist(ctx: Context<MigrateToHashlistCtx>) -> Result<()> {
 
     let current_mint_amount = fungible_mint.supply;
 
-    let final_mint_amount = deployment.get_max_fungible_mint_amount();
+    let multiplier_limits = if deployment_config.owner == &crate::ID {
+        let mut config_data: &[u8] = &deployment_config.try_borrow_data()?;
+        DeploymentConfig::try_deserialize(&mut config_data)?.multiplier_limits
+    } else {
+        None
+    };
+
+    let final_mint_amount = deployment.get_max_fungible_mint_amount(&multiplier_limits);
 
 
     // if we're not minted out on the fungible, max out the mint 
