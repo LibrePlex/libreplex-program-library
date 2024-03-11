@@ -159,7 +159,6 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
                 payer: ctx.accounts.payer.to_account_info(),
                 signer: liquidity.to_account_info(),
                 fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
-                minter: liquidity.to_account_info(),
                 non_fungible_mint: ctx.accounts.pooled_non_fungible_mint.to_account_info(),
                 non_fungible_token_account: ctx
                     .accounts
@@ -213,7 +212,6 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
             destination: ctx.accounts.payer.to_account_info(),
             authority: liquidity.to_account_info(),
         }, &[seeds]))?;
-
     }
 
     let remaining_accounts_mint 
@@ -233,7 +231,6 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
             payer: ctx.accounts.payer.to_account_info(),
             signer: liquidity.to_account_info(),
             fungible_mint: ctx.accounts.fungible_mint.to_account_info(),
-            minter: ctx.accounts.receiver.to_account_info(),
             non_fungible_mint: ctx.accounts.non_fungible_mint.to_account_info(),
             non_fungible_token_account: ctx.accounts.non_fungible_token_account.to_account_info(),
             token_program: ctx.accounts.token_program_22.to_account_info(),

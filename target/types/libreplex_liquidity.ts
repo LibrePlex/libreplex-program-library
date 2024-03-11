@@ -449,6 +449,49 @@ export type LibreplexLiquidity = {
       ]
     },
     {
+      "name": "reduceMintCount",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "libreplexFairLaunchProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "ReduceMintCountInputLiquidity"
+          }
+        }
+      ]
+    },
+    {
       "name": "initialiseV2",
       "accounts": [
         {
@@ -1299,6 +1342,18 @@ export type LibreplexLiquidity = {
           {
             "name": "userMultiplierDenominator",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReduceMintCountInputLiquidity",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
           }
         ]
       }
@@ -1886,6 +1941,49 @@ export const IDL: LibreplexLiquidity = {
       ]
     },
     {
+      "name": "reduceMintCount",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "libreplexFairLaunchProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "ReduceMintCountInputLiquidity"
+          }
+        }
+      ]
+    },
+    {
       "name": "initialiseV2",
       "accounts": [
         {
@@ -2736,6 +2834,18 @@ export const IDL: LibreplexLiquidity = {
           {
             "name": "userMultiplierDenominator",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReduceMintCountInputLiquidity",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
           }
         ]
       }
