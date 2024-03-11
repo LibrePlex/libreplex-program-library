@@ -42,7 +42,7 @@ pub fn mint_token2022_logic<'info>(
     payer: &Signer<'info>,
     associated_token_program: &Program<'info, AssociatedToken>,
     token_program: &UncheckedAccount<'info>,
-    minter: &UncheckedAccount<'info>,
+    minter: &AccountInfo<'info>,
     non_fungible_token_account: &AccountInfo<'info>,
     hashlist: &mut UncheckedAccount<'info>,
     hashlist_marker: &mut HashlistMarker,

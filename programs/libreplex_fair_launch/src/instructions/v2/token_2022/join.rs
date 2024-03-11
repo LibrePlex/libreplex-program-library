@@ -7,6 +7,7 @@ use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_2022::extension::group_member_pointer::GroupMemberPointer;
 use spl_token_2022::extension::BaseStateWithExtensions;
 use spl_token_2022::extension::metadata_pointer::MetadataPointer;
+use spl_token_metadata_interface::state::TokenMetadata;
 
 
 use crate::MintInput;
@@ -62,10 +63,6 @@ pub struct JoinCtx<'info> {
     #[account(mut)]
     pub fungible_mint: InterfaceAccount<'info, Mint>,
 
-    /// CHECK: It's a fair launch. Anybody can sign, anybody can receive the inscription
-    #[account(mut)]
-    pub minter: UncheckedAccount<'info>,
-
     #[account(mut, owner = spl_token_2022::ID)]
     pub non_fungible_mint: Signer<'info>,
 
@@ -97,7 +94,6 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
     let deployment_config = &mut ctx.accounts.deployment_config;
     let payer = &ctx.accounts.payer; 
     let signer = &ctx.accounts.signer;
-    let minter= &ctx.accounts.minter;
     let non_fungible_mint = &ctx.accounts.non_fungible_mint;
     let non_fungible_token_account = &ctx.accounts.non_fungible_token_account;
     let token_program = &ctx.accounts.token_program;
@@ -109,11 +105,11 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
     let hashlist = &mut ctx.accounts.hashlist;
     
     if !deployment.require_creator_cosign {
-        panic!()
+        panic!("Joins require a co signer")
     }
    
     if non_fungible_token_account.amount != 1 {
-        panic!()
+        panic!("Can only join NFTs")
     }
 
     let non_fungible_mint_data = non_fungible_mint.try_borrow_data()?;
@@ -126,14 +122,14 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
     if mint_base.supply != 1 || 
         mint_base.mint_authority.is_some() || 
         mint_base.freeze_authority.expect("Freeze authority not provided") != deployment.key() {
-        panic!()
+        panic!("Invalid join mint")
     }
 
     mint_with_extensions.get_extension::<MetadataPointer>()?;
     let group_member_ptr = mint_with_extensions.get_extension::<GroupMemberPointer>()?;
 
     if group_member_ptr.authority != OptionalNonZeroPubkey::try_from(Some(deployment.key()))? {
-        panic!()
+        panic!("Invalid group pointer")
     }
 
     mint_token2022_logic(
@@ -146,7 +142,7 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
         payer, 
         associated_token_program, 
         token_program, 
-        minter, 
+        ctx.accounts.non_fungible_token_account_owner.as_ref(), 
         non_fungible_token_account.as_ref(), 
         hashlist,
         &mut ctx.accounts.hashlist_marker,

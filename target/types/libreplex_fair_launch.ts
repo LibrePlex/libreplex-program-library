@@ -3,44 +3,6 @@ export type LibreplexFairLaunch = {
   "name": "libreplex_fair_launch",
   "instructions": [
     {
-      "name": "initialiseV2",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "deploymentConfig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "creator",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "InitialiseInputV2"
-          }
-        }
-      ]
-    },
-    {
       "name": "initialiseV3",
       "accounts": [
         {
@@ -325,11 +287,6 @@ export type LibreplexFairLaunch = {
         },
         {
           "name": "fungibleMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "minter",
           "isMut": true,
           "isSigner": false
         },
@@ -855,6 +812,11 @@ export type LibreplexFairLaunch = {
           "isSigner": false
         },
         {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "migrationMarker",
           "isMut": true,
           "isSigner": false
@@ -1298,68 +1260,6 @@ export type LibreplexFairLaunch = {
     }
   ],
   "types": [
-    {
-      "name": "InitialiseInputV2",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "limitPerMint",
-            "type": "u64"
-          },
-          {
-            "name": "maxNumberOfTokens",
-            "type": "u64"
-          },
-          {
-            "name": "decimals",
-            "type": "u8"
-          },
-          {
-            "name": "ticker",
-            "type": "string"
-          },
-          {
-            "name": "deploymentTemplate",
-            "type": "string"
-          },
-          {
-            "name": "mintTemplate",
-            "type": "string"
-          },
-          {
-            "name": "offchainUrl",
-            "type": "string"
-          },
-          {
-            "name": "creatorCosignProgramId",
-            "type": {
-              "option": "publicKey"
-            }
-          },
-          {
-            "name": "useInscriptions",
-            "type": "bool"
-          },
-          {
-            "name": "deploymentType",
-            "type": "u8"
-          },
-          {
-            "name": "creatorFeeTreasury",
-            "type": "publicKey"
-          },
-          {
-            "name": "creatorFeePerMintInLamports",
-            "type": "u64"
-          },
-          {
-            "name": "deflationRatePerSwap",
-            "type": "u16"
-          }
-        ]
-      }
-    },
     {
       "name": "InitialiseInputV3",
       "type": {
@@ -1756,44 +1656,6 @@ export const IDL: LibreplexFairLaunch = {
   "name": "libreplex_fair_launch",
   "instructions": [
     {
-      "name": "initialiseV2",
-      "accounts": [
-        {
-          "name": "deployment",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "deploymentConfig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "creator",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": "InitialiseInputV2"
-          }
-        }
-      ]
-    },
-    {
       "name": "initialiseV3",
       "accounts": [
         {
@@ -2078,11 +1940,6 @@ export const IDL: LibreplexFairLaunch = {
         },
         {
           "name": "fungibleMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "minter",
           "isMut": true,
           "isSigner": false
         },
@@ -2608,6 +2465,11 @@ export const IDL: LibreplexFairLaunch = {
           "isSigner": false
         },
         {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "migrationMarker",
           "isMut": true,
           "isSigner": false
@@ -3051,68 +2913,6 @@ export const IDL: LibreplexFairLaunch = {
     }
   ],
   "types": [
-    {
-      "name": "InitialiseInputV2",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "limitPerMint",
-            "type": "u64"
-          },
-          {
-            "name": "maxNumberOfTokens",
-            "type": "u64"
-          },
-          {
-            "name": "decimals",
-            "type": "u8"
-          },
-          {
-            "name": "ticker",
-            "type": "string"
-          },
-          {
-            "name": "deploymentTemplate",
-            "type": "string"
-          },
-          {
-            "name": "mintTemplate",
-            "type": "string"
-          },
-          {
-            "name": "offchainUrl",
-            "type": "string"
-          },
-          {
-            "name": "creatorCosignProgramId",
-            "type": {
-              "option": "publicKey"
-            }
-          },
-          {
-            "name": "useInscriptions",
-            "type": "bool"
-          },
-          {
-            "name": "deploymentType",
-            "type": "u8"
-          },
-          {
-            "name": "creatorFeeTreasury",
-            "type": "publicKey"
-          },
-          {
-            "name": "creatorFeePerMintInLamports",
-            "type": "u64"
-          },
-          {
-            "name": "deflationRatePerSwap",
-            "type": "u16"
-          }
-        ]
-      }
-    },
     {
       "name": "InitialiseInputV3",
       "type": {

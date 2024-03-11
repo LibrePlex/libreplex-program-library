@@ -139,8 +139,8 @@ impl Deployment {
             .unwrap()
     }
 
-    pub fn get_max_fungible_mint_amount(&self, config: &DeploymentConfig) -> u64 {
-        let multiplier_limits = config.multiplier_limits.as_ref().unwrap_or(&MultiplierLimits {
+    pub fn get_max_fungible_mint_amount(&self, multiplier_limits: &Option<MultiplierLimits>) -> u64 {
+        let multiplier_limits = multiplier_limits.as_ref().unwrap_or(&MultiplierLimits {
             max_numerator: 1,
             min_denominator: 1,
         });
@@ -189,18 +189,20 @@ impl anchor_lang::IdlBuild for HashlistMarker {
 
 impl anchor_lang::AccountSerialize for HashlistMarker {
    fn try_serialize<W: std::io::prelude::Write>(&self, writer: &mut W) -> Result<()> {
-    if writer.write_all(&HashlistMarker::discriminator()).is_err() {
-        return Err(anchor_lang::error::ErrorCode::AccountDidNotSerialize.into());
-    }
-    if AnchorSerialize::serialize(&self.multiplier_numerator, writer).is_err() {
-        return Err(anchor_lang::error::ErrorCode::AccountDidNotSerialize.into());
-    }
+        if writer.write_all(&HashlistMarker::discriminator()).is_err() {
+            return Err(anchor_lang::error::ErrorCode::AccountDidNotSerialize.into());
+        }
 
-    if AnchorSerialize::serialize(&self.multiplier_denominator, writer).is_err() {
-        return Err(anchor_lang::error::ErrorCode::AccountDidNotSerialize.into());
+        let wrote_numerator = AnchorSerialize::serialize(&self.multiplier_numerator, writer);
+        let wrote_denominator = AnchorSerialize::serialize(&self.multiplier_denominator, writer);
+
+        if (self.multiplier_denominator != 1 || self.multiplier_numerator != 1) && 
+            (wrote_numerator.is_err() || wrote_denominator.is_err()) {
+            return Err(anchor_lang::error::ErrorCode::AccountDidNotSerialize.into()); 
+        }
+
+        Ok(())
     }
-    Ok(())
-   }
 }
 
 impl anchor_lang::Owner for HashlistMarker {

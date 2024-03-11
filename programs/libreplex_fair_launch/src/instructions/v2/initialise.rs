@@ -2,26 +2,6 @@ use anchor_lang::prelude::*;
 use crate::{initialise_logic, Deployment, DeploymentConfig, MultiplierLimits};
 
 
-
-#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
-pub struct InitialiseInputV2 {
-    pub limit_per_mint: u64, // this number of SPL tokens are issued into the escrow when an op: 'mint' comes in 
-    pub max_number_of_tokens: u64, // this is the max *number* of tokens
-    pub decimals: u8,
-    pub ticker: String,
-    pub deployment_template: String,
-    pub mint_template: String,
-    pub offchain_url: String, // used both for the fungible and the non-fungible
-    pub creator_cosign_program_id: Option<Pubkey>,
-    pub use_inscriptions: bool,
-    pub deployment_type: u8,
-    pub creator_fee_treasury: Pubkey,
-    pub creator_fee_per_mint_in_lamports: u64,
-    // this allows for interesting dynamics
-    pub deflation_rate_per_swap: u16
-}
-
-
 // Same as v2 with multiplier_upper_limit added
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseInputV3 {
@@ -59,33 +39,6 @@ pub struct InitialiseInputV3 {
 
 */
 
-#[derive(Accounts)]
-#[instruction(input: InitialiseInputV2)]
-pub struct InitialiseV2Ctx<'info>  {
-    #[account(init, payer = payer, space = 8 + Deployment::INIT_SPACE, 
-        seeds = ["deployment".as_ref(), input.ticker.as_ref()], bump)]
-    pub deployment: Account<'info, Deployment>,
-
-    #[account(
-        init,
-        payer = payer,
-        space = DeploymentConfig::SIZE,
-        // deployment must be executed by the payer 
-        seeds=["deployment_config".as_bytes(), deployment.key().as_ref()],
-        bump
-    )]
-    pub deployment_config: Account<'info, DeploymentConfig>,
-
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
-    /// CHECK: Can be anyone.
-    pub creator: UncheckedAccount<'info>,
-
-    #[account()]
-    pub system_program: Program<'info, System>,
-}
-
 // Same as V2 just with extra field in input.
 #[derive(Accounts)]
 #[instruction(input: InitialiseInputV3)]
@@ -113,51 +66,6 @@ pub struct InitialiseV3Ctx<'info>  {
     #[account()]
     pub system_program: Program<'info, System>,
 }
-
-
-
-pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) -> Result<()> {
-    let deployment: &mut Account<'_, Deployment> = &mut ctx.accounts.deployment;
-    let deployment_config = &mut ctx.accounts.deployment_config;
-    let creator = &ctx.accounts.creator;
-
-    let InitialiseInputV2 { limit_per_mint, max_number_of_tokens, 
-        decimals, ticker, deployment_template,
-         mint_template, offchain_url, 
-
-         creator_cosign_program_id, use_inscriptions, 
-        deployment_type, creator_fee_treasury, 
-        creator_fee_per_mint_in_lamports, 
-        deflation_rate_per_swap } = input;
-
-    initialise_logic(
-        InitialiseInputV3 {
-            limit_per_mint,
-            max_number_of_tokens,
-            decimals,
-            ticker,
-            deployment_template,
-            mint_template,
-            offchain_url,
-            creator_cosign_program_id,
-            use_inscriptions,
-            deployment_type,
-            creator_fee_treasury,
-            creator_fee_per_mint_in_lamports,
-            deflation_rate_per_swap,
-            multiplier_limits: MultiplierLimits {
-                max_numerator: 1,
-                min_denominator: 1,
-            },
-        }, 
-        deployment, 
-        creator.key(), 
-        deployment_config)?;
-  
-    Ok(())
-}
-
-
 
 pub fn initialise_v3(ctx: Context<InitialiseV3Ctx>, input: InitialiseInputV3) -> Result<()> {
     let deployment: &mut Account<'_, Deployment> = &mut ctx.accounts.deployment;

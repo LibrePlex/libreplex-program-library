@@ -6,7 +6,7 @@ use libreplex_shared::SharedError;
 
 
 
-use crate::{Deployment, MigrationMarker, HashlistMarker, add_to_hashlist, MigrationCounter};
+use crate::{add_to_hashlist, Deployment, DeploymentConfig, HashlistMarker, MigrationCounter, MigrationMarker};
 
 #[event]
 pub struct HashlistEvent {
@@ -40,6 +40,10 @@ pub struct MigrateToHashlistCtx<'info>  {
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
     pub deployment: Account<'info, Deployment>,
 
+    /// CHECK: Checked by address, may not exist.
+    #[account(mut,
+        seeds = ["deployment_config".as_ref(), deployment.key().as_ref()], bump)]
+    pub deployment_config: UncheckedAccount<'info>,
 
     // will prevent a single mint from being migrated multiple times
     #[account(
@@ -116,118 +120,127 @@ pub struct MigrateToHashlistCtx<'info>  {
 
 pub fn migrate_to_hashlist(ctx: Context<MigrateToHashlistCtx>) -> Result<()> {
 
-    // let deployment = &mut ctx.accounts.deployment;
-    // let hashlist = &mut ctx.accounts.hashlist;
-    // let mint: &mut Account<'_, Mint> = &mut ctx.accounts.mint;
-    // let inscription_v3 = &ctx.accounts.inscription_v3;
-    // let token_program = &ctx.accounts.token_program;
-    // let fungible_mint = &ctx.accounts.fungible_mint;
-    // let fungible_token_account_escrow = &ctx.accounts.fungible_token_account_escrow;
-    // // let associated_token_program = &ctx.accounts.associated_token_program;
-    // let system_program = &ctx.accounts.system_program;
-    // let payer = &ctx.accounts.payer;
-    // let migration_counter = &mut ctx.accounts.migration_counter;
+    let deployment = &mut ctx.accounts.deployment;
+    let hashlist = &mut ctx.accounts.hashlist;
+    let mint: &mut Account<'_, Mint> = &mut ctx.accounts.mint;
+    let inscription_v3 = &ctx.accounts.inscription_v3;
+    let token_program = &ctx.accounts.token_program;
+    let fungible_mint = &ctx.accounts.fungible_mint;
+    let fungible_token_account_escrow = &ctx.accounts.fungible_token_account_escrow;
+    // let associated_token_program = &ctx.accounts.associated_token_program;
+    let system_program = &ctx.accounts.system_program;
+    let payer = &ctx.accounts.payer;
+    let migration_counter = &mut ctx.accounts.migration_counter;
 
-    // migration_counter.migration_count += 1;
-    // migration_counter.deployment = deployment.key();
+    let deployment_config = &ctx.accounts.deployment_config;
+
+    migration_counter.migration_count += 1;
+    migration_counter.deployment = deployment.key();
     
-    // let deployment_seeds: &[&[u8]] = &[
-    //     "deployment".as_bytes(),
-    //     deployment.ticker.as_ref(),
-    //     &[ctx.bumps.deployment],
-    // ];
+    let deployment_seeds: &[&[u8]] = &[
+        "deployment".as_bytes(),
+        deployment.ticker.as_ref(),
+        &[ctx.bumps.deployment],
+    ];
 
-    // if !deployment.migrated_from_legacy {
-    //     panic!("Cannot migrate to this deployment")
-    // }
-
-
-    // let expected_token_account = anchor_spl::associated_token::get_associated_token_address(
-    //     &deployment.key(), &fungible_mint.key());
-
-    // if expected_token_account != fungible_token_account_escrow.key() {
-    //     return Err(SharedError::InvalidTokenAccount.into());
-    // }   
+    if !deployment.migrated_from_legacy {
+        panic!("Cannot migrate to this deployment")
+    }
 
 
-    // let current_mint_amount = fungible_mint.supply;
+    let expected_token_account = anchor_spl::associated_token::get_associated_token_address(
+        &deployment.key(), &fungible_mint.key());
 
-    // let final_mint_amount = deployment.get_max_fungible_mint_amount();
+    if expected_token_account != fungible_token_account_escrow.key() {
+        return Err(SharedError::InvalidTokenAccount.into());
+    }   
 
 
-    // // if we're not minted out on the fungible, max out the mint 
-    // // and remove freeze + mint authorities
-    // if current_mint_amount < final_mint_amount {
-    //     msg!("current_mint_amount {}",current_mint_amount);
-    //     msg!("final_mint_amount {}",final_mint_amount);
+    let current_mint_amount = fungible_mint.supply;
 
-    //     // it is possible that the current mint amount is smaller than the final mint amount
-    //     // this can happen when a part of the total supply has been burned after scribing out
-    //     // so we put this check here. In any case there's no point trying to mint anything 
-    //     // if there is no mint authority.
-    //     if fungible_mint.mint_authority.is_some()  {
-    //         mint_to(
-    //             CpiContext::new_with_signer(
-    //                 token_program.to_account_info(),
-    //                 MintTo {
-    //                     mint: fungible_mint.to_account_info(),
-    //                     // always mint spl tokens to the program escrow
-    //                     to: fungible_token_account_escrow.to_account_info(),
-    //                     authority: deployment.to_account_info(),
-    //                 },
-    //                 &[deployment_seeds],
-    //             ),
+    let multiplier_limits = if deployment_config.owner == &crate::ID {
+        let mut config_data: &[u8] = &deployment_config.try_borrow_data()?;
+        DeploymentConfig::try_deserialize(&mut config_data)?.multiplier_limits
+    } else {
+        None
+    };
 
-    //             final_mint_amount - current_mint_amount  
-    //         )?;
-    //     }
+    let final_mint_amount = deployment.get_max_fungible_mint_amount(&multiplier_limits);
 
-    //     if fungible_mint.freeze_authority.is_some() {
-    //         // ok we are at max mint
-    //         set_authority(CpiContext::new_with_signer(
-    //             token_program.to_account_info(),
-    //             SetAuthority {
-    //                 current_authority: deployment.to_account_info(),
-    //                 account_or_mint: fungible_mint.to_account_info(),
-    //             },
-    //             &[deployment_seeds]
-    //         ),
-    //         AuthorityType::FreezeAccount,
-    //         None
-    //         )?;
-    //     }
 
-    //     if fungible_mint.mint_authority.is_some() {
-    //         // ok we are at max mint
-    //         set_authority(CpiContext::new_with_signer(
-    //             token_program.to_account_info(),
-    //             SetAuthority {
-    //                 current_authority: deployment.to_account_info(),
-    //                 account_or_mint: fungible_mint.to_account_info(),
-    //             },
-    //             &[deployment_seeds]
-    //         ),
-    //         AuthorityType::MintTokens,
-    //         None
-    //         )?;
-    //     }
+    // if we're not minted out on the fungible, max out the mint 
+    // and remove freeze + mint authorities
+    if current_mint_amount < final_mint_amount {
+        msg!("current_mint_amount {}",current_mint_amount);
+        msg!("final_mint_amount {}",final_mint_amount);
+
+        // it is possible that the current mint amount is smaller than the final mint amount
+        // this can happen when a part of the total supply has been burned after scribing out
+        // so we put this check here. In any case there's no point trying to mint anything 
+        // if there is no mint authority.
+        if fungible_mint.mint_authority.is_some()  {
+            mint_to(
+                CpiContext::new_with_signer(
+                    token_program.to_account_info(),
+                    MintTo {
+                        mint: fungible_mint.to_account_info(),
+                        // always mint spl tokens to the program escrow
+                        to: fungible_token_account_escrow.to_account_info(),
+                        authority: deployment.to_account_info(),
+                    },
+                    &[deployment_seeds],
+                ),
+
+                final_mint_amount - current_mint_amount  
+            )?;
+        }
+
+        if fungible_mint.freeze_authority.is_some() {
+            // ok we are at max mint
+            set_authority(CpiContext::new_with_signer(
+                token_program.to_account_info(),
+                SetAuthority {
+                    current_authority: deployment.to_account_info(),
+                    account_or_mint: fungible_mint.to_account_info(),
+                },
+                &[deployment_seeds]
+            ),
+            AuthorityType::FreezeAccount,
+            None
+            )?;
+        }
+
+        if fungible_mint.mint_authority.is_some() {
+            // ok we are at max mint
+            set_authority(CpiContext::new_with_signer(
+                token_program.to_account_info(),
+                SetAuthority {
+                    current_authority: deployment.to_account_info(),
+                    account_or_mint: fungible_mint.to_account_info(),
+                },
+                &[deployment_seeds]
+            ),
+            AuthorityType::MintTokens,
+            None
+            )?;
+        }
 
         
         
-    // } 
-    // // we cannot use the number of tokens issued because for migrations
-    // // number of tokens issues is usually equal to the max supply. So we
-    // // need to work off the migration counter.
+    } 
+    // we cannot use the number of tokens issued because for migrations
+    // number of tokens issues is usually equal to the max supply. So we
+    // need to work off the migration counter.
    
-    // add_to_hashlist(
-    //     migration_counter.migration_count as u32, // already pre-incremented
-    //     hashlist, 
-    //     payer, 
-    //     system_program, 
-    //     &mint.key(), 
-    //     &deployment.key(),
-    //     inscription_v3.order
-    // )?;
+    add_to_hashlist(
+        migration_counter.migration_count as u32, // already pre-incremented
+        hashlist, 
+        payer, 
+        system_program, 
+        &mint.key(), 
+        &deployment.key(),
+        inscription_v3.order
+    )?;
 
     
 

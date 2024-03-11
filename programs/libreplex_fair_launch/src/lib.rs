@@ -14,15 +14,6 @@ pub mod libreplex_fair_launch {
     
     use super::*;
 
-    // v2 endpoints. Prefer these over the original ones. 
-    // they allow setting of optional creator co-signer
-    // and toggling inscriptions on and off. 
-    // for now, creator co-sign is disabled but will be enabled
-    // soon to allow for wrapper contracts
-    pub fn initialise_v2(ctx: Context<InitialiseV2Ctx>, input: InitialiseInputV2) -> Result<()> {
-        instructions::initialise_v2(ctx, input)
-    }
-
     pub fn initialise_v3(ctx: Context<InitialiseV3Ctx>, input: InitialiseInputV3) -> Result<()> {
         instructions::initialise_v3(ctx, input)
     }
