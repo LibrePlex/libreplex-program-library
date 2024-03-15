@@ -93,17 +93,20 @@ impl AnchorDeserialize for MintInput {
         let maybe_multiplier_numerator: std::io::Result<u16> = AnchorDeserialize::deserialize_reader(reader);
         let maybe_multiplier_denominator: std::io::Result<u16> = AnchorDeserialize::deserialize_reader(reader);
 
-        if maybe_multiplier_numerator.is_ok() && maybe_multiplier_denominator.is_ok()  {
-            return Ok(Self {
-                multiplier_numerator: maybe_multiplier_numerator.unwrap(),
-                multiplier_denominator: maybe_multiplier_denominator.unwrap(),
-            })
+        if let Ok(a) = maybe_multiplier_numerator {
+            if let Ok(b) = maybe_multiplier_denominator {
+                return Ok(Self {
+                    multiplier_numerator: a,
+                    multiplier_denominator: b,
+                })
+            }
         }
-
-        return Ok(Self {
+        
+       
+        Ok(Self {
             multiplier_numerator: 1, 
             multiplier_denominator: 1,
-        });
+        })
     }
 }
 
@@ -142,7 +145,7 @@ pub fn mint_token2022<'info>(
         hashlist,
         &mut ctx.accounts.hashlist_marker,
         ctx.bumps.deployment,
-        ctx.remaining_accounts, &signer, true, input)?;
+        ctx.remaining_accounts, signer, true, input)?;
 
     Ok(())
 }

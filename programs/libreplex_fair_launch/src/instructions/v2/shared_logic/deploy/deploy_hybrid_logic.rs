@@ -57,7 +57,7 @@ pub fn deploy_hybrid_logic<'f>(
         token_program,
         deployment_seeds,
         false,
-        &deployment_config,
+        deployment_config,
     )?;
 
     if deployment.deployment_type == HYBRID_DEPLOYMENT_TYPE {

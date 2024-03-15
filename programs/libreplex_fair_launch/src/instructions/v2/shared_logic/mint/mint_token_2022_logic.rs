@@ -52,7 +52,7 @@ pub fn mint_token2022_logic<'info>(
     create_the_nft: bool,
     mint_input: MintInput,
 ) -> Result<()> {
-    validate_new_multiplier(&mint_input, &deployment_config, &deployment)?;
+    validate_new_multiplier(&mint_input, deployment_config, deployment)?;
 
     hashlist_marker.multiplier_denominator = mint_input.multiplier_denominator;
     hashlist_marker.multiplier_numerator = mint_input.multiplier_numerator;
@@ -132,9 +132,7 @@ pub fn mint_token2022_logic<'info>(
             deployment_seeds,
         )?;
     }
-    else {
-
-    }
+    
 
     if deployment.use_inscriptions {
         if remaining_accounts.len() != 4 {

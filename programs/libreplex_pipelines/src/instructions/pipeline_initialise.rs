@@ -1,5 +1,6 @@
 use anchor_lang::{prelude::*, system_program};
-use libreplex_fair_launch::{cpi::accounts::InitialiseV2Ctx, InitialiseInputV2, HYBRID_DEPLOYMENT_TYPE};
+use libreplex_fair_launch::MultiplierLimits;
+use libreplex_fair_launch::{cpi::accounts::InitialiseV3Ctx, InitialiseInputV3, HYBRID_DEPLOYMENT_TYPE};
 use libreplex_liquidity::{InitialiseInput, DEPLOYMENT_TYPE_SPL};
 use libreplex_liquidity::cpi::accounts::Initialise as InitialiseV2CtxLiquidity;
 use crate::{Filter, Pipeline};
@@ -73,7 +74,7 @@ pub struct InitialisePipelineCtx<'info> {
 
     /// CHECK: ID checked in constraint
     #[account(
-        constraint = libreplex_fair_launch_program.key().eq(&libreplex_fair_launch::ID)
+        constraint = libreplex_liquidity_program.key().eq(&libreplex_liquidity::ID)
     )]
     pub libreplex_liquidity_program: UncheckedAccount<'info>,
 
@@ -135,10 +136,10 @@ pub fn initialise_pipeline(
         panic!("Liquidity fee cannot be 0 for pipelines")
     }
 
-    libreplex_fair_launch::cpi::initialise_v2(
+    libreplex_fair_launch::cpi::initialise_v3(
         CpiContext::new(
             libreplex_fair_launch_program.to_account_info(),
-            InitialiseV2Ctx {
+            InitialiseV3Ctx {
                 /* the inscription root is set to metaplex
                  inscription object.
                 */
@@ -152,11 +153,15 @@ pub fn initialise_pipeline(
             },
         ),
         // this has the cosigner specified
-        InitialiseInputV2 {
+        InitialiseInputV3 {
             limit_per_mint: input.limit_per_mint,
             max_number_of_tokens: input.max_number_of_tokens,
             decimals: input.decimals,
             ticker: input.ticker,
+            multiplier_limits: MultiplierLimits{
+                max_numerator: 1,
+                min_denominator: 1,
+            },
             deployment_template: "".to_owned(),
             mint_template: "".to_owned(),
             offchain_url: fair_launch_input.offchain_url,

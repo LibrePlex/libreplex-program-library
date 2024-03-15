@@ -1,6 +1,6 @@
 
 
-use anchor_lang::{prelude::*};
+use anchor_lang::prelude::*;
 use anchor_spl::{associated_token::AssociatedToken, token::spl_token, token_interface::{Mint, spl_token_2022::{self}}};
 use libreplex_fair_launch::{Deployment, TOKEN2022_DEPLOYMENT_TYPE};
 
@@ -176,6 +176,12 @@ pub fn verify(proof: Vec<[u8; 32]>, root: [u8; 32], leaf: [u8; 32]) -> bool {
 
 
 pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()> {
+
+    let deployment = &ctx.accounts.deployment;
+   
+    if deployment.number_of_tokens_issued < deployment.max_number_of_tokens {
+        panic!("Deployment not minted out. Cannot create swap");
+    }
     
     // to make sure we don't create initial swap twice for the same mint.
     let pipeline_swap_marker = &mut ctx.accounts.pipeline_swap_marker;
@@ -191,7 +197,6 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()
     let token_program_22 = &ctx.accounts.token_program_22;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
-    let deployment = &ctx.accounts.deployment;
     let fungible_mint = &ctx.accounts.fungible_mint;
     
     let payer_nonfungible_token_account = &ctx.accounts.payer_nonfungible_token_account; 

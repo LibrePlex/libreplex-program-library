@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{associated_token::AssociatedToken, token::TokenAccount};
 
-use crate::{events, Liquidity, DEPLOYMENT_TYPE_NFT, DEPLOYMENT_TYPE_NFT_JOIN};
+use crate::{events, Liquidity, DEPLOYMENT_TYPE_NFT};
 use libreplex_fair_launch::{program::LibreplexFairLaunch, MintInput};
 
 #[derive(Accounts)]

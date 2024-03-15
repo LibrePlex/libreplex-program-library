@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, Discriminator};
 use solana_program::pubkey::Pubkey;
 
-use crate::errors::FairLaunchError;
+
 
 pub const TICKER_LIMIT: usize = 200;
 pub const TEMPLATE_LIMIT: usize = 1200;
@@ -220,7 +220,7 @@ impl anchor_lang::AccountDeserialize for HashlistMarker {
     }
 
     let given_disc = &buf[..8];
-    if &HashlistMarker::discriminator() != given_disc {
+    if HashlistMarker::discriminator() != given_disc {
         return Err(
             anchor_lang::error::Error::from(anchor_lang::error::AnchorError {
                     error_name: anchor_lang::error::ErrorCode::AccountDiscriminatorMismatch
@@ -247,7 +247,7 @@ impl anchor_lang::AccountDeserialize for HashlistMarker {
  fn try_deserialize_unchecked(buf: &mut &[u8]) -> Result<Self> {
     let mut data: &[u8] = &buf[8..];
 
-    if data.len() == 0 {
+    if data.is_empty() {
         return Ok(Self {
             multiplier_denominator: 1,
             multiplier_numerator: 1,

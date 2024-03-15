@@ -7,7 +7,7 @@ use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_2022::extension::group_member_pointer::GroupMemberPointer;
 use spl_token_2022::extension::BaseStateWithExtensions;
 use spl_token_2022::extension::metadata_pointer::MetadataPointer;
-use spl_token_metadata_interface::state::TokenMetadata;
+
 
 
 use crate::MintInput;
@@ -146,10 +146,8 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
         non_fungible_token_account.as_ref(), 
         hashlist,
         &mut ctx.accounts.hashlist_marker,
-    ctx.bumps.deployment,
-ctx.remaining_accounts, &signer, false, input)?;
-
-    
+        ctx.bumps.deployment,
+        ctx.remaining_accounts, signer, false, input)?;
 
     Ok(())
 }
