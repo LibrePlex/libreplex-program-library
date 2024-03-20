@@ -37,7 +37,7 @@ pub mod sysvar_instructions_program {
 pub struct MigrateToHashlistCtx<'info>  {
     #[account(mut,
         seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
-    pub deployment: Account<'info, Deployment>,
+    pub deployment: Box<Account<'info, Deployment>>,
 
 
     // will prevent a single mint from being migrated multiple times
@@ -46,14 +46,14 @@ pub struct MigrateToHashlistCtx<'info>  {
         space=8,
         payer=payer,
         seeds=["migration_marker".as_ref(), mint.key().as_ref()], bump)]
-    pub migration_marker: Account<'info, MigrationMarker>,
+    pub migration_marker: Box<Account<'info, MigrationMarker>>,
 
     #[account(
         init_if_needed,
         space=8+32+8,
         payer=payer,
         seeds=["migration_counter".as_ref(), deployment.key().as_ref()], bump)]
-    pub migration_counter: Account<'info, MigrationCounter>,
+    pub migration_counter: Box<Account<'info, MigrationCounter>>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -65,10 +65,7 @@ pub struct MigrateToHashlistCtx<'info>  {
     pub signer: Signer<'info>,
 
     /// CHECK: checked via PDA
-    #[account(mut, 
-        seeds = ["hashlist".as_bytes(), 
-        deployment.key().as_ref()],
-        bump,)]
+    #[account(mut)]
     pub hashlist: UncheckedAccount<'info>,
 
     #[account(init, 
@@ -80,16 +77,16 @@ pub struct MigrateToHashlistCtx<'info>  {
         bump,)]
     pub hashlist_marker: Account<'info, HashlistMarker>,
 
-    #[account(mut)]
-    pub mint: Account<'info, Mint>,
+    #[account()]
+    pub mint: Box<Account<'info, Mint>>,
 
-    #[account(mut)]
-    pub inscription_v3: Account<'info, InscriptionV3>,
+    #[account()]
+    pub inscription_v3: Box<Account<'info, InscriptionV3>>,
 
 
     #[account(mut,
         constraint = deployment.fungible_mint == fungible_mint.key())]
-    pub fungible_mint: Account<'info, Mint>,
+    pub fungible_mint: Box<Account<'info, Mint>>,
 
 
      /// CHECK: Id checked in constraint
@@ -97,7 +94,7 @@ pub struct MigrateToHashlistCtx<'info>  {
         token::authority = deployment.key(),
         token::mint = fungible_mint.key()
     )]
-    pub fungible_token_account_escrow: Account<'info, TokenAccount>,
+    pub fungible_token_account_escrow: Box<Account<'info, TokenAccount>>,
 
 
     #[account()]
@@ -130,6 +127,16 @@ pub fn migrate_to_hashlist(ctx: Context<MigrateToHashlistCtx>) -> Result<()> {
     migration_counter.migration_count += 1;
     migration_counter.deployment = deployment.key();
     
+
+
+    let expected_hashlist_key = Pubkey::find_program_address(&["hashlist".as_bytes(), 
+    deployment.key().as_ref()], &crate::id());
+
+    if hashlist.key != &expected_hashlist_key.0 {
+        panic!("Invalid hashlist key")
+    }
+
+
     let deployment_seeds: &[&[u8]] = &[
         "deployment".as_bytes(),
         deployment.ticker.as_ref(),

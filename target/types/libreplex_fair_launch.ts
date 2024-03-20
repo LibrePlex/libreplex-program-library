@@ -843,12 +843,12 @@ export type LibreplexFairLaunch = {
         },
         {
           "name": "mint",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
           "name": "inscriptionV3",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2491,12 +2491,12 @@ export const IDL: LibreplexFairLaunch = {
         },
         {
           "name": "mint",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
           "name": "inscriptionV3",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
