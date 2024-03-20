@@ -812,11 +812,6 @@ export type LibreplexFairLaunch = {
           "isSigner": false
         },
         {
-          "name": "deploymentConfig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "migrationMarker",
           "isMut": true,
           "isSigner": false
@@ -2461,11 +2456,6 @@ export const IDL: LibreplexFairLaunch = {
       "accounts": [
         {
           "name": "deployment",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "deploymentConfig",
           "isMut": true,
           "isSigner": false
         },
