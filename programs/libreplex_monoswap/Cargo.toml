@@ -25,6 +25,7 @@ spl-associated-token-account = "2.2.0"
 solana-program = {version = "1.17.22"}
 libreplex_shared = {version = "*", path = "../libreplex_shared", features=["cpi"]}
 mpl-token-metadata = { version="~3" }
+nifty-asset = "0.0.1-alpha.3"
 
 [dev-dependencies]
 mocha = "0.1.1"

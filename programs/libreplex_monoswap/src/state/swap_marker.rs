@@ -11,7 +11,7 @@ pub struct SwapMarker {
     pub namespace: Pubkey,
     // allows slicing and dicing by incoming mint
     pub mint_incoming: Pubkey,
-     // allows slicing and dicing by outgoing mint
+    // allows slicing and dicing by outgoing mint
     pub mint_outgoing: Pubkey,
     pub mint_incoming_amount: u64,
     pub mint_outgoing_amount: u64,
@@ -20,10 +20,15 @@ pub struct SwapMarker {
     // closed to avoid a situation where a
     // holder gets trapped into a crappy token
     // and cannot go back
-    pub used: bool
+    pub used: bool,
 }
 
 impl SwapMarker {
     pub const SIZE: usize = 8 + 32 + 32 + 32 + 8 + 8 + 1;
 }
 
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub enum SwapDirection {
+    AssetIn,
+    AssetOut,
+}

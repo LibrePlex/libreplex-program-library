@@ -1,51 +1,51 @@
-
-
 use anchor_lang::prelude::*;
-use anchor_spl::{associated_token::AssociatedToken, token::spl_token, token_interface::{Mint,TokenAccount, spl_token_2022}};
+use anchor_spl::{
+    associated_token::AssociatedToken,
+    token::spl_token,
+    token_interface::{spl_token_2022, Mint, TokenAccount},
+};
 use libreplex_shared::operations::transfer_generic_spl;
 
 use crate::SwapMarker;
 
-
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateMonoSwapInput {
     pub mint_outgoing_amount: u64,
-    pub mint_incoming_amount: u64
+    pub mint_incoming_amount: u64,
 }
 
 #[derive(Accounts)]
 pub struct CreateMonoSwapCtx<'info> {
-
     #[account(init,
-        payer = payer, 
+        payer = payer,
         space = SwapMarker::SIZE,
-        seeds = ["swap_marker".as_bytes(), 
+        seeds = ["swap_marker".as_bytes(),
         namespace.key().as_ref(),
         mint_outgoing.key().as_ref(),
         mint_incoming.key().as_ref()], // always indexed by the incoming mint
         bump,)]
     pub swap_marker: Account<'info, SwapMarker>,
 
-    #[account(mut)] 
+    #[account(mut)]
     pub mint_incoming: InterfaceAccount<'info, Mint>,
 
-    // each mint has to exist - there must be enough 
-    pub mint_outgoing: InterfaceAccount<'info, Mint>, 
+    // each mint has to exist - there must be enough
+    pub mint_outgoing: InterfaceAccount<'info, Mint>,
 
     // it is the responsibility of each swapper program to create enough
-    // of the outgoing mint so that the swap can happen. It is deposited 
+    // of the outgoing mint so that the swap can happen. It is deposited
     // from this account
     #[account(mut,
         associated_token::mint = mint_outgoing,
         associated_token::authority = mint_outgoing_owner
-    )] 
+    )]
     pub mint_outgoing_token_account_source: InterfaceAccount<'info, TokenAccount>,
-    
-    // escrow holders are organised by namespace + incoming mint - 
+
+    // escrow holders are organised by namespace + incoming mint -
     // that way you can get wallet contents to see what swaps are available to you
     /// CHECK: Checked in transfer logic
     #[account(
-        seeds = ["swap_escrow".as_bytes(), 
+        seeds = ["swap_escrow".as_bytes(),
         namespace.key().as_ref(),
         mint_incoming.key().as_ref()], // always indexed by the incoming mint
         bump)]
@@ -60,7 +60,6 @@ pub struct CreateMonoSwapCtx<'info> {
     )]
     pub mint_outgoing_token_account_escrow: InterfaceAccount<'info, TokenAccount>,
 
-
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -68,7 +67,7 @@ pub struct CreateMonoSwapCtx<'info> {
     #[account(mut)]
     pub mint_outgoing_owner: Signer<'info>,
 
-    // any account that can sign this. this is useful for grouping swaps 
+    // any account that can sign this. this is useful for grouping swaps
     pub namespace: Signer<'info>,
 
     /// CHECK: Checked in constraint
@@ -81,14 +80,14 @@ pub struct CreateMonoSwapCtx<'info> {
 
     #[account()]
     pub system_program: Program<'info, System>,
-
 }
 
-pub fn create_swap(ctx: Context<CreateMonoSwapCtx>, input: CreateMonoSwapInput) -> Result<()> {
-    
+pub fn process_create_swap(
+    ctx: Context<CreateMonoSwapCtx>,
+    input: CreateMonoSwapInput,
+) -> Result<()> {
     let swap_marker = &mut ctx.accounts.swap_marker;
     let mint_outgoing = &mut ctx.accounts.mint_outgoing;
-    
 
     swap_marker.namespace = ctx.accounts.namespace.key();
     swap_marker.mint_incoming = ctx.accounts.mint_incoming.key();
@@ -98,7 +97,7 @@ pub fn create_swap(ctx: Context<CreateMonoSwapCtx>, input: CreateMonoSwapInput) 
 
     swap_marker.used = false;
 
-    // transfer the outgoing mint into escrow - 
+    // transfer the outgoing mint into escrow -
     let token_program = &ctx.accounts.token_program;
     let mint_outgoing_token_account_source = &ctx.accounts.mint_outgoing_token_account_source;
     let mint_outgoing_token_account_escrow = &ctx.accounts.mint_outgoing_token_account_escrow;
@@ -124,7 +123,6 @@ pub fn create_swap(ctx: Context<CreateMonoSwapCtx>, input: CreateMonoSwapInput) 
         mint_outgoing.decimals,
         input.mint_outgoing_amount,
     )?;
-    
 
     Ok(())
 }
