@@ -34,7 +34,6 @@ pub struct CreateNiftySwapCtx<'info> {
     )]
     pub asset: UncheckedAccount<'info>,
 
-    // each mint has to exist - there must be enough
     pub mint: InterfaceAccount<'info, Mint>,
 
     // escrow holders are organised by namespace + incoming mint -
@@ -51,23 +50,20 @@ pub struct CreateNiftySwapCtx<'info> {
     )]
     pub escrow_owner: UncheckedAccount<'info>,
 
-    #[account(init,
+    #[account(
+        init,
         payer = payer,
         associated_token::mint = mint,
         associated_token::authority = escrow_owner,
     )]
     pub escrow_token_account: InterfaceAccount<'info, TokenAccount>,
 
-    #[account(init,
-        payer = payer,
+    #[account(
+        mut,
         associated_token::mint = mint,
         associated_token::authority = payer,
     )]
     pub source_token_account: InterfaceAccount<'info, TokenAccount>,
-
-    // leave this here for integrations
-    #[account(mut)]
-    pub mint_outgoing_owner: Signer<'info>,
 
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -79,7 +75,7 @@ pub struct CreateNiftySwapCtx<'info> {
     pub nifty_program: UncheckedAccount<'info>,
 }
 
-pub fn create_nifty_swap(ctx: Context<CreateNiftySwapCtx>, amount: u64) -> Result<()> {
+pub fn process_create_nifty_swap(ctx: Context<CreateNiftySwapCtx>, amount: u64) -> Result<()> {
     let swap_marker = &mut ctx.accounts.nifty_marker;
     let mint = &ctx.accounts.mint;
 

@@ -76,7 +76,7 @@ pub struct NiftySwapCtx<'info> {
     pub nifty_program: UncheckedAccount<'info>,
 }
 
-pub fn nifty_swap(ctx: Context<NiftySwapCtx>, direction: SwapDirection) -> Result<()> {
+pub fn process_nifty_swap(ctx: Context<NiftySwapCtx>, direction: SwapDirection) -> Result<()> {
     let nifty_marker = &mut ctx.accounts.nifty_marker;
     let asset_pubkey = ctx.accounts.asset.key();
     let mint_pubkey = ctx.accounts.mint.key();

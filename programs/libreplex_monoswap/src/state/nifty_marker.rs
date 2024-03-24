@@ -1,4 +1,3 @@
-use anchor_lang::prelude::borsh::{BorshDeserialize, BorshSerialize};
 use anchor_lang::prelude::*;
 use anchor_lang::{AnchorDeserialize, AnchorSerialize};
 
@@ -16,7 +15,7 @@ pub struct NiftyMarker {
     pub amount: u64,
 }
 
-#[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq, InitSpace)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, Eq, PartialEq, InitSpace)]
 pub enum MarkerState {
     Uninitialized,
     AssetEscrowed,

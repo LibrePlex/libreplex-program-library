@@ -27,4 +27,12 @@ pub mod libreplex_monoswap {
     pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
         process_swap(ctx)
     }
+
+    pub fn create_nifty_swap(ctx: Context<CreateNiftySwapCtx>, amount: u64) -> Result<()> {
+        process_create_nifty_swap(ctx, amount)
+    }
+
+    pub fn nifty_swap(ctx: Context<NiftySwapCtx>, direction: SwapDirection) -> Result<()> {
+        process_nifty_swap(ctx, direction)
+    }
 }

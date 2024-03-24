@@ -2398,6 +2398,8 @@ dependencies = [
  "solana-program-test",
  "solana-sdk",
  "spl-associated-token-account",
+ "spl-token",
+ "spl-token-2022 1.0.0",
 ]
 
 [[package]]
