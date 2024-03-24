@@ -62,7 +62,7 @@ pub fn transfer_generic_spl<'info>(
     )?;
 
     remaining_accounts.iter().for_each(|meta| {
-        ix.accounts.push(AccountMeta { pubkey: meta.key(), is_signer: meta.is_signer, is_writable: meta.is_writable })
+        ix.accounts.push(AccountMeta { pubkey: meta.key(), is_signer: false, is_writable: false })
     });
 
     let infos = [
