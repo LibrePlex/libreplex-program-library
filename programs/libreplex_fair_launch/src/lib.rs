@@ -81,7 +81,7 @@ pub mod libreplex_fair_launch {
     ) -> Result<()> {
         instructions::mint_token2022(ctx, input)
     }
-    pub fn swap_to_fungible22(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> {
+    pub fn swap_to_fungible22<'info>(ctx: Context<'_, '_, '_, 'info, SwapToFungible2022Ctx<'info>>) -> Result<()> {
         instructions::swap_to_fungible_2022(ctx)
     }
 

@@ -95,7 +95,7 @@ pub struct SwapToFungible2022Ctx<'info> {
     sysvar_instructions: UncheckedAccount<'info>,
 }
 
-pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> {
+pub fn swap_to_fungible_2022<'info>(ctx: Context<'_, '_, '_, 'info, SwapToFungible2022Ctx<'info>>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
     let token_program_22 = &ctx.accounts.token_program_22;
 
@@ -145,6 +145,7 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
         payer,
         0,
         1,
+        ctx.remaining_accounts,
     )?;
 
     let ticker = deployment.ticker.clone();
@@ -183,6 +184,7 @@ pub fn swap_to_fungible_2022(ctx: Context<SwapToFungible2022Ctx>) -> Result<()> 
         &payer.to_account_info(),
         deployment.decimals,
         deployment.get_fungible_mint_amount(&ctx.accounts.hashlist_marker),
+        ctx.remaining_accounts,
     )?;
     deployment.escrow_non_fungible_count += 1;
 

@@ -232,8 +232,8 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
         Some(&[seeds]),
         &ctx.accounts.payer.to_account_info(),
         deployment.decimals,
-        amount_to_transfer_to_minter
-
+        amount_to_transfer_to_minter,
+        ctx.remaining_accounts,
     )?;
     // transfer_checked(
     //     CpiContext::new_with_signer(

@@ -186,7 +186,7 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
                     sysvar_instructions: ctx.accounts.sysvar_instructions.to_account_info(),
                 }, 
                 &[seeds]
-            )
+            ).with_remaining_accounts(ctx.remaining_accounts.to_vec()),
         )?;
     }
 
