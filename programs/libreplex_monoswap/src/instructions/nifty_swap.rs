@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
     token::Token,
-    token_interface::{Mint, Token2022, TokenAccount},
+    token_interface::{Mint, Token2022, TokenAccount, TokenInterface},
 };
 use libreplex_shared::operations::transfer_generic_spl;
 use nifty_asset::instructions::TransferCpi;
@@ -53,6 +53,7 @@ pub struct NiftySwapCtx<'info> {
     #[account(mut,
         associated_token::mint = mint,
         associated_token::authority = escrow_owner
+        // token::token_program = token_program,
     )]
     pub escrow_token_account: InterfaceAccount<'info, TokenAccount>,
 
@@ -62,11 +63,13 @@ pub struct NiftySwapCtx<'info> {
     #[account(mut,
         associated_token::mint = mint,
         associated_token::authority = payer
+        // token::token_program = token_program,
     )]
     pub external_token_account: InterfaceAccount<'info, TokenAccount>,
 
-    pub token_program: Program<'info, Token>,
-    pub token_program_2022: Program<'info, Token2022>,
+    pub token_program: Interface<'info, TokenInterface>,
+    // pub token_program: Program<'info, Token>,
+    // pub token_program_2022: Program<'info, Token2022>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
 

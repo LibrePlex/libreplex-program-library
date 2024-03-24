@@ -55,13 +55,15 @@ pub struct CreateNiftySwapCtx<'info> {
         payer = payer,
         associated_token::mint = mint,
         associated_token::authority = escrow_owner,
+        token::token_program = token_program,
     )]
     pub escrow_token_account: InterfaceAccount<'info, TokenAccount>,
 
     #[account(
         mut,
-        associated_token::mint = mint,
-        associated_token::authority = payer,
+        token::mint = mint,
+        token::authority = payer,
+        token::token_program = token_program,
     )]
     pub source_token_account: InterfaceAccount<'info, TokenAccount>,
 
