@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token_interface::{transfer, Transfer, transfer_checked, TransferChecked};
+use solana_program::program::{invoke, invoke_signed};
 
 use crate::SharedError;
 
@@ -16,6 +17,7 @@ pub fn transfer_generic_spl<'info>(
     payer: &AccountInfo<'info>,
     decimals: u8,
     amount: u64,
+    remaining_accounts: &[AccountInfo<'info>],
 ) -> Result<()> {
     msg!("{}", token_program.key());
     let expected_token_account =
@@ -48,37 +50,34 @@ pub fn transfer_generic_spl<'info>(
 
     msg!("Transferring {} (decimals={})", amount, decimals );
 
+    let mut ix = spl_token_2022::instruction::transfer_checked(
+        token_program.key,
+        source_token_account.key,
+        mint.key,
+        target_token_account.key,
+        source_wallet.key,
+        &[],
+        amount,
+        decimals,
+    )?;
+
+    remaining_accounts.iter().for_each(|meta| {
+        ix.accounts.push(AccountMeta { pubkey: meta.key(), is_signer: meta.is_signer, is_writable: meta.is_writable })
+    });
+
+    let infos = [
+        &[source_token_account.clone(), mint.clone(), target_token_account.clone(), source_wallet.clone()], 
+        remaining_accounts].concat();
+
+
     match authority_seeds {
         Some(x) => {
-            transfer_checked(
-                CpiContext::new_with_signer(
-                    token_program.clone(),
-                    TransferChecked {
-                        to: target_token_account.clone(),
-                        from: source_token_account.clone(),
-                        authority: source_wallet.clone(),
-                        mint: mint.clone(),
-                    },
-                    x,
-                ),
-                amount,
-                decimals
-            )?;
+            invoke_signed(&ix, 
+                infos.as_slice(), x)?;
         }
         None => {
-            transfer_checked(
-                CpiContext::new(
-                    token_program.clone(),
-                    TransferChecked {
-                        to: target_token_account.clone(),
-                        from: source_token_account.clone(),
-                        authority: source_wallet.clone(),
-                        mint: mint.clone(),
-                    },
-                ),
-                amount,
-                decimals
-            )?;
+            invoke(&ix, 
+                infos.as_slice())?;
         }
     }
 

@@ -2,7 +2,7 @@ use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{associated_token::AssociatedToken, token::TokenAccount};
 
 use crate::{events, Liquidity, DEPLOYMENT_TYPE_NFT};
-use libreplex_fair_launch::{program::LibreplexFairLaunch, MintInput};
+use libreplex_fair_launch::{program::LibreplexFairLaunch, Deployment, MintInput};
 
 #[derive(Accounts)]
 pub struct JoinCtx<'info> {
@@ -142,10 +142,18 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
     if should_double_mint {
         let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
 
-        let remaining_accounts_mint_pooled = ctx.remaining_accounts[
-            std::cmp::min(4, ctx.remaining_accounts.len())..std::cmp::min(8, ctx.remaining_accounts.len())].to_vec();
+        let deployment_data = ctx.accounts.deployment.try_borrow_data()?;
+        let mut deployment_ref: &[u8] = *deployment_data;
 
 
+        let use_inscriptions = Deployment::try_deserialize(&mut deployment_ref)?.use_inscriptions;
+        let (remaining_accounts_mint_pooled, remanaining_accounts_swap) = if use_inscriptions {
+            (ctx.remaining_accounts[4..8].to_vec(), ctx.remaining_accounts[8..].to_vec())
+        } else {
+            (vec![], ctx.remaining_accounts.to_vec())
+        };
+
+        drop(deployment_data);
 
         libreplex_fair_launch::cpi::join(CpiContext::new_with_signer(
             fair_launch.to_account_info(),
@@ -203,7 +211,7 @@ pub fn join_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinCtx<'info>>, inpu
 
                 }, 
                 &[seeds]
-            )
+            ).with_remaining_accounts(remanaining_accounts_swap)
         )?;
 
         anchor_spl::token_interface::close_account(CpiContext::new_with_signer(ctx.accounts.token_program_22.to_account_info(), 

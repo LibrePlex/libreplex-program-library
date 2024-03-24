@@ -185,6 +185,7 @@ pub fn swap_to_nonfungible_2022<'a>(ctx: Context<'_,'_,'_,'a, SwapToNonFungible2
         deployment.decimals,
         // we need to add deflationary adjustment if applicable
         fungible_amount_to_transfer,
+        ctx.remaining_accounts,
     )?;
     deployment.escrow_non_fungible_count -= 1;
 
@@ -209,6 +210,7 @@ pub fn swap_to_nonfungible_2022<'a>(ctx: Context<'_,'_,'_,'a, SwapToNonFungible2
         &payer.to_account_info(),
         0,
         1,
+        ctx.remaining_accounts,
     )?;
 
     // We have crossed the NFT / Defi barrier. As a side effect have a splittable SPL 20
