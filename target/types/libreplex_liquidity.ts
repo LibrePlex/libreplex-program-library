@@ -960,6 +960,11 @@ export type LibreplexLiquidity = {
           "isSigner": true
         },
         {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "authority",
           "isMut": false,
           "isSigner": true
@@ -969,7 +974,8 @@ export type LibreplexLiquidity = {
           "isMut": true,
           "isSigner": false,
           "relations": [
-            "deployment"
+            "deployment",
+            "treasury"
           ]
         },
         {
@@ -2452,6 +2458,11 @@ export const IDL: LibreplexLiquidity = {
           "isSigner": true
         },
         {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "authority",
           "isMut": false,
           "isSigner": true
@@ -2461,7 +2472,8 @@ export const IDL: LibreplexLiquidity = {
           "isMut": true,
           "isSigner": false,
           "relations": [
-            "deployment"
+            "deployment",
+            "treasury"
           ]
         },
         {

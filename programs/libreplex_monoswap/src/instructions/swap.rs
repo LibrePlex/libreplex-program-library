@@ -162,6 +162,7 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
         &payer.to_account_info(),
         mint_outgoing.decimals,
         swap_marker.mint_outgoing_amount,
+        &[]
     )?;
 
     transfer_generic_spl(
@@ -180,6 +181,7 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
         &payer.to_account_info(),
         mint_incoming.decimals,
         swap_marker.mint_incoming_amount,
+        &[]
     )?;
 
 

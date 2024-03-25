@@ -123,6 +123,7 @@ pub fn create_swap(ctx: Context<CreateMonoSwapCtx>, input: CreateMonoSwapInput) 
         &payer.to_account_info(),
         mint_outgoing.decimals,
         input.mint_outgoing_amount,
+        &[]
     )?;
     
 
