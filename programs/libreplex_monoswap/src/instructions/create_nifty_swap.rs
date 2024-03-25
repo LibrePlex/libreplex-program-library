@@ -5,7 +5,7 @@ use anchor_spl::{
 };
 use libreplex_shared::operations::transfer_generic_spl;
 
-use crate::NiftyMarker;
+use crate::{MarkerState, NiftyMarker};
 
 // Swaps are created by transferring a token in.
 #[derive(Accounts)]
@@ -83,7 +83,9 @@ pub fn process_create_nifty_swap(ctx: Context<CreateNiftySwapCtx>, amount: u64) 
 
     swap_marker.namespace = ctx.accounts.namespace.key();
     swap_marker.mint = ctx.accounts.mint.key();
+    swap_marker.asset = ctx.accounts.asset.key();
     swap_marker.amount = amount;
+    swap_marker.state = MarkerState::FungibleEscrowed;
 
     // transfer the outgoing mint into escrow -
     let token_program = &ctx.accounts.token_program;

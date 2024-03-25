@@ -17,20 +17,20 @@ pub struct NiftySwapCtx<'info> {
     pub payer: Signer<'info>,
 
     #[account(mut,
-        close = payer,
-        constraint = mint.key() == nifty_marker.mint,
-        constraint = asset.key() == nifty_marker.asset,
         seeds = [
             "nifty_marker".as_bytes(),
             nifty_marker.namespace.as_ref(),
             asset.key().as_ref(),
             mint.key().as_ref(),
         ],
-        bump
+        bump,
+        has_one = mint,
+        has_one = asset,
     )]
     pub nifty_marker: Account<'info, NiftyMarker>,
 
     #[account(
+        mut,
         constraint = asset.owner == nifty_program.key
     )]
     pub asset: UncheckedAccount<'info>,
@@ -50,7 +50,8 @@ pub struct NiftySwapCtx<'info> {
     )]
     pub escrow_owner: UncheckedAccount<'info>,
 
-    #[account(mut,
+    #[account(
+        mut,
         associated_token::mint = mint,
         associated_token::authority = escrow_owner
         // token::token_program = token_program,
@@ -60,7 +61,8 @@ pub struct NiftySwapCtx<'info> {
     // it is the responsibility of each swapper program to create enough
     // of the outgoing mint so that the swap can happen. It is deposited
     // from this account
-    #[account(mut,
+    #[account(
+        mut,
         associated_token::mint = mint,
         associated_token::authority = payer
         // token::token_program = token_program,
@@ -140,7 +142,7 @@ pub fn process_nifty_swap(ctx: Context<NiftySwapCtx>, direction: SwapDirection) 
                 recipient: &ctx.accounts.payer.to_account_info(),
                 group_asset: None,
             }
-            .invoke()?;
+            .invoke_signed(&[authority_seeds])?;
 
             // Transfer fungible from payer to escrow
             transfer_generic_spl(

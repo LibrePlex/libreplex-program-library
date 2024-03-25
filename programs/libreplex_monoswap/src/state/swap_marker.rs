@@ -26,9 +26,3 @@ pub struct SwapMarker {
 impl SwapMarker {
     pub const SIZE: usize = 8 + 32 + 32 + 32 + 8 + 8 + 1;
 }
-
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum SwapDirection {
-    AssetIn,
-    AssetOut,
-}

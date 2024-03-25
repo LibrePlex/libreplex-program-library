@@ -21,3 +21,9 @@ pub enum MarkerState {
     AssetEscrowed,
     FungibleEscrowed,
 }
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub enum SwapDirection {
+    AssetIn,
+    AssetOut,
+}
