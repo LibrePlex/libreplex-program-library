@@ -1,8 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::Token,
-    token_interface::{Mint, Token2022, TokenAccount, TokenInterface},
+    token_interface::{Mint, TokenAccount, TokenInterface},
 };
 use libreplex_shared::operations::transfer_generic_spl;
 use nifty_asset::instructions::TransferCpi;
