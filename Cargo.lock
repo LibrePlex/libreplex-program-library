@@ -2357,6 +2357,7 @@ dependencies = [
  "amm-proxy",
  "anchor-lang",
  "anchor-spl",
+ "dyn-fmt",
  "libreplex_fair_launch",
  "libreplex_inscriptions",
  "libreplex_shared",
