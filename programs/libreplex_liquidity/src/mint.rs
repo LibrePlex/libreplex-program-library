@@ -58,7 +58,8 @@ pub struct MintCtx<'info> {
     #[account(mut)]
     pub fungible_mint: UncheckedAccount<'info>,
 
-    #[account(mut, 
+    #[account(init_if_needed, 
+        payer = payer,
         associated_token::authority = liquidity,
          associated_token::mint = fungible_mint)]
     pub liquidity_fungible_token_account: Account<'info, TokenAccount>,
