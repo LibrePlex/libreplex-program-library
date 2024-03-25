@@ -194,8 +194,8 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
             payer: payer.to_account_info(),
             deployment: deployment.to_account_info(),
             deployment_config: deployment_config.to_account_info(),
-            // creator fee treasury is always system program for these
             creator_fee_treasury: creator_fee_treasury.to_account_info(),
+            // liquidity treasury is always system program for these
             hashlist: hashlist.to_account_info(),
             hashlist_marker: hashlist_marker.to_account_info(),
             // fungible accounts
@@ -253,6 +253,7 @@ pub fn add_liquidity(ctx: Context<AddLiquidityCtx>) -> Result<()> {
             payer,
             deployment.decimals,
             pipeline.spl_swap_amount_primary,
+            &[]
         )?;
     
 

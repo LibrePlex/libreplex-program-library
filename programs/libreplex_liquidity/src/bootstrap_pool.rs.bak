@@ -1,0 +1,447 @@
+
+
+use anchor_lang::prelude::*;
+use anchor_spl::{associated_token::AssociatedToken, token::{Mint, Token, TokenAccount}};
+use libreplex_fair_launch::Deployment;
+use vault_proxy::program::Vault;
+use libreplex_shared::operations::create_and_verify_ata;
+use dyn_fmt::AsStrFormatExt;
+use crate::{events, Liquidity};
+
+
+#[derive(Accounts)]
+pub struct BootstapPool<'info> {
+    #[account(mut, has_one = deployment)]
+    pub liquidity: Box<Account<'info, Liquidity>>,
+
+    #[account()]
+    pub deployment: Box<Account<'info, Deployment>>,
+    
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account(init_if_needed, 
+        associated_token::authority = payer,
+        associated_token::mint = wrapped_sol_mint,
+         payer = payer)]
+    pub payer_wrapped_sol_account: Box<Account<'info, TokenAccount>>,
+
+  
+ 
+
+    #[account(mut, address = anchor_spl::token::spl_token::native_mint::id())]
+    pub wrapped_sol_mint: Box<Account<'info, Mint>>,
+
+
+    #[account(
+        mut,
+        associated_token::mint = wrapped_sol_mint, 
+        associated_token::authority = liquidity
+    )]
+    pub wrapped_sol_escrow: Box<Account<'info, TokenAccount>>,
+
+    /// CHECK: I maybe should check, but checked in coi
+    #[account(mut)]
+    pub pool: UncheckedAccount<'info>,
+
+    /// CHECK: Checked in cpi
+    #[account(mut)]
+    pub wrapped_sol_vault: UncheckedAccount<'info>,
+
+    /// CHECK: Checked in cpi
+    #[account(mut)]
+    pub fungible_vault: UncheckedAccount<'info>,
+
+    /// CHECK: Wrapped Sol Token account of the vault
+    #[account(mut)]
+    pub wrapped_sol_token_vault: UncheckedAccount<'info>,
+
+
+    /// CHECK: Checked in cpi
+    #[account(mut)]
+    pub lp_mint: UncheckedAccount<'info>,
+
+    /// CHECK: Checked in program
+    #[account(
+        mut,
+    )]
+    pub payer_lp_token_account: UncheckedAccount<'info>,
+
+    /// CHECK: Checked by address
+    #[account(
+        mut,
+        seeds = [system_program.key.as_ref(), anchor_spl::token::spl_token::ID.as_ref(), 
+        lp_mint.key.as_ref()], bump, 
+        seeds::program = anchor_spl::associated_token::ID
+    )]
+    pub system_program_lp_token_account: UncheckedAccount<'info>,
+
+    pub system_program: Program<'info, System>,
+
+    pub token_program: Program<'info, Token>,
+
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    
+   
+
+    pub rent: Sysvar<'info, Rent>,
+
+ 
+}
+
+
+#[derive(Accounts)]
+pub struct PrepareNativeEscrow<'info> {
+    #[account(mut)]
+    pub liquidity: Box<Account<'info, Liquidity>>,
+
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account(mut, address = anchor_spl::token::spl_token::native_mint::id())]
+    pub wrapped_sol_mint: Box<Account<'info, Mint>>,
+
+    #[account(init_if_needed, payer = payer, associated_token::mint = wrapped_sol_mint, 
+        associated_token::authority = liquidity)]
+    pub escrow_wrapped_sol_account: Box<Account<'info, TokenAccount>>,
+
+    pub system_program: Program<'info, System>,
+
+    pub token_program: Program<'info, Token>,
+
+    pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+pub fn prepare_native_escrow_handler(ctx: Context<PrepareNativeEscrow>) -> Result<()> {
+    let liquidity: &AccountInfo = ctx.accounts.liquidity.as_ref().as_ref();
+    let native_escrow: &AccountInfo = ctx.accounts.escrow_wrapped_sol_account.as_ref().as_ref();
+
+    let rent = Rent::get()?;
+
+    let bal = liquidity.to_account_info().lamports();
+    let required_bal = rent.minimum_balance(liquidity.to_account_info().data_len());
+    let excess_sol = bal.saturating_sub(required_bal);
+
+    
+    //msg!("{} {} {}", bal, required_bal, excess_sol);
+
+    if excess_sol > 0 {
+        **(liquidity.try_borrow_mut_lamports()?) -= excess_sol;
+        **(native_escrow.try_borrow_mut_lamports()?) += excess_sol;
+    }
+
+    Ok(())
+}
+
+
+pub fn bootstrap_pool_handler<'a>(ctx: Context<'_,'_, '_,'a, BootstapPool<'a>>) -> Result<()> {
+    //msg!("Handler: Bootstrap pool");
+     msg!("1");
+    let BootstapPool { liquidity, deployment, 
+        payer, 
+        payer_wrapped_sol_account, 
+        wrapped_sol_mint, 
+        pool,
+        fungible_vault, 
+        wrapped_sol_token_vault, 
+        lp_mint, payer_lp_token_account,
+        system_program_lp_token_account, 
+        rent,
+        associated_token_program,
+        token_program,
+        system_program,
+        ..
+        } = ctx.accounts;
+    //msg!("Unpacked accounts");
+    // msg!("1");
+
+    let metadata_program = ctx.remaining_accounts[0].to_account_info();
+    //msg!("b");
+    let fungible_token_vault = get_remaining_account_at_position(ctx.remaining_accounts, 1, None);
+
+
+    let fungible_token_fee = ctx.remaining_accounts[2].to_account_info();
+    let wrapped_sol_token_fee = ctx.remaining_accounts[3].to_account_info();
+    let fee_owner = ctx.remaining_accounts[4].to_account_info();
+    let lp_mint_metadata = ctx.remaining_accounts[5].to_account_info();
+    let fungible_mint = ctx.remaining_accounts[6].to_account_info();
+    
+    // verified in logic when optionally created
+    let fungible_escrow_token_account = ctx.remaining_accounts[7].to_account_info();
+    let payer_fungible_mint_token_account = ctx.remaining_accounts[8].to_account_info();
+
+    let amm_program = get_remaining_account_at_position(ctx.remaining_accounts, 9, Some(amm_proxy::program::Amm::id()));
+    //msg!("5");
+    // Vault program. The pool will deposit/withdraw liquidity from the vault.
+    let vault_program = get_remaining_account_at_position(ctx.remaining_accounts, 10, 
+        Some(Vault::id()));
+    
+
+    // CHECK: Checked in cpi, the lp mint of the wrapped sol vault
+    let wrapped_sol_vault_lp_mint = get_remaining_account_at_position(ctx.remaining_accounts, 11, 
+        None);
+
+    // CHECK: Checked in cpi
+    let fungible_vault_lp_mint = get_remaining_account_at_position(ctx.remaining_accounts, 12, 
+        None);
+
+    // CHECK: Checked in cpi, a token account
+    let wrapped_sol_vault_lp = get_remaining_account_at_position(ctx.remaining_accounts, 13, 
+        None);
+
+    // CHECK: Checked in cpi
+    let fungible_vault_lp = get_remaining_account_at_position(ctx.remaining_accounts, 14, 
+        None);
+    
+    // #[account(init_if_needed, 
+    //     associated_token::authority = payer,
+    //     associated_token::mint = fungible_mint,
+    //      payer = payer)]
+    // pub payer_fungible_mint_token_account: Box<Account<'info, TokenAccount>>,
+
+    msg!("6");
+
+    let fungible_escrow_token_account_obj = create_and_verify_ata(
+        &payer.to_account_info(),
+        &liquidity.to_account_info(),
+        &fungible_mint.to_account_info(),
+        &fungible_escrow_token_account.to_account_info(),
+        &associated_token_program.to_account_info(),
+        &system_program.to_account_info(),
+        &token_program.to_account_info()
+    );
+
+    let payer_fungible_mint_token_account_obj = create_and_verify_ata(
+        &payer.to_account_info(),
+        &payer.to_account_info(),
+        &fungible_mint.to_account_info(),
+        &payer_fungible_mint_token_account.to_account_info(),
+        &associated_token_program.to_account_info(),
+        &system_program.to_account_info(),
+        &token_program.to_account_info()
+    );
+
+   
+    if !deployment.fungible_mint.eq(&fungible_mint.key()) {
+        panic!("Fungible mint did not match deployment");
+    }
+
+    if liquidity.pool_bootstrapped {
+        if payer_wrapped_sol_account.amount == 0 {
+            anchor_spl::token::close_account(CpiContext::new(ctx.accounts.token_program.to_account_info(), 
+            anchor_spl::token::CloseAccount {
+                account: payer_wrapped_sol_account.to_account_info(),
+                destination: payer.to_account_info(),
+                authority: payer.to_account_info(),
+            }))?;
+        }
+
+        if payer_fungible_mint_token_account_obj.amount == 0 {
+            anchor_spl::token::close_account(CpiContext::new(ctx.accounts.token_program.to_account_info(), 
+            anchor_spl::token::CloseAccount {
+                account: payer_fungible_mint_token_account.to_account_info(),
+                destination: payer.to_account_info(),
+                authority: payer.to_account_info(),
+            }))?;
+        }
+
+        return Ok(())
+    }
+
+    let excess_sol = liquidity.to_account_info().lamports().saturating_sub(
+        rent.minimum_balance(liquidity.to_account_info().data_len()));
+    
+    if excess_sol > 0 {
+        panic!("Call prepare native escrow before bootstrapping");
+    } 
+
+    //msg!("7");
+
+    let clock = Clock::get()?;
+    let time = clock.unix_timestamp;
+    if let Some(bootstrap_start_time) = liquidity.bootstrap_start_time {
+        if time < bootstrap_start_time {
+            panic!("Bootstrap time not reached yet");
+        }
+    }
+
+    let deployment = &ctx.accounts.deployment;
+
+    let sold_out = deployment.number_of_tokens_issued >= deployment.max_number_of_tokens;
+
+    if liquidity.bootstrap_requires_sold_out && !sold_out {
+        panic!("Deployment not sold out yet");
+    }
+ 
+    let wrapped_sol_escrow = &mut ctx.accounts.wrapped_sol_escrow;
+
+    anchor_spl::token::sync_native(CpiContext::new(token_program.to_account_info(), 
+    anchor_spl::token::SyncNative{ account: wrapped_sol_escrow.to_account_info() }))?;
+
+    wrapped_sol_escrow.reload()?;
+
+    let seeds = &[
+        b"liquidity",
+        liquidity.seed.as_ref(),
+        &[liquidity.bump],
+    ];
+
+    let wrapped_sol_vault = &ctx.accounts.wrapped_sol_vault;
+
+    if wrapped_sol_vault.data_is_empty() {
+        let init_a_vault_accounts = vault_proxy::cpi::accounts::Initialize {
+            vault: wrapped_sol_vault.to_account_info(),
+            payer: payer.to_account_info(),
+            token_vault: wrapped_sol_token_vault.to_account_info(),
+            token_mint: wrapped_sol_mint.to_account_info(),
+            lp_mint: wrapped_sol_vault_lp_mint.to_account_info(),
+            rent: rent.to_account_info(),
+            token_program: token_program.to_account_info(),
+            system_program: system_program.to_account_info(),
+        };
+
+        vault_proxy::cpi::initialize(CpiContext::new(
+            vault_program.to_account_info(), 
+            init_a_vault_accounts))?;
+    }
+
+    let init_b_vault_accounts = vault_proxy::cpi::accounts::Initialize {
+        vault: fungible_vault.to_account_info(),
+        payer: payer.to_account_info(),
+        token_vault: fungible_token_vault.to_account_info(),
+        token_mint: fungible_mint.to_account_info(),
+        lp_mint: fungible_vault_lp_mint.to_account_info(),
+        rent: rent.to_account_info(),
+        token_program: token_program.to_account_info(),
+        system_program: system_program.to_account_info(),
+    };
+
+    vault_proxy::cpi::initialize(CpiContext::new(
+        vault_program.to_account_info(), 
+        init_b_vault_accounts))?;
+
+
+
+    // WE need to transfer the wrapped SOL and fungible mint pooled amt to the payer temprorarily.
+    let wrapped_sol_to_pool = wrapped_sol_escrow.amount;
+
+    anchor_spl::token::transfer(CpiContext::new_with_signer(token_program.to_account_info(),
+     anchor_spl::token::Transfer {
+        from: wrapped_sol_escrow.to_account_info(),
+        to: payer_wrapped_sol_account.to_account_info(),
+        authority: liquidity.to_account_info(),
+    }, &[seeds]), wrapped_sol_to_pool)?;
+
+ 
+    anchor_spl::token::transfer(CpiContext::new_with_signer(token_program.to_account_info(),
+    anchor_spl::token::Transfer {
+       from: fungible_escrow_token_account.to_account_info(),
+       to: payer_fungible_mint_token_account.to_account_info(),
+       authority: liquidity.to_account_info(),
+   }, &[seeds]), fungible_escrow_token_account_obj.amount)?;
+
+
+
+    //msg!("Unpacking");
+    let init_pool_accs = amm_proxy::cpi::accounts::InitializePermissionlessPoolWithFeeTier {
+        metadata_program,
+        mint_metadata: lp_mint_metadata.to_account_info(),
+        pool: pool.to_account_info(),
+        lp_mint: lp_mint.to_account_info(),
+        token_a_mint: wrapped_sol_mint.to_account_info(),
+        token_b_mint: fungible_mint.to_account_info(),
+        a_vault: wrapped_sol_vault.to_account_info(),
+        b_vault: fungible_vault.to_account_info(),
+        a_token_vault: wrapped_sol_token_vault.to_account_info(),
+        b_token_vault: fungible_token_vault.to_account_info(),
+        a_vault_lp_mint: wrapped_sol_vault_lp_mint.to_account_info(),
+        b_vault_lp_mint: fungible_vault_lp_mint.to_account_info(),
+        a_vault_lp: wrapped_sol_vault_lp.to_account_info(),
+        b_vault_lp: fungible_vault_lp.to_account_info(),
+        payer_token_a: payer_wrapped_sol_account.to_account_info(),
+        payer_token_b: payer_fungible_mint_token_account.to_account_info(),
+        payer_pool_lp: payer_lp_token_account.to_account_info(),
+        admin_token_a_fee: wrapped_sol_token_fee.to_account_info(),
+        admin_token_b_fee: fungible_token_fee.to_account_info(),
+        payer: payer.to_account_info(),
+        fee_owner: fee_owner.to_account_info(),
+        rent: rent.to_account_info(),
+        vault_program: vault_program.to_account_info(),
+        token_program: token_program.to_account_info(),
+        associated_token_program: associated_token_program.to_account_info(),
+        system_program: system_program.to_account_info(),
+    };
+
+    //msg!("Unpacked");
+
+    amm_proxy::cpi::initialize_permissionless_pool_with_fee_tier(
+        CpiContext::new(amm_program.to_account_info(), init_pool_accs),
+         amm_proxy::CurveType::ConstantProduct, liquidity.pool_fee_basis_points, 
+         wrapped_sol_escrow.amount, 
+         fungible_escrow_token_account_obj.amount)?;
+
+     
+    payer_wrapped_sol_account.reload()?;
+
+    if payer_wrapped_sol_account.amount == 0 {
+        anchor_spl::token::close_account(CpiContext::new(ctx.accounts.token_program.to_account_info(), 
+        anchor_spl::token::CloseAccount {
+            account: payer_wrapped_sol_account.to_account_info(),
+            destination: ctx.accounts.payer.to_account_info(),
+            authority: ctx.accounts.payer.to_account_info(),
+        }))?;
+    }
+
+    anchor_spl::token::close_account(CpiContext::new(ctx.accounts.token_program.to_account_info(), 
+    anchor_spl::token::CloseAccount {
+        account: payer_fungible_mint_token_account.to_account_info(),
+        destination: ctx.accounts.payer.to_account_info(),
+        authority: ctx.accounts.payer.to_account_info(),
+    }))?;
+
+    let payer_lp_token_account = &ctx.accounts.payer_lp_token_account;
+
+    let lp_supply = {
+        let mut payer_lp_token_account_data: &[u8] = &payer_lp_token_account.try_borrow_data()?;
+
+        anchor_spl::token::TokenAccount::try_deserialize(&mut payer_lp_token_account_data)?.amount
+    };
+
+    // Burn the lp token
+    anchor_spl::associated_token::create(CpiContext::new(ctx.accounts.associated_token_program.to_account_info(),
+     anchor_spl::associated_token::Create {
+        payer: ctx.accounts.payer.to_account_info(),
+        associated_token: system_program_lp_token_account.to_account_info(),
+        authority: ctx.accounts.system_program.to_account_info(),
+        mint: ctx.accounts.lp_mint.to_account_info(),
+        system_program: ctx.accounts.system_program.to_account_info(),
+        token_program: ctx.accounts.token_program.to_account_info(),
+    }
+    ))?;
+
+    anchor_spl::token::transfer(
+        CpiContext::new(ctx.accounts.token_program.to_account_info(), 
+            anchor_spl::token::Transfer {
+                from: payer_lp_token_account.to_account_info(),
+                to: system_program_lp_token_account.to_account_info(),
+                authority: ctx.accounts.payer.to_account_info(),
+            }), 
+        lp_supply)?;
+
+    liquidity.pool_bootstrapped = true;
+
+    // emit!(events::Bootstrap { liquidity: liquidity.key() });
+
+    Ok(())
+}
+
+pub fn get_remaining_account_at_position<'f>(remaining_accounts: &[AccountInfo<'f>], pos: usize, expected_id: Option<Pubkey>) 
+-> AccountInfo<'f>{
+    let account = &remaining_accounts[pos];
+    if let Some(x) = expected_id {
+        if !account.key().eq(&x) {
+            panic!("Unexpected remaining account at position {}. Expected {}", pos, x);
+        }   
+    }
+    return account.clone()
+}

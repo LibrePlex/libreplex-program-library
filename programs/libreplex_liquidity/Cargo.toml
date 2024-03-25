@@ -29,6 +29,7 @@ amm-proxy = {path = "../../utils/mercurial-proxy", features = ["cpi"]}
 vault-proxy = {path = "../../utils/vault-proxy", features = ["cpi"]}
 solana-program = "~1.17"
 solana-address-lookup-table-program = "^1.17"
+dyn-fmt = "0.3.0"
 
 [dev-dependencies]
 solana-program-test = {version= "1.17.22"}

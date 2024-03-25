@@ -309,7 +309,8 @@ pub fn create_swap(ctx: Context<CreateSwapCtx>, input: FilterInput) -> Result<()
         Some(&[pipeline_seeds]),
         payer,
         fungible_mint.decimals,
-        swap_amount
+        swap_amount,
+        &[]
     )?;
 
     // one less of these, it's gone into the swaps

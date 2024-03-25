@@ -16,6 +16,7 @@ pub struct MintSplCtx<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
+
     // this prevents direct mints via liquidity program, for ex with
     // pipelines
     #[account(
@@ -130,6 +131,10 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
     let remaining_accounts_mint_pooled = ctx.remaining_accounts[
         std::cmp::min(0, ctx.remaining_accounts.len())..std::cmp::min(4, ctx.remaining_accounts.len())].to_vec();
 
+
+    let balance_before = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
+   
+
     libreplex_fair_launch::cpi::mint_token22(CpiContext::new_with_signer(
         fair_launch.to_account_info(),
         libreplex_fair_launch::cpi::accounts::MintToken2022Ctx {
@@ -157,6 +162,7 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
         multiplier_numerator: 1,
     })?;
 
+    
 
     libreplex_fair_launch::cpi::swap_to_fungible22(
         CpiContext::new_with_signer(
@@ -199,9 +205,11 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
     let mut marker_data: &[u8] = &ctx.accounts.hashlist_marker.try_borrow_data()?;
     let marker = HashlistMarker::try_deserialize(&mut marker_data)?;
 
-    let amount_to_transfer_to_minter = deployment.get_fungible_mint_amount(&marker).checked_mul(
-        liquidity.lp_ratio as u64 - 1
-    ).unwrap().checked_div(liquidity.lp_ratio as u64).unwrap();
+    let amount_to_transfer_to_minter = liquidity.amount_to_transfer_to_minter(deployment, &marker);
+    
+    // deployment.get_fungible_mint_amount(&marker).checked_mul(
+    //     liquidity.lp_ratio as u64 - 1
+    // ).unwrap().checked_div(liquidity.lp_ratio as u64).unwrap();
 
 
     let token_program_for_fungible = match *fungible_mint.to_account_info().owner{
@@ -212,14 +220,8 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
         }
     };
 
-    msg!("amt before: {}", ctx.accounts.liquidity_fungible_token_account.amount);
-    msg!("{} {} {} {} {} {}",ctx.accounts.fungible_token_account_receiver.key(),
-        ctx.accounts.liquidity_fungible_token_account.key(),
-        liquidity.key(),
-        fungible_mint.key(),
-        amount_to_transfer_to_minter,
-        deployment.decimals
-    );
+
+    
     transfer_generic_spl(
         &token_program_for_fungible,
         &ctx.accounts.liquidity_fungible_token_account.to_account_info(),
@@ -235,6 +237,30 @@ pub fn mint_spl_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintSplCtx<'info>
         amount_to_transfer_to_minter,
         ctx.remaining_accounts,
     )?;
+
+    let balance_after = AsRef::<AccountInfo>::as_ref(liquidity.as_ref()).lamports();
+
+    let mint_funds_received = balance_after.saturating_sub(balance_before);
+    msg!("mint funds received {}", mint_funds_received);
+
+
+    if mint_funds_received > 0 && !liquidity.treasury.eq(&system_program::ID) {
+
+        let treasury_account_info = ctx.remaining_accounts.iter().find(|&r| r.key().eq(&liquidity.treasury));
+
+        if let Some(x) = treasury_account_info {
+            msg!("creator basis points {}", liquidity.creator_basis_points);
+            let fee_to_creator =  mint_funds_received.checked_mul(liquidity.creator_basis_points).unwrap().checked_div(10000).unwrap();
+
+            msg!("Fee to creator {} ({})", fee_to_creator, x.key());
+        
+            liquidity.sub_lamports(fee_to_creator)?;
+            x.add_lamports(fee_to_creator)?;
+        } else {
+            panic!("Liquidity specifies a treasury but it was not found in remaining accounts");
+        }
+    }
+
     // transfer_checked(
     //     CpiContext::new_with_signer(
     //         token_program_for_fungible.clone(),

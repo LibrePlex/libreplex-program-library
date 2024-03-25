@@ -72,7 +72,7 @@ pub mod libreplex_liquidity {
     }
     
 
-    pub fn bootstrap_pool(ctx: Context<BootstapPool>) -> Result<()> {
+    pub fn bootstrap_pool<'a>(ctx: Context<'_,'_,'_, 'a, BootstapPool<'a>>) -> Result<()> {
         bootstrap_pool_handler(ctx)
     }
 
@@ -80,7 +80,7 @@ pub mod libreplex_liquidity {
         relinquish_cosigner_handler(ctx)
     }
 
-    pub fn fix_deployment_type(ctx: Context<BootstapPool>) -> Result<()> {
+    pub fn fix_deployment_type<'a>(ctx: Context<'_,'_,'_, 'a, BootstapPool<'a>>) -> Result<()> {
         bootstrap_pool_handler(ctx)
     }
 

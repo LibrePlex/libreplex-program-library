@@ -96,7 +96,8 @@ pub fn claim_spl_as_liquidity_provider(
         Some(&[liquidity_provider_escrow_seeds]),
         payer,
         fungible_mint.decimals,
-        liquidity_provider_escrow_token_account.amount
+        liquidity_provider_escrow_token_account.amount,
+        &[]
     )?;
 
     Ok(())

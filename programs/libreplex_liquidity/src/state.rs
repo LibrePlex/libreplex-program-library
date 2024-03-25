@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use libreplex_fair_launch::{Deployment, HashlistMarker};
 
 pub const DEPLOYMENT_TYPE_NFT: u8 = 0;
 pub const DEPLOYMENT_TYPE_SPL: u8 = 1;
@@ -39,6 +40,14 @@ pub struct Liquidity {
     pub required_double_mints: Option<u32>,
 
     pub padding: [u8; 62]
+}
+
+impl Liquidity {
+    pub fn amount_to_transfer_to_minter(&self, deployment: &Deployment, marker: &HashlistMarker) -> u64 {
+        deployment.get_fungible_mint_amount(marker).checked_mul(
+            self.lp_ratio as u64 - 1
+        ).unwrap().checked_div(self.lp_ratio as u64).unwrap()
+    }
 }
 
 pub mod events {
