@@ -2394,10 +2394,13 @@ dependencies = [
  "libreplex_shared",
  "mocha",
  "mpl-token-metadata",
+ "nifty-asset",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
  "spl-associated-token-account",
+ "spl-token",
+ "spl-token-2022 1.0.0",
 ]
 
 [[package]]
@@ -2687,6 +2690,34 @@ dependencies = [
  "borsh 0.10.3",
  "num-derive 0.3.3",
  "num-traits",
+ "solana-program",
+ "thiserror",
+]
+
+[[package]]
+name = "nifty-asset"
+version = "0.0.1-alpha.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "99238aae879eafc74679bfa512af21b5694ebfb0c485d5f709c4e33b2dd463a9"
+dependencies = [
+ "borsh 0.10.3",
+ "kaigan",
+ "nifty-asset-types",
+ "num-derive 0.3.3",
+ "num-traits",
+ "solana-program",
+ "thiserror",
+]
+
+[[package]]
+name = "nifty-asset-types"
+version = "0.0.1-alpha.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0b94791938a72017c1cb3a95eef3b593d8871013d108463b2478cbaef5e6818"
+dependencies = [
+ "borsh 0.10.3",
+ "bytemuck",
+ "podded",
  "solana-program",
  "thiserror",
 ]
@@ -3091,6 +3122,15 @@ name = "plain"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
+
+[[package]]
+name = "podded"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e5ef03855395ea7838e038410cf2be5dd419fa65560c3c82dfcf1ee5b32cfb4e"
+dependencies = [
+ "bytemuck",
+]
 
 [[package]]
 name = "polyval"

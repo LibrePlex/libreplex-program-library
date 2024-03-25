@@ -9,25 +9,30 @@ pub mod state;
 pub use errors::*;
 
 pub use constants::*;
-pub use state::*;
 pub use instructions::*;
+pub use state::*;
 
 #[program]
 pub mod libreplex_monoswap {
+
     use super::*;
 
     pub fn create_monoswap(
         ctx: Context<CreateMonoSwapCtx>,
         input: CreateMonoSwapInput,
     ) -> Result<()> {
-        instructions::create_monoswap::create_swap(ctx, input)
+        process_create_swap(ctx, input)
     }
 
-
-    pub fn swap(
-        ctx: Context<SwapCtx>,
-    ) -> Result<()> {
-        instructions::swap::swap(ctx)
+    pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
+        process_swap(ctx)
     }
 
+    pub fn create_nifty_swap(ctx: Context<CreateNiftySwapCtx>, amount: u64) -> Result<()> {
+        process_create_nifty_swap(ctx, amount)
+    }
+
+    pub fn nifty_swap(ctx: Context<NiftySwapCtx>, direction: SwapDirection) -> Result<()> {
+        process_nifty_swap(ctx, direction)
+    }
 }

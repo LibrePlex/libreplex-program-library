@@ -12,12 +12,12 @@ use crate::SwapMarker;
 // it can be used to swap back and forth
 #[derive(Accounts)]
 pub struct SwapCtx<'info> {
-    #[account(mut, 
+    #[account(mut,
         close = payer,
         constraint = mint_incoming.key() == swap_marker.mint_incoming,
         constraint = mint_outgoing.key() == swap_marker.mint_outgoing,
         seeds = [
-            "swap_marker".as_bytes(), 
+            "swap_marker".as_bytes(),
             swap_marker.namespace.as_ref(),
             mint_outgoing.key().as_ref(),
             mint_incoming.key().as_ref()],
@@ -26,9 +26,9 @@ pub struct SwapCtx<'info> {
 
     /// swapping always creates a symmetrical swap marker that enables a swap back
     #[account(init,
-        payer = payer, 
+        payer = payer,
         space = SwapMarker::SIZE,
-        seeds = ["swap_marker".as_bytes(), 
+        seeds = ["swap_marker".as_bytes(),
         swap_marker.namespace.as_ref(),
         mint_incoming.key().as_ref(),
         mint_outgoing.key().as_ref()], // always indexed by the incoming mint
@@ -44,7 +44,7 @@ pub struct SwapCtx<'info> {
     #[account()]
     pub mint_outgoing: InterfaceAccount<'info, Mint>,
 
-     // it is the responsibility of each swapper program to create enough
+    // it is the responsibility of each swapper program to create enough
     // of the outgoing mint so that the swap can happen. It is deposited
     // from this account
     #[account(mut,
@@ -55,25 +55,24 @@ pub struct SwapCtx<'info> {
 
     /// CHECK: Check in pda derivation
     #[account(
-        seeds = ["swap_escrow".as_bytes(), 
+        seeds = ["swap_escrow".as_bytes(),
         swap_marker.namespace.as_ref(),
         mint_incoming.key().as_ref()], // always indexed by the incoming mint
         bump)]
     pub escrow_holder: UncheckedAccount<'info>,
 
-        /// CHECK: Check in pda derivation
-        #[account(
-            seeds = ["swap_escrow".as_bytes(), 
+    /// CHECK: Check in pda derivation
+    #[account(
+            seeds = ["swap_escrow".as_bytes(),
             swap_marker.namespace.as_ref(),
             mint_outgoing.key().as_ref()], // always indexed by the incoming mint
             bump)]
-        pub escrow_holder_reverse: UncheckedAccount<'info>,
+    pub escrow_holder_reverse: UncheckedAccount<'info>,
 
     // ... into this escrow account
     /// CHECK: Checked in transfer logic
     #[account(mut)]
     pub mint_incoming_token_account_target: UncheckedAccount<'info>,
-
 
     // it is the responsibility of each swapper program to create enough
     // of the outgoing mint so that the swap can happen. It is deposited
@@ -100,28 +99,26 @@ pub struct SwapCtx<'info> {
 
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    
     #[account()]
     pub system_program: Program<'info, System>,
 }
 
-pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
-
-    
+pub fn process_swap(ctx: Context<SwapCtx>) -> Result<()> {
     let swap_marker_reverse = &mut ctx.accounts.swap_marker_reverse;
     let mint_incoming = &mut ctx.accounts.mint_incoming;
     let mint_outgoing = &mut ctx.accounts.mint_outgoing;
     let escrow_holder_reverse = &ctx.accounts.escrow_holder_reverse;
     let swap_marker = &ctx.accounts.swap_marker;
 
-    swap_marker_reverse.set_inner(SwapMarker { 
-        namespace: swap_marker.namespace.key(), 
-        mint_incoming: mint_outgoing.key(), 
-        mint_outgoing: mint_incoming.key(), 
-        mint_incoming_amount: swap_marker.mint_outgoing_amount, 
-        mint_outgoing_amount: swap_marker.mint_incoming_amount, 
-        used: true });
-    
+    swap_marker_reverse.set_inner(SwapMarker {
+        namespace: swap_marker.namespace.key(),
+        mint_incoming: mint_outgoing.key(),
+        mint_outgoing: mint_incoming.key(),
+        mint_incoming_amount: swap_marker.mint_outgoing_amount,
+        mint_outgoing_amount: swap_marker.mint_incoming_amount,
+        used: true,
+    });
+
     // transfer the outgoing mint into escrow -
     let token_program = &ctx.accounts.token_program;
     let mint_outgoing_token_account_source = &ctx.accounts.mint_outgoing_token_account_source;
@@ -141,7 +138,6 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
         mint_incoming_key.as_ref(),
         &[ctx.bumps.escrow_holder],
     ];
-
 
     let payer = &ctx.accounts.payer;
 
@@ -183,7 +179,6 @@ pub fn swap(ctx: Context<SwapCtx>) -> Result<()> {
         swap_marker.mint_incoming_amount,
         &[]
     )?;
-
 
     Ok(())
 }
