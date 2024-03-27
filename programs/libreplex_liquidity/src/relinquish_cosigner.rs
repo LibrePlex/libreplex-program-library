@@ -29,7 +29,7 @@ pub fn relinquish_cosigner_handler(ctx: Context<RelinquishCosignersCtx>) -> Resu
 
     let liquidity = &ctx.accounts.liquidity;
     let deployment = &ctx.accounts.deployment;
-    let payer = &ctx.accounts.deployment;
+    let payer = &ctx.accounts.payer;
     let libreplex_fair_launch_program = &ctx.accounts.libreplex_fair_launch_program;
 
     let seeds = &[
