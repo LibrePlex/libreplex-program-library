@@ -106,6 +106,10 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
 
     liquidity.total_mints += 1;
 
+    if liquidity.cosigner_program_id.ne(&system_program::ID) {
+        panic!("No co signer")
+    }
+
     let seeds = &[
         b"liquidity",
         liquidity.seed.as_ref(),
