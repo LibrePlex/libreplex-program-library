@@ -24,7 +24,8 @@ pub struct InitialisePipeline {
     pub liquidity_provider_amount_in_lamports: u64,
     pub liquidity_provider_amount_in_spl: u64,
     pub hashlist_url: String,
-    pub require_cosigner: bool
+    pub require_cosigner: bool,
+    pub transfer_fee_withdraw_authority: Option<Pubkey>
    
     // this allows for interesting dynamics
 }
@@ -173,7 +174,9 @@ pub fn initialise_pipeline(
             // and treasury is always liquidity
             creator_fee_treasury: liquidity.key(),
             creator_fee_per_mint_in_lamports: fair_launch_input.liquidity_provider_amount_in_lamports,
-            deflation_rate_per_swap: 0,
+            transfer_fee_in_basis_points: 0,
+            transfer_fee_withdraw_authority: fair_launch_input.transfer_fee_withdraw_authority
+
         },
     )?;
 

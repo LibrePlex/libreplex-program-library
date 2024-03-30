@@ -18,10 +18,11 @@ pub struct InitialiseInputV3 {
     pub creator_fee_treasury: Pubkey,
     pub creator_fee_per_mint_in_lamports: u64,
     // this allows for interesting dynamics
-    pub deflation_rate_per_swap: u16,
+    pub transfer_fee_in_basis_points: u16,
 
     // The largest possible multiplier
     pub multiplier_limits: MultiplierLimits,
+    pub transfer_fee_withdraw_authority: Option<Pubkey>
 }
 
 /*

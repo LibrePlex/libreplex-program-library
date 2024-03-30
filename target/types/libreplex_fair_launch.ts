@@ -1116,7 +1116,7 @@ export type LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
@@ -1129,6 +1129,12 @@ export type LibreplexFairLaunch = {
               "option": {
                 "defined": "MultiplierLimits"
               }
+            }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
             }
           }
         ]
@@ -1311,13 +1317,19 @@ export type LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
             "name": "multiplierLimits",
             "type": {
               "defined": "MultiplierLimits"
+            }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
             }
           }
         ]
@@ -1369,7 +1381,7 @@ export type LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
@@ -1382,6 +1394,12 @@ export type LibreplexFairLaunch = {
               "option": {
                 "defined": "MultiplierLimits"
               }
+            }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
             }
           }
         ]
@@ -2764,7 +2782,7 @@ export const IDL: LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
@@ -2777,6 +2795,12 @@ export const IDL: LibreplexFairLaunch = {
               "option": {
                 "defined": "MultiplierLimits"
               }
+            }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
             }
           }
         ]
@@ -2959,13 +2983,19 @@ export const IDL: LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
             "name": "multiplierLimits",
             "type": {
               "defined": "MultiplierLimits"
+            }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
             }
           }
         ]
@@ -3017,7 +3047,7 @@ export const IDL: LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
@@ -3030,6 +3060,12 @@ export const IDL: LibreplexFairLaunch = {
               "option": {
                 "defined": "MultiplierLimits"
               }
+            }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
             }
           }
         ]

@@ -35,6 +35,11 @@ pub struct TokenMemberInput<'f> {
     pub group_mint: AccountInfo<'f>,
 }
 
+pub struct TransferFeeParams {
+    pub transfer_fee_bps: u16,
+    pub withdraw_fee_authority: Pubkey,
+}
+
 /// Creates the metadata accounts and mint a new token.
 pub fn create_token_2022_and_metadata(
     accounts: MintAccounts2022,
@@ -44,7 +49,7 @@ pub fn create_token_2022_and_metadata(
     token_group: Option<TokenGroupInput>,
     token_member: Option<TokenMemberInput>,
     auth_seeds: Option<&[&[u8]]>,
-    transfer_fee_bps: u16,
+    transfer_fee_params: Option<TransferFeeParams>,
 ) -> Result<()> {
     // msg!("create_token_2022_and_metadata called");
     let MintAccounts2022 {
@@ -79,9 +84,11 @@ pub fn create_token_2022_and_metadata(
         None => {}
     };
 
-    if transfer_fee_bps > 0 {
-        extension_types.push(ExtensionType::TransferFeeConfig);
-        extension_extra_space += std::mem::size_of::<TransferFeeConfig>()
+    if let Some(x) = &transfer_fee_params {
+        if x.transfer_fee_bps > 0 {
+            extension_types.push(ExtensionType::TransferFeeConfig);
+            extension_extra_space += std::mem::size_of::<TransferFeeConfig>()
+        }
     }
 
     match &token_member {
@@ -150,37 +157,39 @@ pub fn create_token_2022_and_metadata(
         _ => {}
     }
 
-    if transfer_fee_bps > 0 {
-        let initialise_transfer_fee_extension =
+    if let Some(tfp) = &transfer_fee_params {
+        if tfp.transfer_fee_bps > 0 {
+            let initialise_transfer_fee_extension =
             spl_token_2022::extension::transfer_fee::instruction::initialize_transfer_fee_config(
                 &spl_token_2022::ID,
                 &nft_mint.key(),
                 Some(&authority.key()),
-                Some(&authority.key()),
-                transfer_fee_bps,
+                Some(&tfp.withdraw_fee_authority),
+                tfp.transfer_fee_bps.clone(),
                 std::u64::MAX,
             )?;
-        match &auth_seeds {
-            Some(y) => {
-                invoke_signed(
-                    &initialise_transfer_fee_extension,
-                    &[
-                        nft_mint.to_account_info(),
-                        authority.to_account_info(),
-                        nft_mint.to_account_info(),
-                    ],
-                    &[y],
-                )?;
-            }
-            None => {
-                invoke(
-                    &initialise_transfer_fee_extension,
-                    &[
-                        nft_mint.to_account_info(),
-                        authority.to_account_info(),
-                        nft_mint.to_account_info(),
-                    ],
-                )?;
+            match &auth_seeds {
+                Some(y) => {
+                    invoke_signed(
+                        &initialise_transfer_fee_extension,
+                        &[
+                            nft_mint.to_account_info(),
+                            authority.to_account_info(),
+                            nft_mint.to_account_info(),
+                        ],
+                        &[y],
+                    )?;
+                }
+                None => {
+                    invoke(
+                        &initialise_transfer_fee_extension,
+                        &[
+                            nft_mint.to_account_info(),
+                            authority.to_account_info(),
+                            nft_mint.to_account_info(),
+                        ],
+                    )?;
+                }
             }
         }
     }
@@ -221,8 +230,6 @@ pub fn create_token_2022_and_metadata(
         }
         None => {}
     }
-
-
 
     match &token_member {
         Some(x) => {

@@ -17,14 +17,18 @@ pub fn initialise_logic(input: InitialiseInputV3,
         panic!("Bad deployment type")
     }
     
-    if deployment_type == HYBRID_DEPLOYMENT_TYPE && input.deflation_rate_per_swap > 0{
+    if deployment_type == HYBRID_DEPLOYMENT_TYPE && input.transfer_fee_in_basis_points > 0{
         panic!("Non-zero deflation rate requires a token-2022 deployment")
     }
 
 
     config.creator_fee_treasury = input.creator_fee_treasury;
     config.creator_fee_per_mint_lamports = input.creator_fee_per_mint_in_lamports;
-    config.deflation_rate_per_swap = input.deflation_rate_per_swap;
+    config.transfer_fee_in_basis_points = input.transfer_fee_in_basis_points;
+    config.transfer_fee_withdraw_authority = match input.transfer_fee_withdraw_authority {
+        Some(x) => Some(x),
+        _ => Some(deployment.key())
+    };
 
     config.multiplier_limits = Some(input.multiplier_limits);
 

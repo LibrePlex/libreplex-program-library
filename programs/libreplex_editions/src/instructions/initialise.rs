@@ -152,7 +152,7 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         }),
         None,
         Some(deployment_seeds),
-        0
+        None
     )?;
     
 

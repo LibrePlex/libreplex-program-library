@@ -145,13 +145,13 @@ pub fn swap_to_nonfungible_2022<'a>(ctx: Context<'_,'_,'_,'a, SwapToNonFungible2
         let mut data: &[u8] = &tai.try_borrow_data()?;
         let deployment_config_object = DeploymentConfig::try_deserialize(&mut data)?;
      
-        if deployment_config_object.deflation_rate_per_swap > 0 {
+        if deployment_config_object.transfer_fee_in_basis_points > 0 {
             // where there is deflation, adjust accordingly
             let mut numerator = (deployment.get_fungible_mint_amount(&ctx.accounts.hashlist_marker) as u128)
                 .checked_mul(10_000_u128)
                 .unwrap();
             let denominator = 10_000_u128
-                .checked_sub(deployment_config_object.deflation_rate_per_swap as u128)
+                .checked_sub(deployment_config_object.transfer_fee_in_basis_points as u128)
                 .unwrap();
 
             let remainder = numerator.checked_rem(denominator);
