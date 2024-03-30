@@ -7,7 +7,8 @@ use anchor_spl::associated_token::{
     self, get_associated_token_address_with_program_id, AssociatedToken,
 };
 
-use libreplex_fair_launch::{Deployment, DeploymentConfig, MintInput, MultiplierLimits, TOKEN2022_DEPLOYMENT_TYPE};
+use anchor_spl::token_2022::spl_token_2022::extension::transfer_fee::TransferFeeConfig;
+use libreplex_fair_launch::{Deployment, DeploymentConfig, MintInput, MultiplierLimits, TransferFeeInputConfig, TOKEN2022_DEPLOYMENT_TYPE};
 use libreplex_shared::sysvar_instructions_program;
 use solana_program::hash::Hash;
 use solana_program::program_pack::Pack;
@@ -506,6 +507,7 @@ pub async fn initialise_token_2022(
 
     let creator_fee_treasury = Keypair::new().pubkey();
 
+    let withdraw_authority = Keypair::new().pubkey();
    
 
     context
@@ -527,12 +529,16 @@ pub async fn initialise_token_2022(
                         deployment_type: TOKEN2022_DEPLOYMENT_TYPE,
                         creator_fee_per_mint_in_lamports: CREATOR_FEE_IN_LAMPORTS,
                         creator_fee_treasury,
-                        transfer_fee_in_basis_points: DEFLATION_RATE,
+                        transfer_fee_config: Some(TransferFeeInputConfig {
+                            fee_in_basis_points: DEFLATION_RATE,
+                            withdraw_authority: withdraw_authority,
+                            target_wallet: withdraw_authority
+                        }),
                         multiplier_limits: MultiplierLimits {
                             max_numerator: 1,
                             min_denominator: 1,
                         },
-                        transfer_fee_withdraw_authority: None
+                        
                     },
                 }
                 .data(),

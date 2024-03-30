@@ -1136,6 +1136,12 @@ export type LibreplexFairLaunch = {
             "type": {
               "option": "publicKey"
             }
+          },
+          {
+            "name": "transferFeeTargetWallet",
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
@@ -1317,20 +1323,38 @@ export type LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "transferFeeInBasisPoints",
-            "type": "u16"
-          },
-          {
             "name": "multiplierLimits",
             "type": {
               "defined": "MultiplierLimits"
             }
           },
           {
-            "name": "transferFeeWithdrawAuthority",
+            "name": "transferFeeConfig",
             "type": {
-              "option": "publicKey"
+              "option": {
+                "defined": "TransferFeeInputConfig"
+              }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferFeeInputConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeInBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "withdrawAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "targetWallet",
+            "type": "publicKey"
           }
         ]
       }
@@ -1398,6 +1422,12 @@ export type LibreplexFairLaunch = {
           },
           {
             "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "transferFeeTargetWallet",
             "type": {
               "option": "publicKey"
             }
@@ -2802,6 +2832,12 @@ export const IDL: LibreplexFairLaunch = {
             "type": {
               "option": "publicKey"
             }
+          },
+          {
+            "name": "transferFeeTargetWallet",
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
@@ -2983,20 +3019,38 @@ export const IDL: LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "transferFeeInBasisPoints",
-            "type": "u16"
-          },
-          {
             "name": "multiplierLimits",
             "type": {
               "defined": "MultiplierLimits"
             }
           },
           {
-            "name": "transferFeeWithdrawAuthority",
+            "name": "transferFeeConfig",
             "type": {
-              "option": "publicKey"
+              "option": {
+                "defined": "TransferFeeInputConfig"
+              }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferFeeInputConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeInBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "withdrawAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "targetWallet",
+            "type": "publicKey"
           }
         ]
       }
@@ -3064,6 +3118,12 @@ export const IDL: LibreplexFairLaunch = {
           },
           {
             "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "transferFeeTargetWallet",
             "type": {
               "option": "publicKey"
             }

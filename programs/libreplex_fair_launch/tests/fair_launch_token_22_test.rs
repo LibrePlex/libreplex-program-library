@@ -412,12 +412,11 @@ pub async fn initialise_token_2022(
                         deployment_type: TOKEN2022_DEPLOYMENT_TYPE,
                         creator_fee_per_mint_in_lamports: CREATOR_FEE_IN_LAMPORTS,
                         creator_fee_treasury,
-                        transfer_fee_in_basis_points: 0,
+                        transfer_fee_config: None,
                         multiplier_limits: MultiplierLimits {
                             max_numerator: 1,
                             min_denominator: 1,
-                        },
-                        transfer_fee_withdraw_authority: None
+                        }
 
                     },
                 }

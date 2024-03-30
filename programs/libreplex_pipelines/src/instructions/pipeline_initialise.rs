@@ -174,9 +174,7 @@ pub fn initialise_pipeline(
             // and treasury is always liquidity
             creator_fee_treasury: liquidity.key(),
             creator_fee_per_mint_in_lamports: fair_launch_input.liquidity_provider_amount_in_lamports,
-            transfer_fee_in_basis_points: 0,
-            transfer_fee_withdraw_authority: fair_launch_input.transfer_fee_withdraw_authority
-
+            transfer_fee_config: None
         },
     )?;
 

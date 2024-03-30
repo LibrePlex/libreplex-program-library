@@ -85,6 +85,7 @@ pub struct DeploymentConfig {
 
     pub multiplier_limits: Option<MultiplierLimits>,
     pub transfer_fee_withdraw_authority: Option<Pubkey>,
+    pub transfer_fee_target_wallet: Option<Pubkey>,
     
 }
 
