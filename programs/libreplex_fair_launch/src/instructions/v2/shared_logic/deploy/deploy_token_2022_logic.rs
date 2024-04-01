@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 
 use libreplex_shared::{
-    create_token_2022_and_metadata, MintAccounts2022, TokenGroupInput, TransferFeeParams,
+    create_token_2022_and_metadata, MintAccounts2022, TransferFeeParams,
 };
 
 use spl_token_metadata_interface::state::TokenMetadata;
@@ -59,9 +59,10 @@ pub fn deploy_token_2022_logic<'f>(
             uri: deployment.offchain_url.clone(),
             additional_metadata: vec![],
         }),
-        Some(TokenGroupInput {
-            max_size: deployment.max_number_of_tokens as u32,
-        }),
+        None,
+        // Some(TokenGroupInput {
+        //     max_size: deployment.max_number_of_tokens as u32,
+        // }),
         None,
         Some(deployment_seeds),
         match deployment_config.transfer_fee_in_basis_points {
