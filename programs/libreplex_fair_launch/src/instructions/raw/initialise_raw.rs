@@ -5,7 +5,6 @@ use crate::DeploymentRaw;
 
 
 
-// Same as v2 with multiplier_upper_limit added
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseRawInput {
     pub limit_per_mint: u64, // this number of SPL tokens are issued into the escrow when an op: 'mint' comes in 
@@ -18,22 +17,6 @@ pub struct InitialiseRawInput {
     pub cosigner_swap_to_nft: Option<Pubkey>,
 }
 
-/*
-
-    Initialise sets the main template parameters of the deployment:
-    1) ticker
-    2) deployment template
-    3) mint template
-    4) decimals
-    5) limit per mint
-    6) max number of tokens
-
-    It does not create any inscriptions / mints as these are handled by the deploy endpoints.
-    This method is metadata agnostic.
-
-*/
-
-// Same as V2 just with extra field in input.
 #[derive(Accounts)]
 #[instruction(input: InitialiseRawInput)]
 pub struct InitialiseRawCtx<'info>  {
