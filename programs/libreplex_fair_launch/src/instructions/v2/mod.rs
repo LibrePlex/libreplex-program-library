@@ -12,6 +12,9 @@
 pub mod token_2022;
 pub use token_2022::*;
 
+pub mod burn_excess_spl;
+pub use burn_excess_spl::*;
+
 pub mod relinquish_cosigner;
 pub use relinquish_cosigner::*;
 

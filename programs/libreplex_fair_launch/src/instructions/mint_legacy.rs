@@ -166,6 +166,7 @@ pub fn mint_legacy<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyCtx<'info>>)
     let associated_token_program = &ctx.accounts.associated_token_program;
     let sysvar_instructions_program = &ctx.accounts.sysvar_instructions;
 
+    
     mint_legacy_logic(deployment, inscriptions_program, inscription_summary, non_fungible_mint, inscription_v3, system_program, payer, inscription_data, 
         fungible_mint, fungible_token_account_escrow, associated_token_program, token_program, inscriber, non_fungible_token_account, non_fungible_metadata, non_fungible_masteredition, metadata_program, sysvar_instructions_program, hashlist,
     &ctx.accounts.hashlist_marker,
