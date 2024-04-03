@@ -39,4 +39,13 @@ pub enum FairLaunchError {
 
     #[msg("Custom multiplier mints require co signer")]
     MultiplierMissMatch,
+
+    #[msg("Incorrect cosigner for mint")]
+    IncorrectMintCosigner,
+
+    #[msg("Incorrect cosigner for swap to spl")]
+    IncorrectSwapToSplCosigner,
+
+    #[msg("Incorrect cosigner for mint")]
+    IncorrectSwapToNftCosigner,
 }

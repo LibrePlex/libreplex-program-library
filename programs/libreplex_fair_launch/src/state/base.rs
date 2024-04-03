@@ -95,6 +95,7 @@ impl DeploymentConfig {
 }
 
 
+
 #[event]
 pub struct NewDeploymentEvent {
     pub ticker: String,
