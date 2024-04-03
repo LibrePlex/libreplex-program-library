@@ -75,6 +75,12 @@ pub mod libreplex_fair_launch {
         instructions::reduce_mint_count(ctx, input)
     }
    
+    pub fn burn_excess_spl<'info>(
+        ctx: Context<'_, '_, '_, 'info, BurnExcessSplCtx<'info>>
+    ) -> Result<()> {
+        instructions::burn_excess_spl(ctx)
+    }
+
     pub fn mint_token22<'info>(
         ctx: Context<'_, '_, '_, 'info, MintToken2022Ctx<'info>>,
         input: MintInput,

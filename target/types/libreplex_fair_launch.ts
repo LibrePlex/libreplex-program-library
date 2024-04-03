@@ -431,6 +431,47 @@ export type LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "burnExcessSpl",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "mintToken22",
       "accounts": [
         {
@@ -1142,6 +1183,21 @@ export type LibreplexFairLaunch = {
             "type": {
               "option": "publicKey"
             }
+          },
+          {
+            "name": "totalSplEquivalentMinted",
+            "type": "u64"
+          },
+          {
+            "name": "splExcessInEscrow",
+            "type": "u64"
+          },
+          {
+            "name": "allowBurn",
+            "docs": [
+              "used for variable-rate swaps"
+            ],
+            "type": "bool"
           }
         ]
       }
@@ -1431,6 +1487,21 @@ export type LibreplexFairLaunch = {
             "type": {
               "option": "publicKey"
             }
+          },
+          {
+            "name": "totalSplEquivalentMinted",
+            "type": "u64"
+          },
+          {
+            "name": "splExcessInEscrow",
+            "type": "u64"
+          },
+          {
+            "name": "allowBurn",
+            "docs": [
+              "used for variable-rate swaps"
+            ],
+            "type": "bool"
           }
         ]
       }
@@ -2127,6 +2198,47 @@ export const IDL: LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "burnExcessSpl",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "mintToken22",
       "accounts": [
         {
@@ -2838,6 +2950,21 @@ export const IDL: LibreplexFairLaunch = {
             "type": {
               "option": "publicKey"
             }
+          },
+          {
+            "name": "totalSplEquivalentMinted",
+            "type": "u64"
+          },
+          {
+            "name": "splExcessInEscrow",
+            "type": "u64"
+          },
+          {
+            "name": "allowBurn",
+            "docs": [
+              "used for variable-rate swaps"
+            ],
+            "type": "bool"
           }
         ]
       }
@@ -3127,6 +3254,21 @@ export const IDL: LibreplexFairLaunch = {
             "type": {
               "option": "publicKey"
             }
+          },
+          {
+            "name": "totalSplEquivalentMinted",
+            "type": "u64"
+          },
+          {
+            "name": "splExcessInEscrow",
+            "type": "u64"
+          },
+          {
+            "name": "allowBurn",
+            "docs": [
+              "used for variable-rate swaps"
+            ],
+            "type": "bool"
           }
         ]
       }

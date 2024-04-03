@@ -158,7 +158,7 @@ pub fn migrate_to_hashlist(ctx: Context<MigrateToHashlistCtx>) -> Result<()> {
 
     let current_mint_amount = fungible_mint.supply;
 
-    let final_mint_amount = deployment.get_max_fungible_mint_amount(
+    let final_mint_amount = deployment.get_max_fungible_mint_amount_per_deployment(
         &None
     );
 
