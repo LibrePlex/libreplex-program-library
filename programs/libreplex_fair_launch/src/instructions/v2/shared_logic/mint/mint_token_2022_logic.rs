@@ -96,7 +96,7 @@ pub fn mint_token2022_logic<'info>(
         deployment.get_fungible_mint_amount(hashlist_marker);
 
     if deployment_config.allow_burn {
-        deployment_config.spl_excess_in_escrow = deployment
+        deployment_config.spl_excess_in_escrow += deployment
             .get_max_fungible_mint_amount_per_token(&deployment_config.multiplier_limits)
             .checked_sub(deployment.get_fungible_mint_amount(hashlist_marker))
             .unwrap();
