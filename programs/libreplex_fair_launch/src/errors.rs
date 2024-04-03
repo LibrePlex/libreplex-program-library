@@ -46,6 +46,6 @@ pub enum FairLaunchError {
     #[msg("Incorrect cosigner for swap to spl")]
     IncorrectSwapToSplCosigner,
 
-    #[msg("Incorrect cosigner for mint")]
+    #[msg("Incorrect cosigner for swap to NFT")]
     IncorrectSwapToNftCosigner,
 }
