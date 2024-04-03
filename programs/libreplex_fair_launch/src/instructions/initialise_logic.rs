@@ -25,7 +25,7 @@ pub fn initialise_logic(input: InitialiseInputV3,
     config.creator_fee_treasury = input.creator_fee_treasury;
     config.creator_fee_per_mint_lamports = input.creator_fee_per_mint_in_lamports;
     config.allow_burn = true;
-    // WARNING WARNING! These impact the amount of SPL that is available to burn 
+    // NB: These impact the amount of SPL that is available to burn 
     // at the end of mint (in case there is excess in a multi-tier rarity set-up)
     config.spl_excess_in_escrow = 0;
     config.total_spl_equivalent_minted = 0;
