@@ -32,12 +32,10 @@ pub struct BurnExcessSplCtx<'info> {
     )]
     pub signer: Signer<'info>,
 
-    /* fungible accounts */
     /// CHECK: checked above against deployment.fungible_mint
     #[account(mut)]
     pub fungible_mint: UncheckedAccount<'info>,
 
-    /// this always exists so we can specify the account type explicitly
     #[account(
         mut,
         token::mint = fungible_mint,
@@ -62,9 +60,6 @@ pub fn burn_excess_spl<'info>(
     let deployment = &mut ctx.accounts.deployment;
     let deployment_config = &mut ctx.accounts.deployment_config;
     
-    // simples. two steps:
-    // 1) move the non_fungible into the escrow
-
     let ticker = deployment.ticker.clone();
 
     let authority_seeds = &[
