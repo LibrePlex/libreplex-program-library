@@ -28,7 +28,7 @@ pub struct BurnExcessSplCtx<'info> {
     pub payer: Signer<'info>,
 
     #[account(
-        constraint = deployment.require_creator_cosign && deployment.creator == signer.key()
+        constraint = !deployment.require_creator_cosign || deployment.creator.eq(&signer.key())
     )]
     pub signer: Signer<'info>,
 
@@ -60,6 +60,14 @@ pub fn burn_excess_spl<'info>(
     let deployment = &mut ctx.accounts.deployment;
     let deployment_config = &mut ctx.accounts.deployment_config;
     
+    if deployment.number_of_tokens_issued < deployment.max_number_of_tokens {
+        panic!("Cannot burn before mint-out")
+    }
+
+    if !deployment_config.allow_burn {
+        panic!("This deployment does not allow burning")
+    }
+
     let ticker = deployment.ticker.clone();
 
     let authority_seeds = &[
