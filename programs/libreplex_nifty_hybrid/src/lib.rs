@@ -11,7 +11,6 @@ pub mod mint;
 pub use mint::*;
 
 
-
 pub mod initialise;
 pub use initialise::*;
 
@@ -29,5 +28,7 @@ pub mod libreplex_nifty_hybrid {
     pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
         init_handler(ctx, input)
     }
+
+    // no deploy method here.  deploy_raw can be called directly 
 
 }

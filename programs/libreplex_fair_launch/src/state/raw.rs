@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 
+use anchor_spl::token_interface::Mint;
 use solana_program::pubkey::Pubkey;
 
 
@@ -31,7 +32,7 @@ pub struct DeploymentRaw {
     pub max_number_of_tokens: u64,
 
     pub number_of_tokens_issued: u64,
-    
+
     
     // this is used to sanity check that
     // whenever swaps occur, to the maount
@@ -43,7 +44,11 @@ pub struct DeploymentRaw {
     #[max_len(TICKER_LIMIT)]
     pub ticker: String,
 
-    pub fungible_mint: Pubkey, // starts as 111111111111...
+    // responsibility of the deployer to set this correctly.
+    // also, responsibility of the deployer to ensure that 
+    // the associated token account (owned by deployment)
+    // contains sufficient tokens for the swap
+    pub fungible_mint: Pubkey,
   
     #[max_len(OFFCHAIN_URL_LIMIT)]
     pub offchain_url: String, // pub padding: Vec<u8, EXCESS>
@@ -62,4 +67,12 @@ pub struct DeploymentRaw {
 
     // just in case
     pub padding: [u8; 200]
+}
+
+impl DeploymentRaw {
+    pub fn get_base_amount_per_mint(&self, fungible_mint: &Mint) -> u64 {
+        self.limit_per_mint
+        .checked_mul(10_u64.checked_pow(fungible_mint.decimals as u32).unwrap())
+        .unwrap()
+    }
 }

@@ -8,7 +8,6 @@ use crate::{events::NiftyHybridCreate, NiftyHybrid};
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseInput {
     pub seed: Pubkey,
-    pub deployment: Pubkey,
     pub cosigner: Option<Pubkey>,
     pub cosigner_program_id: Option<Pubkey>,
 }
@@ -21,7 +20,7 @@ pub struct InitialiseCtx<'info> {
     #[account(mut)]
     pub deployment: Account<'info, DeploymentRaw>,
 
-     /// CHECK: Can be anyone
+     /// CHECK: Can be any
     pub group_mint: UncheckedAccount<'info>,
 
     #[account(mut)]
@@ -41,7 +40,6 @@ pub fn init_handler(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Resu
     let InitialiseInput {
         seed,
         cosigner,
-        deployment,
         cosigner_program_id,
     } = input;
 
@@ -49,7 +47,7 @@ pub fn init_handler(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Resu
         seed,
         creator: ctx.accounts.creator.key(),
         bump: ctx.bumps.nifty_hybrid,
-        deployment,
+        deployment: ctx.accounts.deployment.key(),
         cosigner: match &cosigner {
             Some(x)=>*x,
             _ => system_program::ID
@@ -87,8 +85,8 @@ pub fn init_handler(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Resu
         payer.to_account_info(),
         system_program.to_account_info()]
     )?;
-    
 
+    // mint the required amount of fungible
     emit_create(&ctx.accounts.nifty_hybrid);
 
     Ok(())

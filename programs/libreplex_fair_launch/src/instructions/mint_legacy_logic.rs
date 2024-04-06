@@ -51,6 +51,7 @@ pub fn mint_legacy_logic<'info>(
         return Err(FairLaunchError::IncorrectMintType.into())
     }
 
+    
     deployment.number_of_tokens_issued += 1;
  
     if deployment.use_inscriptions {

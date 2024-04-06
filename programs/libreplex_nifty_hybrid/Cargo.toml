@@ -27,6 +27,7 @@ solana-program = "~1.17"
 solana-address-lookup-table-program = "^1.17"
 dyn-fmt = "0.3.0"
 nifty-asset = {version = "0.1.2"}
+libreplex-monoswap-client = {version = "*", path = "../../../monoswap/clients/rust/"}
 
 [dev-dependencies]
 solana-program-test = {version= "1.17.22"}

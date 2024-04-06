@@ -101,7 +101,7 @@ pub fn mint_all_fungibles<'a>(
             },
             &[deployment_seeds],
         ),
-        deployment.get_max_fungible_mint_amount(&deployment_config.multiplier_limits),
+        deployment.get_max_fungible_mint_amount_per_deployment(&deployment_config.multiplier_limits),
     )?;
 
     if revoke_auths {
