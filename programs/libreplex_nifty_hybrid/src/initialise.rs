@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, system_program};
 
-use libreplex_fair_launch::DeploymentRaw;
+use libreplex_fair_launch::DeploymentV2;
 use nifty_asset::{instructions::CreateInstructionArgs, types::Standard};
 use solana_program::program::invoke;
 use crate::{events::NiftyHybridCreate, NiftyHybrid};
@@ -18,7 +18,7 @@ pub struct InitialiseCtx<'info> {
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
-    pub deployment: Account<'info, DeploymentRaw>,
+    pub deployment: Account<'info, DeploymentV2>,
 
      /// CHECK: Can be any
     pub group_mint: UncheckedAccount<'info>,

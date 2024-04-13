@@ -39,6 +39,36 @@ export type LibreplexNiftyHybrid = {
           "isSigner": false
         },
         {
+          "name": "swapMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapMarkerAux",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "incomingAsset",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "incomingAssetAux",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "externalAsset",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "incomingAssetProgram",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "hashlistMarker",
           "isMut": true,
           "isSigner": false
@@ -49,7 +79,17 @@ export type LibreplexNiftyHybrid = {
           "isSigner": false
         },
         {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "fairLaunch",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -216,10 +256,6 @@ export type LibreplexNiftyHybrid = {
         "fields": [
           {
             "name": "seed",
-            "type": "publicKey"
-          },
-          {
-            "name": "deployment",
             "type": "publicKey"
           },
           {
@@ -356,6 +392,36 @@ export const IDL: LibreplexNiftyHybrid = {
           "isSigner": false
         },
         {
+          "name": "swapMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapMarkerAux",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "incomingAsset",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "incomingAssetAux",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "externalAsset",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "incomingAssetProgram",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "hashlistMarker",
           "isMut": true,
           "isSigner": false
@@ -366,7 +432,17 @@ export const IDL: LibreplexNiftyHybrid = {
           "isSigner": false
         },
         {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "fairLaunch",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -533,10 +609,6 @@ export const IDL: LibreplexNiftyHybrid = {
         "fields": [
           {
             "name": "seed",
-            "type": "publicKey"
-          },
-          {
-            "name": "deployment",
             "type": "publicKey"
           },
           {

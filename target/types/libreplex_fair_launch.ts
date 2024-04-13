@@ -49,6 +49,11 @@ export type LibreplexFairLaunch = {
           "isSigner": false
         },
         {
+          "name": "fungibleMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -72,6 +77,32 @@ export type LibreplexFairLaunch = {
           }
         }
       ]
+    },
+    {
+      "name": "deployRaw",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "deployToken22",
@@ -1327,7 +1358,7 @@ export type LibreplexFairLaunch = {
       }
     },
     {
-      "name": "deploymentRaw",
+      "name": "deploymentV2",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1346,6 +1377,10 @@ export type LibreplexFairLaunch = {
           {
             "name": "numberOfTokensIssued",
             "type": "u64"
+          },
+          {
+            "name": "fungibleDecimals",
+            "type": "u8"
           },
           {
             "name": "escrowNonFungibleCount",
@@ -1378,6 +1413,22 @@ export type LibreplexFairLaunch = {
           {
             "name": "cosignerSwapToSpl",
             "type": "publicKey"
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
+            }
+          },
+          {
+            "name": "deployed",
+            "type": "bool"
           },
           {
             "name": "padding",
@@ -1512,6 +1563,18 @@ export type LibreplexFairLaunch = {
             "name": "cosignerSwapToNft",
             "type": {
               "option": "publicKey"
+            }
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
             }
           }
         ]
@@ -1728,6 +1791,37 @@ export type LibreplexFairLaunch = {
           {
             "name": "minDenominator",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NonFungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          },
+          {
+            "name": "Nifty"
           }
         ]
       }
@@ -1969,7 +2063,7 @@ export type LibreplexFairLaunch = {
     {
       "code": 6014,
       "name": "IncorrectSwapToNftCosigner",
-      "msg": "Incorrect cosigner for mint"
+      "msg": "Incorrect cosigner for swap to NFT"
     }
   ]
 };
@@ -2025,6 +2119,11 @@ export const IDL: LibreplexFairLaunch = {
           "isSigner": false
         },
         {
+          "name": "fungibleMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -2048,6 +2147,32 @@ export const IDL: LibreplexFairLaunch = {
           }
         }
       ]
+    },
+    {
+      "name": "deployRaw",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "deployToken22",
@@ -3303,7 +3428,7 @@ export const IDL: LibreplexFairLaunch = {
       }
     },
     {
-      "name": "deploymentRaw",
+      "name": "deploymentV2",
       "type": {
         "kind": "struct",
         "fields": [
@@ -3322,6 +3447,10 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "numberOfTokensIssued",
             "type": "u64"
+          },
+          {
+            "name": "fungibleDecimals",
+            "type": "u8"
           },
           {
             "name": "escrowNonFungibleCount",
@@ -3354,6 +3483,22 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "cosignerSwapToSpl",
             "type": "publicKey"
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
+            }
+          },
+          {
+            "name": "deployed",
+            "type": "bool"
           },
           {
             "name": "padding",
@@ -3488,6 +3633,18 @@ export const IDL: LibreplexFairLaunch = {
             "name": "cosignerSwapToNft",
             "type": {
               "option": "publicKey"
+            }
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
             }
           }
         ]
@@ -3704,6 +3861,37 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "minDenominator",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NonFungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          },
+          {
+            "name": "Nifty"
           }
         ]
       }
@@ -3945,7 +4133,7 @@ export const IDL: LibreplexFairLaunch = {
     {
       "code": 6014,
       "name": "IncorrectSwapToNftCosigner",
-      "msg": "Incorrect cosigner for mint"
+      "msg": "Incorrect cosigner for swap to NFT"
     }
   ]
 };

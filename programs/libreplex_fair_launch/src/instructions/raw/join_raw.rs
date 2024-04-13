@@ -4,7 +4,7 @@ use libreplex_shared::SharedError;
 
 
 use crate::errors::FairLaunchError;
-use crate::{add_to_hashlist, DeploymentRaw, MintInput};
+use crate::{add_to_hashlist, DeploymentV2, MintInput};
 use crate::
     HashlistMarker
 ;
@@ -21,7 +21,7 @@ use crate::
 pub struct JoinRawCtx<'info> {
     #[account(mut,
        seeds = ["deployment".as_ref(), deployment.ticker.as_ref()], bump)]
-    pub deployment: Account<'info, DeploymentRaw>,
+    pub deployment: Account<'info, DeploymentV2>,
 
     #[account(mut, 
         seeds = ["hashlist".as_bytes(), 

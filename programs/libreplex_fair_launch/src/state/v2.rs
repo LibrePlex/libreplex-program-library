@@ -6,12 +6,27 @@ use solana_program::pubkey::Pubkey;
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 #[derive(InitSpace)]
-enum CosignerType {
+pub enum CosignerType {
     Mint,
     SwapToNft,
     SwapToSpl
 }
 
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+#[derive(InitSpace)]
+pub enum FungibleType {
+    TokenKeg,
+    Token2022
+}
+
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+#[derive(InitSpace)]
+pub enum NonFungibleType {
+    TokenKeg,
+    Token2022,
+    Nifty
+}
 
 use crate::{OFFCHAIN_URL_LIMIT, TICKER_LIMIT};
 
@@ -23,7 +38,7 @@ use crate::{OFFCHAIN_URL_LIMIT, TICKER_LIMIT};
 */
 #[account]
 #[derive(InitSpace)]
-pub struct DeploymentRaw {
+pub struct DeploymentV2 {
     
     pub creator: Pubkey,
 
@@ -32,6 +47,8 @@ pub struct DeploymentRaw {
     pub max_number_of_tokens: u64,
 
     pub number_of_tokens_issued: u64,
+
+    pub fungible_decimals: u8,
 
     
     // this is used to sanity check that
@@ -65,11 +82,16 @@ pub struct DeploymentRaw {
 
     pub cosigner_swap_to_spl: Pubkey,
 
+    pub fungible_type: FungibleType,
+    pub non_fungible_type: NonFungibleType,
+
+    pub deployed: bool,
+
     // just in case
     pub padding: [u8; 200]
 }
 
-impl DeploymentRaw {
+impl DeploymentV2 {
     pub fn get_base_amount_per_mint(&self, fungible_mint: &Mint) -> u64 {
         self.limit_per_mint
         .checked_mul(10_u64.checked_pow(fungible_mint.decimals as u32).unwrap())

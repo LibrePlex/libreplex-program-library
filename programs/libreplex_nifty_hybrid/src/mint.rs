@@ -7,7 +7,7 @@ use solana_program::program::invoke;
 
 use crate::NiftyHybrid;
 use libreplex_fair_launch::cpi::accounts::JoinRawCtx;
-use libreplex_fair_launch::{program::LibreplexFairLaunch, DeploymentRaw, MintInput};
+use libreplex_fair_launch::{program::LibreplexFairLaunch, DeploymentV2, MintInput};
 
 #[derive(Accounts)]
 pub struct MintCtx<'info> {
@@ -25,7 +25,7 @@ pub struct MintCtx<'info> {
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
-    pub deployment: Account<'info, DeploymentRaw>,
+    pub deployment: Account<'info, DeploymentV2>,
 
     /// CHECK: Checked in cpi.
     #[account(mut)]
@@ -59,10 +59,6 @@ pub struct MintCtx<'info> {
     pub hashlist_marker: UncheckedAccount<'info>,
 
     /// CHECK: Checked in cpi.
-    #[account(mut)]
-    pub non_fungible_mint: UncheckedAccount<'info>,
-
-    /// CHECK: Checked in cpi.
     #[account(mut, 
         constraint = deployment.fungible_mint == fungible_mint.key())]
     pub fungible_mint: InterfaceAccount<'info, Mint>,
@@ -77,7 +73,6 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
     let fair_launch = &ctx.accounts.fair_launch;
     let deployment = &ctx.accounts.deployment;
     let nifty_hybrid = &mut ctx.accounts.nifty_hybrid;
-    let non_fungible_mint = &ctx.accounts.non_fungible_mint;
     let receiver = &ctx.accounts.receiver;
     let payer = &ctx.accounts.payer;
     let swap_marker = &ctx.accounts.swap_marker;
@@ -91,7 +86,7 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
     let fungible_mint = &ctx.accounts.fungible_mint;
    invoke(
         &nifty_asset::instructions::Create {
-            asset: non_fungible_mint.key(),
+            asset: incoming_asset.key(),
             authority: (deployment.key(), false),
             owner: receiver.key(),
             group: None,
@@ -104,7 +99,7 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
             mutable: true,
         }),
         &[
-            non_fungible_mint.to_account_info(),
+            incoming_asset.to_account_info(),
             deployment.to_account_info(),
             receiver.to_account_info(),
             payer.to_account_info(),
@@ -127,7 +122,7 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
                 hashlist_marker: ctx.accounts.hashlist_marker.to_account_info(),
                 payer: ctx.accounts.payer.to_account_info(),
                 signer: nifty_hybrid.to_account_info(),
-                non_fungible_mint: ctx.accounts.non_fungible_mint.to_account_info(),
+                non_fungible_mint: ctx.accounts.incoming_asset.to_account_info(),
                 system_program: ctx.accounts.system_program.to_account_info(),
             },
             &[seeds],

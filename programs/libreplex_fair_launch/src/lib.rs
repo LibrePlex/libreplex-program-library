@@ -23,6 +23,10 @@ pub mod libreplex_fair_launch {
         instructions::initialise_raw(ctx, input)
     }
 
+    pub fn deploy_raw(ctx: Context<DeployRawCtx>) -> Result<()> {
+        instructions::deploy_raw(ctx)
+    }
+
     pub fn deploy_token22(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
         instructions::deploy_token_2022(ctx)
     }
