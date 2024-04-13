@@ -6,8 +6,10 @@ declare_id!("8bvPnYE5Pvz2Z9dE6RAqWr1rzLknTndZ9hwvRE6kPDXP");
 
 pub mod errors;
 pub mod state;
-
 pub use state::*;
+
+pub mod state_v2;
+pub use state_v2::*;
 
 #[program]
 pub mod libreplex_fair_launch {
