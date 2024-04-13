@@ -6,16 +6,27 @@ declare_id!("8bvPnYE5Pvz2Z9dE6RAqWr1rzLknTndZ9hwvRE6kPDXP");
 
 pub mod errors;
 pub mod state;
-
 pub use state::*;
+
+pub mod state_v2;
+pub use state_v2::*;
 
 #[program]
 pub mod libreplex_fair_launch {
     
     use super::*;
 
+
     pub fn initialise_v3(ctx: Context<InitialiseV3Ctx>, input: InitialiseInputV3) -> Result<()> {
         instructions::initialise_v3(ctx, input)
+    }
+
+    pub fn initialise_raw(ctx: Context<InitialiseRawCtx>, input: InitialiseRawInput) -> Result<()> {
+        instructions::initialise_raw(ctx, input)
+    }
+
+    pub fn deploy_raw(ctx: Context<DeployRawCtx>) -> Result<()> {
+        instructions::deploy_raw(ctx)
     }
 
     pub fn deploy_token22(ctx: Context<DeployToken2022Ctx>) -> Result<()> {
@@ -53,6 +64,13 @@ pub mod libreplex_fair_launch {
         input: MintInput,
     ) -> Result<()> {
         instructions::join_handler(ctx, input)
+    }
+
+    pub fn joinraw<'info>(
+        ctx: Context<'_, '_, '_, 'info, JoinRawCtx<'info>>,
+        input: MintInput,
+    ) -> Result<()> {
+        instructions::joinraw_handler(ctx, input)
     }
 
     pub fn update_spl_metadata<'info>(
