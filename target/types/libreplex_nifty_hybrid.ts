@@ -44,24 +44,19 @@ export type LibreplexNiftyHybrid = {
           "isSigner": false
         },
         {
-          "name": "swapMarkerAux",
+          "name": "fungibleMintTargetAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "incomingAsset",
+          "name": "fungibleMintSourceAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "incomingAssetAux",
+          "name": "nonFungibleMint",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "externalAsset",
-          "isMut": true,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "incomingAssetProgram",
@@ -70,11 +65,6 @@ export type LibreplexNiftyHybrid = {
         },
         {
           "name": "hashlistMarker",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nonFungibleMint",
           "isMut": true,
           "isSigner": false
         },
@@ -92,6 +82,16 @@ export type LibreplexNiftyHybrid = {
           "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "niftyProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "monoswapProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -106,8 +106,8 @@ export type LibreplexNiftyHybrid = {
         },
         {
           "name": "groupMint",
-          "isMut": false,
-          "isSigner": false
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "payer",
@@ -128,6 +128,11 @@ export type LibreplexNiftyHybrid = {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "niftyProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -142,7 +147,7 @@ export type LibreplexNiftyHybrid = {
   ],
   "accounts": [
     {
-      "name": "deploymentRaw",
+      "name": "deploymentV2",
       "type": {
         "kind": "struct",
         "fields": [
@@ -161,6 +166,10 @@ export type LibreplexNiftyHybrid = {
           {
             "name": "numberOfTokensIssued",
             "type": "u64"
+          },
+          {
+            "name": "fungibleDecimals",
+            "type": "u8"
           },
           {
             "name": "escrowNonFungibleCount",
@@ -193,6 +202,22 @@ export type LibreplexNiftyHybrid = {
           {
             "name": "cosignerSwapToSpl",
             "type": "publicKey"
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
+            }
+          },
+          {
+            "name": "deployed",
+            "type": "bool"
           },
           {
             "name": "padding",
@@ -228,6 +253,10 @@ export type LibreplexNiftyHybrid = {
             "type": "publicKey"
           },
           {
+            "name": "groupMint",
+            "type": "publicKey"
+          },
+          {
             "name": "cosigner",
             "type": "publicKey"
           },
@@ -249,6 +278,37 @@ export type LibreplexNiftyHybrid = {
     }
   ],
   "types": [
+    {
+      "name": "FungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NonFungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          },
+          {
+            "name": "Nifty"
+          }
+        ]
+      }
+    },
     {
       "name": "InitialiseInput",
       "type": {
@@ -292,6 +352,10 @@ export type LibreplexNiftyHybrid = {
           },
           {
             "name": "deployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "groupMint",
             "type": "publicKey"
           },
           {
@@ -397,24 +461,19 @@ export const IDL: LibreplexNiftyHybrid = {
           "isSigner": false
         },
         {
-          "name": "swapMarkerAux",
+          "name": "fungibleMintTargetAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "incomingAsset",
+          "name": "fungibleMintSourceAta",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "incomingAssetAux",
+          "name": "nonFungibleMint",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "externalAsset",
-          "isMut": true,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "incomingAssetProgram",
@@ -423,11 +482,6 @@ export const IDL: LibreplexNiftyHybrid = {
         },
         {
           "name": "hashlistMarker",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nonFungibleMint",
           "isMut": true,
           "isSigner": false
         },
@@ -445,6 +499,16 @@ export const IDL: LibreplexNiftyHybrid = {
           "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "niftyProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "monoswapProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -459,8 +523,8 @@ export const IDL: LibreplexNiftyHybrid = {
         },
         {
           "name": "groupMint",
-          "isMut": false,
-          "isSigner": false
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "payer",
@@ -481,6 +545,11 @@ export const IDL: LibreplexNiftyHybrid = {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "niftyProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -495,7 +564,7 @@ export const IDL: LibreplexNiftyHybrid = {
   ],
   "accounts": [
     {
-      "name": "deploymentRaw",
+      "name": "deploymentV2",
       "type": {
         "kind": "struct",
         "fields": [
@@ -514,6 +583,10 @@ export const IDL: LibreplexNiftyHybrid = {
           {
             "name": "numberOfTokensIssued",
             "type": "u64"
+          },
+          {
+            "name": "fungibleDecimals",
+            "type": "u8"
           },
           {
             "name": "escrowNonFungibleCount",
@@ -546,6 +619,22 @@ export const IDL: LibreplexNiftyHybrid = {
           {
             "name": "cosignerSwapToSpl",
             "type": "publicKey"
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
+            }
+          },
+          {
+            "name": "deployed",
+            "type": "bool"
           },
           {
             "name": "padding",
@@ -581,6 +670,10 @@ export const IDL: LibreplexNiftyHybrid = {
             "type": "publicKey"
           },
           {
+            "name": "groupMint",
+            "type": "publicKey"
+          },
+          {
             "name": "cosigner",
             "type": "publicKey"
           },
@@ -602,6 +695,37 @@ export const IDL: LibreplexNiftyHybrid = {
     }
   ],
   "types": [
+    {
+      "name": "FungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NonFungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          },
+          {
+            "name": "Nifty"
+          }
+        ]
+      }
+    },
     {
       "name": "InitialiseInput",
       "type": {
@@ -645,6 +769,10 @@ export const IDL: LibreplexNiftyHybrid = {
           },
           {
             "name": "deployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "groupMint",
             "type": "publicKey"
           },
           {

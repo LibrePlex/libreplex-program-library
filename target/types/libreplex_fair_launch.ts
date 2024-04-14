@@ -61,7 +61,7 @@ export type LibreplexFairLaunch = {
         {
           "name": "creator",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -2131,7 +2131,7 @@ export const IDL: LibreplexFairLaunch = {
         {
           "name": "creator",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "systemProgram",

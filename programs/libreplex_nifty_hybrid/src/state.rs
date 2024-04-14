@@ -8,6 +8,7 @@ pub struct NiftyHybrid {
     pub bump: u8,
     pub creator: Pubkey,
     pub deployment: Pubkey,
+    pub group_mint: Pubkey,
     
     // Single costi
     pub cosigner: Pubkey,
