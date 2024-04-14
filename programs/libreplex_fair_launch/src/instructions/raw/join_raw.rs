@@ -69,7 +69,7 @@ pub fn joinraw_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinRawCtx<'info>>
   
 
     add_to_hashlist(
-        deployment.number_of_tokens_issued as u32,
+        (deployment.number_of_tokens_issued + 1) as u32,
         hashlist,
         payer,
         system_program,
