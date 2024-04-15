@@ -2207,6 +2207,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "13e3bf6590cbc649f4d1a3eefc9d5d6eb746f5200ffb04e5e142700b8faa56e7"
 
 [[package]]
+name = "libreplex-monoswap-client"
+version = "0.0.0"
+dependencies = [
+ "borsh 0.10.3",
+ "num-derive 0.3.3",
+ "num-traits",
+ "solana-program",
+ "thiserror",
+]
+
+[[package]]
 name = "libreplex_creator"
 version = "0.12.1"
 dependencies = [
@@ -2303,9 +2314,11 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "arrayref",
+ "bytemuck",
  "libreplex_inscriptions",
  "libreplex_shared",
  "mpl-token-metadata",
+ "podded",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -2410,6 +2423,22 @@ dependencies = [
  "mocha",
  "solana-program",
  "spl-token-2022 1.0.0",
+]
+
+[[package]]
+name = "libreplex_nifty_hybrid"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "dyn-fmt",
+ "libreplex-monoswap-client",
+ "libreplex_fair_launch",
+ "libreplex_shared",
+ "nifty-asset",
+ "solana-address-lookup-table-program",
+ "solana-program",
+ "solana-program-test",
 ]
 
 [[package]]
@@ -2687,6 +2716,34 @@ dependencies = [
  "borsh 0.10.3",
  "num-derive 0.3.3",
  "num-traits",
+ "solana-program",
+ "thiserror",
+]
+
+[[package]]
+name = "nifty-asset"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05da1da31f1e815de1255e9bf03695bbb94b4e2cfa1404fa081a9faf09c85e91"
+dependencies = [
+ "borsh 0.10.3",
+ "kaigan",
+ "nifty-asset-types",
+ "num-derive 0.3.3",
+ "num-traits",
+ "solana-program",
+ "thiserror",
+]
+
+[[package]]
+name = "nifty-asset-types"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "463987426bc0a1debe2db68b2b6dc5d0faeb27d25d0f092e1dc1d45f99baae9c"
+dependencies = [
+ "borsh 0.10.3",
+ "bytemuck",
+ "podded",
  "solana-program",
  "thiserror",
 ]
@@ -3091,6 +3148,15 @@ name = "plain"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
+
+[[package]]
+name = "podded"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e5ef03855395ea7838e038410cf2be5dd419fa65560c3c82dfcf1ee5b32cfb4e"
+dependencies = [
+ "bytemuck",
+]
 
 [[package]]
 name = "polyval"
