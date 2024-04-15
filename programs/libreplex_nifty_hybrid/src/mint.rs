@@ -3,9 +3,9 @@ use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token_interface::Mint;
 use libreplex_monoswap_client::instructions::CreateSwapInstructionArgs;
 
-use nifty_asset::extensions::{ExtensionBuilder, GroupingBuilder};
+
 use nifty_asset::instructions::CreateInstructionArgs;
-use nifty_asset::types::{ExtensionInput, ExtensionType};
+
 use solana_program::program::invoke_signed;
 
 
@@ -53,6 +53,11 @@ pub struct MintCtx<'info> {
     #[account(mut)]
     pub non_fungible_mint: Signer<'info>,
 
+    /// CHECK: Passed into monoswap program  - this is the non fungible
+    #[account(mut, 
+        constraint = nifty_hybrid.group_mint == group_mint.key())]
+    pub group_mint: UncheckedAccount<'info>,
+
     #[account(mut)]
     pub incoming_asset_program: UncheckedAccount<'info>,
 
@@ -95,10 +100,8 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
     let system_program = &ctx.accounts.system_program;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let fungible_mint = &ctx.accounts.fungible_mint;
-   
-    let mut grouping_extension = GroupingBuilder::default();
-    let grouping_data = grouping_extension.data();
-   
+    let group_mint = &ctx.accounts.group_mint;
+    
 
     let seeds = &[
         b"nifty_hybrid",
@@ -111,7 +114,7 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
             authority: (nifty_hybrid.key(), false),
             group_authority: Some(nifty_hybrid.key()),
             owner: receiver.key(),
-            group: None,
+            group: Some(group_mint.key()),
             payer: Some(payer.key()),
             system_program: Some(system_program.key()),
         }
@@ -119,15 +122,12 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
             name: deployment.ticker.clone(),
             standard: nifty_asset::types::Standard::NonFungible,
             mutable: true,
-            extensions: Some(vec![ExtensionInput {
-                extension_type: ExtensionType::Grouping,
-                length: grouping_data.len() as u32,
-                data: Some(grouping_data),
-            }])
+            extensions: None 
         }),
         &[
             non_fungible_mint.to_account_info(),
             nifty_hybrid.to_account_info(),
+            group_mint.to_account_info(),
             deployment.to_account_info(),
             receiver.to_account_info(),
             payer.to_account_info(),
@@ -136,6 +136,43 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
         &[seeds]
     )?;
 
+    
+    invoke_signed(
+        &libreplex_monoswap_client::instructions::CreateSwap {
+            payer: payer.key(),
+            // use raw deployment as the namespace - this allows us to narrow things
+            // down when filtering on target options
+            namespace: nifty_hybrid.key(),
+            authority: nifty_hybrid.key(),
+            swap_marker: swap_marker.key(),
+            swap_marker_ata: Some(fungible_mint_target_ata.key()),
+            incoming_asset: fungible_mint.key(),
+            nifty_asset_group: Some(group_mint.key()),
+            authority_ata: Some(fungible_mint_source_ata.key()),
+            external_asset: non_fungible_mint.key(),
+            incoming_asset_program: incoming_asset_program.key(),
+            associated_token_program: Some(associated_token_program.key()),
+            system_program: system_program.key(),
+        }
+        .instruction(CreateSwapInstructionArgs {
+            incoming_amount: deployment.get_base_amount_per_mint(fungible_mint), // one NFT in
+            external_amount: 1,
+        }),
+        &[
+            payer.to_account_info(),
+            nifty_hybrid.to_account_info(),
+            swap_marker.to_account_info(),
+            group_mint.to_account_info(),
+            fungible_mint_target_ata.to_account_info(),
+            fungible_mint.to_account_info(),
+            fungible_mint_source_ata.to_account_info(),
+            non_fungible_mint.to_account_info(),
+            incoming_asset_program.to_account_info(),
+            associated_token_program.to_account_info(),
+            system_program.to_account_info(),
+        ],
+        &[seeds]
+    )?;
 
     libreplex_fair_launch::cpi::joinraw(
         CpiContext::new_with_signer(
@@ -158,40 +195,6 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
         },
     )?;
 
-    invoke_signed(
-        &libreplex_monoswap_client::instructions::CreateSwap {
-            payer: payer.key(),
-            // use raw deployment as the namespace - this allows us to narrow things
-            // down when filtering on target options
-            namespace: nifty_hybrid.key(),
-            authority: nifty_hybrid.key(),
-            swap_marker: swap_marker.key(),
-            swap_marker_aux: fungible_mint_target_ata.key(),
-            incoming_asset: fungible_mint.key(),
-            incoming_asset_aux: Some(fungible_mint_source_ata.key()),
-            external_asset: non_fungible_mint.key(),
-            incoming_asset_program: incoming_asset_program.key(),
-            associated_token_program: associated_token_program.key(),
-            system_program: system_program.key(),
-        }
-        .instruction(CreateSwapInstructionArgs {
-            incoming_amount: deployment.get_base_amount_per_mint(fungible_mint), // one NFT in
-            external_amount: 1,
-        }),
-        &[
-            payer.to_account_info(),
-            nifty_hybrid.to_account_info(),
-            swap_marker.to_account_info(),
-            fungible_mint_target_ata.to_account_info(),
-            fungible_mint.to_account_info(),
-            fungible_mint_source_ata.to_account_info(),
-            non_fungible_mint.to_account_info(),
-            incoming_asset_program.to_account_info(),
-            associated_token_program.to_account_info(),
-            system_program.to_account_info(),
-        ],
-        &[seeds]
-    )?;
 
     Ok(())
 }

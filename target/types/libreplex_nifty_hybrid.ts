@@ -59,6 +59,11 @@ export type LibreplexNiftyHybrid = {
           "isSigner": true
         },
         {
+          "name": "groupMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "incomingAssetProgram",
           "isMut": true,
           "isSigner": false
@@ -474,6 +479,11 @@ export const IDL: LibreplexNiftyHybrid = {
           "name": "nonFungibleMint",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "groupMint",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "incomingAssetProgram",

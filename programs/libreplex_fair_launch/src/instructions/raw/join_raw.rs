@@ -43,13 +43,13 @@ pub struct JoinRawCtx<'info> {
 
     // when deployment.require_creator_cosign is true, this must be equal to the creator
     // of the deployment otherwise, can be any signer account
-    #[account(mut)]
+    #[account()]
     pub signer: Signer<'info>,
 
     // The wrapper program is responsible for producing assets
     // that make some sense
     /// CHECK: Can be anything.
-    #[account(mut)]
+    #[account()]
     pub non_fungible_mint: UncheckedAccount<'info>,
 
     #[account()]
@@ -66,8 +66,9 @@ pub fn joinraw_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinRawCtx<'info>>
     
     let hashlist = &mut ctx.accounts.hashlist;
     let hashlist_marker = &mut ctx.accounts.hashlist_marker;
-  
-
+    if !deployment.deployed {
+        panic!("Not deployed. Cannot join/mint");
+    }
     add_to_hashlist(
         (deployment.number_of_tokens_issued + 1) as u32,
         hashlist,
@@ -77,6 +78,8 @@ pub fn joinraw_handler<'info>(ctx: Context<'_, '_, '_, 'info, JoinRawCtx<'info>>
         &deployment.key(),
         0,
     )?;
+
+    msg!("Add to hashlist finished");
     
     hashlist_marker.multiplier_denominator = input.multiplier_denominator;
     hashlist_marker.multiplier_numerator = input.multiplier_numerator;
