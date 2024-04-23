@@ -2218,45 +2218,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "libreplex_creator"
-version = "0.12.1"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "arrayref",
- "assert_matches",
- "bincode",
- "libreplex_metadata",
- "libreplex_nft",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token",
- "winnow 0.4.1",
-]
-
-[[package]]
-name = "libreplex_creator_controls"
-version = "0.3.1"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "arrayref",
- "assert_matches",
- "bincode",
- "libreplex_creator",
- "libreplex_metadata",
- "libreplex_nft",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token",
- "winnow 0.4.1",
-]
-
-[[package]]
 name = "libreplex_default_renderer"
 version = "0.1.2"
 dependencies = [
@@ -2379,21 +2340,6 @@ dependencies = [
  "solana-program",
  "solana-program-test",
  "vault-proxy",
-]
-
-[[package]]
-name = "libreplex_metadata"
-version = "0.16.3"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "libreplex_inscriptions",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token-2022 1.0.0",
 ]
 
 [[package]]
@@ -5866,7 +5812,7 @@ checksum = "1b5bb770da30e5cbfde35a2d7b9b8a2c4b8ef89548a7a6aeab5c9a576e3e7421"
 dependencies = [
  "indexmap 2.1.0",
  "toml_datetime",
- "winnow 0.5.33",
+ "winnow",
 ]
 
 [[package]]
@@ -5877,7 +5823,7 @@ checksum = "d34d383cd00a163b4a5b85053df514d45bc330f6de7737edfe0a93311d1eaa03"
 dependencies = [
  "indexmap 2.1.0",
  "toml_datetime",
- "winnow 0.5.33",
+ "winnow",
 ]
 
 [[package]]
@@ -6465,15 +6411,6 @@ name = "windows_x86_64_msvc"
 version = "0.52.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dff9641d1cd4be8d1a070daf9e3773c5f67e78b4d9d42263020c057706765c04"
-
-[[package]]
-name = "winnow"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae8970b36c66498d8ff1d66685dc86b91b29db0c7739899012f63a63814b4b28"
-dependencies = [
- "memchr",
-]
 
 [[package]]
 name = "winnow"
