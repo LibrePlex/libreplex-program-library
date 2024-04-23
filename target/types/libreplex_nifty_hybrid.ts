@@ -49,6 +49,14 @@ export type LibreplexNiftyHybrid = {
           "isSigner": false
         },
         {
+          "name": "fungibleMintMinterAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "ATA of the recipient (minter) -> we swap nifties into SPL on mint"
+          ]
+        },
+        {
           "name": "fungibleMintSourceAta",
           "isMut": true,
           "isSigner": false
@@ -469,6 +477,14 @@ export const IDL: LibreplexNiftyHybrid = {
           "name": "fungibleMintTargetAta",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "fungibleMintMinterAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "ATA of the recipient (minter) -> we swap nifties into SPL on mint"
+          ]
         },
         {
           "name": "fungibleMintSourceAta",

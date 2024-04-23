@@ -6,7 +6,7 @@ use libreplex_monoswap_client::instructions::CreateSwapInstructionArgs;
 
 use nifty_asset::instructions::CreateInstructionArgs;
 
-use solana_program::program::invoke_signed;
+use solana_program::program::{invoke, invoke_signed};
 
 
 use libreplex_monoswap_client::programs::MONOSWAP_ID;
@@ -45,6 +45,11 @@ pub struct MintCtx<'info> {
     #[account(mut)]
     pub fungible_mint_target_ata: UncheckedAccount<'info>,
 
+
+    /// ATA of the recipient (minter) -> we swap nifties into SPL on mint
+    #[account(mut)]
+    pub fungible_mint_minter_ata: UncheckedAccount<'info>,
+
     /// CHECK: Passed into monoswap program, owned by nifty hybrid
     #[account(mut)]
     pub fungible_mint_source_ata: UncheckedAccount<'info>,
@@ -75,6 +80,7 @@ pub struct MintCtx<'info> {
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
 
+   
     #[account(
         constraint = nifty_program.key().eq(&nifty_asset::ID)
     )]
@@ -101,7 +107,7 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
     let associated_token_program = &ctx.accounts.associated_token_program;
     let fungible_mint = &ctx.accounts.fungible_mint;
     let group_mint = &ctx.accounts.group_mint;
-    
+    let nifty_program = &ctx.accounts.nifty_program;
 
     let seeds = &[
         b"nifty_hybrid",
@@ -174,6 +180,9 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
         &[seeds]
     )?;
 
+    let fungible_mint_minter_ata = &ctx.accounts.fungible_mint_minter_ata;
+
+
     libreplex_fair_launch::cpi::joinraw(
         CpiContext::new_with_signer(
             fair_launch.to_account_info(),
@@ -194,6 +203,43 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
             multiplier_numerator: 1,
         },
     )?;
+
+
+    // swap straight into a fungible (for now until nifties are more established)
+    invoke(
+        &libreplex_monoswap_client::instructions::SwapNiftySPL {
+            payer: payer.key(),
+            // use raw deployment as the namespace - this allows us to narrow things
+            // down when filtering on target options
+            authority: receiver.key(),
+            swap_marker: swap_marker.key(),
+            swap_marker_ata: fungible_mint_target_ata.key(),
+            incoming_asset: non_fungible_mint.key(),
+            nifty_asset_group: Some(group_mint.key()),
+            authority_ata: fungible_mint_minter_ata.key(),
+            escrowed_asset: fungible_mint.key(),
+            escrowed_asset_program: incoming_asset_program.key(),
+            incoming_asset_program: nifty_program.key(),
+            associated_token_program: Some(associated_token_program.key()),
+            system_program: system_program.key(),
+        }
+        .instruction(),
+        &[
+            payer.to_account_info(),
+            nifty_hybrid.to_account_info(),
+            swap_marker.to_account_info(),
+            group_mint.to_account_info(),
+            fungible_mint_target_ata.to_account_info(),
+            fungible_mint.to_account_info(),
+            fungible_mint_source_ata.to_account_info(),
+            fungible_mint_minter_ata.to_account_info(),
+            non_fungible_mint.to_account_info(),
+            incoming_asset_program.to_account_info(),
+            associated_token_program.to_account_info(),
+            system_program.to_account_info(),
+        ]
+    )?;
+
 
 
     Ok(())
