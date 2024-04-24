@@ -38,6 +38,9 @@ pub mod swap_to_non_fungible;
 pub mod v2;
 pub use v2::*;
 
+pub mod raw;
+pub use raw::*;
+
 
 pub const COMPRESSED_DEPLOYMENT_TYPE: u8 = 2;
 pub const STANDARD_DEPLOYMENT_TYPE: u8 = 0;

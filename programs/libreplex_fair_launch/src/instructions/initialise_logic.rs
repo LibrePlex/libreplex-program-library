@@ -17,15 +17,29 @@ pub fn initialise_logic(input: InitialiseInputV3,
         panic!("Bad deployment type")
     }
     
-    if deployment_type == HYBRID_DEPLOYMENT_TYPE && input.deflation_rate_per_swap > 0{
+    if deployment_type == HYBRID_DEPLOYMENT_TYPE && input.transfer_fee_config.is_some(){
         panic!("Non-zero deflation rate requires a token-2022 deployment")
     }
 
 
     config.creator_fee_treasury = input.creator_fee_treasury;
     config.creator_fee_per_mint_lamports = input.creator_fee_per_mint_in_lamports;
-    config.deflation_rate_per_swap = input.deflation_rate_per_swap;
+    config.allow_burn = true;
+    // NB: These impact the amount of SPL that is available to burn 
+    // at the end of mint (in case there is excess in a multi-tier rarity set-up)
+    config.spl_excess_in_escrow = 0;
+    config.total_spl_equivalent_minted = 0;
 
+    if let Some(x) = input.transfer_fee_config {
+        config.transfer_fee_in_basis_points = x.fee_in_basis_points;
+        config.transfer_fee_withdraw_authority = Some(x.withdraw_authority);
+        config.transfer_fee_target_wallet = Some(x.target_wallet);
+    } else {
+        config.transfer_fee_in_basis_points = 0;
+        config.transfer_fee_withdraw_authority = None;
+        config.transfer_fee_target_wallet = None;
+    }
+   
     config.multiplier_limits = Some(input.multiplier_limits);
 
     if let Some(limits) = config.multiplier_limits.as_ref() {

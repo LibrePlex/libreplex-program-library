@@ -1,6 +1,13 @@
 use anchor_lang::prelude::*;
+
 use crate::{initialise_logic, Deployment, DeploymentConfig, MultiplierLimits};
 
+#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
+pub struct TransferFeeInputConfig {
+    pub fee_in_basis_points: u16,
+    pub withdraw_authority: Pubkey,
+    pub target_wallet: Pubkey
+}
 
 // Same as v2 with multiplier_upper_limit added
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
@@ -17,11 +24,10 @@ pub struct InitialiseInputV3 {
     pub deployment_type: u8,
     pub creator_fee_treasury: Pubkey,
     pub creator_fee_per_mint_in_lamports: u64,
-    // this allows for interesting dynamics
-    pub deflation_rate_per_swap: u16,
-
+    
     // The largest possible multiplier
     pub multiplier_limits: MultiplierLimits,
+    pub transfer_fee_config: Option<TransferFeeInputConfig>
 }
 
 /*

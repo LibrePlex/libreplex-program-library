@@ -1,9 +1,9 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 
-use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGroupInput};
-
-
+use libreplex_shared::{
+    create_token_2022_and_metadata, MintAccounts2022, TransferFeeParams,
+};
 
 use spl_token_metadata_interface::state::TokenMetadata;
 
@@ -36,7 +36,7 @@ pub fn deploy_token_2022_logic<'f>(
         deployment.ticker.as_ref(),
         &[deployment_bump],
     ];
-    
+
     let update_authority =
         OptionalNonZeroPubkey::try_from(Some(deployment.key())).expect("Bad update auth");
 
@@ -59,12 +59,23 @@ pub fn deploy_token_2022_logic<'f>(
             uri: deployment.offchain_url.clone(),
             additional_metadata: vec![],
         }),
-        Some(TokenGroupInput {
-            max_size: deployment.max_number_of_tokens as u32,
-        }),
+        None,
+        // Some(TokenGroupInput {
+        //     max_size: deployment.max_number_of_tokens as u32,
+        // }),
         None,
         Some(deployment_seeds),
-        deployment_config.deflation_rate_per_swap
+        match deployment_config.transfer_fee_in_basis_points {
+            0 => None,
+            x => Some(TransferFeeParams {
+                transfer_fee_bps: x,
+                withdraw_fee_authority: match deployment_config.transfer_fee_withdraw_authority {
+                    Some(y) => y,
+                    _ => deployment.key()
+                },
+            }),
+            
+        },
     )?;
 
     let deployment_seeds: &[&[u8]] = &[
@@ -88,11 +99,10 @@ pub fn deploy_token_2022_logic<'f>(
 
     msg!("Created non fungible");
 
-    emit!(DeploymentActive { 
+    emit!(DeploymentActive {
         ticker: deployment.ticker.clone(),
         fungible_mint: fungible_mint.key(),
     });
 
     Ok(())
 }
-

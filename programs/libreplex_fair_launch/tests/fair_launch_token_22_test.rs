@@ -7,7 +7,9 @@ use anchor_spl::associated_token::{
     self, get_associated_token_address_with_program_id, AssociatedToken,
 };
 
-use libreplex_fair_launch::{Deployment, DeploymentConfig, MintInput, MultiplierLimits, TOKEN2022_DEPLOYMENT_TYPE};
+use libreplex_fair_launch::{
+    Deployment, DeploymentConfig, MintInput, MultiplierLimits, TOKEN2022_DEPLOYMENT_TYPE,
+};
 use libreplex_shared::sysvar_instructions_program;
 use solana_program::hash::Hash;
 use solana_program::program_pack::Pack;
@@ -63,7 +65,8 @@ mod inscriptions_tests {
         );
         let mut context: ProgramTestContext = program.start_with_context().await;
 
-        let (deployment, deployment_config, creator_fee_treasury) = initialise_token_2022(&mut context, TICKER).await.unwrap();
+        let (deployment, deployment_config, creator_fee_treasury) =
+            initialise_token_2022(&mut context, TICKER).await.unwrap();
 
         let mut deployment_account = context
             .banks_client
@@ -174,7 +177,8 @@ mod inscriptions_tests {
             0,
             0,
             DECIMALS,
-        ).await;
+        )
+        .await;
 
         let minter_wallet = Keypair::new();
 
@@ -216,7 +220,7 @@ mod inscriptions_tests {
             context.payer.pubkey(),
             0,
             1,
-            DECIMALS
+            DECIMALS,
         )
         .await;
 
@@ -240,7 +244,7 @@ mod inscriptions_tests {
             context.payer.pubkey(),
             0,
             2,
-            DECIMALS
+            DECIMALS,
         )
         .await;
 
@@ -256,7 +260,7 @@ mod inscriptions_tests {
             creator_fee_treasury,
             fungible_mint,
             &context.payer,
-            context.last_blockhash
+            context.last_blockhash,
         )
         .await;
 
@@ -268,7 +272,7 @@ mod inscriptions_tests {
             context.payer.pubkey(),
             0,
             2,
-            DECIMALS
+            DECIMALS,
         )
         .await;
 
@@ -278,7 +282,7 @@ mod inscriptions_tests {
             check_mint_state(
                 banks_client,
                 m.clone(),
-                None, // mint auth must be None
+                None,                   // mint auth must be None
                 Some(deployment.key()), // mint auth must be None
                 // check that this mint belongs to the fungible mint group
                 Some(fungible_mint.clone()),
@@ -339,7 +343,7 @@ mod inscriptions_tests {
             context.payer.pubkey(),
             1,
             2,
-            DECIMALS
+            DECIMALS,
         )
         .await;
 
@@ -364,10 +368,19 @@ mod inscriptions_tests {
             context.payer.pubkey(),
             0,
             2,
-            DECIMALS
+            DECIMALS,
         )
         .await;
 
+        check_deployment_config_account_state(
+            &mut banks_client,
+            deployment.key(),
+            creator_fee_treasury,
+            10_000_000,
+            0,
+
+        ).await;
+        
     }
 }
 
@@ -412,11 +425,11 @@ pub async fn initialise_token_2022(
                         deployment_type: TOKEN2022_DEPLOYMENT_TYPE,
                         creator_fee_per_mint_in_lamports: CREATOR_FEE_IN_LAMPORTS,
                         creator_fee_treasury,
-                        deflation_rate_per_swap: 0,
+                        transfer_fee_config: None,
                         multiplier_limits: MultiplierLimits {
                             max_numerator: 1,
                             min_denominator: 1,
-                        }
+                        },
                     },
                 }
                 .data(),
@@ -467,7 +480,6 @@ pub async fn deploy_2022<'info>(
         &libreplex_fair_launch::ID,
     )
     .0;
-
 
     context
         .banks_client
@@ -593,30 +605,29 @@ pub async fn mint_token_2022(
     }
     .to_account_metas(None);
 
-    accounts.push(AccountMeta{
+    accounts.push(AccountMeta {
         pubkey: libreplex_inscriptions::ID,
         is_signer: false,
         is_writable: false,
     });
 
-    accounts.push(AccountMeta{
+    accounts.push(AccountMeta {
         pubkey: inscription_summary,
         is_signer: false,
         is_writable: true,
     });
 
-    accounts.push(AccountMeta{
+    accounts.push(AccountMeta {
         pubkey: inscription_v3,
         is_signer: false,
         is_writable: true,
     });
 
-    accounts.push(AccountMeta{
+    accounts.push(AccountMeta {
         pubkey: inscription_data,
         is_signer: false,
         is_writable: true,
     });
-
 
     let err = banks_client
         .process_transaction(Transaction::new_signed_with_payer(
@@ -626,8 +637,9 @@ pub async fn mint_token_2022(
                     input: MintInput {
                         multiplier_denominator: 1,
                         multiplier_numerator: 1,
-                    }
-                }.data(),
+                    },
+                }
+                .data(),
                 accounts,
             }],
             Some(&minter_wallet_key),
@@ -697,7 +709,7 @@ pub async fn swap_to_fungible_2022(
     let fungible_target_token_account = get_associated_token_address_with_program_id(
         &minter_wallet_key,
         &fungible_mint,
-        &anchor_spl::token_2022::ID
+        &anchor_spl::token_2022::ID,
     );
 
     let deployment_config = Pubkey::find_program_address(
@@ -806,7 +818,6 @@ pub async fn swap_to_non_fungible_2022(
         &libreplex_fair_launch::ID,
     )
     .0;
-
 
     banks_client
         .process_transaction(Transaction::new_signed_with_payer(
@@ -927,6 +938,7 @@ pub async fn check_deployment_config_account_state(
     deployment: Pubkey,
     creator_fee_treasury: Pubkey,
     creator_fee_per_mint_lamports: u64,
+    expected_excess_spl: u64,
 ) {
     let deployment_config = Pubkey::find_program_address(
         &[b"deployment_config", deployment.as_ref()],
@@ -962,6 +974,11 @@ pub async fn check_deployment_config_account_state(
     assert_eq!(
         deployment_account_obj.creator_fee_treasury,
         creator_fee_treasury
+    );
+
+    assert_eq!(
+        deployment_account_obj.spl_excess_in_escrow,
+        expected_excess_spl
     );
 }
 

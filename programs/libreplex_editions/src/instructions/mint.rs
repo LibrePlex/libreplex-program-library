@@ -162,7 +162,7 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
             group_mint: group_mint.to_account_info(),
         }),
         Some(deployment_seeds),
-        0
+        None
     )?;
 
      // msg!("Minting 2022");

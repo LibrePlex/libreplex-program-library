@@ -7,7 +7,8 @@ use anchor_spl::associated_token::{
     self, get_associated_token_address_with_program_id, AssociatedToken,
 };
 
-use libreplex_fair_launch::{Deployment, DeploymentConfig, MintInput, MultiplierLimits, TOKEN2022_DEPLOYMENT_TYPE};
+use anchor_spl::token_2022::spl_token_2022::extension::transfer_fee::TransferFeeConfig;
+use libreplex_fair_launch::{Deployment, DeploymentConfig, MintInput, MultiplierLimits, TransferFeeInputConfig, TOKEN2022_DEPLOYMENT_TYPE};
 use libreplex_shared::sysvar_instructions_program;
 use solana_program::hash::Hash;
 use solana_program::program_pack::Pack;
@@ -26,6 +27,9 @@ const DECIMALS: u8 = 5;
 mod fair_launch_deflationary_test {
 
     use anchor_lang::prelude::Account;
+    use anchor_spl::token_2022::spl_token_2022::extension::confidential_transfer::DecryptableBalance;
+    use anchor_spl::token_2022::spl_token_2022::extension::confidential_transfer_fee::instruction::{withdraw_withheld_tokens_from_accounts, withdraw_withheld_tokens_from_mint};
+    use anchor_spl::token_2022::spl_token_2022::proof::ProofLocation;
     use libreplex_fair_launch::{Deployment, TOKEN2022_DEPLOYMENT_TYPE};
 
     use solana_program::account_info::AccountInfo;
@@ -454,6 +458,30 @@ mod fair_launch_deflationary_test {
         //     post_swap_2_balance,
         // )
         // .await;
+
+    
+    // banks_client
+    // .process_transaction(Transaction::new_signed_with_payer(
+    //     &withdraw_withheld_tokens_from_mint(
+    //         &spl_token_2022::ID,
+    //         &fungible_mint,
+    //         &fee_withdraw_authority.key(),
+    //         &[0,36],
+    //         &fee_withdraw_authority.key(),
+    //         &[],
+    //         ProofLocation {
+
+    //         },
+    //     ).unwrap(),
+    //     Some(&context.payer.pubkey()),
+    //     &[&context.payer],
+    //     context.last_blockhash,
+    // ))
+    // .await
+    // .unwrap();
+
+
+        
     }
 }
 
@@ -479,6 +507,9 @@ pub async fn initialise_token_2022(
 
     let creator_fee_treasury = Keypair::new().pubkey();
 
+    let withdraw_authority = Keypair::new().pubkey();
+   
+
     context
         .banks_client
         .process_transaction(Transaction::new_signed_with_payer(
@@ -498,11 +529,16 @@ pub async fn initialise_token_2022(
                         deployment_type: TOKEN2022_DEPLOYMENT_TYPE,
                         creator_fee_per_mint_in_lamports: CREATOR_FEE_IN_LAMPORTS,
                         creator_fee_treasury,
-                        deflation_rate_per_swap: DEFLATION_RATE,
+                        transfer_fee_config: Some(TransferFeeInputConfig {
+                            fee_in_basis_points: DEFLATION_RATE,
+                            withdraw_authority: withdraw_authority,
+                            target_wallet: withdraw_authority
+                        }),
                         multiplier_limits: MultiplierLimits {
                             max_numerator: 1,
                             min_denominator: 1,
-                        }
+                        },
+                        
                     },
                 }
                 .data(),

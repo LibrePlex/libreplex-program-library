@@ -1,5 +1,5 @@
 export type LibreplexFairLaunch = {
-  "version": "0.2.1",
+  "version": "0.3.0",
   "name": "libreplex_fair_launch",
   "instructions": [
     {
@@ -39,6 +39,70 @@ export type LibreplexFairLaunch = {
           }
         }
       ]
+    },
+    {
+      "name": "initialiseRaw",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialiseRawInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deployRaw",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "deployToken22",
@@ -331,6 +395,54 @@ export type LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "joinraw",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "updateSplMetadata",
       "accounts": [
         {
@@ -429,6 +541,47 @@ export type LibreplexFairLaunch = {
           }
         }
       ]
+    },
+    {
+      "name": "burnExcessSpl",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "mintToken22",
@@ -1116,7 +1269,7 @@ export type LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
@@ -1130,6 +1283,33 @@ export type LibreplexFairLaunch = {
                 "defined": "MultiplierLimits"
               }
             }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "transferFeeTargetWallet",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "totalSplEquivalentMinted",
+            "type": "u64"
+          },
+          {
+            "name": "splExcessInEscrow",
+            "type": "u64"
+          },
+          {
+            "name": "allowBurn",
+            "docs": [
+              "used for variable-rate swaps"
+            ],
+            "type": "bool"
           }
         ]
       }
@@ -1175,6 +1355,91 @@ export type LibreplexFairLaunch = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "deploymentV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "limitPerMint",
+            "type": "u64"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "numberOfTokensIssued",
+            "type": "u64"
+          },
+          {
+            "name": "fungibleDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "escrowNonFungibleCount",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "name": "fungibleMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          },
+          {
+            "name": "proxyProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "cosignerMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "cosignerSwapToNft",
+            "type": "publicKey"
+          },
+          {
+            "name": "cosignerSwapToSpl",
+            "type": "publicKey"
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
+            }
+          },
+          {
+            "name": "deployed",
+            "type": "bool"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                200
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -1256,6 +1521,66 @@ export type LibreplexFairLaunch = {
   ],
   "types": [
     {
+      "name": "InitialiseRawInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limitPerMint",
+            "type": "u64"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          },
+          {
+            "name": "proxyProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "cosignerMint",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "cosignerSwapToSpl",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "cosignerSwapToNft",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "InitialiseInputV3",
       "type": {
         "kind": "struct",
@@ -1311,14 +1636,38 @@ export type LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
-            "type": "u16"
-          },
-          {
             "name": "multiplierLimits",
             "type": {
               "defined": "MultiplierLimits"
             }
+          },
+          {
+            "name": "transferFeeConfig",
+            "type": {
+              "option": {
+                "defined": "TransferFeeInputConfig"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferFeeInputConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeInBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "withdrawAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "targetWallet",
+            "type": "publicKey"
           }
         ]
       }
@@ -1369,7 +1718,7 @@ export type LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
@@ -1383,6 +1732,33 @@ export type LibreplexFairLaunch = {
                 "defined": "MultiplierLimits"
               }
             }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "transferFeeTargetWallet",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "totalSplEquivalentMinted",
+            "type": "u64"
+          },
+          {
+            "name": "splExcessInEscrow",
+            "type": "u64"
+          },
+          {
+            "name": "allowBurn",
+            "docs": [
+              "used for variable-rate swaps"
+            ],
+            "type": "bool"
           }
         ]
       }
@@ -1415,6 +1791,37 @@ export type LibreplexFairLaunch = {
           {
             "name": "minDenominator",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NonFungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          },
+          {
+            "name": "Nifty"
           }
         ]
       }
@@ -1642,12 +2049,27 @@ export type LibreplexFairLaunch = {
       "code": 6011,
       "name": "MultiplierMissMatch",
       "msg": "Custom multiplier mints require co signer"
+    },
+    {
+      "code": 6012,
+      "name": "IncorrectMintCosigner",
+      "msg": "Incorrect cosigner for mint"
+    },
+    {
+      "code": 6013,
+      "name": "IncorrectSwapToSplCosigner",
+      "msg": "Incorrect cosigner for swap to spl"
+    },
+    {
+      "code": 6014,
+      "name": "IncorrectSwapToNftCosigner",
+      "msg": "Incorrect cosigner for swap to NFT"
     }
   ]
 };
 
 export const IDL: LibreplexFairLaunch = {
-  "version": "0.2.1",
+  "version": "0.3.0",
   "name": "libreplex_fair_launch",
   "instructions": [
     {
@@ -1687,6 +2109,70 @@ export const IDL: LibreplexFairLaunch = {
           }
         }
       ]
+    },
+    {
+      "name": "initialiseRaw",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialiseRawInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deployRaw",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "deployToken22",
@@ -1979,6 +2465,54 @@ export const IDL: LibreplexFairLaunch = {
       ]
     },
     {
+      "name": "joinraw",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "MintInput"
+          }
+        }
+      ]
+    },
+    {
       "name": "updateSplMetadata",
       "accounts": [
         {
@@ -2077,6 +2611,47 @@ export const IDL: LibreplexFairLaunch = {
           }
         }
       ]
+    },
+    {
+      "name": "burnExcessSpl",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "mintToken22",
@@ -2764,7 +3339,7 @@ export const IDL: LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
@@ -2778,6 +3353,33 @@ export const IDL: LibreplexFairLaunch = {
                 "defined": "MultiplierLimits"
               }
             }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "transferFeeTargetWallet",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "totalSplEquivalentMinted",
+            "type": "u64"
+          },
+          {
+            "name": "splExcessInEscrow",
+            "type": "u64"
+          },
+          {
+            "name": "allowBurn",
+            "docs": [
+              "used for variable-rate swaps"
+            ],
+            "type": "bool"
           }
         ]
       }
@@ -2823,6 +3425,91 @@ export const IDL: LibreplexFairLaunch = {
       "type": {
         "kind": "struct",
         "fields": []
+      }
+    },
+    {
+      "name": "deploymentV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "limitPerMint",
+            "type": "u64"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "numberOfTokensIssued",
+            "type": "u64"
+          },
+          {
+            "name": "fungibleDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "escrowNonFungibleCount",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "name": "fungibleMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          },
+          {
+            "name": "proxyProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "cosignerMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "cosignerSwapToNft",
+            "type": "publicKey"
+          },
+          {
+            "name": "cosignerSwapToSpl",
+            "type": "publicKey"
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
+            }
+          },
+          {
+            "name": "deployed",
+            "type": "bool"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                200
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -2904,6 +3591,66 @@ export const IDL: LibreplexFairLaunch = {
   ],
   "types": [
     {
+      "name": "InitialiseRawInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limitPerMint",
+            "type": "u64"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "ticker",
+            "type": "string"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          },
+          {
+            "name": "proxyProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "cosignerMint",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "cosignerSwapToSpl",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "cosignerSwapToNft",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "fungibleType",
+            "type": {
+              "defined": "FungibleType"
+            }
+          },
+          {
+            "name": "nonFungibleType",
+            "type": {
+              "defined": "NonFungibleType"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "InitialiseInputV3",
       "type": {
         "kind": "struct",
@@ -2959,14 +3706,38 @@ export const IDL: LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
-            "type": "u16"
-          },
-          {
             "name": "multiplierLimits",
             "type": {
               "defined": "MultiplierLimits"
             }
+          },
+          {
+            "name": "transferFeeConfig",
+            "type": {
+              "option": {
+                "defined": "TransferFeeInputConfig"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferFeeInputConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeInBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "withdrawAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "targetWallet",
+            "type": "publicKey"
           }
         ]
       }
@@ -3017,7 +3788,7 @@ export const IDL: LibreplexFairLaunch = {
             "type": "u64"
           },
           {
-            "name": "deflationRatePerSwap",
+            "name": "transferFeeInBasisPoints",
             "type": "u16"
           },
           {
@@ -3031,6 +3802,33 @@ export const IDL: LibreplexFairLaunch = {
                 "defined": "MultiplierLimits"
               }
             }
+          },
+          {
+            "name": "transferFeeWithdrawAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "transferFeeTargetWallet",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "totalSplEquivalentMinted",
+            "type": "u64"
+          },
+          {
+            "name": "splExcessInEscrow",
+            "type": "u64"
+          },
+          {
+            "name": "allowBurn",
+            "docs": [
+              "used for variable-rate swaps"
+            ],
+            "type": "bool"
           }
         ]
       }
@@ -3063,6 +3861,37 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "minDenominator",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NonFungibleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TokenKeg"
+          },
+          {
+            "name": "Token2022"
+          },
+          {
+            "name": "Nifty"
           }
         ]
       }
@@ -3290,6 +4119,21 @@ export const IDL: LibreplexFairLaunch = {
       "code": 6011,
       "name": "MultiplierMissMatch",
       "msg": "Custom multiplier mints require co signer"
+    },
+    {
+      "code": 6012,
+      "name": "IncorrectMintCosigner",
+      "msg": "Incorrect cosigner for mint"
+    },
+    {
+      "code": 6013,
+      "name": "IncorrectSwapToSplCosigner",
+      "msg": "Incorrect cosigner for swap to spl"
+    },
+    {
+      "code": 6014,
+      "name": "IncorrectSwapToNftCosigner",
+      "msg": "Incorrect cosigner for swap to NFT"
     }
   ]
 };

@@ -1,6 +1,6 @@
 [package]
 name = "libreplex_fair_launch"
-version = "0.2.1"
+version = "0.3.0"
 description = "Created with Anchor"
 edition = "2021"
 license = "MIT"
@@ -31,6 +31,8 @@ spl-token-metadata-interface = {version= "0.2.0"}
 spl-token-group-interface = {version= "0.1.0"}
 spl-type-length-value = {version= "0.3.0"}
 spl-pod = {version= "0.1.0"}
+podded = "0.5.1"
+bytemuck = "1.14"
 
 [dev-dependencies]
 solana-program-test = {version= "1.17.22"}
