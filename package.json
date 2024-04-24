@@ -10,6 +10,7 @@
 
     "libre-cli": "ts-node src/cli/index.ts",
     "libreplex_fair_launch:deploy:devnet": "anchor deploy -p libreplex_fair_launch --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "libreplex_nifty_hybrid:deploy:devnet": "anchor deploy -p libreplex_nifty_hybrid --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_monoswap:deploy:devnet": "anchor deploy -p libreplex_monoswap --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_monoswap:deploy:mainnet": "anchor deploy -p libreplex_monoswap --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
     "libreplex_pipelines:deploy:devnet": "anchor deploy -p libreplex_pipelines --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
