@@ -957,6 +957,75 @@ export type LibreplexFairLaunch = {
       "args": []
     },
     {
+      "name": "claimTransferFeeAuthAsCreator",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram22",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "sources",
+          "type": {
+            "vec": "publicKey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "allowCreatorToClaimTransferFee",
+      "accounts": [
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "migrateToHashlist",
       "accounts": [
         {
@@ -1309,6 +1378,10 @@ export type LibreplexFairLaunch = {
             "docs": [
               "used for variable-rate swaps"
             ],
+            "type": "bool"
+          },
+          {
+            "name": "allowClaimTransferFeeAuthAsCreator",
             "type": "bool"
           }
         ]
@@ -1668,6 +1741,10 @@ export type LibreplexFairLaunch = {
           {
             "name": "targetWallet",
             "type": "publicKey"
+          },
+          {
+            "name": "allowClaimTransferFeeAuthAsCreator",
+            "type": "bool"
           }
         ]
       }
@@ -1758,6 +1835,10 @@ export type LibreplexFairLaunch = {
             "docs": [
               "used for variable-rate swaps"
             ],
+            "type": "bool"
+          },
+          {
+            "name": "allowClaimTransferFeeAuthAsCreator",
             "type": "bool"
           }
         ]
@@ -3027,6 +3108,75 @@ export const IDL: LibreplexFairLaunch = {
       "args": []
     },
     {
+      "name": "claimTransferFeeAuthAsCreator",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram22",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "sources",
+          "type": {
+            "vec": "publicKey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "allowCreatorToClaimTransferFee",
+      "accounts": [
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "migrateToHashlist",
       "accounts": [
         {
@@ -3379,6 +3529,10 @@ export const IDL: LibreplexFairLaunch = {
             "docs": [
               "used for variable-rate swaps"
             ],
+            "type": "bool"
+          },
+          {
+            "name": "allowClaimTransferFeeAuthAsCreator",
             "type": "bool"
           }
         ]
@@ -3738,6 +3892,10 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "targetWallet",
             "type": "publicKey"
+          },
+          {
+            "name": "allowClaimTransferFeeAuthAsCreator",
+            "type": "bool"
           }
         ]
       }
@@ -3828,6 +3986,10 @@ export const IDL: LibreplexFairLaunch = {
             "docs": [
               "used for variable-rate swaps"
             ],
+            "type": "bool"
+          },
+          {
+            "name": "allowClaimTransferFeeAuthAsCreator",
             "type": "bool"
           }
         ]

@@ -13,9 +13,8 @@ pub use state_v2::*;
 
 #[program]
 pub mod libreplex_fair_launch {
-    
-    use super::*;
 
+    use super::*;
 
     pub fn initialise_v3(ctx: Context<InitialiseV3Ctx>, input: InitialiseInputV3) -> Result<()> {
         instructions::initialise_v3(ctx, input)
@@ -48,10 +47,10 @@ pub mod libreplex_fair_launch {
     // whereas there are no limits on the ticker size
 
     // this method works because metadata update authority is retain until token-metadata-2022
-    // groups roll out. the plan is to include all generated token-2022 launches in groups 
+    // groups roll out. the plan is to include all generated token-2022 launches in groups
     // and for that you need the update auth too
 
-    // incidentally the update auth can be used to update the symbol here as well from "" 
+    // incidentally the update auth can be used to update the symbol here as well from ""
     // to the ticker as token-2022 metadata has no limitations on the size of the symbol
     pub fn update_symbol22<'info>(
         ctx: Context<'_, '_, '_, 'info, UpdateSymbol2022Ctx<'info>>,
@@ -75,26 +74,26 @@ pub mod libreplex_fair_launch {
 
     pub fn update_spl_metadata<'info>(
         ctx: Context<'_, '_, '_, 'info, UpdateSplMetadata2022Ctx<'info>>,
-        new_uri: String
+        new_uri: String,
     ) -> Result<()> {
         instructions::update_spl_metadata2022(ctx, new_uri)
     }
     pub fn switch_deployment_type<'info>(
         ctx: Context<'_, '_, '_, 'info, SwitchDeploymentTypeCtx<'info>>,
-        deployment_type: u8
+        deployment_type: u8,
     ) -> Result<()> {
         instructions::switch_deployment_type(ctx, deployment_type)
     }
 
     pub fn reduce_mint_count<'info>(
         ctx: Context<'_, '_, '_, 'info, ReduceMintCountCtx<'info>>,
-        input: ReduceMintCountInput
+        input: ReduceMintCountInput,
     ) -> Result<()> {
         instructions::reduce_mint_count(ctx, input)
     }
-   
+
     pub fn burn_excess_spl<'info>(
-        ctx: Context<'_, '_, '_, 'info, BurnExcessSplCtx<'info>>
+        ctx: Context<'_, '_, '_, 'info, BurnExcessSplCtx<'info>>,
     ) -> Result<()> {
         instructions::burn_excess_spl(ctx)
     }
@@ -105,19 +104,32 @@ pub mod libreplex_fair_launch {
     ) -> Result<()> {
         instructions::mint_token2022(ctx, input)
     }
-    pub fn swap_to_fungible22<'info>(ctx: Context<'_, '_, '_, 'info, SwapToFungible2022Ctx<'info>>) -> Result<()> {
+    pub fn swap_to_fungible22<'info>(
+        ctx: Context<'_, '_, '_, 'info, SwapToFungible2022Ctx<'info>>,
+    ) -> Result<()> {
         instructions::swap_to_fungible_2022(ctx)
     }
 
-    pub fn swap_to_nonfungible22<'a>(ctx: Context<'_,'_,'_,'a, SwapToNonFungible2022Ctx<'a>>) -> Result<()> {
+    pub fn swap_to_nonfungible22<'a>(
+        ctx: Context<'_, '_, '_, 'a, SwapToNonFungible2022Ctx<'a>>,
+    ) -> Result<()> {
         instructions::swap_to_nonfungible_2022(ctx)
     }
-    
+
     pub fn mint_legacy<'info>(ctx: Context<'_, '_, '_, 'info, MintLegacyCtx<'info>>) -> Result<()> {
         instructions::mint_legacy::mint_legacy(ctx)
     }
 
-
+    pub fn claim_transfer_fee_auth_as_creator<'info>(
+        ctx: Context<'_, '_, '_, 'info, ClaimTransferFeeAuthAsCreatorCtx<'info>>,
+        sources: Vec<Pubkey>
+    ) -> Result<()> {
+        instructions::claim_transfer_fee_as_creator::claim_transfer_fee_as_creator_handler(
+            ctx,
+            sources
+        )
+    }
+    
     /*
        Migration methods - to be deactivated once old validation migrations are complete
     */
@@ -137,5 +149,4 @@ pub mod libreplex_fair_launch {
     pub fn swap_to_nonfungible(ctx: Context<SwapFungibleToLegacyCtx>) -> Result<()> {
         instructions::swap_to_nonfungible(ctx)
     }
-
 }

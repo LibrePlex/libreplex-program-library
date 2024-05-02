@@ -532,7 +532,8 @@ pub async fn initialise_token_2022(
                         transfer_fee_config: Some(TransferFeeInputConfig {
                             fee_in_basis_points: DEFLATION_RATE,
                             withdraw_authority: withdraw_authority,
-                            target_wallet: withdraw_authority
+                            target_wallet: withdraw_authority,
+                            allow_claim_transfer_fee_auth_as_creator: false,
                         }),
                         multiplier_limits: MultiplierLimits {
                             max_numerator: 1,

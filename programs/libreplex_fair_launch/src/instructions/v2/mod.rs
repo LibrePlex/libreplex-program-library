@@ -15,6 +15,9 @@ pub use token_2022::*;
 pub mod burn_excess_spl;
 pub use burn_excess_spl::*;
 
+pub mod allow_creator_to_claim_transfer_fee;
+pub use allow_creator_to_claim_transfer_fee::*;
+
 pub mod relinquish_cosigner;
 pub use relinquish_cosigner::*;
 
@@ -28,3 +31,6 @@ pub mod reduce_mint_count;
 pub use shared_logic::*;
 pub mod shared_logic;
 
+
+pub use claim_transfer_fee_as_creator::*;
+pub mod claim_transfer_fee_as_creator;

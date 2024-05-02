@@ -34,10 +34,12 @@ pub fn initialise_logic(input: InitialiseInputV3,
         config.transfer_fee_in_basis_points = x.fee_in_basis_points;
         config.transfer_fee_withdraw_authority = Some(x.withdraw_authority);
         config.transfer_fee_target_wallet = Some(x.target_wallet);
+        config.allow_claim_transfer_fee_auth_as_creator = x.allow_claim_transfer_fee_auth_as_creator;
     } else {
         config.transfer_fee_in_basis_points = 0;
         config.transfer_fee_withdraw_authority = None;
         config.transfer_fee_target_wallet = None;
+        config.allow_claim_transfer_fee_auth_as_creator = false;
     }
    
     config.multiplier_limits = Some(input.multiplier_limits);

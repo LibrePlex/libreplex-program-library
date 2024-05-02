@@ -92,6 +92,8 @@ pub struct DeploymentConfig {
 
     /// used for variable-rate swaps
     pub allow_burn: bool,
+
+    pub allow_claim_transfer_fee_auth_as_creator: bool
 }
 
 impl DeploymentConfig {

@@ -6,7 +6,8 @@ use crate::{initialise_logic, Deployment, DeploymentConfig, MultiplierLimits};
 pub struct TransferFeeInputConfig {
     pub fee_in_basis_points: u16,
     pub withdraw_authority: Pubkey,
-    pub target_wallet: Pubkey
+    pub target_wallet: Pubkey,
+    pub allow_claim_transfer_fee_auth_as_creator: bool
 }
 
 // Same as v2 with multiplier_upper_limit added
