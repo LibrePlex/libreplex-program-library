@@ -26,7 +26,7 @@ libreplex_shared = {version = "*", path = "../libreplex_shared", features=["cpi"
 solana-program = "~1.17"
 solana-address-lookup-table-program = "^1.17"
 dyn-fmt = "0.3.0"
-nifty-asset = {version = "0.3.0"}
+nifty-asset = {version = "0.4.0"}
 libreplex-monoswap-client = {version = "*", path = "../../../monoswap/clients/rust/"}
 
 [dev-dependencies]

@@ -4,8 +4,10 @@ use anchor_spl::token_interface::Mint;
 use libreplex_monoswap_client::instructions::CreateSwapInstructionArgs;
 
 
-use nifty_asset::instructions::CreateInstructionArgs;
+use nifty_asset::extensions::{ExtensionBuilder, MetadataBuilder};
+use nifty_asset::instructions::{AllocateCpiBuilder, CreateCpiBuilder};
 
+use nifty_asset::types::{ExtensionInput, ExtensionType};
 use solana_program::program::{invoke, invoke_signed};
 
 
@@ -114,34 +116,39 @@ pub fn mint_handler<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> R
         nifty_hybrid.seed.as_ref(),
         &[nifty_hybrid.bump],
     ];
-    invoke_signed(
-        &nifty_asset::instructions::Create {
-            asset: non_fungible_mint.key(),
-            authority: (nifty_hybrid.key(), false),
-            group_authority: Some(nifty_hybrid.key()),
-            owner: receiver.key(),
-            group: Some(group_mint.key()),
-            payer: Some(payer.key()),
-            system_program: Some(system_program.key()),
-        }
-        .instruction(CreateInstructionArgs {
-            name: deployment.ticker.clone(),
-            standard: nifty_asset::types::Standard::NonFungible,
-            mutable: true,
-            extensions: None 
-        }),
-        &[
-            non_fungible_mint.to_account_info(),
-            nifty_hybrid.to_account_info(),
-            group_mint.to_account_info(),
-            deployment.to_account_info(),
-            receiver.to_account_info(),
-            payer.to_account_info(),
-            system_program.to_account_info(),
-        ],
-        &[seeds]
-    )?;
 
+
+    let mut metadata_builder = MetadataBuilder::default();
+    metadata_builder.set(
+        Some(&deployment.ticker.to_string()), 
+        None, 
+        Some(&deployment.offchain_url.to_string()));
+
+    let data = metadata_builder.data();
+
+    AllocateCpiBuilder::new(nifty_program)
+    .asset(&ctx.accounts.non_fungible_mint.to_account_info())
+    .payer(Some(payer))
+    .system_program(Some(system_program))
+    .extension(ExtensionInput {
+        extension_type: ExtensionType::Metadata,
+        length: data.len() as u32,
+        data: Some(data),
+    })
+    .invoke_signed(&[seeds])?;
+
+    CreateCpiBuilder::new(nifty_program)
+    .asset(&ctx.accounts.non_fungible_mint.to_account_info())
+    .authority(&nifty_hybrid.to_account_info(), false)
+    .group(Some(&group_mint.to_account_info()))
+    .group_authority(Some(&nifty_hybrid.to_account_info()))
+    .owner(&receiver.to_account_info())
+    .payer(Some(&payer.to_account_info()))
+    .system_program(Some(system_program))
+    .name(deployment.ticker.clone())
+    .standard(nifty_asset::types::Standard::NonFungible)
+    .mutable(true)
+    .invoke_signed(&[seeds])?;
     
     invoke_signed(
         &libreplex_monoswap_client::instructions::CreateSwap {
