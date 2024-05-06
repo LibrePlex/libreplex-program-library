@@ -2277,7 +2277,7 @@ dependencies = [
  "anchor-spl",
  "arrayref",
  "dyn-fmt",
- "libreplex_shared",
+ "libreplex_shared 0.0.0",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -2296,7 +2296,7 @@ dependencies = [
  "anchor-spl",
  "arrayref",
  "libreplex_editions",
- "libreplex_shared",
+ "libreplex_shared 0.0.0",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -2316,7 +2316,7 @@ dependencies = [
  "arrayref",
  "bytemuck",
  "libreplex_inscriptions",
- "libreplex_shared",
+ "libreplex_shared 0.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "mpl-token-metadata",
  "podded",
  "solana-program",
@@ -2373,7 +2373,7 @@ dependencies = [
  "dyn-fmt",
  "libreplex_fair_launch",
  "libreplex_inscriptions",
- "libreplex_shared",
+ "libreplex_shared 0.0.0",
  "mpl-token-metadata",
  "solana-address-lookup-table-program",
  "solana-program",
@@ -2404,7 +2404,7 @@ dependencies = [
  "anchor-spl",
  "assert_matches",
  "libreplex_fair_launch",
- "libreplex_shared",
+ "libreplex_shared 0.0.0",
  "mocha",
  "mpl-token-metadata",
  "solana-program",
@@ -2434,7 +2434,7 @@ dependencies = [
  "dyn-fmt",
  "libreplex-monoswap-client",
  "libreplex_fair_launch",
- "libreplex_shared",
+ "libreplex_shared 0.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "nifty-asset",
  "solana-address-lookup-table-program",
  "solana-program",
@@ -2451,7 +2451,7 @@ dependencies = [
  "libreplex_fair_launch",
  "libreplex_liquidity",
  "libreplex_monoswap",
- "libreplex_shared",
+ "libreplex_shared 0.0.0",
  "mocha",
  "mpl-token-metadata",
  "solana-program",
@@ -2465,6 +2465,24 @@ dependencies = [
 [[package]]
 name = "libreplex_shared"
 version = "0.0.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "mpl-token-metadata",
+ "solana-program",
+ "spl-pod",
+ "spl-token",
+ "spl-token-2022 1.0.0",
+ "spl-token-group-interface",
+ "spl-token-metadata-interface",
+ "spl-type-length-value",
+]
+
+[[package]]
+name = "libreplex_shared"
+version = "0.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97d6a9c75f3c98f1386e2a22506ca55d3d9251d222da0ecdb7d6e1daa71367b9"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
