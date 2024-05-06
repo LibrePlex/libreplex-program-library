@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::TokenAccount;
 use solana_program::{
     account_info::AccountInfo,
-    program::{invoke, invoke_signed},
+    program::invoke_signed,
     rent::Rent,
     system_instruction,
 };
@@ -93,6 +93,7 @@ pub fn transfer_native<'info>(
         // ok we can use an existing one as long as the owner and mint match
         let tai = tmp_token_account.to_account_info();
         let data: &[u8] = &tai.try_borrow_data()?;
+        #[allow(noop_method_call)]
         let tmp_token_account_obj = TokenAccount::try_deserialize(&mut data.clone())?;
         if tmp_token_account_obj.mint != wrapped_sol::ID {
             return Err(SharedError::BadTokenAccountMint.into());

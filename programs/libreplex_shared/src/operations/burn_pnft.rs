@@ -4,7 +4,7 @@ use mpl_token_metadata::instructions::BurnV1Builder;
 use anchor_lang::prelude::*;
 use solana_program::program::{invoke, invoke_signed};
 
-use crate::SharedError;
+
 
 pub fn burn_pnft<'info>(
     token_program: &AccountInfo<'info>,

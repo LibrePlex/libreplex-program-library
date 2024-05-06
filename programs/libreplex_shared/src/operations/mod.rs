@@ -10,9 +10,6 @@ pub use minting::*;
 pub mod create_and_mint;
 pub use create_and_mint::*;
 
-pub mod create_mint;
-pub use create_mint::*;
-
 pub mod create_and_verify_ata;
 pub use create_and_verify_ata::*;
 

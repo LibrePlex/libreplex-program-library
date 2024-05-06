@@ -11,10 +11,7 @@ use spl_token_2022::{
     state::Mint,
 };
 
-use spl_token_group_interface::{
-    instruction::{initialize_group, initialize_member},
-    state::{TokenGroup, TokenGroupMember},
-};
+use spl_token_group_interface::state::{TokenGroup, TokenGroupMember};
 use spl_token_metadata_interface::{instruction::initialize, state::TokenMetadata};
 use spl_type_length_value::state::{TlvState, TlvStateBorrowed};
 
@@ -123,38 +120,35 @@ pub fn create_token_2022_and_metadata(
         ],
     )?;
 
-    match &token_metadata {
-        Some(_) => {
-            let initialize_extension =
-                spl_token_2022::extension::metadata_pointer::instruction::initialize(
-                    &spl_token_2022::ID,
-                    &nft_mint.key(),
-                    Some(authority.key()),
-                    // we are using the native metadata implementation,
-                    // hence setting metadata address = mint address
-                    Some(nft_mint.key()),
-                )
-                .unwrap();
+    if token_metadata.is_some() {
+        let initialize_extension =
+            spl_token_2022::extension::metadata_pointer::instruction::initialize(
+                &spl_token_2022::ID,
+                &nft_mint.key(),
+                Some(authority.key()),
+                // we are using the native metadata implementation,
+                // hence setting metadata address = mint address
+                Some(nft_mint.key()),
+            )
+            .unwrap();
 
-            msg!("Invoke initialise metadata pointer extension");
+        msg!("Invoke initialise metadata pointer extension");
 
-            match auth_seeds {
-                Some(x) => {
-                    invoke_signed(
-                        &initialize_extension,
-                        &[authority.to_account_info(), nft_mint.to_account_info()],
-                        &[x],
-                    )?;
-                }
-                None => {
-                    invoke(
-                        &initialize_extension,
-                        &[authority.to_account_info(), nft_mint.to_account_info()],
-                    )?;
-                }
+        match auth_seeds {
+            Some(x) => {
+                invoke_signed(
+                    &initialize_extension,
+                    &[authority.to_account_info(), nft_mint.to_account_info()],
+                    &[x],
+                )?;
+            }
+            None => {
+                invoke(
+                    &initialize_extension,
+                    &[authority.to_account_info(), nft_mint.to_account_info()],
+                )?;
             }
         }
-        _ => {}
     }
 
     if let Some(tfp) = &transfer_fee_params {
@@ -165,7 +159,7 @@ pub fn create_token_2022_and_metadata(
                 &nft_mint.key(),
                 Some(&authority.key()),
                 Some(&tfp.withdraw_fee_authority),
-                tfp.transfer_fee_bps.clone(),
+                tfp.transfer_fee_bps,
                 std::u64::MAX,
             )?;
             match &auth_seeds {
@@ -195,7 +189,7 @@ pub fn create_token_2022_and_metadata(
     }
 
     match &token_group {
-        Some(x) => {
+        Some(_x) => {
             let initialize_extension =
                 spl_token_2022::extension::group_pointer::instruction::initialize(
                     &spl_token_2022::ID,
@@ -232,7 +226,7 @@ pub fn create_token_2022_and_metadata(
     }
 
     match &token_member {
-        Some(x) => {
+        Some(_x) => {
             let initialize_extension =
                 spl_token_2022::extension::group_member_pointer::instruction::initialize(
                     &spl_token_2022::ID,

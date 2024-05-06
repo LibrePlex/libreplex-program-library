@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token_interface::{transfer, Transfer, transfer_checked, TransferChecked};
+
 use solana_program::program::{invoke, invoke_signed};
 
 use crate::SharedError;

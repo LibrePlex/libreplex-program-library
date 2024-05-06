@@ -102,8 +102,8 @@ pub fn create_metadata_and_masteredition<'f>(
                         invoke_signed(&ix, master_edition_infos.as_slice(), &[x])?;
                         match &creators {
                             None => {}
-                            _ => match verified_creator {
-                                Some(_verified_creator) => {
+                            _ => {
+                                if let Some(_verified_creator) = verified_creator {
                                     let sign_metadata_infos =
                                         vec![metadata.to_account_info(), _verified_creator.to_account_info()];
                                     let mut sign_metadata_builder = SignMetadataBuilder::new();
@@ -115,7 +115,6 @@ pub fn create_metadata_and_masteredition<'f>(
         
                                     invoke_signed(&ix, &sign_metadata_infos, &[x])?;
                                 }
-                                None => {}
                             },
                         }
                     },

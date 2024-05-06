@@ -4,9 +4,9 @@ use mpl_token_metadata::{
     instructions::{
         CreateV1Builder,
         MintV1Builder, // builders::{CreateBuilder, MintBuilder, UpdateBuilder, VerifyBuilder},
-                         // create_master_edition_v3, create_metadata_accounts_v3, set_and_verify_collection,
-                         // set_and_verify_sized_collection_item, update_metadata_accounts_v2, CreateArgs,
-                         // InstructionBuilder, MintArgs, RuleSetToggle, UpdateArgs, VerificationArgs,
+                       // create_master_edition_v3, create_metadata_accounts_v3, set_and_verify_collection,
+                       // set_and_verify_sized_collection_item, update_metadata_accounts_v2, CreateArgs,
+                       // InstructionBuilder, MintArgs, RuleSetToggle, UpdateArgs, VerificationArgs,
     },
     types::{Creator, PrintSupply, TokenStandard},
     // state::{AssetData, Collection, Metadata, PrintSupply, TokenMetadataAccount, TokenStandard},
@@ -53,6 +53,7 @@ pub fn create_mint_with_metadata_and_masteredition(
 
     let master_edition = accounts.nft_master_edition;
 
+    let me_key = master_edition.clone().map(|x|x.key());
     let mut create_ix_builder = CreateV1Builder::new();
     create_ix_builder
         .metadata(accounts.nft_metadata.key())
@@ -60,10 +61,7 @@ pub fn create_mint_with_metadata_and_masteredition(
         .authority(accounts.nft_mint_authority.key())
         .payer(accounts.payer.key())
         .update_authority(accounts.authority_pda.key(), true)
-        .master_edition(match &master_edition {
-            Some(x) => Some(x.key()),
-            None => None,
-        })
+        .master_edition(me_key)
         .seller_fee_basis_points(seller_fee_basis_points)
         .is_mutable(is_mutable)
         .name(name)
@@ -76,11 +74,8 @@ pub fn create_mint_with_metadata_and_masteredition(
         } else {
             PrintSupply::Limited(max_supply)
         });
-    match &creators {
-        Some(x) => {
-            create_ix_builder.creators(x.to_vec());
-        }
-        _ => {}
+    if let Some(x) = &creators {
+        create_ix_builder.creators(x.to_vec());
     };
     let create_ix = create_ix_builder.instruction();
 
@@ -111,14 +106,12 @@ pub fn create_mint_with_metadata_and_masteredition(
 
     if mint_amount > 0 {
         let mut mint_builder = MintV1Builder::new();
+        let me_key = master_edition.clone().map(|x| x.key());
         mint_builder
             .token(token_info.key())
             .token_owner(Some(accounts.nft_owner.key()))
             .metadata(accounts.nft_metadata.key())
-            .master_edition(match &master_edition {
-                Some(x) => Some(x.key()),
-                None => None,
-            })
+            .master_edition(me_key)
             .mint(accounts.nft_mint.key())
             .payer(accounts.payer.key())
             .authority(accounts.authority_pda.key())
@@ -148,6 +141,6 @@ pub fn create_mint_with_metadata_and_masteredition(
 
         invoke_signed(&mint_ix, &mint_infos, &[&authority_seeds])?;
     }
-   
+
     Ok(())
 }

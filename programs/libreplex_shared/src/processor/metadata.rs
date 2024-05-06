@@ -35,9 +35,9 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
     system_program: &AccountInfo<'f>,
     verified_creator: &AccountInfo<'f>,
     rent: &AccountInfo<'f>,
-    name: &String,
-    symbol: &String,
-    offchain_url: &String,
+    name: &str,
+    symbol: &str,
+    offchain_url: &str,
     royalties_basis_points: u16,
     creators: Option<Vec<Creator>>,
     verify_first_creator: bool,
@@ -75,8 +75,8 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
         &spl_token::instruction::initialize_mint2(
             &spl_token::id(),
             &mint_key,
-            &owner_key,
-            Some(&owner_key),
+            owner_key,
+            Some(owner_key),
             decimals,
         )?,
         &[token_program.to_account_info(), mint.to_account_info()],
@@ -117,8 +117,8 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
                             &spl_token::instruction::mint_to(
                                 &spl_token::id(),
                                 &mint_key,
-                                &token_account_key,
-                                &owner_key,
+                                token_account_key,
+                                owner_key,
                                 &[],
                                 initial_mint_amount,
                             )?,
@@ -146,9 +146,9 @@ pub fn create_mint_with_metadata_and_masteredition<'f>(
         .payer(payer_key)
         .mint(mint_key)
         .data(DataV2 {
-            name: name.clone(),
-            symbol: symbol.clone(),
-            uri: offchain_url.clone(),
+            name: name.to_owned(),
+            symbol: symbol.to_owned(),
+            uri: offchain_url.to_string(),
             seller_fee_basis_points: royalties_basis_points,
             creators: creators.to_owned(),
             collection: None,

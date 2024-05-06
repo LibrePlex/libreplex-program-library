@@ -1,9 +1,9 @@
 use anchor_lang::prelude::*;
 use mpl_token_metadata::{
-    instructions::{CreateMetadataAccountV3Builder, CreateV1CpiBuilder, CreateMasterEditionV3Builder},
-    types::{Creator, PrintSupply, TokenStandard, DataV2},
+    instructions::CreateV1CpiBuilder,
+    types::{Creator, TokenStandard},
 };
-use solana_program::{account_info::AccountInfo, program::invoke_signed};
+use solana_program::account_info::AccountInfo;
 
 /// Accounts to mint an NFT.
 pub struct CreateMetadataAccounts<'info> {

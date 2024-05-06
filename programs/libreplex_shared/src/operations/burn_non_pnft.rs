@@ -14,9 +14,7 @@ pub fn burn_non_pnft<'info>(
     system_program: &AccountInfo<'info>,
     sysvar_instructions: &AccountInfo<'info>,
     authority_seeds: Option<&[&[&[u8]]]>,
-    collection_metadata: &AccountInfo<'info>,
-    metadata_program_account: &AccountInfo<'info>,
-    payer: &AccountInfo<'info>
+    collection_metadata: &AccountInfo<'info>
 ) -> Result<()> {
     // simple. move the token from source token account to the target token account
 

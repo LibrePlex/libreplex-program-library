@@ -4,7 +4,7 @@ members = [
 ]
 resolver = "2"
 
-exclude = ["programs/libreplex_shared", "programs/libreplex_loop"]
+exclude = ["programs/libreplex_loop"]
 
 [profile.release]
 overflow-checks = true

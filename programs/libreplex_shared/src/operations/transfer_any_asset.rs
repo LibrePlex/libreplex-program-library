@@ -1,13 +1,10 @@
-
 use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
 
 use anchor_lang::prelude::*;
 
-
-
 use crate::SharedError;
 
-use super::{transfer_pnft, transfer_non_pnft};
+use super::{transfer_non_pnft, transfer_pnft};
 
 pub fn transfer_any_asset<'info>(
     token_program: &AccountInfo<'info>,
@@ -29,20 +26,16 @@ pub fn transfer_any_asset<'info>(
     payer: &AccountInfo<'info>,
     amount: u64,
 ) -> Result<()> {
-
     let mut is_pnft = false;
-
 
     if !metadata.to_account_info().data_is_empty() {
         // we may have a pNFT
-        
+
         let metadata_obj = Metadata::try_from(&metadata.to_account_info())?;
-        match metadata_obj.token_standard {
-            Some(x) =>{
-                if x == TokenStandard::ProgrammableNonFungible {
-                    is_pnft = true;
-                }
-            }, None => {}
+        if let Some(x) = metadata_obj.token_standard {
+            if x == TokenStandard::ProgrammableNonFungible {
+                is_pnft = true;
+            }
         }
     }
 
@@ -68,7 +61,7 @@ pub fn transfer_any_asset<'info>(
             auth_rules_program,
             auth_rules,
             authority_seeds,
-            payer
+            payer,
         )?;
     } else {
         transfer_non_pnft(
@@ -82,11 +75,9 @@ pub fn transfer_any_asset<'info>(
             system_program,
             authority_seeds,
             payer,
-            amount
+            amount,
         )?;
     }
 
-
     Ok(())
-
 }

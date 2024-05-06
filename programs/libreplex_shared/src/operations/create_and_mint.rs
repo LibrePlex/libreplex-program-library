@@ -105,7 +105,7 @@ pub fn create_and_mint(
         .payer(accounts.payer.key())
         .authority(accounts.authority_pda.key());
 
-    let mut mint_infos = vec![
+    let mint_infos = vec![
         token_info.to_account_info(),
         accounts.nft_owner.to_account_info(),
         accounts.nft_metadata.to_account_info(),
