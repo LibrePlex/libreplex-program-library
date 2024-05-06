@@ -2309,7 +2309,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_fair_launch"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -2722,9 +2722,9 @@ dependencies = [
 
 [[package]]
 name = "nifty-asset"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05da1da31f1e815de1255e9bf03695bbb94b4e2cfa1404fa081a9faf09c85e91"
+checksum = "a75ac494054efc518d6d90bd5ec5b5db50d27963ae2c3773009bf7643b11315c"
 dependencies = [
  "borsh 0.10.3",
  "kaigan",
@@ -2737,9 +2737,9 @@ dependencies = [
 
 [[package]]
 name = "nifty-asset-types"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "463987426bc0a1debe2db68b2b6dc5d0faeb27d25d0f092e1dc1d45f99baae9c"
+checksum = "0a150fb8153040cd5e568c2d01b15e908fd3d0a15a636efb176ae8004c285a1e"
 dependencies = [
  "borsh 0.10.3",
  "bytemuck",

@@ -15,9 +15,6 @@ pub use token_2022::*;
 pub mod burn_excess_spl;
 pub use burn_excess_spl::*;
 
-pub mod allow_creator_to_claim_transfer_fee;
-pub use allow_creator_to_claim_transfer_fee::*;
-
 pub mod relinquish_cosigner;
 pub use relinquish_cosigner::*;
 
