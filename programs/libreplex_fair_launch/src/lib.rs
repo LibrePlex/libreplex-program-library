@@ -32,6 +32,10 @@ pub mod libreplex_fair_launch {
         instructions::deploy_token_2022(ctx)
     }
 
+    pub fn toggle_freeze(ctx: Context<ToggleFreeze>) -> Result<()> {
+        instructions::toggle_freeze(ctx)
+    }
+
     // deploy hybrid - it's like token 2022 but with an extra metaplex
     // metadata for the FUNGIBLE mint only
     pub fn deployhybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
