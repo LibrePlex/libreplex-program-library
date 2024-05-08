@@ -1,5 +1,5 @@
 export type LibreplexFairLaunch = {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "name": "libreplex_fair_launch",
   "instructions": [
     {
@@ -1008,22 +1008,6 @@ export type LibreplexFairLaunch = {
           }
         }
       ]
-    },
-    {
-      "name": "allowCreatorToClaimTransferFee",
-      "accounts": [
-        {
-          "name": "deploymentConfig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        }
-      ],
-      "args": []
     },
     {
       "name": "migrateToHashlist",
@@ -2150,7 +2134,7 @@ export type LibreplexFairLaunch = {
 };
 
 export const IDL: LibreplexFairLaunch = {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "name": "libreplex_fair_launch",
   "instructions": [
     {
@@ -3159,22 +3143,6 @@ export const IDL: LibreplexFairLaunch = {
           }
         }
       ]
-    },
-    {
-      "name": "allowCreatorToClaimTransferFee",
-      "accounts": [
-        {
-          "name": "deploymentConfig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        }
-      ],
-      "args": []
     },
     {
       "name": "migrateToHashlist",

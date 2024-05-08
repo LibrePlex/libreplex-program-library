@@ -41,6 +41,9 @@ pub use v2::*;
 pub mod raw;
 pub use raw::*;
 
+pub mod toggle_freeze;
+pub use toggle_freeze::*;
+
 
 pub const COMPRESSED_DEPLOYMENT_TYPE: u8 = 2;
 pub const STANDARD_DEPLOYMENT_TYPE: u8 = 0;
