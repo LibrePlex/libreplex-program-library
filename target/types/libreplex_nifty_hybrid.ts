@@ -110,6 +110,47 @@ export type LibreplexNiftyHybrid = {
       "args": []
     },
     {
+      "name": "updateMetadata",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "niftyHybrid",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "groupMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "niftyProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initialise",
       "accounts": [
         {
@@ -533,6 +574,47 @@ export const IDL: LibreplexNiftyHybrid = {
         },
         {
           "name": "monoswapProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateMetadata",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "niftyHybrid",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nonFungibleMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "groupMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "niftyProgram",
           "isMut": false,
           "isSigner": false
         }
