@@ -5,7 +5,7 @@ use solana_program::system_program;
 
 
 use crate::{
-    deploy_hybrid_logic, Deployment, DeploymentConfig, Hashlist, HYBRID_DEPLOYMENT_TYPE
+    deploy_hybrid_logic, Deployment, DeploymentActive, DeploymentConfig, Hashlist, HYBRID_DEPLOYMENT_TYPE
 };
 
 pub mod sysvar_instructions_program {
@@ -109,7 +109,6 @@ pub struct DeployHybridCtx<'info> {
     /// CHECK: address checked
     #[account(address = mpl_token_metadata::ID)]
     pub metadata_program: UncheckedAccount<'info>,
-
 }
 
 pub fn deploy_hybrid(ctx: Context<DeployHybridCtx>) -> Result<()> {
@@ -175,4 +174,89 @@ pub fn check_deploy_allowed (deployment: &Account<Deployment>){
     }
 
     // fungible mint = system program id, this has not been deployed yet at all
+}
+
+
+// Raw deployments do not enforce as many restrictions on the mint
+#[derive(Accounts)]
+pub struct DeployHybridUncheckedCtx<'info> {
+    #[account(
+        mut,
+        seeds=["deployment".as_bytes(), deployment.ticker.as_bytes()],
+        bump
+    )]
+    pub deployment: Box<Account<'info, Deployment>>,
+
+    #[account(
+        mut,
+        seeds=["deployment_config".as_bytes(), deployment.key().as_ref()],
+        bump
+    )]
+    pub deployment_config: Box<Account<'info, DeploymentConfig>>,
+
+    #[account(init_if_needed, seeds = ["hashlist".as_bytes(), 
+    deployment.key().as_ref()],
+    bump, payer = payer, space = 8 + 32 + 4)]
+    pub hashlist: Box<Account<'info, Hashlist>>,
+
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    // this signer is no longer used but retained for backwards compatibility.
+    // reason being, the deploy call can be permissionless - it conveys no 
+    // special privileges to the creator that initialised the mint.
+    #[account(mut)]
+    pub creator: Signer<'info>,
+
+    #[account(
+        mint::decimals = deployment.decimals)]
+    pub fungible_mint: Box<Account<'info, Mint>>,
+    
+
+    /// CHECK: checked in code
+    #[account(init, 
+        associated_token::mint = fungible_mint, 
+        payer = payer, associated_token::authority = deployment)]
+    pub fungible_escrow_token_account: Box<Account<'info, TokenAccount>>,
+
+    /* INITIALISE NON_FUNGIBLE ACCOUNTS. NB: no token account neede until mint */
+    // #[account(mut)]
+    // pub non_fungible_mint: Signer<'info>,
+
+    /* BOILERPLATE PROGRAM ACCOUNTS */
+    /// CHECK: passed in via CPI to libreplex_inscriptions program
+    #[account(
+        constraint = token_program.key() == spl_token::ID
+    )]
+    pub token_program: UncheckedAccount<'info>,
+
+    #[account()]
+    pub associated_token_program: Program<'info, AssociatedToken>,
+
+    #[account()]
+    pub system_program: Program<'info, System>,
+}
+
+pub fn deploy_hybrid_unchecked_handler(ctx: Context<DeployHybridUncheckedCtx>) -> Result<()> {
+    let deployment = ctx.accounts.deployment.as_mut();
+    check_deploy_allowed(deployment);
+
+    if deployment.deployment_type != HYBRID_DEPLOYMENT_TYPE {
+        panic!("Wrong deployment type")
+    }
+
+    let hashlist = ctx.accounts.hashlist.as_mut();
+    let fungible_mint = ctx.accounts.fungible_mint.as_ref();
+
+    hashlist.deployment = deployment.key();
+    deployment.fungible_mint = fungible_mint.key();
+
+    ctx.accounts.deployment_config.unchecked_fungible = true;
+
+    emit!(DeploymentActive { 
+        ticker: deployment.ticker.clone(),
+        fungible_mint: fungible_mint.key(),
+    });
+
+    Ok(())
 }

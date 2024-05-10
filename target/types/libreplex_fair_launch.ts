@@ -288,6 +288,62 @@ export type LibreplexFairLaunch = {
       "args": []
     },
     {
+      "name": "deployHybridUnchecked",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "relinquishCosigner",
       "accounts": [
         {
@@ -1403,6 +1459,10 @@ export type LibreplexFairLaunch = {
           {
             "name": "allowClaimTransferFeeAuthAsCreator",
             "type": "bool"
+          },
+          {
+            "name": "uncheckedFungible",
+            "type": "bool"
           }
         ]
       }
@@ -1859,6 +1919,10 @@ export type LibreplexFairLaunch = {
           },
           {
             "name": "allowClaimTransferFeeAuthAsCreator",
+            "type": "bool"
+          },
+          {
+            "name": "uncheckedFungible",
             "type": "bool"
           }
         ]
@@ -2459,6 +2523,62 @@ export const IDL: LibreplexFairLaunch = {
       "args": []
     },
     {
+      "name": "deployHybridUnchecked",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deploymentConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fungibleMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "fungibleEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "relinquishCosigner",
       "accounts": [
         {
@@ -3574,6 +3694,10 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "allowClaimTransferFeeAuthAsCreator",
             "type": "bool"
+          },
+          {
+            "name": "uncheckedFungible",
+            "type": "bool"
           }
         ]
       }
@@ -4030,6 +4154,10 @@ export const IDL: LibreplexFairLaunch = {
           },
           {
             "name": "allowClaimTransferFeeAuthAsCreator",
+            "type": "bool"
+          },
+          {
+            "name": "uncheckedFungible",
             "type": "bool"
           }
         ]
