@@ -11,7 +11,10 @@ use spl_token_2022::{
     state::Mint,
 };
 
-use spl_token_group_interface::state::{TokenGroup, TokenGroupMember};
+use spl_token_group_interface::{
+    instruction::{initialize_group, initialize_member},
+    state::{TokenGroup, TokenGroupMember},
+};
 use spl_token_metadata_interface::{instruction::initialize, state::TokenMetadata};
 use spl_type_length_value::state::{TlvState, TlvStateBorrowed};
 
@@ -38,15 +41,16 @@ pub struct TransferFeeParams {
 }
 
 /// Creates the metadata accounts and mint a new token.
-pub fn create_token_2022_and_metadata(
-    accounts: MintAccounts2022,
+pub fn create_token_2022_and_metadata<'a>(
+    accounts: MintAccounts2022<'a>,
     decimals: u8,
     token_metadata: Option<TokenMetadata>,
     // token group is optional - specifying this turns this into a group mint
     token_group: Option<TokenGroupInput>,
-    token_member: Option<TokenMemberInput>,
+    token_member: Option<TokenMemberInput<'a>>,
     auth_seeds: Option<&[&[u8]]>,
     transfer_fee_params: Option<TransferFeeParams>,
+    initialise_groups: bool,
 ) -> Result<()> {
     // msg!("create_token_2022_and_metadata called");
     let MintAccounts2022 {
@@ -276,45 +280,46 @@ pub fn create_token_2022_and_metadata(
     invoke(&initialize_ix, &[nft_mint.to_account_info()])?;
 
     // to be enabled when groups have been audited and rolled out
-
-    // match &token_group {
-    //     Some(x) => {
-    //         match &auth_seeds {
-    //             Some(y) => {
-    //                 msg!("Initialise group");
-    //                 invoke_signed(
-    //                     &initialize_group(
-    //                         &spl_token_2022::ID,
-    //                         &nft_mint.key(),
-    //                         &nft_mint.key(),
-    //                         &authority.key(),
-    //                         // Pubkey::new_unique().into(),
-    //                         Some(authority.key()),
-    //                         x.max_size,
-    //                     ),
-    //                     &[nft_mint.to_account_info(), authority.to_account_info()],
-    //                     &[y],
-    //                 )?;
-    //                 msg!("Group initialised");
-    //             }
-    //             None => {
-    //                 invoke(
-    //                     &initialize_group(
-    //                         &spl_token_2022::ID,
-    //                         &nft_mint.key(),
-    //                         &nft_mint.key(),
-    //                         &authority.key(),
-    //                         // Pubkey::new_unique().into(),
-    //                         Some(authority.key()),
-    //                         x.max_size,
-    //                     ),
-    //                     &[nft_mint.to_account_info(), authority.to_account_info()],
-    //                 )?;
-    //             }
-    //         }
-    //     }
-    //     None => {}
-    // }
+    if initialise_groups {
+        match &token_group {
+            Some(x) => {
+                match &auth_seeds {
+                    Some(y) => {
+                        msg!("Initialise group");
+                        invoke_signed(
+                            &initialize_group(
+                                &spl_token_2022::ID,
+                                &nft_mint.key(),
+                                &nft_mint.key(),
+                                &authority.key(),
+                                // Pubkey::new_unique().into(),
+                                Some(authority.key()),
+                                x.max_size,
+                            ),
+                            &[nft_mint.to_account_info(), authority.to_account_info()],
+                            &[y],
+                        )?;
+                        msg!("Group initialised");
+                    }
+                    None => {
+                        invoke(
+                            &initialize_group(
+                                &spl_token_2022::ID,
+                                &nft_mint.key(),
+                                &nft_mint.key(),
+                                &authority.key(),
+                                // Pubkey::new_unique().into(),
+                                Some(authority.key()),
+                                x.max_size,
+                            ),
+                            &[nft_mint.to_account_info(), authority.to_account_info()],
+                        )?;
+                    }
+                }
+            }
+            None => {}
+        }
+    }
 
     msg!("Initialise metadata if needed");
     if let Some(x) = token_metadata {
@@ -346,42 +351,42 @@ pub fn create_token_2022_and_metadata(
     }
 
     // to be enabled when groups have been audited and rolled out
-
-    // match &token_member {
-    //     Some(x) => {
-    //         let group_mint = x.group_mint.clone();
-    //         match &auth_seeds {
-    //             Some(y) => {
-    //                 invoke_signed(
-    //                     &initialize_member(
-    //                         &spl_token_2022::ID,
-    //                         &nft_mint.key(),
-    //                         &nft_mint.key(),
-    //                         &authority.key(),
-    //                         &x.group_mint.key(),
-    //                         &authority.key(),
-    //                     ),
-    //                     &[nft_mint, group_mint, authority.to_account_info()],
-    //                     &[y],
-    //                 )?;
-    //             }
-    //             None => {
-    //                 invoke(
-    //                     &initialize_member(
-    //                         &spl_token_2022::ID,
-    //                         &nft_mint.key(),
-    //                         &nft_mint.key(),
-    //                         &authority.key(),
-    //                         &x.group_mint.key(),
-    //                         &authority.key(),
-    //                     ),
-    //                     &[nft_mint.to_account_info(), x.group_mint.to_account_info(), authority.to_account_info()]
-    //                 )?;
-    //             }
-    //         }
-    //     }
-    //     None => {}
-    // }
+    if initialise_groups {
+    match &token_member {
+        Some(x) => {
+            match &auth_seeds {
+                Some(y) => {
+                    invoke_signed(
+                        &initialize_member(
+                            &spl_token_2022::ID,
+                            &nft_mint.key(),
+                            &nft_mint.key(),
+                            &authority.key(),
+                            &x.group_mint.key(),
+                            &authority.key(),
+                        ),
+                        &[nft_mint, x.group_mint.clone(), authority.to_account_info()],
+                        &[y],
+                    )?;
+                }
+                None => {
+                    invoke(
+                        &initialize_member(
+                            &spl_token_2022::ID,
+                            &nft_mint.key(),
+                            &nft_mint.key(),
+                            &authority.key(),
+                            &x.group_mint.key(),
+                            &authority.key(),
+                        ),
+                        &[nft_mint.to_account_info(), x.group_mint.to_account_info(), authority.to_account_info()]
+                    )?;
+                }
+            }
+        }
+        None => {}
+    }
+    }
 
     msg!("Finished");
     Ok(())
