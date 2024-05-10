@@ -1,5 +1,5 @@
 export type LibreplexFairLaunch = {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "name": "libreplex_fair_launch",
   "instructions": [
     {
@@ -164,6 +164,42 @@ export type LibreplexFairLaunch = {
         },
         {
           "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "toggleFreeze",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "delegate",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1008,22 +1044,6 @@ export type LibreplexFairLaunch = {
           }
         }
       ]
-    },
-    {
-      "name": "allowCreatorToClaimTransferFee",
-      "accounts": [
-        {
-          "name": "deploymentConfig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        }
-      ],
-      "args": []
     },
     {
       "name": "migrateToHashlist",
@@ -2150,7 +2170,7 @@ export type LibreplexFairLaunch = {
 };
 
 export const IDL: LibreplexFairLaunch = {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "name": "libreplex_fair_launch",
   "instructions": [
     {
@@ -2315,6 +2335,42 @@ export const IDL: LibreplexFairLaunch = {
         },
         {
           "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "toggleFreeze",
+      "accounts": [
+        {
+          "name": "deployment",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "delegate",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -3159,22 +3215,6 @@ export const IDL: LibreplexFairLaunch = {
           }
         }
       ]
-    },
-    {
-      "name": "allowCreatorToClaimTransferFee",
-      "accounts": [
-        {
-          "name": "deploymentConfig",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        }
-      ],
-      "args": []
     },
     {
       "name": "migrateToHashlist",
