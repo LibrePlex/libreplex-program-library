@@ -288,7 +288,7 @@ export type LibreplexFairLaunch = {
       "args": []
     },
     {
-      "name": "deployHybridRaw",
+      "name": "deployHybridUnchecked",
       "accounts": [
         {
           "name": "deployment",
@@ -297,7 +297,7 @@ export type LibreplexFairLaunch = {
         },
         {
           "name": "deploymentConfig",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -1459,6 +1459,10 @@ export type LibreplexFairLaunch = {
           {
             "name": "allowClaimTransferFeeAuthAsCreator",
             "type": "bool"
+          },
+          {
+            "name": "uncheckedFungible",
+            "type": "bool"
           }
         ]
       }
@@ -1915,6 +1919,10 @@ export type LibreplexFairLaunch = {
           },
           {
             "name": "allowClaimTransferFeeAuthAsCreator",
+            "type": "bool"
+          },
+          {
+            "name": "uncheckedFungible",
             "type": "bool"
           }
         ]
@@ -2515,7 +2523,7 @@ export const IDL: LibreplexFairLaunch = {
       "args": []
     },
     {
-      "name": "deployHybridRaw",
+      "name": "deployHybridUnchecked",
       "accounts": [
         {
           "name": "deployment",
@@ -2524,7 +2532,7 @@ export const IDL: LibreplexFairLaunch = {
         },
         {
           "name": "deploymentConfig",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -3686,6 +3694,10 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "allowClaimTransferFeeAuthAsCreator",
             "type": "bool"
+          },
+          {
+            "name": "uncheckedFungible",
+            "type": "bool"
           }
         ]
       }
@@ -4142,6 +4154,10 @@ export const IDL: LibreplexFairLaunch = {
           },
           {
             "name": "allowClaimTransferFeeAuthAsCreator",
+            "type": "bool"
+          },
+          {
+            "name": "uncheckedFungible",
             "type": "bool"
           }
         ]

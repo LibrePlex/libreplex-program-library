@@ -179,7 +179,7 @@ pub fn check_deploy_allowed (deployment: &Account<Deployment>){
 
 // Raw deployments do not enforce as many restrictions on the mint
 #[derive(Accounts)]
-pub struct DeployHybridRawCtx<'info> {
+pub struct DeployHybridUncheckedCtx<'info> {
     #[account(
         mut,
         seeds=["deployment".as_bytes(), deployment.ticker.as_bytes()],
@@ -188,6 +188,7 @@ pub struct DeployHybridRawCtx<'info> {
     pub deployment: Box<Account<'info, Deployment>>,
 
     #[account(
+        mut,
         seeds=["deployment_config".as_bytes(), deployment.key().as_ref()],
         bump
     )]
@@ -236,7 +237,7 @@ pub struct DeployHybridRawCtx<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn deploy_hybrid_raw_handler(ctx: Context<DeployHybridRawCtx>) -> Result<()> {
+pub fn deploy_hybrid_unchecked_handler(ctx: Context<DeployHybridUncheckedCtx>) -> Result<()> {
     let deployment = ctx.accounts.deployment.as_mut();
     check_deploy_allowed(deployment);
 
@@ -250,6 +251,7 @@ pub fn deploy_hybrid_raw_handler(ctx: Context<DeployHybridRawCtx>) -> Result<()>
     hashlist.deployment = deployment.key();
     deployment.fungible_mint = fungible_mint.key();
 
+    ctx.accounts.deployment_config.unchecked_fungible = true;
 
     emit!(DeploymentActive { 
         ticker: deployment.ticker.clone(),

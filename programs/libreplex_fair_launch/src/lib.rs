@@ -42,8 +42,8 @@ pub mod libreplex_fair_launch {
         instructions::deploy_hybrid(ctx)
     }
 
-    pub fn deploy_hybrid_raw(ctx: Context<DeployHybridRawCtx>) -> Result<()> {
-        deploy_hybrid_raw_handler(ctx)
+    pub fn deploy_hybrid_unchecked(ctx: Context<DeployHybridUncheckedCtx>) -> Result<()> {
+        deploy_hybrid_unchecked_handler(ctx)
     }
 
     pub fn relinquish_cosigner(ctx: Context<RelinquishCosignersCtx>) -> Result<()> {
