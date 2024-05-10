@@ -2315,7 +2315,7 @@ dependencies = [
  "anchor-spl",
  "arrayref",
  "bytemuck",
- "libreplex_inscriptions",
+ "libreplex_inscriptions 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libreplex_shared 0.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "mpl-token-metadata",
  "podded",
@@ -2344,6 +2344,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "libreplex_inscriptions"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e9d25382d3d07591ef578a41cb49b39159d43caa80b67afe7e18e7159570211"
+dependencies = [
+ "anchor-attribute-event",
+ "anchor-derive-accounts",
+ "anchor-lang",
+]
+
+[[package]]
 name = "libreplex_legacy"
 version = "0.2.0"
 dependencies = [
@@ -2351,7 +2362,7 @@ dependencies = [
  "anchor-spl",
  "assert_matches",
  "bubblegum-proxy",
- "libreplex_inscriptions",
+ "libreplex_inscriptions 0.4.0",
  "mocha",
  "mpl-bubblegum",
  "mpl-token-metadata",
@@ -2372,7 +2383,7 @@ dependencies = [
  "anchor-spl",
  "dyn-fmt",
  "libreplex_fair_launch",
- "libreplex_inscriptions",
+ "libreplex_inscriptions 0.4.0",
  "libreplex_shared 0.0.0",
  "mpl-token-metadata",
  "solana-address-lookup-table-program",
@@ -2388,7 +2399,7 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "assert_matches",
- "libreplex_inscriptions",
+ "libreplex_inscriptions 0.4.0",
  "mocha",
  "solana-program",
  "solana-program-test",
