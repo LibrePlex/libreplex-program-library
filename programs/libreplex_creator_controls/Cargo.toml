@@ -21,7 +21,7 @@ anchor-lang = {version = "0.29.0", features = ["init-if-needed"]}
 libreplex_creator = {path='../libreplex_creator', features = ["cpi"]}
 anchor-spl = "0.29.0"
 spl-token = { version = "~4",  features = ["no-entrypoint"] }
-solana-program = "1.17.13"
+solana-program = "~1.18"
 winnow="=0.4.1"
 libreplex_metadata = {path='../libreplex_metadata',  features = ["cpi"]}
 arrayref = "0.3.7"

@@ -50,7 +50,7 @@ pub fn create_token_2022_and_metadata<'a>(
     token_member: Option<TokenMemberInput<'a>>,
     auth_seeds: Option<&[&[u8]]>,
     transfer_fee_params: Option<TransferFeeParams>,
-    initialise_groups: bool,
+    token_group_program_id: Option<Pubkey>,
 ) -> Result<()> {
     // msg!("create_token_2022_and_metadata called");
     let MintAccounts2022 {
@@ -81,6 +81,9 @@ pub fn create_token_2022_and_metadata<'a>(
             extension_types.push(ExtensionType::GroupPointer);
             extension_extra_space +=
                 std::mem::size_of::<TokenGroup>() + TlvStateBorrowed::get_base_len();
+            // extension_types.push(ExtensionType::TokenGroup);
+            // extension_extra_space +=
+            //     std::mem::size_of::<TokenGroup>() + TlvStateBorrowed::get_base_len();
         }
         None => {}
     };
@@ -110,7 +113,7 @@ pub fn create_token_2022_and_metadata<'a>(
         &nft_mint.key(),
         rent_lamports,
         (base_size).try_into().unwrap(),
-        &spl_token_2022::ID,
+        &spl_token_2022::ID // &token_group_program_id.unwrap() //,
     );
 
     msg!("Invoke create account {},{}", payer.key(), nft_mint.key());
@@ -280,7 +283,7 @@ pub fn create_token_2022_and_metadata<'a>(
     invoke(&initialize_ix, &[nft_mint.to_account_info()])?;
 
     // to be enabled when groups have been audited and rolled out
-    if initialise_groups {
+    if let Some(program_id) = token_group_program_id {
         match &token_group {
             Some(x) => {
                 match &auth_seeds {
@@ -288,15 +291,14 @@ pub fn create_token_2022_and_metadata<'a>(
                         msg!("Initialise group");
                         invoke_signed(
                             &initialize_group(
-                                &spl_token_2022::ID,
+                                &program_id, //&nft_mint.key(),
                                 &nft_mint.key(),
                                 &nft_mint.key(),
                                 &authority.key(),
-                                // Pubkey::new_unique().into(),
                                 Some(authority.key()),
                                 x.max_size,
                             ),
-                            &[nft_mint.to_account_info(), authority.to_account_info()],
+                            &[nft_mint.to_account_info(), nft_mint.to_account_info(), authority.to_account_info()],
                             &[y],
                         )?;
                         msg!("Group initialised");
@@ -304,7 +306,7 @@ pub fn create_token_2022_and_metadata<'a>(
                     None => {
                         invoke(
                             &initialize_group(
-                                &spl_token_2022::ID,
+                                &program_id,
                                 &nft_mint.key(),
                                 &nft_mint.key(),
                                 &authority.key(),
@@ -351,14 +353,13 @@ pub fn create_token_2022_and_metadata<'a>(
     }
 
     // to be enabled when groups have been audited and rolled out
-    if initialise_groups {
-    match &token_member {
-        Some(x) => {
-            match &auth_seeds {
+    if let Some(program_id) = token_group_program_id {
+        match &token_member {
+            Some(x) => match &auth_seeds {
                 Some(y) => {
                     invoke_signed(
                         &initialize_member(
-                            &spl_token_2022::ID,
+                            &program_id,
                             &nft_mint.key(),
                             &nft_mint.key(),
                             &authority.key(),
@@ -379,13 +380,16 @@ pub fn create_token_2022_and_metadata<'a>(
                             &x.group_mint.key(),
                             &authority.key(),
                         ),
-                        &[nft_mint.to_account_info(), x.group_mint.to_account_info(), authority.to_account_info()]
+                        &[
+                            nft_mint.to_account_info(),
+                            x.group_mint.to_account_info(),
+                            authority.to_account_info(),
+                        ],
                     )?;
                 }
-            }
+            },
+            None => {}
         }
-        None => {}
-    }
     }
 
     msg!("Finished");

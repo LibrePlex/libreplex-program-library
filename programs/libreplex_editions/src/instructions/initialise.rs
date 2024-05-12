@@ -3,7 +3,7 @@ use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGr
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::TokenMetadata;
 
-use crate::{EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
+use crate::{group_extension_program, EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
 
 
 
@@ -55,6 +55,10 @@ pub struct InitialiseCtx<'info>  {
     /// CHECK: address checked
     #[account(address = spl_token_2022::ID)]
     pub token_program: AccountInfo<'info>,
+
+    /// CHECK: address checked
+    #[account(address = group_extension_program::ID)]
+    pub group_extension_program: AccountInfo<'info>,
 }
 
 
@@ -114,6 +118,7 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     let payer = &ctx.accounts.payer;
     let group_mint = &ctx.accounts.group_mint;
     let token_program = &ctx.accounts.token_program;
+    let group_extension_program = &ctx.accounts.group_extension_program;
 
 
     let update_authority =
@@ -152,7 +157,8 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         }),
         None,
         Some(deployment_seeds),
-        None
+        None,
+        Some(group_extension_program.key())
     )?;
     
 

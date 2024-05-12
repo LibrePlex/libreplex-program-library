@@ -12,6 +12,11 @@ pub use logic::*;
 
 pub use state::*;
 
+pub mod group_extension_program {
+    use anchor_lang::declare_id;
+    declare_id!("TGRPp2mDGxSyH3We9hH8pwcmhajtszPAvWjVdVgsPa5");
+}
+
 #[program]
 pub mod libreplex_editions {
     

@@ -10,7 +10,7 @@ use libreplex_shared::{create_token_2022_and_metadata, operations::mint_non_fung
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::TokenMetadata;
 
-use crate::{add_to_hashlist, errors::EditionsError, EditionsDeployment, HashlistMarker};
+use crate::{add_to_hashlist, errors::EditionsError, group_extension_program, EditionsDeployment, HashlistMarker};
 
 
 
@@ -79,6 +79,9 @@ pub struct MintCtx<'info> {
     pub associated_token_program: Program<'info, AssociatedToken>,
 
 
+    /// CHECK: address checked
+    #[account(address = group_extension_program::ID)]
+    pub group_extension_program: AccountInfo<'info>,
 
 
     #[account()]
@@ -101,8 +104,7 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
     let group_mint = &ctx.accounts.group_mint;
-    
-
+    let group_extension_program = &ctx.accounts.group_extension_program;
     // mutable borrows
     let editions_deployment = &mut ctx.accounts.editions_deployment;
     let hashlist = &mut ctx.accounts.hashlist;
@@ -162,7 +164,8 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
             group_mint: group_mint.to_account_info(),
         }),
         Some(deployment_seeds),
-        None
+        None,
+        Some(group_extension_program.key())
     )?;
 
      // msg!("Minting 2022");

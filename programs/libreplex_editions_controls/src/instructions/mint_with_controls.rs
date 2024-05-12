@@ -6,6 +6,7 @@ use anchor_spl::{
 };
 
 
+use libreplex_editions::group_extension_program;
 use libreplex_editions::{program::LibreplexEditions, EditionsDeployment};
 use libreplex_editions::cpi::accounts::MintCtx;
 
@@ -103,7 +104,9 @@ pub struct MintWithControlsCtx<'info> {
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-
+    /// CHECK: address checked
+    #[account(address = group_extension_program::ID)]
+    pub group_extension_program: AccountInfo<'info>,
 
     #[account()]
     pub system_program: Program<'info, System>,
@@ -133,7 +136,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     let minter_stats = &mut ctx.accounts.minter_stats;
     let treasury = &ctx.accounts.treasury;
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
-
+    let group_extension_program = &ctx.accounts.group_extension_program;
    
 
     let current_phase = &editions_controls.phases[mint_input.phase_index as usize]; 
@@ -191,6 +194,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
                 token_program: token_program.to_account_info(),
                 associated_token_program: associated_token_program.to_account_info(),
                 system_program: system_program.to_account_info(),
+                group_extension_program: group_extension_program.to_account_info() 
             },
             &[seeds]
         ))?;

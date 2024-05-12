@@ -1,7 +1,6 @@
 use anchor_lang::{prelude::*, system_program};
 use libreplex_editions::{
-    program::LibreplexEditions, InitialiseInput,
-    cpi::accounts::InitialiseCtx,
+    cpi::accounts::InitialiseCtx, program::LibreplexEditions, group_extension_program, InitialiseInput
 };
 
 use crate::EditionsControls;
@@ -68,6 +67,10 @@ pub struct InitialiseEditionControlsCtx<'info> {
     #[account(address = spl_token_2022::ID)]
     pub token_program: AccountInfo<'info>,
 
+     /// CHECK: address checked
+     #[account(address = group_extension_program::ID)]
+     pub group_extension_program: AccountInfo<'info>,
+
     pub libreplex_editions_program: Program<'info, LibreplexEditions>
 }
 
@@ -83,6 +86,7 @@ pub fn initialise_editions_controls(ctx: Context<InitialiseEditionControlsCtx>, 
     let group_mint = &ctx.accounts.group_mint;
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
+    let group_extension_program = &ctx.accounts.group_extension_program;
     
 
     
@@ -108,6 +112,7 @@ pub fn initialise_editions_controls(ctx: Context<InitialiseEditionControlsCtx>, 
                 group_mint: group_mint.to_account_info(),
                 system_program: system_program.to_account_info(),
                 token_program: token_program.to_account_info(),
+                group_extension_program: group_extension_program.to_account_info()
             },
         ),
         core_input,

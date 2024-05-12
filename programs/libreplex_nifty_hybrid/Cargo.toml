@@ -23,11 +23,11 @@ anchor-lang = {version = "~0.29", features = ["init-if-needed"]}
 anchor-spl = {version = "~0.29"}
 libreplex_fair_launch = {version="*", path = "../libreplex_fair_launch", features =["cpi", "no-entrypoint"]}
 libreplex_shared = {version = "0.0.0", features=["cpi"]}
-solana-program = "~1.17"
+solana-program = "~1.18"
 solana-address-lookup-table-program = "^1.17"
 dyn-fmt = "0.3.0"
 nifty-asset = {version = "0.4.0"}
 libreplex-monoswap-client = {version = "*", path = "../../../monoswap/clients/rust/"}
 
 [dev-dependencies]
-solana-program-test = {version= "1.17.22"}
+solana-program-test = {version= "~1.18"}

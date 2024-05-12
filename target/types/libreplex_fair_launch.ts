@@ -1463,6 +1463,10 @@ export type LibreplexFairLaunch = {
           {
             "name": "uncheckedFungible",
             "type": "bool"
+          },
+          {
+            "name": "useGroupExtension",
+            "type": "bool"
           }
         ]
       }
@@ -1923,6 +1927,10 @@ export type LibreplexFairLaunch = {
           },
           {
             "name": "uncheckedFungible",
+            "type": "bool"
+          },
+          {
+            "name": "useGroupExtension",
             "type": "bool"
           }
         ]
@@ -3698,6 +3706,10 @@ export const IDL: LibreplexFairLaunch = {
           {
             "name": "uncheckedFungible",
             "type": "bool"
+          },
+          {
+            "name": "useGroupExtension",
+            "type": "bool"
           }
         ]
       }
@@ -4158,6 +4170,10 @@ export const IDL: LibreplexFairLaunch = {
           },
           {
             "name": "uncheckedFungible",
+            "type": "bool"
+          },
+          {
+            "name": "useGroupExtension",
             "type": "bool"
           }
         ]

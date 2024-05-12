@@ -39,6 +39,11 @@ export type LibreplexEditions = {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -105,6 +110,11 @@ export type LibreplexEditions = {
         },
         {
           "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -355,6 +365,11 @@ export const IDL: LibreplexEditions = {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -421,6 +436,11 @@ export const IDL: LibreplexEditions = {
         },
         {
           "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
           "isMut": false,
           "isSigner": false
         },
