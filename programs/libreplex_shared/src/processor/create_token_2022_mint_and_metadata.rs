@@ -6,7 +6,7 @@ use solana_program::{
 };
 
 use spl_token_2022::{
-    extension::{transfer_fee::TransferFeeConfig, ExtensionType},
+    extension::{group_pointer::GroupPointer, transfer_fee::TransferFeeConfig, ExtensionType},
     instruction::initialize_mint2,
     state::Mint,
 };
@@ -27,12 +27,14 @@ pub struct MintAccounts2022<'info> {
     pub spl_token_program: AccountInfo<'info>,
 }
 
-pub struct TokenGroupInput {
+pub struct TokenGroupInput<'f> {
     pub max_size: u32,
+    pub group: AccountInfo<'f>,
 }
 
 pub struct TokenMemberInput<'f> {
-    pub group_mint: AccountInfo<'f>,
+    pub group: AccountInfo<'f>,
+    pub member: AccountInfo<'f>,
 }
 
 pub struct TransferFeeParams {
@@ -46,7 +48,7 @@ pub fn create_token_2022_and_metadata<'a>(
     decimals: u8,
     token_metadata: Option<TokenMetadata>,
     // token group is optional - specifying this turns this into a group mint
-    token_group: Option<TokenGroupInput>,
+    token_group: Option<TokenGroupInput<'a>>,
     token_member: Option<TokenMemberInput<'a>>,
     auth_seeds: Option<&[&[u8]]>,
     transfer_fee_params: Option<TransferFeeParams>,
@@ -79,11 +81,13 @@ pub fn create_token_2022_and_metadata<'a>(
     match &token_group {
         Some(_) => {
             extension_types.push(ExtensionType::GroupPointer);
+            // extension_types.push(ExtensionType::TokenGroup);
+            extension_extra_space += std::mem::size_of::<GroupPointer>()
+                // + std::mem::size_of::<TokenGroup>()
+                + TlvStateBorrowed::get_base_len();
+
             extension_extra_space +=
                 std::mem::size_of::<TokenGroup>() + TlvStateBorrowed::get_base_len();
-            // extension_types.push(ExtensionType::TokenGroup);
-            // extension_extra_space +=
-            //     std::mem::size_of::<TokenGroup>() + TlvStateBorrowed::get_base_len();
         }
         None => {}
     };
@@ -113,7 +117,7 @@ pub fn create_token_2022_and_metadata<'a>(
         &nft_mint.key(),
         rent_lamports,
         (base_size).try_into().unwrap(),
-        &spl_token_2022::ID // &token_group_program_id.unwrap() //,
+        &spl_token_2022::ID, // &token_group_program_id.unwrap() //,
     );
 
     msg!("Invoke create account {},{}", payer.key(), nft_mint.key());
@@ -283,45 +287,6 @@ pub fn create_token_2022_and_metadata<'a>(
     invoke(&initialize_ix, &[nft_mint.to_account_info()])?;
 
     // to be enabled when groups have been audited and rolled out
-    if let Some(program_id) = token_group_program_id {
-        match &token_group {
-            Some(x) => {
-                match &auth_seeds {
-                    Some(y) => {
-                        msg!("Initialise group");
-                        invoke_signed(
-                            &initialize_group(
-                                &program_id, //&nft_mint.key(),
-                                &nft_mint.key(),
-                                &nft_mint.key(),
-                                &authority.key(),
-                                Some(authority.key()),
-                                x.max_size,
-                            ),
-                            &[nft_mint.to_account_info(), nft_mint.to_account_info(), authority.to_account_info()],
-                            &[y],
-                        )?;
-                        msg!("Group initialised");
-                    }
-                    None => {
-                        invoke(
-                            &initialize_group(
-                                &program_id,
-                                &nft_mint.key(),
-                                &nft_mint.key(),
-                                &authority.key(),
-                                // Pubkey::new_unique().into(),
-                                Some(authority.key()),
-                                x.max_size,
-                            ),
-                            &[nft_mint.to_account_info(), authority.to_account_info()],
-                        )?;
-                    }
-                }
-            }
-            None => {}
-        }
-    }
 
     msg!("Initialise metadata if needed");
     if let Some(x) = token_metadata {
@@ -352,42 +317,131 @@ pub fn create_token_2022_and_metadata<'a>(
         }
     }
 
+    if let Some(program_id) = token_group_program_id {
+        match &token_group {
+            Some(x) => {
+                let space = TlvStateBorrowed::get_base_len() + std::mem::size_of::<TokenGroup>();
+                let rent_lamports = rent.minimum_balance(space);
+
+                let create_group_account_ix = system_instruction::create_account(
+                    &payer.key(),
+                    &x.group.key(),
+                    rent_lamports,
+                    (space).try_into().unwrap(),
+                    &program_id, // &token_group_program_id.unwrap() //,
+                );
+
+                msg!("Invoke create account {},{}", payer.key(), nft_mint.key());
+
+                invoke(
+                    &create_group_account_ix,
+                    &[
+                        x.group.to_account_info(),
+                        payer.to_account_info(),
+                        spl_token_program.to_account_info(),
+                    ],
+                )?;
+                match &auth_seeds {
+                    Some(y) => {
+                        msg!("Initialise group");
+
+                        invoke_signed(
+                            &initialize_group(
+                                &program_id, //&nft_mint.key(),
+                                &x.group.key(),
+                                &nft_mint.key(),
+                                &authority.key(),
+                                Some(authority.key()),
+                                x.max_size,
+                            ),
+                            &[
+                                nft_mint.to_account_info(),
+                                x.group.to_account_info(),
+                                nft_mint.to_account_info(),
+                                authority.to_account_info(),
+                            ],
+                            &[y],
+                        )?;
+                        msg!("Group initialised");
+                    }
+                    None => {
+                        invoke(
+                            &initialize_group(
+                                &program_id,
+                                &nft_mint.key(),
+                                &nft_mint.key(),
+                                &authority.key(),
+                                // Pubkey::new_unique().into(),
+                                Some(authority.key()),
+                                x.max_size,
+                            ),
+                            &[nft_mint.to_account_info(), authority.to_account_info()],
+                        )?;
+                    }
+                }
+            }
+            None => {}
+        }
+    }
+
     // to be enabled when groups have been audited and rolled out
     if let Some(program_id) = token_group_program_id {
         match &token_member {
-            Some(x) => match &auth_seeds {
-                Some(y) => {
-                    invoke_signed(
-                        &initialize_member(
-                            &program_id,
-                            &nft_mint.key(),
-                            &nft_mint.key(),
-                            &authority.key(),
-                            &x.group_mint.key(),
-                            &authority.key(),
-                        ),
-                        &[nft_mint, x.group_mint.clone(), authority.to_account_info()],
-                        &[y],
-                    )?;
+            Some(x) => {
+                let member_space =
+                    TlvStateBorrowed::get_base_len() + std::mem::size_of::<TokenGroupMember>();
+                let member_rent_lamports = rent.minimum_balance(member_space);
+
+                let create_member_account_ix = system_instruction::create_account(
+                    &payer.key(),
+                    &x.member.key(),
+                    member_rent_lamports,
+                    (member_space).try_into().unwrap(),
+                    &program_id, // &token_group_program_id.unwrap() //,
+                );
+
+                msg!("Invoke create account {},{}", payer.key(), nft_mint.key());
+
+                invoke(
+                    &create_member_account_ix,
+                    &[
+                        x.member.to_account_info(),
+                        payer.to_account_info(),
+                        spl_token_program.to_account_info(),
+                    ],
+                )?;
+
+                let initialize_member_ix = initialize_member(
+                    &program_id,
+                    &x.member.key(),
+                    &nft_mint.key(),
+                    &authority.key(),
+                    &x.group.key(),
+                    &authority.key(),
+                );
+
+                let initialize_member_account_infos = [
+                    nft_mint,
+                    x.member.clone(),
+                    x.group.clone(),
+                    authority.to_account_info(),
+                ];
+                match &auth_seeds {
+                    Some(y) => {
+                        invoke_signed(
+                            &initialize_member_ix,
+                            &initialize_member_account_infos,
+                            &[y],
+                        )?;
+                    }
+                    None => {
+                        invoke(
+                            &initialize_member_ix,
+                            &initialize_member_account_infos,
+                        )?;
+                    }
                 }
-                None => {
-                    invoke(
-                        &initialize_member(
-                            &spl_token_2022::ID,
-                            &nft_mint.key(),
-                            &nft_mint.key(),
-                            &authority.key(),
-                            &x.group_mint.key(),
-                            &authority.key(),
-                        ),
-                        &[
-                            nft_mint.to_account_info(),
-                            x.group_mint.to_account_info(),
-                            authority.to_account_info(),
-                        ],
-                    )?;
-                }
-            },
+            }
             None => {}
         }
     }

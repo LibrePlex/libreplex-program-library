@@ -60,6 +60,9 @@ pub struct InitialiseEditionControlsCtx<'info> {
     #[account(mut)]
     pub group_mint: Signer<'info>,
 
+    #[account(mut)]
+    pub group: Signer<'info>,
+
     #[account()]
     pub system_program: Program<'info, System>,
 
@@ -83,6 +86,8 @@ pub fn initialise_editions_controls(ctx: Context<InitialiseEditionControlsCtx>, 
     let hashlist = &ctx.accounts.hashlist;
     let payer = &ctx.accounts.payer;
     let creator = &ctx.accounts.creator;
+
+    let group = &ctx.accounts.group;
     let group_mint = &ctx.accounts.group_mint;
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
@@ -109,10 +114,12 @@ pub fn initialise_editions_controls(ctx: Context<InitialiseEditionControlsCtx>, 
                 hashlist: hashlist.to_account_info(),
                 payer: payer.to_account_info(),
                 creator: editions_controls.to_account_info(),
+                group: group.to_account_info(),
                 group_mint: group_mint.to_account_info(),
                 system_program: system_program.to_account_info(),
                 token_program: token_program.to_account_info(),
-                group_extension_program: group_extension_program.to_account_info()
+                group_extension_program: group_extension_program.to_account_info(),
+                
             },
         ),
         core_input,

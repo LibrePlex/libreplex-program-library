@@ -2,7 +2,7 @@
 
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{
-    associated_token::AssociatedToken, token_2022, token_interface::Mint
+    associated_token::AssociatedToken, token_2022
 };
 
 
@@ -80,9 +80,12 @@ pub struct MintWithControlsCtx<'info> {
     #[account(mut)]
     pub mint: Signer<'info>,
 
+    #[account(mut)]
+    pub member: Signer<'info>,
+
     #[account(mut,
-    constraint = editions_deployment.group_mint == group_mint.key())]
-    pub group_mint: InterfaceAccount<'info, Mint>,
+    constraint = editions_deployment.group == group.key())]
+    pub group: UncheckedAccount<'info>,
 
     /// CHECK: passed in via CPI to mpl_token_metadata program
     #[account(mut)]
@@ -130,14 +133,14 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     let token_account = &ctx.accounts.token_account;
     let associated_token_program = &ctx.accounts.associated_token_program;
     let minter = &ctx.accounts.minter;
-    let group_mint = &ctx.accounts.group_mint;
+    let group = &ctx.accounts.group;
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
     let minter_stats = &mut ctx.accounts.minter_stats;
     let treasury = &ctx.accounts.treasury;
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
     let group_extension_program = &ctx.accounts.group_extension_program;
-   
+    let member = &ctx.accounts.member;
 
     let current_phase = &editions_controls.phases[mint_input.phase_index as usize]; 
     check_phase_constraints(current_phase,
@@ -189,12 +192,13 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
                 signer: editions_controls.to_account_info(),
                 minter: minter.to_account_info(),
                 mint: mint.to_account_info(),
-                group_mint: group_mint.to_account_info(),
+                group: group.to_account_info(),
                 token_account: token_account.to_account_info(),
                 token_program: token_program.to_account_info(),
                 associated_token_program: associated_token_program.to_account_info(),
                 system_program: system_program.to_account_info(),
-                group_extension_program: group_extension_program.to_account_info() 
+                group_extension_program: group_extension_program.to_account_info(),
+                member: member.to_account_info(), 
             },
             &[seeds]
         ))?;

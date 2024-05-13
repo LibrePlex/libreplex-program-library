@@ -24,6 +24,8 @@ pub struct EditionsDeployment {
 
     pub group_mint: Pubkey,
 
+    pub group: Pubkey,
+
     #[max_len(SYMBOL_LIMIT)]
     pub symbol: String,
 

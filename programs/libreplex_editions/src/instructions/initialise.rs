@@ -49,6 +49,9 @@ pub struct InitialiseCtx<'info>  {
     #[account(mut)]
     pub group_mint: Signer<'info>,
 
+    #[account(mut)]
+    pub group: Signer<'info>,
+
     #[account()]
     pub system_program: Program<'info, System>,
 
@@ -76,6 +79,8 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
 
     let group_mint = &ctx.accounts.group_mint;
 
+    let group = &ctx.accounts.group;
+
 
 
     let url_is_template = match input.offchain_url.matches("{}").count() {
@@ -101,6 +106,7 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         max_number_of_tokens: input.max_number_of_tokens,
         number_of_tokens_issued: 0,
         group_mint: group_mint.key(),
+        group: group.key(),
         cosigner_program_id: match input.creator_cosign_program_id {
             Some(x) => x,
             _ => system_program::ID
@@ -150,6 +156,7 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
             additional_metadata: vec![],
         }),
         Some(TokenGroupInput {
+            group: group.to_account_info(),
             max_size: match editions_deployment.max_number_of_tokens  {
                 0 => u32::MAX,
                 _ => editions_deployment.max_number_of_tokens as u32

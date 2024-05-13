@@ -31,6 +31,11 @@ export type LibreplexEditions = {
           "isSigner": true
         },
         {
+          "name": "group",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -94,7 +99,12 @@ export type LibreplexEditions = {
           "isSigner": true
         },
         {
-          "name": "groupMint",
+          "name": "member",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "group",
           "isMut": true,
           "isSigner": false
         },
@@ -151,6 +161,10 @@ export type LibreplexEditions = {
           },
           {
             "name": "groupMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "group",
             "type": "publicKey"
           },
           {
@@ -357,6 +371,11 @@ export const IDL: LibreplexEditions = {
           "isSigner": true
         },
         {
+          "name": "group",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -420,7 +439,12 @@ export const IDL: LibreplexEditions = {
           "isSigner": true
         },
         {
-          "name": "groupMint",
+          "name": "member",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "group",
           "isMut": true,
           "isSigner": false
         },
@@ -477,6 +501,10 @@ export const IDL: LibreplexEditions = {
           },
           {
             "name": "groupMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "group",
             "type": "publicKey"
           },
           {

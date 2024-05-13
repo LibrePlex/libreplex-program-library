@@ -2,7 +2,7 @@
 use dyn_fmt::AsStrFormatExt;
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{
-    associated_token::AssociatedToken, token_2022, token_interface::Mint
+    associated_token::AssociatedToken, token_2022
 };
 
 
@@ -57,9 +57,13 @@ pub struct MintCtx<'info> {
     #[account(mut)]
     pub mint: Signer<'info>,
 
+    #[account(mut)]
+    pub member: Signer<'info>,
+
+    /// CHECK: Checked in constraint
     #[account(mut,
-    constraint = editions_deployment.group_mint == group_mint.key())]
-    pub group_mint: InterfaceAccount<'info, Mint>,
+        constraint = editions_deployment.group == group.key())]
+    pub group: UncheckedAccount<'info>,
 
     /// CHECK: passed in via CPI to mpl_token_metadata program
     #[account(mut)]
@@ -103,7 +107,9 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
     let associated_token_program = &ctx.accounts.associated_token_program;
     let system_program = &ctx.accounts.system_program;
     let mint = &ctx.accounts.mint;
-    let group_mint = &ctx.accounts.group_mint;
+    let member = &ctx.accounts.member;
+    
+    let group = &ctx.accounts.group;
     let group_extension_program = &ctx.accounts.group_extension_program;
     // mutable borrows
     let editions_deployment = &mut ctx.accounts.editions_deployment;
@@ -161,7 +167,8 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         }),
         None,
         Some(TokenMemberInput {
-            group_mint: group_mint.to_account_info(),
+            member: member.to_account_info(),
+            group: group.to_account_info(),
         }),
         Some(deployment_seeds),
         None,
