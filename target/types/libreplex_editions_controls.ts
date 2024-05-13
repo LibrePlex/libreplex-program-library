@@ -50,12 +50,22 @@ export type LibreplexEditionsControls = {
           "isSigner": true
         },
         {
+          "name": "group",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -233,7 +243,12 @@ export type LibreplexEditionsControls = {
           "isSigner": true
         },
         {
-          "name": "groupMint",
+          "name": "member",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "group",
           "isMut": true,
           "isSigner": false
         },
@@ -254,6 +269,11 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -589,12 +609,22 @@ export const IDL: LibreplexEditionsControls = {
           "isSigner": true
         },
         {
+          "name": "group",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -772,7 +802,12 @@ export const IDL: LibreplexEditionsControls = {
           "isSigner": true
         },
         {
-          "name": "groupMint",
+          "name": "member",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "group",
           "isMut": true,
           "isSigner": false
         },
@@ -793,6 +828,11 @@ export const IDL: LibreplexEditionsControls = {
         },
         {
           "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
           "isMut": false,
           "isSigner": false
         },

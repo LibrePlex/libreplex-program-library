@@ -83,6 +83,7 @@ pub struct MintWithControlsCtx<'info> {
     #[account(mut)]
     pub member: Signer<'info>,
 
+    /// CHECK: checked in constraint
     #[account(mut,
     constraint = editions_deployment.group == group.key())]
     pub group: UncheckedAccount<'info>,
@@ -141,7 +142,13 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
     let group_extension_program = &ctx.accounts.group_extension_program;
     let member = &ctx.accounts.member;
-
+    if mint_input.phase_index >= editions_controls.phases.len() as u32 {
+        if editions_controls.phases.is_empty() {
+            panic!("No phases added. Cannot mint");
+        } else {
+            panic!("Attempted to mint with phase {} (max phase {})", mint_input.phase_index, editions_controls.phases.len());
+        }
+    }
     let current_phase = &editions_controls.phases[mint_input.phase_index as usize]; 
     check_phase_constraints(current_phase,
         minter_stats,

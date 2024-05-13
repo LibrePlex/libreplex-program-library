@@ -57,9 +57,11 @@ pub struct InitialiseEditionControlsCtx<'info> {
     #[account()]
     pub creator: UncheckedAccount<'info>,
 
+    /// CHECK: created
     #[account(mut)]
     pub group_mint: Signer<'info>,
 
+    /// CHECK: created
     #[account(mut)]
     pub group: Signer<'info>,
 
