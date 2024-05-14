@@ -45,7 +45,7 @@ pub fn toggle_freeze(ctx: Context<ToggleFreeze>) -> Result<()> {
 
     if token_account.is_frozen() {
         anchor_spl::token_interface::thaw_account(
-            CpiContext::new_with_signer(ctx.accounts.token_account.to_account_info(),
+            CpiContext::new_with_signer(ctx.accounts.token_program.to_account_info(),
                  anchor_spl::token_interface::ThawAccount {
                     account: ctx.accounts.token_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
@@ -55,7 +55,7 @@ pub fn toggle_freeze(ctx: Context<ToggleFreeze>) -> Result<()> {
         )?;
     } else {
         anchor_spl::token_interface::freeze_account(
-            CpiContext::new_with_signer(ctx.accounts.token_account.to_account_info(),
+            CpiContext::new_with_signer(ctx.accounts.token_program.to_account_info(),
                  anchor_spl::token_interface::FreezeAccount {
                     account: ctx.accounts.token_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
