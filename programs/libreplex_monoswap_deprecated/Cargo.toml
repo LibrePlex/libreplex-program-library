@@ -1,6 +1,6 @@
 [package]
-name = "libreplex_legacy"
-version = "0.2.0"
+name = "libreplex_monoswap_deprecated"
+version = "0.0.0"
 description = "Created with Anchor"
 edition = "2021"
 license = "MIT"
@@ -8,7 +8,7 @@ repository = "https://github.com/LibrePlex/metadata"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "libreplex_legacy"
+name = "libreplex_monoswap_deprecated"
 
 [features]
 no-entrypoint = []
@@ -16,20 +16,17 @@ no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
 default = []
-idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build", "libreplex_inscriptions/idl-build"]
 
 [dependencies]
 anchor-lang = {version = "~0.30", features = ["init-if-needed"]}
 anchor-spl = {version = "~0.30"}
-libreplex_inscriptions = {version = "*", path="../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
 spl-associated-token-account = "3.0.2"
-solana-program = {version = "1.17.13"}
+solana-program = {version = "~1.18"}
+libreplex_shared = {version= "0.3.0", features=["no-entrypoint"] }
 mpl-token-metadata = { version="~3" }
-spl-account-compression = { version="0.3.0", features = ["cpi", "no-entrypoint"] }
-mpl-bubblegum = {version = "1.2.0"}
 
 [dev-dependencies]
 mocha = "0.1.1"
 assert_matches = "1.5.0"
-solana-program-test = "1.17.13"
-solana-sdk = "1.17.13"
+solana-program-test = "~1.18"
+solana-sdk = "~1.18"
