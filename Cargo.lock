@@ -2399,6 +2399,7 @@ dependencies = [
  "anchor-attribute-event 0.30.0",
  "anchor-derive-accounts 0.30.0",
  "anchor-lang 0.30.0",
+ "anchor-spl",
  "assert_matches",
  "mocha",
  "solana-program",

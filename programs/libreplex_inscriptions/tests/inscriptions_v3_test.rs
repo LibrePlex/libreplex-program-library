@@ -19,7 +19,7 @@ mod inscriptions_tests {
         accounts::ResizeInscriptionV3,
         accounts::WriteToInscriptionV3,
         instructions::{
-            create_inscription::CreateInscriptionInput, ResizeInscriptionInput,
+            create_inscription_v2::CreateInscriptionInput, ResizeInscriptionInput,
             WriteToInscriptionInput,
         },
         Inscription,
