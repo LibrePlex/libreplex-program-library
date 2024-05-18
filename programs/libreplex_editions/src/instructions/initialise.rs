@@ -41,7 +41,7 @@ pub struct InitialiseCtx<'info>  {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    // can be different from payer for PDA integration
+    /// CHECK: can be different from payer for PDA integration
     #[account(mut)]
     pub creator: UncheckedAccount<'info>,
 

@@ -1,14 +1,28 @@
 use crate::errors::ErrorCode;
 
-use crate::instructions::{SignerType, InscriptionEventCreate, legacy_inscriber};
 use crate::{
     Inscription, InscriptionData, 
     InscriptionSummary, MediaType, EncodingType, InscriptionEventData, InscriptionV3,
 };
 use anchor_lang::prelude::*;
 
-use super::CreateInscriptionInput;
+#[event]
+pub struct InscriptionEventCreate {
+    pub id: Pubkey,
+    pub data: InscriptionEventData
+}
 
+pub mod legacy_inscriber {
+    use super::*;
+    declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
+}
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub enum SignerType {
+    Root,
+    LegacyMetadataSigner,
+    FairLaunchGhostRootSigner,
+}
 
 const INITIAL_SIZE: usize = 8;
 #[derive(Accounts)]
@@ -70,6 +84,33 @@ pub struct CreateInscriptionV2<'info> {
     pub inscription_v3: Account<'info, InscriptionV3>,
 
     pub system_program: Program<'info, System>,
+}
+
+
+
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
+pub struct CreateInscriptionInput {
+    pub authority: Option<Pubkey>,
+    // each rank page holds a maximum of 320000 inscription ids.
+    // when this runs out, we move onto the next page
+    pub current_rank_page: u32,
+    pub signer_type: SignerType,
+    pub validation_hash: Option<String>
+}
+
+impl CreateInscriptionInput {
+    pub fn get_size(&self) -> usize {
+            1
+            + match self.authority {
+                Some(_) => 32,
+                None => 0,
+            } 
+            + 2 // default media type length
+            + 1 + match &self.validation_hash {
+                Some(x)=> x.len() + 4,
+                None => 0
+            }
+    }
 }
 
 

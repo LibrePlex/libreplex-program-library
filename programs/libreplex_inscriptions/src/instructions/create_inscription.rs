@@ -7,12 +7,7 @@ use crate::{
 use anchor_lang::prelude::*;
 
 
-#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
-pub enum SignerType {
-    Root,
-    LegacyMetadataSigner,
-    FairLaunchGhostRootSigner,
-}
+
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct CreateInscriptionInput {
@@ -39,11 +34,6 @@ impl CreateInscriptionInput {
     }
 }
 
-#[event]
-pub struct InscriptionEventCreate {
-    pub id: Pubkey,
-    pub data: InscriptionEventData
-}
 
 const INITIAL_SIZE: usize = 8;
 #[derive(Accounts)]
@@ -125,10 +115,6 @@ pub struct CreateInscription<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub mod legacy_inscriber {
-    use super::*;
-    declare_id!("Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n");
-}
 
 
 pub fn handler(ctx: Context<CreateInscription>, input: CreateInscriptionInput) -> Result<()> {

@@ -1,6 +1,6 @@
 use crate::errors::ErrorCode;
 
-use crate::instructions::create_inscription::legacy_inscriber;
+use crate::instructions::create_inscription_v2::legacy_inscriber;
 use crate::instructions::{SignerType, InscriptionV3EventCreate};
 use crate::{
     Inscription, InscriptionData, InscriptionSummary, InscriptionV3, InscriptionV3EventData,

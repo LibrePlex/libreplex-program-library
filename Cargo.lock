@@ -2342,45 +2342,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97b3888a4aecf77e811145cadf6eef5901f4782c53886191b2f693f24761847c"
 
 [[package]]
-name = "libreplex_creator"
-version = "0.12.1"
-dependencies = [
- "anchor-lang 0.30.0",
- "anchor-spl",
- "arrayref",
- "assert_matches",
- "bincode",
- "libreplex_metadata",
- "libreplex_nft",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token",
- "winnow 0.4.1",
-]
-
-[[package]]
-name = "libreplex_creator_controls"
-version = "0.3.1"
-dependencies = [
- "anchor-lang 0.30.0",
- "anchor-spl",
- "arrayref",
- "assert_matches",
- "bincode",
- "libreplex_creator",
- "libreplex_metadata",
- "libreplex_nft",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token",
- "winnow 0.4.1",
-]
-
-[[package]]
 name = "libreplex_default_renderer"
 version = "0.1.2"
 dependencies = [
@@ -2461,21 +2422,6 @@ dependencies = [
  "solana-sdk",
  "spl-account-compression",
  "spl-associated-token-account 3.0.2",
-]
-
-[[package]]
-name = "libreplex_metadata"
-version = "0.16.3"
-dependencies = [
- "anchor-lang 0.30.0",
- "anchor-spl",
- "assert_matches",
- "libreplex_inscriptions",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token-2022 3.0.2",
 ]
 
 [[package]]
@@ -6676,15 +6622,6 @@ name = "windows_x86_64_msvc"
 version = "0.52.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bec47e5bfd1bff0eeaf6d8b485cc1074891a197ab4225d504cb7a1ab88b02bf0"
-
-[[package]]
-name = "winnow"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae8970b36c66498d8ff1d66685dc86b91b29db0c7739899012f63a63814b4b28"
-dependencies = [
- "memchr",
-]
 
 [[package]]
 name = "winnow"

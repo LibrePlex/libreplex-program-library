@@ -4,8 +4,6 @@ members = [
 ]
 resolver = "2"
 
-exclude = ["programs/libreplex_loop"]
-
 [profile.release]
 overflow-checks = true
 lto = "fat"

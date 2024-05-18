@@ -1,11 +1,11 @@
 use crate::errors::ErrorCode;
 
-use crate::instructions::create_inscription::legacy_inscriber;
 use crate::instructions::{SignerType, InscriptionEventCreate};
 use crate::{
     Inscription, InscriptionData, InscriptionSummary, InscriptionV3, InscriptionV3EventData, InscriptionEventData,
 };
 
+use crate::legacy_inscriber;
 #[event]
 pub struct InscriptionV3EventCreate {
     pub id: Pubkey,
@@ -148,7 +148,7 @@ pub fn handler(ctx: Context<CreateInscriptionV3>, input: CreateInscriptionInputV
         }
         SignerType::LegacyMetadataSigner => {
             let expected_signer =
-                Pubkey::find_program_address(&[root_key.as_ref()], &legacy_inscriber::id()).0;
+                Pubkey::find_program_address(&[root_key.as_ref()], &legacy_inscriber::ID).0;
             if expected_signer != signer {
                 return Err(ErrorCode::LegacyMetadataSignerMismatch.into());
             }
