@@ -2356,7 +2356,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_editions"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "anchor-lang 0.30.0",
  "anchor-spl",
@@ -2374,13 +2374,32 @@ dependencies = [
 ]
 
 [[package]]
-name = "libreplex_editions_controls"
-version = "0.2.1"
+name = "libreplex_editions"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c401a84bd65b4d567e94c03d35ecaefda203ae4beb0c46b3a3cffb973cfea35"
 dependencies = [
  "anchor-lang 0.30.0",
  "anchor-spl",
  "arrayref",
- "libreplex_editions",
+ "dyn-fmt",
+ "libreplex_shared",
+ "solana-program",
+ "spl-pod 0.2.2",
+ "spl-token-2022 3.0.2",
+ "spl-token-group-interface 0.2.3",
+ "spl-token-metadata-interface 0.3.3",
+ "spl-type-length-value 0.3.1",
+]
+
+[[package]]
+name = "libreplex_editions_controls"
+version = "0.2.2"
+dependencies = [
+ "anchor-lang 0.30.0",
+ "anchor-spl",
+ "arrayref",
+ "libreplex_editions 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libreplex_shared",
  "solana-program",
  "solana-program-test",
@@ -2394,7 +2413,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_inscriptions"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "anchor-attribute-event 0.30.0",
  "anchor-derive-accounts 0.30.0",
@@ -2427,7 +2446,7 @@ dependencies = [
 
 [[package]]
 name = "libreplex_monoswap_deprecated"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "anchor-lang 0.30.0",
  "anchor-spl",
@@ -2455,9 +2474,9 @@ dependencies = [
 
 [[package]]
 name = "libreplex_shared"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f27769daa550e10152c9841674849521b778083b0090c70f84e6993386e59f7"
+checksum = "43b2dae7e6ff2b17f8a24f4c04c3fd50d993897a2b17537d76672127a6ddfb1e"
 dependencies = [
  "anchor-lang 0.30.0",
  "anchor-spl",

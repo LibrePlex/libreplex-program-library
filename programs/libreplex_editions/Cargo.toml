@@ -1,6 +1,6 @@
 [package]
 name = "libreplex_editions"
-version = "0.2.1"
+version = "0.2.2"
 description = "Created with Anchor"
 edition = "2021"
 license = "MIT"
@@ -26,7 +26,7 @@ anchor-spl = {version = "~0.30"}
 
 solana-program = {version = "1.17.13"}
 arrayref = "0.3.7"
-libreplex_shared = {version= "0.3.0", features=["no-entrypoint"] }
+libreplex_shared = {version= "0.4.0", features=["no-entrypoint"] }
 spl-token-2022 = {version = "~3.0", features = ["no-entrypoint"]}
 spl-token-metadata-interface = {version= "~0.3"}
 spl-token-group-interface = {version= "0.2.3"}
