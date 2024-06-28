@@ -1,368 +1,222 @@
-/**
- * Program IDL in camelCase format in order to be used in JS/TS.
- *
- * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/libreplex_editions_controls.json`.
- */
 export type LibreplexEditionsControls = {
-  "address": "EdCo6pePXJX3PuEPRLSE59gKXp4KDwWjATEXRpztvu9X",
-  "metadata": {
-    "name": "libreplexEditionsControls",
-    "version": "0.2.1",
-    "spec": "0.1.0",
-    "description": "Created with Anchor",
-    "repository": "https://github.com/Libreplex/libreplex-program-library"
-  },
+  "version": "0.2.2",
+  "name": "libreplex_editions_controls",
   "instructions": [
     {
-      "name": "addPhase",
-      "discriminator": [
-        245,
-        220,
-        147,
-        40,
-        30,
-        207,
-        36,
-        127
-      ],
+      "name": "initialiseEditionsControls",
       "accounts": [
         {
           "name": "editionsControls",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "editionsDeployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "creator",
-          "writable": true,
-          "signer": true
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "Eddy2qpzTgTfUvNJ271Wgfw3RF2LsbmRJdNTSnZajmU3"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
           "name": "input",
           "type": {
-            "defined": {
-              "name": "initialisePhaseInput"
-            }
+            "defined": "InitialiseControlInput"
           }
         }
       ]
     },
     {
-      "name": "initialiseEditionsControls",
-      "discriminator": [
-        69,
-        176,
-        133,
-        29,
-        20,
-        49,
-        120,
-        202
-      ],
+      "name": "addPhase",
       "accounts": [
         {
           "name": "editionsControls",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110,
-                  115,
-                  95,
-                  99,
-                  111,
-                  110,
-                  116,
-                  114,
-                  111,
-                  108,
-                  115
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editionsDeployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "editionsDeployment",
-          "writable": true
-        },
-        {
-          "name": "hashlist",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
-          "name": "creator"
-        },
-        {
-          "name": "groupMint",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "group",
-          "writable": true,
-          "signer": true
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        },
-        {
-          "name": "groupExtensionProgram",
-          "address": "TGRPp2mDGxSyH3We9hH8pwcmhajtszPAvWjVdVgsPa5"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "Eddy2qpzTgTfUvNJ271Wgfw3RF2LsbmRJdNTSnZajmU3"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
           "name": "input",
           "type": {
-            "defined": {
-              "name": "initialiseControlInput"
-            }
+            "defined": "InitialisePhaseInput"
           }
         }
       ]
     },
     {
       "name": "mintWithControls",
-      "discriminator": [
-        167,
-        57,
-        252,
-        220,
-        69,
-        92,
-        231,
-        61
-      ],
       "accounts": [
         {
           "name": "editionsDeployment",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "editionsControls",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110,
-                  115,
-                  95,
-                  99,
-                  111,
-                  110,
-                  116,
-                  114,
-                  111,
-                  108,
-                  115
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editionsDeployment"
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "hashlist",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "hashlistMarker",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "signer",
-          "signer": true
+          "isMut": false,
+          "isSigner": true
         },
         {
           "name": "minter",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "minterStats",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  101,
-                  114,
-                  95,
-                  115,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editionsDeployment"
-              },
-              {
-                "kind": "account",
-                "path": "minter"
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "minterStatsPhase",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  101,
-                  114,
-                  95,
-                  115,
-                  116,
-                  97,
-                  116,
-                  115,
-                  95,
-                  112,
-                  104,
-                  97,
-                  115,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editionsDeployment"
-              },
-              {
-                "kind": "account",
-                "path": "minter"
-              },
-              {
-                "kind": "arg",
-                "path": "mint_input.phase_index"
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "mint",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "member",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "group",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "tokenAccount",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "treasury",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "tokenProgram"
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "groupExtensionProgram",
-          "address": "TGRPp2mDGxSyH3We9hH8pwcmhajtszPAvWjVdVgsPa5"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "Eddy2qpzTgTfUvNJ271Wgfw3RF2LsbmRJdNTSnZajmU3"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
           "name": "mintInput",
           "type": {
-            "defined": {
-              "name": "mintInput"
-            }
+            "defined": "MintInput"
           }
         }
       ]
@@ -370,153 +224,13 @@ export type LibreplexEditionsControls = {
   ],
   "accounts": [
     {
-      "name": "editionsControls",
-      "discriminator": [
-        124,
-        32,
-        239,
-        85,
-        118,
-        231,
-        152,
-        156
-      ]
-    },
-    {
-      "name": "editionsDeployment",
-      "discriminator": [
-        101,
-        54,
-        68,
-        216,
-        168,
-        131,
-        242,
-        157
-      ]
-    },
-    {
-      "name": "minterStats",
-      "discriminator": [
-        138,
-        239,
-        240,
-        226,
-        199,
-        53,
-        170,
-        179
-      ]
-    }
-  ],
-  "errors": [
-    {
-      "code": 6000,
-      "name": "tickerTooLong",
-      "msg": "Ticker too long"
-    },
-    {
-      "code": 6001,
-      "name": "mintTemplateTooLong",
-      "msg": "Mint template too long"
-    },
-    {
-      "code": 6002,
-      "name": "deploymentTemplateTooLong",
-      "msg": "Deployment template too long"
-    },
-    {
-      "code": 6003,
-      "name": "rootTypeTooLong",
-      "msg": "Root type too long"
-    },
-    {
-      "code": 6004,
-      "name": "mintedOut",
-      "msg": "Minted out"
-    },
-    {
-      "code": 6005,
-      "name": "legacyMigrationsAreMintedOut",
-      "msg": "Legacy migrations are minted out"
-    },
-    {
-      "code": 6006,
-      "name": "missingGlobalTreeDelegate",
-      "msg": "Global tree delegate is missing"
-    },
-    {
-      "code": 6007,
-      "name": "incorrectMintType",
-      "msg": "Incorrect mint type"
-    },
-    {
-      "code": 6008,
-      "name": "invalidMetadata",
-      "msg": "Invalid Metadata"
-    },
-    {
-      "code": 6009,
-      "name": "creatorFeeTooHigh",
-      "msg": "Creator fee too high"
-    }
-  ],
-  "types": [
-    {
-      "name": "editionsControls",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "editionsDeployment",
-            "type": "pubkey"
-          },
-          {
-            "name": "creator",
-            "type": "pubkey"
-          },
-          {
-            "name": "treasury",
-            "type": "pubkey"
-          },
-          {
-            "name": "maxMintsPerWallet",
-            "type": "u64"
-          },
-          {
-            "name": "cosignerProgramId",
-            "type": "pubkey"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                200
-              ]
-            }
-          },
-          {
-            "name": "phases",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "phase"
-                }
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "editionsDeployment",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "creator",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "maxNumberOfTokens",
@@ -528,15 +242,15 @@ export type LibreplexEditionsControls = {
           },
           {
             "name": "cosignerProgramId",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "groupMint",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "group",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "symbol",
@@ -571,45 +285,79 @@ export type LibreplexEditionsControls = {
       }
     },
     {
-      "name": "initialiseControlInput",
+      "name": "editionsControls",
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "editionsDeployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          },
           {
             "name": "maxMintsPerWallet",
             "type": "u64"
           },
           {
-            "name": "treasury",
-            "type": "pubkey"
-          },
-          {
-            "name": "maxNumberOfTokens",
-            "type": "u64"
-          },
-          {
-            "name": "symbol",
-            "type": "string"
-          },
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "offchainUrl",
-            "type": "string"
-          },
-          {
             "name": "cosignerProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "padding",
             "type": {
-              "option": "pubkey"
+              "array": [
+                "u8",
+                200
+              ]
+            }
+          },
+          {
+            "name": "phases",
+            "type": {
+              "vec": {
+                "defined": "Phase"
+              }
             }
           }
         ]
       }
     },
     {
-      "name": "initialisePhaseInput",
+      "name": "minterStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintCount",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                50
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "InitialisePhaseInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -619,7 +367,7 @@ export type LibreplexEditionsControls = {
           },
           {
             "name": "priceToken",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "startTime",
@@ -641,7 +389,45 @@ export type LibreplexEditionsControls = {
       }
     },
     {
-      "name": "mintInput",
+      "name": "InitialiseControlInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxMintsPerWallet",
+            "type": "u64"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -653,32 +439,7 @@ export type LibreplexEditionsControls = {
       }
     },
     {
-      "name": "minterStats",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "wallet",
-            "type": "pubkey"
-          },
-          {
-            "name": "mintCount",
-            "type": "u64"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                50
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "phase",
+      "name": "Phase",
       "type": {
         "kind": "struct",
         "fields": [
@@ -688,7 +449,7 @@ export type LibreplexEditionsControls = {
           },
           {
             "name": "priceToken",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "startTime",
@@ -725,6 +486,602 @@ export type LibreplexEditionsControls = {
           }
         ]
       }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "TickerTooLong",
+      "msg": "Ticker too long"
+    },
+    {
+      "code": 6001,
+      "name": "MintTemplateTooLong",
+      "msg": "Mint template too long"
+    },
+    {
+      "code": 6002,
+      "name": "DeploymentTemplateTooLong",
+      "msg": "Deployment template too long"
+    },
+    {
+      "code": 6003,
+      "name": "RootTypeTooLong",
+      "msg": "Root type too long"
+    },
+    {
+      "code": 6004,
+      "name": "MintedOut",
+      "msg": "Minted out"
+    },
+    {
+      "code": 6005,
+      "name": "LegacyMigrationsAreMintedOut",
+      "msg": "Legacy migrations are minted out"
+    },
+    {
+      "code": 6006,
+      "name": "MissingGlobalTreeDelegate",
+      "msg": "Global tree delegate is missing"
+    },
+    {
+      "code": 6007,
+      "name": "IncorrectMintType",
+      "msg": "Incorrect mint type"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidMetadata",
+      "msg": "Invalid Metadata"
+    },
+    {
+      "code": 6009,
+      "name": "CreatorFeeTooHigh",
+      "msg": "Creator fee too high"
+    }
+  ]
+};
+
+export const IDL: LibreplexEditionsControls = {
+  "version": "0.2.2",
+  "name": "libreplex_editions_controls",
+  "instructions": [
+    {
+      "name": "initialiseEditionsControls",
+      "accounts": [
+        {
+          "name": "editionsControls",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "editionsDeployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialiseControlInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addPhase",
+      "accounts": [
+        {
+          "name": "editionsControls",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "InitialisePhaseInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "mintWithControls",
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "editionsControls",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hashlistMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "minter",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "minterStats",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "minterStatsPhase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "member",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "groupExtensionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "mintInput",
+          "type": {
+            "defined": "MintInput"
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "editionsDeployment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "numberOfTokensIssued",
+            "type": "u64"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "groupMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "group",
+            "type": "publicKey"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          },
+          {
+            "name": "nameIsTemplate",
+            "type": "bool"
+          },
+          {
+            "name": "urlIsTemplate",
+            "type": "bool"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                98
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "editionsControls",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "editionsDeployment",
+            "type": "publicKey"
+          },
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "maxMintsPerWallet",
+            "type": "u64"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                200
+              ]
+            }
+          },
+          {
+            "name": "phases",
+            "type": {
+              "vec": {
+                "defined": "Phase"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "minterStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintCount",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                50
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "InitialisePhaseInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "priceAmount",
+            "type": "u64"
+          },
+          {
+            "name": "priceToken",
+            "type": "publicKey"
+          },
+          {
+            "name": "startTime",
+            "type": "i64"
+          },
+          {
+            "name": "maxMintsPerWallet",
+            "type": "u64"
+          },
+          {
+            "name": "maxMintsTotal",
+            "type": "u64"
+          },
+          {
+            "name": "endTime",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitialiseControlInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxMintsPerWallet",
+            "type": "u64"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "offchainUrl",
+            "type": "string"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "phaseIndex",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Phase",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "priceAmount",
+            "type": "u64"
+          },
+          {
+            "name": "priceToken",
+            "type": "publicKey"
+          },
+          {
+            "name": "startTime",
+            "type": "i64"
+          },
+          {
+            "name": "active",
+            "type": "bool"
+          },
+          {
+            "name": "maxMintsPerWallet",
+            "type": "u64"
+          },
+          {
+            "name": "maxMintsTotal",
+            "type": "u64"
+          },
+          {
+            "name": "endTime",
+            "type": "i64"
+          },
+          {
+            "name": "currentMints",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                200
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "TickerTooLong",
+      "msg": "Ticker too long"
+    },
+    {
+      "code": 6001,
+      "name": "MintTemplateTooLong",
+      "msg": "Mint template too long"
+    },
+    {
+      "code": 6002,
+      "name": "DeploymentTemplateTooLong",
+      "msg": "Deployment template too long"
+    },
+    {
+      "code": 6003,
+      "name": "RootTypeTooLong",
+      "msg": "Root type too long"
+    },
+    {
+      "code": 6004,
+      "name": "MintedOut",
+      "msg": "Minted out"
+    },
+    {
+      "code": 6005,
+      "name": "LegacyMigrationsAreMintedOut",
+      "msg": "Legacy migrations are minted out"
+    },
+    {
+      "code": 6006,
+      "name": "MissingGlobalTreeDelegate",
+      "msg": "Global tree delegate is missing"
+    },
+    {
+      "code": 6007,
+      "name": "IncorrectMintType",
+      "msg": "Incorrect mint type"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidMetadata",
+      "msg": "Invalid Metadata"
+    },
+    {
+      "code": 6009,
+      "name": "CreatorFeeTooHigh",
+      "msg": "Creator fee too high"
     }
   ]
 };

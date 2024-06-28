@@ -1,777 +1,160 @@
-/**
- * Program IDL in camelCase format in order to be used in JS/TS.
- *
- * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/libreplex_inscriptions.json`.
- */
 export type LibreplexInscriptions = {
-  "address": "",
-  "metadata": {
-    "name": "libreplexInscriptions",
-    "version": "0.5.0",
-    "spec": "0.1.0",
-    "description": "Inscriptions from LibrePlex",
-    "repository": "https://github.com/LibrePlex/libreplex-program-library"
-  },
+  "version": "0.5.1",
+  "name": "libreplex_inscriptions",
   "instructions": [
     {
-      "name": "claimExcessRent",
-      "discriminator": [
-        106,
-        43,
-        164,
-        6,
-        220,
-        74,
-        225,
-        17
-      ],
-      "accounts": [
-        {
-          "name": "authority",
-          "signer": true
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "inscriptionV3"
-        },
-        {
-          "name": "inscriptionData",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "inscription_v3.root",
-                "account": "inscriptionV3"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "createGhostRootInscription",
-      "discriminator": [
-        168,
-        13,
-        68,
-        18,
-        130,
-        171,
-        33,
-        121
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "inscriptionSummary",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  115,
-                  117,
-                  109,
-                  109,
-                  97,
-                  114,
-                  121
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "inscriptionData",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "inscription_input.root"
-              }
-            ]
-          }
-        },
-        {
-          "name": "inscriptionV3",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  118,
-                  51
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "inscription_input.root"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "inscriptionInput",
-          "type": {
-            "defined": {
-              "name": "createGhostRootInscriptionInput"
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "createInscriptionRankPage",
-      "discriminator": [
-        250,
-        76,
-        231,
-        197,
-        254,
-        132,
-        31,
-        136
-      ],
       "accounts": [
         {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "page",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  114,
-                  97,
-                  110,
-                  107
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "input.page_index"
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
           "name": "input",
           "type": {
-            "defined": {
-              "name": "createInscriptionRankInput"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "createInscriptionV3",
-      "discriminator": [
-        168,
-        43,
-        77,
-        230,
-        240,
-        247,
-        161,
-        175
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "root"
-        },
-        {
-          "name": "inscriptionSummary",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  115,
-                  117,
-                  109,
-                  109,
-                  97,
-                  114,
-                  121
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "inscriptionData",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "root"
-              }
-            ]
-          }
-        },
-        {
-          "name": "inscriptionV3",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  118,
-                  51
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "root"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "inscriptionInput",
-          "type": {
-            "defined": {
-              "name": "createInscriptionInputV3"
-            }
+            "defined": "CreateInscriptionRankInput"
           }
         }
       ]
     },
     {
       "name": "makeInscriptionImmutable",
-      "discriminator": [
-        161,
-        66,
-        113,
-        199,
-        96,
-        233,
-        223,
-        172
-      ],
       "accounts": [
         {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "authority",
-          "signer": true
+          "isMut": false,
+          "isSigner": true
         },
         {
           "name": "inscriptionSummary",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  115,
-                  117,
-                  109,
-                  109,
-                  97,
-                  114,
-                  121
-                ]
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "inscription",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "inscription2",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
     },
     {
-      "name": "makeInscriptionImmutableV3",
-      "discriminator": [
-        98,
-        71,
-        230,
-        185,
-        46,
-        129,
-        233,
-        48
-      ],
+      "name": "claimExcessRent",
       "accounts": [
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
           "name": "authority",
-          "signer": true
+          "isMut": false,
+          "isSigner": true
         },
         {
-          "name": "inscriptionSummary",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  115,
-                  117,
-                  109,
-                  109,
-                  97,
-                  114,
-                  121
-                ]
-              }
-            ]
-          }
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "inscriptionV3",
-          "writable": true
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
     },
     {
       "name": "migrateToV3",
-      "discriminator": [
-        255,
-        126,
-        224,
-        187,
-        202,
-        169,
-        102,
-        214
-      ],
       "accounts": [
         {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
-          "name": "root"
+          "name": "root",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "migrator",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  103,
-                  114,
-                  97,
-                  116,
-                  111,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "root"
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "inscription",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "root"
-              }
-            ]
-          }
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "inscription2",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  118,
-                  51
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "root"
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
     },
     {
-      "name": "resizeInscriptionV3",
-      "discriminator": [
-        129,
-        45,
-        209,
-        5,
-        231,
-        155,
-        217,
-        211
-      ],
-      "accounts": [
-        {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "inscriptionV3",
-          "writable": true
-        },
-        {
-          "name": "inscriptionData",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  110,
-                  115,
-                  99,
-                  114,
-                  105,
-                  112,
-                  116,
-                  105,
-                  111,
-                  110,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "inscription_v3.root",
-                "account": "inscriptionV3"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "input",
-          "type": {
-            "defined": {
-              "name": "resizeInscriptionInput"
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "setValidationHash",
-      "discriminator": [
-        220,
-        65,
-        43,
-        233,
-        137,
-        215,
-        187,
-        229
-      ],
       "accounts": [
         {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "signer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "inscription",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -784,48 +167,199 @@ export type LibreplexInscriptions = {
       ]
     },
     {
-      "name": "writeToInscriptionV3",
-      "discriminator": [
-        118,
-        248,
-        99,
-        188,
-        226,
-        144,
-        151,
-        46
-      ],
+      "name": "createInscriptionV3",
       "accounts": [
         {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
-          "name": "inscriptionV3",
-          "writable": true
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "root",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "inscriptionData",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "CreateInscriptionInputV3"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createGhostRootInscription",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "CreateGhostRootInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "makeInscriptionImmutableV3",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resizeInscriptionV3",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
           "name": "input",
           "type": {
-            "defined": {
-              "name": "writeToInscriptionInput"
-            }
+            "defined": "ResizeInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "writeToInscriptionV3",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "WriteToInscriptionInput"
           }
         }
       ]
@@ -834,202 +368,32 @@ export type LibreplexInscriptions = {
   "accounts": [
     {
       "name": "inscription",
-      "discriminator": [
-        100,
-        11,
-        151,
-        42,
-        228,
-        38,
-        69,
-        187
-      ]
-    },
-    {
-      "name": "inscriptionData",
-      "discriminator": [
-        44,
-        58,
-        66,
-        156,
-        82,
-        136,
-        80,
-        64
-      ]
-    },
-    {
-      "name": "inscriptionRankPage",
-      "discriminator": [
-        192,
-        133,
-        192,
-        195,
-        42,
-        49,
-        155,
-        198
-      ]
-    },
-    {
-      "name": "inscriptionSummary",
-      "discriminator": [
-        189,
-        189,
-        190,
-        90,
-        73,
-        71,
-        253,
-        107
-      ]
-    },
-    {
-      "name": "inscriptionV3",
-      "discriminator": [
-        232,
-        120,
-        205,
-        47,
-        153,
-        239,
-        229,
-        224
-      ]
-    },
-    {
-      "name": "migrator",
-      "discriminator": [
-        74,
-        71,
-        185,
-        52,
-        75,
-        186,
-        114,
-        78
-      ]
-    }
-  ],
-  "types": [
-    {
-      "name": "createGhostRootInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "authority",
-            "type": {
-              "option": "pubkey"
-            }
-          },
-          {
-            "name": "signerType",
-            "type": {
-              "defined": {
-                "name": "signerType"
-              }
-            }
-          },
-          {
-            "name": "validationHash",
-            "type": {
-              "option": "string"
-            }
+            "type": "publicKey"
           },
           {
             "name": "root",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "createInscriptionInputV3",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": {
-              "option": "pubkey"
-            }
-          },
-          {
-            "name": "signerType",
-            "type": {
-              "defined": {
-                "name": "signerType"
-              }
-            }
-          },
-          {
-            "name": "validationHash",
-            "type": {
-              "option": "string"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "createInscriptionRankInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "pageIndex",
-            "type": "u32"
-          }
-        ]
-      }
-    },
-    {
-      "name": "encodingType",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "none"
-          },
-          {
-            "name": "base64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "inscription",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "pubkey"
-          },
-          {
-            "name": "root",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "mediaType",
             "type": {
-              "defined": {
-                "name": "mediaType"
-              }
+              "defined": "MediaType"
             }
           },
           {
             "name": "encodingType",
             "type": {
-              "defined": {
-                "name": "encodingType"
-              }
+              "defined": "EncodingType"
             }
           },
           {
             "name": "inscriptionData",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "order",
@@ -1053,96 +417,6 @@ export type LibreplexInscriptions = {
       "type": {
         "kind": "struct",
         "fields": []
-      }
-    },
-    {
-      "name": "inscriptionEventCreate",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "pubkey"
-          },
-          {
-            "name": "data",
-            "type": {
-              "defined": {
-                "name": "inscriptionEventData"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "inscriptionEventData",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "pubkey"
-          },
-          {
-            "name": "root",
-            "type": "pubkey"
-          },
-          {
-            "name": "mediaType",
-            "type": {
-              "defined": {
-                "name": "mediaType"
-              }
-            }
-          },
-          {
-            "name": "encodingType",
-            "type": {
-              "defined": {
-                "name": "encodingType"
-              }
-            }
-          },
-          {
-            "name": "inscriptionData",
-            "type": "pubkey"
-          },
-          {
-            "name": "order",
-            "type": "u64"
-          },
-          {
-            "name": "size",
-            "type": "u32"
-          },
-          {
-            "name": "validationHash",
-            "type": {
-              "option": "string"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "inscriptionEventUpdate",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "pubkey"
-          },
-          {
-            "name": "data",
-            "type": {
-              "defined": {
-                "name": "inscriptionEventData"
-              }
-            }
-          }
-        ]
       }
     },
     {
@@ -1172,11 +446,11 @@ export type LibreplexInscriptions = {
           },
           {
             "name": "lastInscription",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "lastInscriber",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "lastInscriptionCreateTime",
@@ -1185,9 +459,7 @@ export type LibreplexInscriptions = {
           {
             "name": "extension",
             "type": {
-              "defined": {
-                "name": "summaryExtension"
-              }
+              "defined": "SummaryExtension"
             }
           }
         ]
@@ -1200,15 +472,15 @@ export type LibreplexInscriptions = {
         "fields": [
           {
             "name": "authority",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "root",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "inscriptionData",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "order",
@@ -1231,156 +503,6 @@ export type LibreplexInscriptions = {
             "type": {
               "option": "string"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "inscriptionV3EventCreate",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "pubkey"
-          },
-          {
-            "name": "data",
-            "type": {
-              "defined": {
-                "name": "inscriptionV3EventData"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "inscriptionV3EventData",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "pubkey"
-          },
-          {
-            "name": "root",
-            "type": "pubkey"
-          },
-          {
-            "name": "contentType",
-            "type": "string"
-          },
-          {
-            "name": "encoding",
-            "type": "string"
-          },
-          {
-            "name": "inscriptionData",
-            "type": "pubkey"
-          },
-          {
-            "name": "order",
-            "type": "u64"
-          },
-          {
-            "name": "size",
-            "type": "u32"
-          },
-          {
-            "name": "validationHash",
-            "type": {
-              "option": "string"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "inscriptionV3EventUpdate",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "pubkey"
-          },
-          {
-            "name": "data",
-            "type": {
-              "defined": {
-                "name": "inscriptionV3EventData"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "mediaType",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "none"
-          },
-          {
-            "name": "audio",
-            "fields": [
-              {
-                "name": "subtype",
-                "type": "string"
-              }
-            ]
-          },
-          {
-            "name": "application",
-            "fields": [
-              {
-                "name": "subtype",
-                "type": "string"
-              }
-            ]
-          },
-          {
-            "name": "image",
-            "fields": [
-              {
-                "name": "subtype",
-                "type": "string"
-              }
-            ]
-          },
-          {
-            "name": "video",
-            "fields": [
-              {
-                "name": "subtype",
-                "type": "string"
-              }
-            ]
-          },
-          {
-            "name": "text",
-            "fields": [
-              {
-                "name": "subtype",
-                "type": "string"
-              }
-            ]
-          },
-          {
-            "name": "custom",
-            "fields": [
-              {
-                "name": "mediaType",
-                "type": "string"
-              }
-            ]
-          },
-          {
-            "name": "erc721"
           }
         ]
       }
@@ -1392,17 +514,78 @@ export type LibreplexInscriptions = {
         "fields": [
           {
             "name": "root",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "migrator",
-            "type": "pubkey"
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateInscriptionRankInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pageIndex",
+            "type": "u32"
           }
         ]
       }
     },
     {
-      "name": "resizeInscriptionInput",
+      "name": "SignerType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Root"
+          },
+          {
+            "name": "LegacyMetadataSigner"
+          },
+          {
+            "name": "FairLaunchGhostRootSigner"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateGhostRootInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "signerType",
+            "type": {
+              "defined": "SignerType"
+            }
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResizeInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1422,35 +605,33 @@ export type LibreplexInscriptions = {
       }
     },
     {
-      "name": "signerType",
+      "name": "CreateInscriptionInputV3",
       "type": {
-        "kind": "enum",
-        "variants": [
+        "kind": "struct",
+        "fields": [
           {
-            "name": "root"
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
           },
           {
-            "name": "legacyMetadataSigner"
+            "name": "signerType",
+            "type": {
+              "defined": "SignerType"
+            }
           },
           {
-            "name": "fairLaunchGhostRootSigner"
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
           }
         ]
       }
     },
     {
-      "name": "summaryExtension",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "none"
-          }
-        ]
-      }
-    },
-    {
-      "name": "writeToInscriptionInput",
+      "name": "WriteToInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1478,14 +659,772 @@ export type LibreplexInscriptions = {
       }
     },
     {
-      "name": "libreplex_inscriptions::instructions::resize_inscription::InscriptionResizeEvent",
+      "name": "EncodingType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Base64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InscriptionEventData",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "authority",
+            "type": "publicKey"
           },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "mediaType",
+            "type": {
+              "defined": "MediaType"
+            }
+          },
+          {
+            "name": "encodingType",
+            "type": {
+              "defined": "EncodingType"
+            }
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InscriptionV3EventData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "contentType",
+            "type": "string"
+          },
+          {
+            "name": "encoding",
+            "type": "string"
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MediaType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Audio",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Application",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Image",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Video",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Text",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              {
+                "name": "mediaType",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Erc721"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SummaryExtension",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "InscriptionEventCreate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionEventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionEventUpdate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionEventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionV3EventCreate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionV3EventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionV3EventUpdate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionV3EventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionWriteEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionWriteEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "BadAuthority",
+      "msg": "Bad authority"
+    },
+    {
+      "code": 6001,
+      "name": "MaxSizeExceeded",
+      "msg": "Max size exceeded"
+    },
+    {
+      "code": 6002,
+      "name": "BadInscriptionRankPage",
+      "msg": "Bad page"
+    },
+    {
+      "code": 6003,
+      "name": "IncorrectInscriptionDataAccount",
+      "msg": "Incorrect inscription data account"
+    },
+    {
+      "code": 6004,
+      "name": "RootSignerMismatch",
+      "msg": "Root signer mismatch"
+    },
+    {
+      "code": 6005,
+      "name": "LegacyMetadataSignerMismatch",
+      "msg": "Legacy metadata signer key does not match the expected PDA"
+    },
+    {
+      "code": 6006,
+      "name": "MismatchingInscriptions",
+      "msg": "Mismatching mints between v1 and v2 inscriptions"
+    }
+  ]
+};
+
+export const IDL: LibreplexInscriptions = {
+  "version": "0.5.1",
+  "name": "libreplex_inscriptions",
+  "instructions": [
+    {
+      "name": "createInscriptionRankPage",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "page",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "CreateInscriptionRankInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "makeInscriptionImmutable",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscription2",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claimExcessRent",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "migrateToV3",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "root",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "migrator",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscription",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscription2",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "setValidationHash",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscription",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "validationHash",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createInscriptionV3",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "root",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "CreateInscriptionInputV3"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createGhostRootInscription",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "inscriptionInput",
+          "type": {
+            "defined": "CreateGhostRootInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "makeInscriptionImmutableV3",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionSummary",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resizeInscriptionV3",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "ResizeInscriptionInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "writeToInscriptionV3",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "inscriptionV3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inscriptionData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "WriteToInscriptionInput"
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "inscription",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "mediaType",
+            "type": {
+              "defined": "MediaType"
+            }
+          },
+          {
+            "name": "encodingType",
+            "type": {
+              "defined": "EncodingType"
+            }
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "inscriptionData",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "inscriptionRankPage",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "size",
             "type": "u32"
@@ -1494,44 +1433,569 @@ export type LibreplexInscriptions = {
       }
     },
     {
-      "name": "libreplex_inscriptions::instructions::v3::resize_inscription_v3::InscriptionResizeEvent",
+      "name": "inscriptionSummary",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "inscriptionCountTotal",
+            "type": "u64"
+          },
+          {
+            "name": "inscriptionCountImmutables",
+            "type": "u64"
+          },
+          {
+            "name": "lastInscription",
+            "type": "publicKey"
+          },
+          {
+            "name": "lastInscriber",
+            "type": "publicKey"
+          },
+          {
+            "name": "lastInscriptionCreateTime",
+            "type": "i64"
+          },
+          {
+            "name": "extension",
+            "type": {
+              "defined": "SummaryExtension"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "inscriptionV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
           },
           {
             "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "contentType",
+            "type": "string"
+          },
+          {
+            "name": "encoding",
+            "type": "string"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "migrator",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "migrator",
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateInscriptionRankInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pageIndex",
             "type": "u32"
           }
         ]
       }
     },
     {
-      "name": "libreplex_inscriptions::instructions::v3::write_to_inscription_v3::InscriptionWriteEvent",
+      "name": "SignerType",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "Root"
+          },
+          {
+            "name": "LegacyMetadataSigner"
+          },
+          {
+            "name": "FairLaunchGhostRootSigner"
           }
         ]
       }
     },
     {
-      "name": "libreplex_inscriptions::instructions::write_to_inscription::InscriptionWriteEvent",
+      "name": "CreateGhostRootInscriptionInput",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "signerType",
+            "type": {
+              "defined": "SignerType"
+            }
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
           }
         ]
       }
+    },
+    {
+      "name": "ResizeInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "change",
+            "type": "i32"
+          },
+          {
+            "name": "expectedStartSize",
+            "type": "u32"
+          },
+          {
+            "name": "targetSize",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateInscriptionInputV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "signerType",
+            "type": {
+              "defined": "SignerType"
+            }
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WriteToInscriptionInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "data",
+            "type": "bytes"
+          },
+          {
+            "name": "startPos",
+            "type": "u32"
+          },
+          {
+            "name": "mediaType",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "encodingType",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EncodingType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Base64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InscriptionEventData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "mediaType",
+            "type": {
+              "defined": "MediaType"
+            }
+          },
+          {
+            "name": "encodingType",
+            "type": {
+              "defined": "EncodingType"
+            }
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InscriptionV3EventData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "root",
+            "type": "publicKey"
+          },
+          {
+            "name": "contentType",
+            "type": "string"
+          },
+          {
+            "name": "encoding",
+            "type": "string"
+          },
+          {
+            "name": "inscriptionData",
+            "type": "publicKey"
+          },
+          {
+            "name": "order",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u32"
+          },
+          {
+            "name": "validationHash",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MediaType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Audio",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Application",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Image",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Video",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Text",
+            "fields": [
+              {
+                "name": "subtype",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Custom",
+            "fields": [
+              {
+                "name": "mediaType",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Erc721"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SummaryExtension",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "InscriptionEventCreate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionEventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionEventUpdate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionEventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionResizeEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionV3EventCreate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionV3EventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionV3EventUpdate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "data",
+          "type": {
+            "defined": "InscriptionV3EventData"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionWriteEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "InscriptionWriteEvent",
+      "fields": [
+        {
+          "name": "id",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "BadAuthority",
+      "msg": "Bad authority"
+    },
+    {
+      "code": 6001,
+      "name": "MaxSizeExceeded",
+      "msg": "Max size exceeded"
+    },
+    {
+      "code": 6002,
+      "name": "BadInscriptionRankPage",
+      "msg": "Bad page"
+    },
+    {
+      "code": 6003,
+      "name": "IncorrectInscriptionDataAccount",
+      "msg": "Incorrect inscription data account"
+    },
+    {
+      "code": 6004,
+      "name": "RootSignerMismatch",
+      "msg": "Root signer mismatch"
+    },
+    {
+      "code": 6005,
+      "name": "LegacyMetadataSignerMismatch",
+      "msg": "Legacy metadata signer key does not match the expected PDA"
+    },
+    {
+      "code": 6006,
+      "name": "MismatchingInscriptions",
+      "msg": "Mismatching mints between v1 and v2 inscriptions"
     }
   ]
 };

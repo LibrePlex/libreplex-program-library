@@ -1,347 +1,160 @@
-/**
- * Program IDL in camelCase format in order to be used in JS/TS.
- *
- * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/libreplex_monoswap.json`.
- */
 export type LibreplexMonoswap = {
-  "address": "MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221",
-  "metadata": {
-    "name": "libreplexMonoswap",
-    "version": "0.0.0",
-    "spec": "0.1.0",
-    "description": "Created with Anchor",
-    "repository": "https://github.com/LibrePlex/metadata"
-  },
+  "version": "0.1.0",
+  "name": "libreplex_monoswap",
   "instructions": [
     {
       "name": "createMonoswap",
-      "discriminator": [
-        98,
-        245,
-        160,
-        178,
-        252,
-        5,
-        159,
-        225
-      ],
       "accounts": [
         {
           "name": "swapMarker",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  119,
-                  97,
-                  112,
-                  95,
-                  109,
-                  97,
-                  114,
-                  107,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "namespace"
-              },
-              {
-                "kind": "account",
-                "path": "mintOutgoing"
-              },
-              {
-                "kind": "account",
-                "path": "mintIncoming"
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "mintIncoming",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "mintOutgoing"
+          "name": "mintOutgoing",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "mintOutgoingTokenAccountSource",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "escrowHolder",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  119,
-                  97,
-                  112,
-                  95,
-                  101,
-                  115,
-                  99,
-                  114,
-                  111,
-                  119
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "namespace"
-              },
-              {
-                "kind": "account",
-                "path": "mintIncoming"
-              }
-            ]
-          }
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "mintOutgoingTokenAccountEscrow",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "mintOutgoingOwner",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "namespace",
-          "signer": true
+          "isMut": false,
+          "isSigner": true
         },
         {
-          "name": "tokenProgram"
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
           "name": "input",
           "type": {
-            "defined": {
-              "name": "createMonoSwapInput"
-            }
+            "defined": "CreateMonoSwapInput"
           }
         }
       ]
     },
     {
       "name": "swap",
-      "discriminator": [
-        248,
-        198,
-        158,
-        145,
-        225,
-        117,
-        135,
-        200
-      ],
       "accounts": [
         {
           "name": "swapMarker",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  119,
-                  97,
-                  112,
-                  95,
-                  109,
-                  97,
-                  114,
-                  107,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "swap_marker.namespace",
-                "account": "swapMarker"
-              },
-              {
-                "kind": "account",
-                "path": "mintOutgoing"
-              },
-              {
-                "kind": "account",
-                "path": "mintIncoming"
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "swapMarkerReverse",
+          "isMut": true,
+          "isSigner": false,
           "docs": [
             "swapping always creates a symmetrical swap marker that enables a swap back"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  119,
-                  97,
-                  112,
-                  95,
-                  109,
-                  97,
-                  114,
-                  107,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "swap_marker.namespace",
-                "account": "swapMarker"
-              },
-              {
-                "kind": "account",
-                "path": "mintIncoming"
-              },
-              {
-                "kind": "account",
-                "path": "mintOutgoing"
-              }
-            ]
-          }
+          ]
         },
         {
-          "name": "mintIncoming"
+          "name": "mintIncoming",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "mintOutgoing"
+          "name": "mintOutgoing",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "mintIncomingTokenAccountSource",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "escrowHolder",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  119,
-                  97,
-                  112,
-                  95,
-                  101,
-                  115,
-                  99,
-                  114,
-                  111,
-                  119
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "swap_marker.namespace",
-                "account": "swapMarker"
-              },
-              {
-                "kind": "account",
-                "path": "mintIncoming"
-              }
-            ]
-          }
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "escrowHolderReverse",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  119,
-                  97,
-                  112,
-                  95,
-                  101,
-                  115,
-                  99,
-                  114,
-                  111,
-                  119
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "swap_marker.namespace",
-                "account": "swapMarker"
-              },
-              {
-                "kind": "account",
-                "path": "mintOutgoing"
-              }
-            ]
-          }
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "mintIncomingTokenAccountTarget",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "mintOutgoingTokenAccountSource",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "mintOutgoingTokenAccountTarget",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "payer",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "tokenProgram2022",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -350,103 +163,20 @@ export type LibreplexMonoswap = {
   "accounts": [
     {
       "name": "swapMarker",
-      "discriminator": [
-        186,
-        7,
-        231,
-        231,
-        117,
-        67,
-        107,
-        191
-      ]
-    }
-  ],
-  "errors": [
-    {
-      "code": 6000,
-      "name": "badMint",
-      "msg": "Metadata has a bad mint"
-    },
-    {
-      "code": 6001,
-      "name": "cannotInscribeFungible",
-      "msg": "Cannot inscribe a fungible asset"
-    },
-    {
-      "code": 6002,
-      "name": "badAuthority",
-      "msg": "Bad authority"
-    },
-    {
-      "code": 6003,
-      "name": "badAuthorityForHolderInscription",
-      "msg": "Bad authority for holder inscription"
-    },
-    {
-      "code": 6004,
-      "name": "badAuthorityForUpdateAuthInscription",
-      "msg": "Bad authority for update auth inscription"
-    },
-    {
-      "code": 6005,
-      "name": "multiSigThresholdMustBeOne",
-      "msg": "Multi Signature threshold must be one to create / edit inscriptions"
-    },
-    {
-      "code": 6006,
-      "name": "notSquadsMember",
-      "msg": "Not squads member"
-    },
-    {
-      "code": 6007,
-      "name": "inscription2KeyMismatch",
-      "msg": "Inscription V2 key mismatch"
-    },
-    {
-      "code": 6008,
-      "name": "inscriptionV3KeyMismatch",
-      "msg": "Inscription V3 key mismatch"
-    },
-    {
-      "code": 6009,
-      "name": "dataHashMismatch",
-      "msg": "Metadata data missmatch"
-    }
-  ],
-  "types": [
-    {
-      "name": "createMonoSwapInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "mintOutgoingAmount",
-            "type": "u64"
-          },
-          {
-            "name": "mintIncomingAmount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "swapMarker",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "namespace",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "mintIncoming",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "mintOutgoing",
-            "type": "pubkey"
+            "type": "publicKey"
           },
           {
             "name": "mintIncomingAmount",
@@ -462,6 +192,344 @@ export type LibreplexMonoswap = {
           }
         ]
       }
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateMonoSwapInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mintOutgoingAmount",
+            "type": "u64"
+          },
+          {
+            "name": "mintIncomingAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "BadMint",
+      "msg": "Metadata has a bad mint"
+    },
+    {
+      "code": 6001,
+      "name": "CannotInscribeFungible",
+      "msg": "Cannot inscribe a fungible asset"
+    },
+    {
+      "code": 6002,
+      "name": "BadAuthority",
+      "msg": "Bad authority"
+    },
+    {
+      "code": 6003,
+      "name": "BadAuthorityForHolderInscription",
+      "msg": "Bad authority for holder inscription"
+    },
+    {
+      "code": 6004,
+      "name": "BadAuthorityForUpdateAuthInscription",
+      "msg": "Bad authority for update auth inscription"
+    },
+    {
+      "code": 6005,
+      "name": "MultiSigThresholdMustBeOne",
+      "msg": "Multi Signature threshold must be one to create / edit inscriptions"
+    },
+    {
+      "code": 6006,
+      "name": "NotSquadsMember",
+      "msg": "Not squads member"
+    },
+    {
+      "code": 6007,
+      "name": "Inscription2KeyMismatch",
+      "msg": "Inscription V2 key mismatch"
+    },
+    {
+      "code": 6008,
+      "name": "InscriptionV3KeyMismatch",
+      "msg": "Inscription V3 key mismatch"
+    },
+    {
+      "code": 6009,
+      "name": "DataHashMismatch",
+      "msg": "Metadata data missmatch"
+    }
+  ]
+};
+
+export const IDL: LibreplexMonoswap = {
+  "version": "0.1.0",
+  "name": "libreplex_monoswap",
+  "instructions": [
+    {
+      "name": "createMonoswap",
+      "accounts": [
+        {
+          "name": "swapMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintIncoming",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintOutgoing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintOutgoingTokenAccountSource",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "escrowHolder",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintOutgoingTokenAccountEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mintOutgoingOwner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "namespace",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": "CreateMonoSwapInput"
+          }
+        }
+      ]
+    },
+    {
+      "name": "swap",
+      "accounts": [
+        {
+          "name": "swapMarker",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapMarkerReverse",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "swapping always creates a symmetrical swap marker that enables a swap back"
+          ]
+        },
+        {
+          "name": "mintIncoming",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintOutgoing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintIncomingTokenAccountSource",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "escrowHolder",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "escrowHolderReverse",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintIncomingTokenAccountTarget",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintOutgoingTokenAccountSource",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintOutgoingTokenAccountTarget",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram2022",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "swapMarker",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "namespace",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintIncoming",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintOutgoing",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintIncomingAmount",
+            "type": "u64"
+          },
+          {
+            "name": "mintOutgoingAmount",
+            "type": "u64"
+          },
+          {
+            "name": "used",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateMonoSwapInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mintOutgoingAmount",
+            "type": "u64"
+          },
+          {
+            "name": "mintIncomingAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "BadMint",
+      "msg": "Metadata has a bad mint"
+    },
+    {
+      "code": 6001,
+      "name": "CannotInscribeFungible",
+      "msg": "Cannot inscribe a fungible asset"
+    },
+    {
+      "code": 6002,
+      "name": "BadAuthority",
+      "msg": "Bad authority"
+    },
+    {
+      "code": 6003,
+      "name": "BadAuthorityForHolderInscription",
+      "msg": "Bad authority for holder inscription"
+    },
+    {
+      "code": 6004,
+      "name": "BadAuthorityForUpdateAuthInscription",
+      "msg": "Bad authority for update auth inscription"
+    },
+    {
+      "code": 6005,
+      "name": "MultiSigThresholdMustBeOne",
+      "msg": "Multi Signature threshold must be one to create / edit inscriptions"
+    },
+    {
+      "code": 6006,
+      "name": "NotSquadsMember",
+      "msg": "Not squads member"
+    },
+    {
+      "code": 6007,
+      "name": "Inscription2KeyMismatch",
+      "msg": "Inscription V2 key mismatch"
+    },
+    {
+      "code": 6008,
+      "name": "InscriptionV3KeyMismatch",
+      "msg": "Inscription V3 key mismatch"
+    },
+    {
+      "code": 6009,
+      "name": "DataHashMismatch",
+      "msg": "Metadata data missmatch"
     }
   ]
 };

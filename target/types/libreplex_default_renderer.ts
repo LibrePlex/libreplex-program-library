@@ -1,62 +1,41 @@
-/**
- * Program IDL in camelCase format in order to be used in JS/TS.
- *
- * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/libreplex_default_renderer.json`.
- */
 export type LibreplexDefaultRenderer = {
-  "address": "rndbQFmFfiQ4tTG9QPhfJeq1J9fLCSBMAPj3EbLQ7Co",
-  "metadata": {
-    "name": "libreplexDefaultRenderer",
-    "version": "0.1.2",
-    "spec": "0.1.0",
-    "description": "Created with Anchor"
-  },
+  "version": "0.1.2",
+  "name": "libreplex_default_renderer",
   "instructions": [
     {
       "name": "canonical",
-      "discriminator": [
-        233,
-        11,
-        68,
-        244,
-        108,
-        63,
-        142,
-        79
-      ],
       "accounts": [
         {
-          "name": "metadata"
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "mint"
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "group"
+          "name": "group",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "renderState",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "outputAccount"
+          "name": "outputAccount",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
           "name": "renderInput",
           "type": {
-            "defined": {
-              "name": "renderInput"
-            }
+            "defined": "RenderInput"
           }
         }
       ],
@@ -65,7 +44,62 @@ export type LibreplexDefaultRenderer = {
   ],
   "types": [
     {
-      "name": "renderInput",
+      "name": "RenderInput",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    }
+  ]
+};
+
+export const IDL: LibreplexDefaultRenderer = {
+  "version": "0.1.2",
+  "name": "libreplex_default_renderer",
+  "instructions": [
+    {
+      "name": "canonical",
+      "accounts": [
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "renderState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "outputAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "renderInput",
+          "type": {
+            "defined": "RenderInput"
+          }
+        }
+      ],
+      "returns": "bytes"
+    }
+  ],
+  "types": [
+    {
+      "name": "RenderInput",
       "type": {
         "kind": "struct",
         "fields": []

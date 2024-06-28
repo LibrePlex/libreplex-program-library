@@ -19,17 +19,16 @@ default = []
 idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build", "libreplex_inscriptions/idl-build"]
 
 [dependencies]
-anchor-lang = {version = "~0.30", features = ["init-if-needed"]}
-anchor-spl = {version = "~0.30"}
+anchor-lang = {version = "~0.29", features = ["init-if-needed"]}
+anchor-spl = {version = "~0.29"}
 libreplex_inscriptions = {version = "*", path="../libreplex_inscriptions", features =["cpi", "no-entrypoint"]}
-spl-associated-token-account = "3.0.2"
-solana-program = {version = "1.17.13"}
+spl-associated-token-account = "~2"
+solana-program = {version = "~1.17"}
 mpl-token-metadata = { version="~3" }
-spl-account-compression = { version="0.3.0", features = ["cpi", "no-entrypoint"] }
 mpl-bubblegum = {version = "1.2.0"}
 
 [dev-dependencies]
 mocha = "0.1.1"
 assert_matches = "1.5.0"
-solana-program-test = "1.17.13"
-solana-sdk = "1.17.13"
+solana-program-test = "~1.17"
+solana-sdk = "~1.17"
