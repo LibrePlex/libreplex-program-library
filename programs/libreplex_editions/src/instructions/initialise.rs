@@ -1,4 +1,5 @@
 use anchor_lang::{prelude::*, system_program};
+use dyn_fmt::AsStrFormatExt;
 use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGroupInput};
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::TokenMetadata;
@@ -99,6 +100,16 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
             panic!("Only one set of curlies ({{}}) can be specified. name had multiple");
         }
     };
+    
+    let name = match name_is_template {
+        true => input.name.format(&["collection"]),
+        false => input.name.clone()
+    };
+
+    let url: String = match url_is_template {
+        true => input.offchain_url.format(&["collection"]),
+        false => input.offchain_url.clone()
+    };
   
 
     ctx.accounts.editions_deployment.set_inner(EditionsDeployment {
@@ -148,9 +159,10 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         },
         0,
         Some(TokenMetadata {
-            name: editions_deployment.name.clone(),
+            name,
             symbol: editions_deployment.symbol.clone(),
-            uri: editions_deployment.offchain_url.clone(),
+            // please let's just call it url ok.... please
+            uri: url,
             update_authority,
             mint: group_mint.key(),
             additional_metadata: vec![],
