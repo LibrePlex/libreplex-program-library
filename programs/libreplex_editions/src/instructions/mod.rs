@@ -10,3 +10,6 @@ pub use initialise::*;
 pub mod mint;
 pub use mint::*;
 
+pub mod update_authority;
+pub use update_authority::*;
+

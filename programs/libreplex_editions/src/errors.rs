@@ -31,5 +31,17 @@ pub enum EditionsError {
     InvalidMetadata,
 
     #[msg("Creator fee too high")]
-    CreatorFeeTooHigh
+    CreatorFeeTooHigh,
+
+    #[msg("Invalid creator")]
+    InvalidCreator,
+
+    #[msg("Update authority already changed")]
+    UpdateAuthorityAlreadyChanged,
+
+    #[msg("Metadata not found")]
+    MetadataNotFound,
+
+    #[msg("Mint is not finished")]
+    MintNotComplete,
 }

@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("Eddy2qpzTgTfUvNJ271Wgfw3RF2LsbmRJdNTSnZajmU3");
+declare_id!("Cb5quBzLtDfFWcAHrdQKc4TooCEuFRu6fiPNhsyATWxd");
 
 pub mod errors;
 pub mod state;
@@ -14,7 +14,7 @@ pub use state::*;
 
 pub mod group_extension_program {
     use anchor_lang::declare_id;
-    declare_id!("TGRPp2mDGxSyH3We9hH8pwcmhajtszPAvWjVdVgsPa5");
+    declare_id!("9XMKDpPqYy8aQMMncJXRFeBgGcZPscwrBDUDdVcpPTzv");
 }
 
 #[program]
@@ -33,6 +33,10 @@ pub mod libreplex_editions {
 
     pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
         instructions::mint(ctx)
+    }
+
+    pub fn update_mint_authority<'info>(ctx: Context<'_, '_, '_, 'info, UpdateMintAuthorityCtx<'info>>) -> Result<()> {
+        instructions::update_mint_authority(ctx)
     }
 
     
