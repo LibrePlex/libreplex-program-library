@@ -39,17 +39,6 @@ pub fn update_mint_authority<'info>(ctx: Context<'_, '_, '_, 'info, UpdateMintAu
 
     require!(editions_deployment.max_number_of_tokens == editions_deployment.number_of_tokens_issued, EditionsError::MintNotComplete);
     require!(editions_deployment.creator.key() == payer.key(), EditionsError::InvalidCreator);
-    
-    let mint_data = mint.data.borrow();
-    let mint_with_extension = StateWithExtensions::<Mint>::unpack(&mint_data)?;
-    let metadata = mint_with_extension.get_variable_len_extension::<TokenMetadata>()?;
-
-    msg!("metadata: {:?}", metadata);
-    let expected_update_authority = OptionalNonZeroPubkey::try_from(Some(editions_deployment.key()))?;
-
-    if metadata.update_authority.ne(&expected_update_authority) {
-        return Err(EditionsError::UpdateAuthorityAlreadyChanged.into());
-    }
 
     let deployment_seeds: &[&[u8]] = &[
             "editions_deployment".as_bytes(),
