@@ -5,7 +5,7 @@ use spl_pod::optional_keys::OptionalNonZeroPubkey;
 
 use crate::{EditionsDeployment, errors::EditionsError};
 
-
+/// TODO: Add hashlist marker or hashlist to verify mint?
 #[derive(Accounts)]
 pub struct UpdateMintAuthorityCtx<'info> {
 
@@ -42,15 +42,12 @@ pub fn update_mint_authority<'info>(ctx: Context<'_, '_, '_, 'info, UpdateMintAu
     
     let mint_data = mint.data.borrow();
     let mint_with_extension = StateWithExtensions::<Mint>::unpack(&mint_data)?;
-    let metadata = mint_with_extension
-    .get_variable_len_extension::<TokenMetadata>()
-    .ok()
-    .map(|x| x.clone());
+    let metadata = mint_with_extension.get_variable_len_extension::<TokenMetadata>()?;
 
-    require!(metadata.is_some(), EditionsError::MetadataNotFound);
+    msg!("metadata: {:?}", metadata);
     let expected_update_authority = OptionalNonZeroPubkey::try_from(Some(editions_deployment.key()))?;
 
-    if metadata.unwrap().update_authority.ne(&expected_update_authority) {
+    if metadata.update_authority.ne(&expected_update_authority) {
         return Err(EditionsError::UpdateAuthorityAlreadyChanged.into());
     }
 
