@@ -17,6 +17,9 @@ pub struct ClaimUpdateAuthorityCtx<'info> {
     pub payer: Signer<'info>,
 
     #[account(mut)]
+    pub creator: Signer<'info>,
+
+    #[account(mut)]
     pub mint: AccountInfo<'info>,
     
     /* BOILERPLATE PROGRAM ACCOUNTS */
@@ -35,11 +38,10 @@ pub fn claim_update_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimUpdate
     let mint = &ctx.accounts.mint;
     let token_program = &ctx.accounts.token_program;
     let editions_deployment = &ctx.accounts.editions_deployment;
-    let payer = &ctx.accounts.payer;
+    let creator = &ctx.accounts.creator;
 
     require!(editions_deployment.max_number_of_tokens == editions_deployment.number_of_tokens_issued, EditionsError::MintNotComplete);
-    require!(editions_deployment.creator.key() == payer.key(), EditionsError::InvalidCreator);
-    require!(payer.is_signer, EditionsError::InvalidSigner);
+    require!(editions_deployment.creator.key() == creator.key(), EditionsError::InvalidCreator);
 
     let deployment_seeds: &[&[u8]] = &[
             "editions_deployment".as_bytes(),
@@ -48,19 +50,19 @@ pub fn claim_update_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimUpdate
         ];
 
     let account_infos = [
-        payer.to_account_info(),
         editions_deployment.to_account_info(),
-        mint.to_account_info(),
+        mint.to_account_info(), 
+        creator.to_account_info(),
         token_program.to_account_info(),
     ];
 
-    let payer = OptionalNonZeroPubkey::try_from(Some(payer.to_account_info().key()))?;
+    let creator_key: OptionalNonZeroPubkey = OptionalNonZeroPubkey::try_from(Some(creator.to_account_info().key()))?;
 
     let update_authority_ix = update_authority(
         &spl_token_2022::ID,
         &mint.key(),
         &editions_deployment.key(),
-        payer
+        creator_key
     );
 
     invoke_signed(&update_authority_ix, &account_infos, &[deployment_seeds])?;

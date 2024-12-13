@@ -13,3 +13,7 @@ pub use add_phase::*;
 pub mod mint_with_controls;
 pub use mint_with_controls::*;
 
+pub mod claim_update_authority;
+pub use claim_update_authority::*;
+
+
