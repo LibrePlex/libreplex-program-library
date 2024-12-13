@@ -220,6 +220,52 @@ export type LibreplexEditionsControls = {
           }
         }
       ]
+    },
+    {
+      "name": "claimUpdateAuthority",
+      "accounts": [
+        {
+          "name": "editionsControls",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "editionsDeployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -774,6 +820,52 @@ export const IDL: LibreplexEditionsControls = {
           }
         }
       ]
+    },
+    {
+      "name": "claimUpdateAuthority",
+      "accounts": [
+        {
+          "name": "editionsControls",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "editionsDeployment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
