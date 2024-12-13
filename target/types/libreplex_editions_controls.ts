@@ -538,6 +538,16 @@ export type LibreplexEditionsControls = {
       "code": 6009,
       "name": "CreatorFeeTooHigh",
       "msg": "Creator fee too high"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidCreator",
+      "msg": "Invalid creator"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidSigner",
+      "msg": "Invalid signer"
     }
   ]
 };
@@ -1082,6 +1092,16 @@ export const IDL: LibreplexEditionsControls = {
       "code": 6009,
       "name": "CreatorFeeTooHigh",
       "msg": "Creator fee too high"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidCreator",
+      "msg": "Invalid creator"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidSigner",
+      "msg": "Invalid signer"
     }
   ]
 };

@@ -150,6 +150,11 @@ export type LibreplexEditions = {
           "isSigner": true
         },
         {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "mint",
           "isMut": true,
           "isSigner": false
@@ -542,6 +547,11 @@ export const IDL: LibreplexEditions = {
         },
         {
           "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
           "isMut": true,
           "isSigner": true
         },
