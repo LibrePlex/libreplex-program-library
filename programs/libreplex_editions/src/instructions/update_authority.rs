@@ -38,7 +38,7 @@ pub fn update_mint_authority<'info>(ctx: Context<'_, '_, '_, 'info, UpdateMintAu
     let payer = &ctx.accounts.payer;
 
     require!(editions_deployment.max_number_of_tokens == editions_deployment.number_of_tokens_issued, EditionsError::MintNotComplete);
-    require!(editions_deployment.creator.key() == payer.key(), EditionsError::InvalidCreator);
+    require!(editions_deployment.creator.key() == payer.key() && payer.is_signer, EditionsError::InvalidCreator);
 
     let deployment_seeds: &[&[u8]] = &[
             "editions_deployment".as_bytes(),
