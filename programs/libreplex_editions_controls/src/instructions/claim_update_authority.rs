@@ -4,7 +4,8 @@ use libreplex_editions::cpi::accounts::ClaimUpdateAuthorityCtx as CpiClaimUpdate
 use libreplex_editions::program::LibreplexEditions;
 use crate::EditionsControls;
 use crate::errors::EditionsError;
-
+use spl_token_metadata_interface::instruction::update_authority;
+use spl_pod::optional_keys::OptionalNonZeroPubkey; 
 #[derive(Accounts)]
 pub struct ClaimUpdateAuthorityCtx<'info> {
 
@@ -72,6 +73,24 @@ pub fn claim_update_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimUpdate
             },
             &[seeds]
         ))?;
+
+    let account_infos = [
+        editions_deployment.to_account_info(),
+        mint.to_account_info(), 
+        creator.to_account_info(),
+        token_program.to_account_info(),
+    ];
     
+    let creator: OptionalNonZeroPubkey = OptionalNonZeroPubkey::try_from(Some(creator.to_account_info().key()))?;
+    
+    let update_authority_ix = update_authority(
+        &spl_token_2022::ID,
+        &mint.key(),
+        &editions_controls.key(),
+        creator
+    );
+
+    invoke_signed(&update_authority_ix, &account_infos, &[seeds])?;
+
     Ok(())
 }
