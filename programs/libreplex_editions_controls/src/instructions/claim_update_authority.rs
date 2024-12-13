@@ -81,13 +81,13 @@ pub fn claim_update_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimUpdate
         token_program.to_account_info(),
     ];
     
-    let creator: OptionalNonZeroPubkey = OptionalNonZeroPubkey::try_from(Some(creator.to_account_info().key()))?;
+    let creator_key: OptionalNonZeroPubkey = OptionalNonZeroPubkey::try_from(Some(creator.to_account_info().key()))?;
     
     let update_authority_ix = update_authority(
         &spl_token_2022::ID,
         &mint.key(),
         &editions_controls.key(),
-        creator
+        creator_key
     );
 
     invoke_signed(&update_authority_ix, &account_infos, &[seeds])?;
