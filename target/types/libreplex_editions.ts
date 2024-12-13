@@ -137,7 +137,7 @@ export type LibreplexEditions = {
       "args": []
     },
     {
-      "name": "claimMintAuthority",
+      "name": "claimUpdateAuthority",
       "accounts": [
         {
           "name": "editionsDeployment",
@@ -533,7 +533,7 @@ export const IDL: LibreplexEditions = {
       "args": []
     },
     {
-      "name": "claimMintAuthority",
+      "name": "claimUpdateAuthority",
       "accounts": [
         {
           "name": "editionsDeployment",

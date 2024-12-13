@@ -35,8 +35,8 @@ pub mod libreplex_editions {
         instructions::mint(ctx)
     }
 
-    pub fn claim_mint_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimMintAuthorityCtx<'info>>) -> Result<()> {
-        instructions::claim_mint_authority(ctx)
+    pub fn claim_update_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimUpdateAuthorityCtx<'info>>) -> Result<()> {
+        instructions::claim_update_authority(ctx)
     }
 
     

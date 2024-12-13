@@ -7,7 +7,7 @@ use crate::{EditionsDeployment, errors::EditionsError};
 
 /// TODO: Add hashlist marker or hashlist to verify mint?
 #[derive(Accounts)]
-pub struct ClaimMintAuthorityCtx<'info> {
+pub struct ClaimUpdateAuthorityCtx<'info> {
 
     #[account(mut,
         seeds = ["editions_deployment".as_ref(), editions_deployment.symbol.as_ref()], bump)]
@@ -31,7 +31,7 @@ pub struct ClaimMintAuthorityCtx<'info> {
 
 }
 
-pub fn claim_mint_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimMintAuthorityCtx<'info>>) -> Result<()> {
+pub fn claim_update_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimUpdateAuthorityCtx<'info>>) -> Result<()> {
     let mint = &ctx.accounts.mint;
     let token_program = &ctx.accounts.token_program;
     let editions_deployment = &ctx.accounts.editions_deployment;
