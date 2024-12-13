@@ -10,3 +10,6 @@ pub use initialise::*;
 pub mod mint;
 pub use mint::*;
 
+pub mod claim_update_authority;
+pub use claim_update_authority::*;
+
