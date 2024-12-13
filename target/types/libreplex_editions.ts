@@ -137,7 +137,7 @@ export type LibreplexEditions = {
       "args": []
     },
     {
-      "name": "updateMintAuthority",
+      "name": "claimMintAuthority",
       "accounts": [
         {
           "name": "editionsDeployment",
@@ -385,6 +385,11 @@ export type LibreplexEditions = {
       "code": 6013,
       "name": "MintNotComplete",
       "msg": "Mint is not finished"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidSigner",
+      "msg": "Invalid signer"
     }
   ]
 };
@@ -528,7 +533,7 @@ export const IDL: LibreplexEditions = {
       "args": []
     },
     {
-      "name": "updateMintAuthority",
+      "name": "claimMintAuthority",
       "accounts": [
         {
           "name": "editionsDeployment",
@@ -776,6 +781,11 @@ export const IDL: LibreplexEditions = {
       "code": 6013,
       "name": "MintNotComplete",
       "msg": "Mint is not finished"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidSigner",
+      "msg": "Invalid signer"
     }
   ]
 };

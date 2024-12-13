@@ -1,13 +1,13 @@
-use spl_token_metadata_interface::{state::TokenMetadata, instruction::update_authority};
+use spl_token_metadata_interface::instruction::update_authority;
 use anchor_lang::{prelude::*, solana_program::program::invoke_signed};
-use anchor_spl::token_2022::{self, spl_token_2022::{extension::{BaseStateWithExtensions, StateWithExtensions}, state::Mint}};
+use anchor_spl::token_2022::{self};
 use spl_pod::optional_keys::OptionalNonZeroPubkey; 
 
 use crate::{EditionsDeployment, errors::EditionsError};
 
 /// TODO: Add hashlist marker or hashlist to verify mint?
 #[derive(Accounts)]
-pub struct UpdateMintAuthorityCtx<'info> {
+pub struct ClaimMintAuthorityCtx<'info> {
 
     #[account(mut,
         seeds = ["editions_deployment".as_ref(), editions_deployment.symbol.as_ref()], bump)]
@@ -31,7 +31,7 @@ pub struct UpdateMintAuthorityCtx<'info> {
 
 }
 
-pub fn update_mint_authority<'info>(ctx: Context<'_, '_, '_, 'info, UpdateMintAuthorityCtx<'info>>) -> Result<()> {
+pub fn claim_mint_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimMintAuthorityCtx<'info>>) -> Result<()> {
     let mint = &ctx.accounts.mint;
     let token_program = &ctx.accounts.token_program;
     let editions_deployment = &ctx.accounts.editions_deployment;
