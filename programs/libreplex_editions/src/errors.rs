@@ -44,4 +44,7 @@ pub enum EditionsError {
 
     #[msg("Mint is not finished")]
     MintNotComplete,
+
+    #[msg("Invalid signer")]
+    InvalidSigner,
 }
