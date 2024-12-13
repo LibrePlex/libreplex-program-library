@@ -75,7 +75,7 @@ pub fn claim_update_authority<'info>(ctx: Context<'_, '_, '_, 'info, ClaimUpdate
         ))?;
 
     let account_infos = [
-        editions_deployment.to_account_info(),
+        editions_controls.to_account_info(),
         mint.to_account_info(), 
         creator.to_account_info(),
         token_program.to_account_info(),
